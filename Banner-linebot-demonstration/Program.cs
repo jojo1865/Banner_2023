@@ -12,6 +12,8 @@ namespace Banner.LineBot.Demo
     {
         public static async Task Main()
         {
+            // 0. 加 bot 好友: @612rsqvr
+
             // 1. 從 app.config 取得 Line Bot 的 Channel Access Token
             string token = ConfigurationManager.AppSettings["ChannelAccessToken"];
 
