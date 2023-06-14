@@ -24,22 +24,22 @@ namespace Banner.LineBot.Implementation
         public async Task<int> GetQuotaAsync()
         {
             string body = await GetWithoutQuery(LineApiEndpoints.QuotaUri);
-            QuotaResponse responseObject = JsonConvert.DeserializeObject<QuotaResponse>(body);
+            QuotaResponse quota = JsonConvert.DeserializeObject<QuotaResponse>(body);
 
-            if (responseObject != null &&
-                responseObject.type.Equals("limited", StringComparison.InvariantCultureIgnoreCase))
-                return responseObject.value;
+            if (quota != null &&
+                quota.type.Equals(LineResponses.QuotaLimited, StringComparison.InvariantCultureIgnoreCase))
+                return quota.value;
 
-            return responseObject is null ? 0 : Int32.MaxValue;
+            return quota is null ? 0 : Int32.MaxValue;
         }
 
         /// <inheritdoc />
         public async Task<int> GetSentCountThisMonthAsync()
         {
             string body = await GetWithoutQuery(LineApiEndpoints.QuotaConsumptionUri);
-            ConsumptionResponse responseObject = JsonConvert.DeserializeObject<ConsumptionResponse>(body);
+            ConsumptionResponse consumption = JsonConvert.DeserializeObject<ConsumptionResponse>(body);
 
-            return responseObject?.TotalUsage ?? 0;
+            return consumption?.TotalUsage ?? 0;
         }
 
         private async Task<string> GetWithoutQuery(Uri uri)
