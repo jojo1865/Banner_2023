@@ -23,21 +23,13 @@ namespace Banner.LineBot.Tests
             string accessToken =
                 "7NWdvcxphKe/68kVpw/B5vMWELLgAD2K6yZUqsftdFEG4xILWq06CQpa5zvclF1PWAvRfi/VMloYycGhh9V7bKGqws+Ywu0ZESZB1ySPIL40DQmJ2jN58wz3LUpjrWcctLPc3D1pjbtJX00w/7JNYwdB04t89/1O/w1cDnyilFU=";
 
-            TextMessage message = new TextMessage
-            {
-                Text = "Peko!"
-            };
-
             string expectedResponseContent = "{}";
-            HttpResponseMessage mockResponse = new HttpResponseMessage
-            {
-                Content = new StringContent(expectedResponseContent, Encoding.UTF8, "application/json")
-            };
+            
+            TextMessage message = Arrange_MockTextMessage();
+            
+            HttpResponseMessage mockResponse = Arrange_MockResponse(expectedResponseContent);
 
-            var mockHttpHandler = new Mock<IHttpHandler>();
-            mockHttpHandler.Setup(h =>
-                    h.PostAsync(broadcastMessageUri, It.Is<string>(c => c.Contains(message.Text))))
-                .ReturnsAsync(mockResponse);
+            Mock<IHttpHandler> mockHttpHandler = Arrange_MockHttpHandler(broadcastMessageUri, message, mockResponse);
 
             // Act
             ILineBot bot = new BroadcastLineBot(accessToken, mockHttpHandler.Object);
@@ -50,6 +42,32 @@ namespace Banner.LineBot.Tests
             MessagingResult result = (MessagingResult)response;
             Assert.IsTrue(result.Success);
             Assert.AreEqual(expectedResponseContent, result.Message);
+        }
+
+        private static TextMessage Arrange_MockTextMessage()
+        {
+            return new TextMessage
+            {
+                Text = "Peko!"
+            };
+        }
+
+        private static HttpResponseMessage Arrange_MockResponse(string expectedResponseContent)
+        {
+            return new HttpResponseMessage
+            {
+                Content = new StringContent(expectedResponseContent, Encoding.UTF8, "application/json")
+            };
+        }
+
+        private static Mock<IHttpHandler> Arrange_MockHttpHandler(Uri broadcastMessageUri, TextMessage message,
+            HttpResponseMessage mockResponse)
+        {
+            Mock<IHttpHandler> mockHttpHandler = new Mock<IHttpHandler>();
+            mockHttpHandler.Setup(h =>
+                    h.PostAsync(broadcastMessageUri, It.Is<string>(c => c.Contains(message.Text))))
+                .ReturnsAsync(mockResponse);
+            return mockHttpHandler;
         }
     }
 }

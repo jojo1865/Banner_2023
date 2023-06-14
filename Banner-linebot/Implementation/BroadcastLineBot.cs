@@ -18,7 +18,7 @@ namespace Banner.LineBot.Implementation
     public class BroadcastLineBot : ILineBot
     {
         private string _channelAccessToken { get; }
-        private IHttpHandler _httpClient { get; }
+        private IHttpHandler _httpHandler { get; }
 
         private static readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
         {
@@ -32,23 +32,18 @@ namespace Banner.LineBot.Implementation
         /// 提供 Line Messaging API 的 Channel Access Token，新建一個 LineBot 實例。
         /// </summary>
         /// <param name="channelAccessToken">Refer to Line Messaging API documentations</param>
-        /// <param name="httpClientHandler"><see cref="HttpHandler"/></param>
-        public BroadcastLineBot(string channelAccessToken, IHttpHandler httpClientHandler)
+        /// <param name="httpHandler"><see cref="IHttpHandler"/></param>
+        public BroadcastLineBot(string channelAccessToken, IHttpHandler httpHandler)
         {
             _channelAccessToken = channelAccessToken;
-            _httpClient = httpClientHandler;
+            _httpHandler = httpHandler;
         }
         
         /// <inheritdoc />
         public async Task<MessagingResult> BroadcastMessageAsync(IMessage message)
         {
-            SetHeaders(_httpClient);
-
-            ApiRequest request = MakeRequest(message);
-            
-            string json = JsonConvert.SerializeObject(request, _serializerSettings);
-            
-            string response = await SendRequest(_httpClient, json);
+            ApiRequest request = new ApiRequest(message);
+            string response = await PostRequest(request);
 
             return new MessagingResult
             {
@@ -57,25 +52,19 @@ namespace Banner.LineBot.Implementation
             };
         }
 
-        private static async Task<string> SendRequest(IHttpHandler httpClient, string requestBodyJson)
+        private async Task<string> PostRequest(ApiRequest request)
         {
-            HttpResponseMessage response = await httpClient.PostAsync(LineApiEndpoints.BroadcastMessageUri, requestBodyJson);
-            string responseString = await response.Content.ReadAsStringAsync();
+            SetHeaders(_httpHandler);
+            
+            string json = JsonConvert.SerializeObject(request, _serializerSettings);
+            HttpResponseMessage response = await _httpHandler.PostAsync(LineApiEndpoints.BroadcastMessageUri, json);
 
-            return responseString;
+            return await response.Content.ReadAsStringAsync();
         }
-
-        private static ApiRequest MakeRequest(IMessage message)
+        
+        private void SetHeaders(IHttpHandler httpHandler)
         {
-            ApiRequest request = new ApiRequest();
-            request.Messages.Add(message);
-            return request;
-        }
-
-        private void SetHeaders(IHttpHandler httpClient)
-        {
-            httpClient.SetFormatAsJson();
-            httpClient.SetBearer(_channelAccessToken);
+            httpHandler.SetBearer(_channelAccessToken);
         }
     }
 }

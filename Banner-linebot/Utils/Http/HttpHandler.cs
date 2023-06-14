@@ -8,21 +8,23 @@ namespace Banner.LineBot.Utils.Http
 {
     public class HttpHandler : IHttpHandler
     {
-        private readonly HttpClient _client = new HttpClient();
-        
         public async Task<HttpResponseMessage> PostAsync(Uri url, string requestBodyJson)
         {
-            return await _client.PostAsync(url, new StringContent(requestBodyJson, Encoding.UTF8, "application/json"));
+            SetAcceptJson();
+            return await HttpClient.PostAsync(url, new StringContent(requestBodyJson, Encoding.UTF8, "application/json"));
         }
 
-        public void SetFormatAsJson()
+        private void SetAcceptJson()
         {
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            HttpClient.DefaultRequestHeaders.Accept.Clear();
+            HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public void SetBearer(string token)
         {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
+
+        private HttpClient HttpClient = new HttpClient();
     }
 }
