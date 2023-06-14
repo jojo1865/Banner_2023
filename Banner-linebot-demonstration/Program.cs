@@ -16,6 +16,25 @@ namespace Banner.LineBot.Demo
             // 1. 從 app.config 取得 Line Bot 的 Channel Access Token
             string token = ConfigurationManager.AppSettings["ChannelAccessToken"];
 
+            await GetQuota(token);
+            await GetSentCountThisMonth(token);
+            await SendMessage(token);
+        }
+
+        private static async Task GetQuota(string token)
+        {
+            IQueryLineBot bot = BotFactory.GetQueryLineBot(token);
+            Console.WriteLine("Quota: " + await bot.GetQuota());
+        }
+
+        private static async Task GetSentCountThisMonth(string token)
+        {
+            IQueryLineBot bot = BotFactory.GetQueryLineBot(token);
+            Console.WriteLine("Sent this month: " + await bot.GetSentCountThisMonth());
+        }
+
+        private static async Task SendMessage(string token)
+        {
             // 2. 取得 BroadcastLineBot 實例，並以異步方式進行「主動推播」
             IBroadcastLineBot bot = BotFactory.GetBroadcastLineBot(token);
 

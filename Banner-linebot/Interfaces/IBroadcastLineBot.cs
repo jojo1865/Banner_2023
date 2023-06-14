@@ -5,7 +5,7 @@ using Banner.LineBot.Models.Messages;
 namespace Banner.LineBot.Interfaces
 {
     /// <summary>
-    /// 與 LINE Messaging API 的溝通介面。
+    /// 與 LINE Messaging API 的溝通介面，主要負責推播功能。
     /// </summary>
     public interface IBroadcastLineBot
     {

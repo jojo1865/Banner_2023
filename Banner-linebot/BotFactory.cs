@@ -19,5 +19,16 @@ namespace Banner.LineBot
         {
             return new BroadcastLineBot(token, handler);
         }
+
+        /// <summary>
+        /// 取得查詢 API 狀態用的 Line Bot 物件。
+        /// </summary>
+        /// <param name="token">Channel Access Token</param>
+        /// <param name="handler">（可選）<see cref="IHttpHandler"/></param>
+        /// <returns>查詢狀態用的 LineBot</returns>
+        public static IQueryLineBot GetQueryLineBot(string token, IHttpHandler handler = null)
+        {
+            return new QueryLineBot(token, handler);
+        }
     }
 }

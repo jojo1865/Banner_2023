@@ -29,11 +29,10 @@ namespace Banner.LineBot.Implementation
         /// <param name="httpHandler">（可選）<see cref="IHttpHandler"/></param>
         public BroadcastLineBot(string channelAccessToken, IHttpHandler httpHandler = null)
         {
-            _channelAccessToken = channelAccessToken;
             _httpHandler = httpHandler ?? new HttpHandler();
+            _httpHandler.SetBearer(channelAccessToken);
         }
 
-        private string _channelAccessToken { get; }
         private IHttpHandler _httpHandler { get; }
 
         /// <inheritdoc />
@@ -51,17 +50,10 @@ namespace Banner.LineBot.Implementation
 
         private async Task<string> PostRequest(MessagingApiRequest request)
         {
-            SetHeaders(_httpHandler);
-
             string json = JsonConvert.SerializeObject(request, _serializerSettings);
             HttpResponseMessage response = await _httpHandler.PostAsync(LineApiEndpoints.BroadcastMessageUri, json);
 
             return await response.Content.ReadAsStringAsync();
-        }
-
-        private void SetHeaders(IHttpHandler httpHandler)
-        {
-            httpHandler.SetBearer(_channelAccessToken);
         }
     }
 }
