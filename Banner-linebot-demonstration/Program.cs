@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Banner.LineBot.Implementation;
 using Banner.LineBot.Interfaces;
 using Banner.LineBot.Models;
+using Banner.LineBot.Models.Messages;
 
 namespace Banner.LineBot.Demo
 {

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Banner.LineBot.Models;
+using Banner.LineBot.Models.Messages;
 
 namespace Banner.LineBot.Interfaces
 {

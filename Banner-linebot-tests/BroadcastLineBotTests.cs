@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Banner.LineBot.Implementation;
 using Banner.LineBot.Interfaces;
 using Banner.LineBot.Models;
+using Banner.LineBot.Models.Messages;
 using Banner.LineBot.Utils.Http;
 using Moq;
 using NUnit.Framework;

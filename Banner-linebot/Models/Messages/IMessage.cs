@@ -1,7 +1,6 @@
-﻿namespace Banner.LineBot.Models
+﻿namespace Banner.LineBot.Models.Messages
 {
     public interface IMessage
     {
-        
     }
 }

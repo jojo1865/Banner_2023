@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Banner.LineBot.Interfaces;
 using Banner.LineBot.Models;
+using Banner.LineBot.Models.Messages;
 using Banner.LineBot.Utils.Http;
 using Banner.LineBot.Utils.Json;
 using Banner.LineBot.Variables;
@@ -38,7 +39,7 @@ namespace Banner.LineBot.Implementation
         /// <inheritdoc />
         public async Task<MessagingResult> BroadcastMessageAsync(IMessage message)
         {
-            ApiRequest request = new ApiRequest(message);
+            MessagingApiRequest request = new MessagingApiRequest(message);
             string response = await PostRequest(request);
 
             return new MessagingResult
@@ -48,7 +49,7 @@ namespace Banner.LineBot.Implementation
             };
         }
 
-        private async Task<string> PostRequest(ApiRequest request)
+        private async Task<string> PostRequest(MessagingApiRequest request)
         {
             SetHeaders(_httpHandler);
 
