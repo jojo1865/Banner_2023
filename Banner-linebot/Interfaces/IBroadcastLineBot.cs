@@ -6,7 +6,7 @@ namespace Banner.LineBot.Interfaces
     /// <summary>
     /// 與 LINE Messaging API 的溝通介面。
     /// </summary>
-    public interface ILineBot
+    public interface IBroadcastLineBot
     {
         /// <summary>
         /// 異步地向所有好友推播訊息。

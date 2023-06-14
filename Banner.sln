@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banner-linebot", "Banner-li
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banner-linebot-tests", "Banner-linebot-tests\Banner-linebot-tests.csproj", "{C7621039-B018-4E76-9C78-8F1C50992CED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banner-linebot-demonstration", "Banner-linebot-demonstration\Banner-linebot-demonstration.csproj", "{BE4AC47E-0CC3-43F1-9F79-D16130B10AE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{C7621039-B018-4E76-9C78-8F1C50992CED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7621039-B018-4E76-9C78-8F1C50992CED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7621039-B018-4E76-9C78-8F1C50992CED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE4AC47E-0CC3-43F1-9F79-D16130B10AE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE4AC47E-0CC3-43F1-9F79-D16130B10AE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE4AC47E-0CC3-43F1-9F79-D16130B10AE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE4AC47E-0CC3-43F1-9F79-D16130B10AE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

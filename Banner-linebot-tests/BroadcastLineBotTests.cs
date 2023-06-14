@@ -29,7 +29,7 @@ namespace Banner.LineBot.Tests
             Mock<IHttpHandler> mockHttpHandler = Arrange_MockHttpHandler(broadcastMessageUri, message, mockResponse);
 
             // Act
-            ILineBot bot = new BroadcastLineBot(accessToken, mockHttpHandler.Object);
+            IBroadcastLineBot bot = new BroadcastLineBot(accessToken, mockHttpHandler.Object);
             object response = await bot.BroadcastMessageAsync(message);
 
             // Assert
