@@ -19,15 +19,18 @@ namespace Banner.LineBot.Demo
             // 2. 取得 BroadcastLineBot 實例，並以異步方式進行「主動推播」
             IBroadcastLineBot bot = BotFactory.GetBroadcastLineBot(token);
 
+            int random = new Random().Next();
+
             MessagingResult result = await bot.BroadcastMessageAsync(new TextMessage
             {
-                Text = "Peko!!!"
+                Text = $"Peko!!! {random}"
             });
 
             // 3. Success 為 Banner-LineBot 判定結果是否成功，
             //    Message 為 Line Messaging API 回傳 Response
             Console.WriteLine($"result: {result.Success}");
             Console.WriteLine($"message: {result.Message}");
+            Console.WriteLine($"random: {random}");
         }
     }
 }
