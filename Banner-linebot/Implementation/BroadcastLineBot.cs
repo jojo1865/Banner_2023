@@ -12,7 +12,7 @@ using Newtonsoft.Json.Serialization;
 namespace Banner.LineBot.Implementation
 {
     /// <inheritdoc />
-    public class BroadcastLineBot : IBroadcastLineBot
+    internal sealed class BroadcastLineBot : IBroadcastLineBot
     {
         private static readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
         {

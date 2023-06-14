@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading.Tasks;
-using Banner.LineBot.Implementation;
 using Banner.LineBot.Interfaces;
 using Banner.LineBot.Models;
 using Banner.LineBot.Models.Messages;
@@ -18,7 +17,7 @@ namespace Banner.LineBot.Demo
             string token = ConfigurationManager.AppSettings["ChannelAccessToken"];
 
             // 2. 取得 BroadcastLineBot 實例，並以異步方式進行「主動推播」
-            IBroadcastLineBot bot = new BroadcastLineBot(token);
+            IBroadcastLineBot bot = BotFactory.GetBroadcastLineBot(token);
 
             MessagingResult result = await bot.BroadcastMessageAsync(new TextMessage
             {

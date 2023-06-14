@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Banner.LineBot.Implementation;
 using Banner.LineBot.Interfaces;
 using Banner.LineBot.Models;
 using Banner.LineBot.Models.Messages;
@@ -30,7 +29,7 @@ namespace Banner.LineBot.Tests
             Mock<IHttpHandler> mockHttpHandler = Arrange_MockHttpHandler(broadcastMessageUri, message, mockResponse);
 
             // Act
-            IBroadcastLineBot bot = new BroadcastLineBot(accessToken, mockHttpHandler.Object);
+            IBroadcastLineBot bot = BotFactory.GetBroadcastLineBot(accessToken, mockHttpHandler.Object);
             object response = await bot.BroadcastMessageAsync(message);
 
             // Assert
