@@ -4,14 +4,13 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace Banner.Controllers
+namespace Banner.Areas.Admin.Controllers
 {
-    public class HomeController : Controller
+    public class SystemSetController : PublicClass
     {
+        // GET: Admin/SystemSet
         public ActionResult Index()
         {
-            ViewBag.Title = "Home Page";
-
             return View();
         }
     }

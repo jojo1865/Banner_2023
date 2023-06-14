@@ -1,0 +1,16 @@
+﻿.bassic_BackColor {
+    background-color: rgb(12, 49, 120);
+}
+
+#nav-tab button{
+    padding:20px 30px;
+}
+#nav-tab .active {
+    background-color: rgb(12, 49, 120);
+    color: white;
+}
+
+.tab-pane
+{
+    padding:30px;
+}

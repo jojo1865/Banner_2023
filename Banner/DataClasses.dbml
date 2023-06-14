@@ -22,13 +22,15 @@
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Account_Account_Note" Member="Account_Note" ThisKey="ACID" OtherKey="ACID" Type="Account_Note" />
       <Association Name="Account_Baptized" Member="Baptized1" ThisKey="ACID" OtherKey="ACID" Type="Baptized" />
       <Association Name="Account_Community" Member="Community" ThisKey="ACID" OtherKey="ACID" Type="Community" />
       <Association Name="Account_Contect" Member="Contect" ThisKey="ACID" OtherKey="ACID" Type="Contect" />
       <Association Name="Account_Family" Member="Family" ThisKey="ACID" OtherKey="ACID" Type="Family" />
+      <Association Name="Account_Groups" Member="Groups" ThisKey="ACID" OtherKey="ACID" Type="Groups" />
       <Association Name="Account_M_Organize_Account" Member="M_Organize_Account" ThisKey="ACID" OtherKey="ACID" Type="M_Organize_Account" />
+      <Association Name="Account_M_Rool_Account" Member="M_Rool_Account" ThisKey="ACID" OtherKey="ACID" Type="M_Rool_Account" />
       <Association Name="Account_Marriage" Member="Marriage" ThisKey="ACID" OtherKey="ACID" Type="Marriage" />
-      <Association Name="Account_Personnel" Member="Personnel" ThisKey="ACID" OtherKey="ACID" Type="Personnel" />
       <Association Name="ZipCode_Account" Member="ZipCode" ThisKey="ZID" OtherKey="ZID" Type="ZipCode" IsForeignKey="true" />
       <Association Name="Meeting_Place_Account" Member="Meeting_Place" ThisKey="MPID" OtherKey="MPID" Type="Meeting_Place" IsForeignKey="true" />
     </Type>
@@ -37,7 +39,7 @@
     <Type Name="ZipCode">
       <Column Name="ZID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="ParentID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Code" Storage="_ZipCode1" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="Code" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
       <Column Name="Title" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
       <Column Name="GroupName" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
       <Column Name="Note" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
@@ -57,6 +59,7 @@
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Account_Account_Note" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Baptized" Member="Baptized">
@@ -105,7 +108,7 @@
   <Table Name="dbo.Groups" Member="Groups">
     <Type Name="Groups">
       <Column Name="GID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="OID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="Code" Type="System.String" DbType="VarChar(30)" CanBeNull="true" />
       <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Column Name="OutreachFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
@@ -115,7 +118,7 @@
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Groups_M_Place_Groups" Member="M_Place_Groups" ThisKey="GID" OtherKey="GID" Type="M_Place_Groups" />
-      <Association Name="Organize_Groups" Member="Organize" ThisKey="OID" OtherKey="OID" Type="Organize" IsForeignKey="true" />
+      <Association Name="Account_Groups" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.M_Organize_Account" Member="M_Organize_Account">
@@ -123,7 +126,6 @@
       <Column Name="MOAID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="OID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="LeaderFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="JoinDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="LeaveDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
@@ -133,21 +135,6 @@
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Account_M_Organize_Account" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
       <Association Name="Organize_M_Organize_Account" Member="Organize" ThisKey="OID" OtherKey="OID" Type="Organize" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.M_Permissions_Menu" Member="M_Permissions_Menu">
-    <Type Name="M_Permissions_Menu">
-      <Column Name="MPMID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="MID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ShowFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="AddFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="EditFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="PrintFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="UploadFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Association Name="Menu_M_Permissions_Menu" Member="Menu" ThisKey="MID" OtherKey="MID" Type="Menu" IsForeignKey="true" />
-      <Association Name="Permissions_M_Permissions_Menu" Member="Permissions" ThisKey="PID" OtherKey="PID" Type="Permissions" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.M_Place_Groups" Member="M_Place_Groups">
@@ -162,6 +149,38 @@
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Groups_M_Place_Groups" Member="Groups" ThisKey="GID" OtherKey="GID" Type="Groups" IsForeignKey="true" />
       <Association Name="Meeting_Place_M_Place_Groups" Member="Meeting_Place" ThisKey="MPID" OtherKey="MPID" Type="Meeting_Place" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.M_Rool_Account" Member="M_Rool_Account">
+    <Type Name="M_Rool_Account">
+      <Column Name="MID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="RID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="JoinDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="LeaveDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Note" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Account_M_Rool_Account" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
+      <Association Name="Rool_M_Rool_Account" Member="Rool" ThisKey="RID" OtherKey="RID" Type="Rool" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.M_Rool_Menu" Member="M_Rool_Menu">
+    <Type Name="M_Rool_Menu">
+      <Column Name="MPMID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="RID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="MID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ShowFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="AddFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="EditFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="PrintFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="UploadFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="Menu_M_Rool_Menu" Member="Menu" ThisKey="MID" OtherKey="MID" Type="Menu" IsForeignKey="true" />
+      <Association Name="Rool_M_Rool_Menu" Member="Rool" ThisKey="RID" OtherKey="RID" Type="Rool" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Marriage" Member="Marriage">
@@ -200,17 +219,14 @@
       <Column Name="ParentID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="MenuType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Areas" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="Controllers" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="Action" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="ItemID" Type="System.String" DbType="VarChar(20) NOT NULL" CanBeNull="false" />
-      <Column Name="TargetID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="URL" Type="System.String" DbType="VarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="SortNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Menu_M_Permissions_Menu" Member="M_Permissions_Menu" ThisKey="MID" OtherKey="MID" Type="M_Permissions_Menu" />
+      <Association Name="Menu_M_Rool_Menu" Member="M_Rool_Menu" ThisKey="MID" OtherKey="MID" Type="M_Rool_Menu" />
     </Type>
   </Table>
   <Table Name="dbo.Organize" Member="Organize">
@@ -226,35 +242,23 @@
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Organize_Groups" Member="Groups" ThisKey="OID" OtherKey="OID" Type="Groups" />
       <Association Name="Organize_M_Organize_Account" Member="M_Organize_Account" ThisKey="OID" OtherKey="OID" Type="M_Organize_Account" />
     </Type>
   </Table>
-  <Table Name="dbo.Permissions" Member="Permissions">
-    <Type Name="Permissions">
-      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+  <Table Name="dbo.Rool" Member="Rool">
+    <Type Name="Rool">
+      <Column Name="RID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ParentID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="RoolType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Permissions_M_Permissions_Menu" Member="M_Permissions_Menu" ThisKey="PID" OtherKey="PID" Type="M_Permissions_Menu" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Personnel" Member="Personnel">
-    <Type Name="Personnel">
-      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="LevelType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="JoinDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="LeaveDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Account_Personnel" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
+      <Association Name="Rool_M_Rool_Account" Member="M_Rool_Account" ThisKey="RID" OtherKey="RID" Type="M_Rool_Account" />
+      <Association Name="Rool_M_Rool_Menu" Member="M_Rool_Menu" ThisKey="RID" OtherKey="RID" Type="M_Rool_Menu" />
     </Type>
   </Table>
 </Database>
