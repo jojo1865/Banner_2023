@@ -2,7 +2,7 @@
 {
     internal class QuotaResponse
     {
-        public string limited { get; set; }
+        public string type { get; set; }
         public int value { get; set; }
     }
 }

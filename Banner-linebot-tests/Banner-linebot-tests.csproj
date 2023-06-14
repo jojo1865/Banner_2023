@@ -61,8 +61,10 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="BroadcastLineBotTests.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Broadcast\BroadcastTests.cs"/>
+        <Compile Include="Properties\AssemblyInfo.cs"/>
+        <Compile Include="Query\GetSentCountThisMonthTests.cs"/>
+        <Compile Include="Query\QuotaTests.cs"/>
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\Banner-linebot\Banner-linebot.csproj">

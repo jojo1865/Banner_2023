@@ -9,9 +9,9 @@ using Banner.LineBot.Utils.Http;
 using Moq;
 using NUnit.Framework;
 
-namespace Banner.LineBot.Tests
+namespace Banner.LineBot.Tests.Broadcast
 {
-    public class BroadcastLineBotTests
+    public class BroadcastTests
     {
         [Test]
         public async Task BroadcastMessageAsync_WillBroadcastMessage_AndReturnResponseAsString()

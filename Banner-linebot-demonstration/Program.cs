@@ -24,13 +24,13 @@ namespace Banner.LineBot.Demo
         private static async Task GetQuota(string token)
         {
             IQueryLineBot bot = BotFactory.GetQueryLineBot(token);
-            Console.WriteLine("Quota: " + await bot.GetQuota());
+            Console.WriteLine("Quota: " + await bot.GetQuotaAsync());
         }
 
         private static async Task GetSentCountThisMonth(string token)
         {
             IQueryLineBot bot = BotFactory.GetQueryLineBot(token);
-            Console.WriteLine("Sent this month: " + await bot.GetSentCountThisMonth());
+            Console.WriteLine("Sent this month: " + await bot.GetSentCountThisMonthAsync());
         }
 
         private static async Task SendMessage(string token)

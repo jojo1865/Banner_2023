@@ -21,16 +21,20 @@ namespace Banner.LineBot.Implementation
         }
 
         /// <inheritdoc />
-        public async Task<int> GetQuota()
+        public async Task<int> GetQuotaAsync()
         {
             string body = await GetWithoutQuery(LineApiEndpoints.QuotaUri);
             QuotaResponse responseObject = JsonConvert.DeserializeObject<QuotaResponse>(body);
 
-            return responseObject?.value ?? 0;
+            if (responseObject != null &&
+                responseObject.type.Equals("limited", StringComparison.InvariantCultureIgnoreCase))
+                return responseObject.value;
+
+            return responseObject is null ? 0 : Int32.MaxValue;
         }
 
         /// <inheritdoc />
-        public async Task<int> GetSentCountThisMonth()
+        public async Task<int> GetSentCountThisMonthAsync()
         {
             string body = await GetWithoutQuery(LineApiEndpoints.QuotaConsumptionUri);
             ConsumptionResponse responseObject = JsonConvert.DeserializeObject<ConsumptionResponse>(body);
@@ -41,7 +45,11 @@ namespace Banner.LineBot.Implementation
         private async Task<string> GetWithoutQuery(Uri uri)
         {
             HttpResponseMessage response = await _httpHandler.GetAsync(uri);
-            string body = await response.Content.ReadAsStringAsync();
+            string body = "";
+
+            if (response?.Content != null)
+                body = await response.Content?.ReadAsStringAsync();
+
             return body;
         }
     }
