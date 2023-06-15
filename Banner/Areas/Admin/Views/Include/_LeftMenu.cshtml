@@ -1,0 +1,38 @@
+﻿@model Banner.Models.cMenu
+
+<ol>
+    @{
+        if (Model != null)
+        {
+            foreach (var M1 in Model.Items.OrderBy(q => q.SortNo))
+            {
+                <li>
+                    <a href="@M1.Url" class="@(M1.SelectFlag ? "Selected" : "")">@(M1.Title)</a>
+                    @if (M1.Items.Count() > 0)
+                    {
+                        <ol>
+                            @foreach (var M2 in M1.Items.OrderBy(q => q.SortNo))
+                            {
+                                <li>
+                                    <a href="@M2.Url" class="@(M2.SelectFlag ? "Selected" : "")">@(M2.Title)</a>
+                                    @if (M2.Items.Count() > 0)
+                                    {
+                                        <ol>
+                                            @foreach (var M3 in M2.Items.OrderBy(q => q.SortNo))
+                                            {
+                                                <li>
+                                                    <a href="@M3.Url" class="@(M3.SelectFlag ? "Selected" : "")">@(M3.Title)</a>
+                                                </li>
+                                            }
+                                        </ol>
+                                    }
+                                </li>
+                            }
+                        </ol>
+                    }
+                </li>
+            }
+        }
+    }
+
+</ol>

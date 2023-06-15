@@ -19,6 +19,8 @@ using System.Text;
 using System.Web.UI.WebControls;
 using ZXing;
 using Banner.Models;
+using System.Net.Mail;
+using System.Net;
 
 namespace Banner
 {
@@ -32,6 +34,7 @@ namespace Banner
         public string sFileName = "Files";//下載檔案資料夾名稱
         public string sAdminPhotoFilePath = "../../../";//從後台最底層到圖片存檔資料夾的回推路徑
         public string DateTimeFormat = "yyyy-MM-dd HH:mm";
+        public string CompanyTitle = "旌旗教會";
         public bool bUsedNewName = true;
         public bool[] bGroup = new bool[] { false, false, false, false, false, false }; //權限
         public string Error = "";
@@ -179,6 +182,36 @@ namespace Banner
             Response.Cookies[sTitle].Value = "";
             Response.Cookies[sTitle].Expires = DateTime.Now.AddDays(-1);
         }
+        //取得QuertString並檢查是否為long
+        public long GetQueryStringInLong(string sTitle)
+        {
+            long l = 0;
+            if (Request.QueryString[sTitle] != null)
+            {
+                try { l = Convert.ToInt64(Request.QueryString[sTitle].ToString()); }
+                catch { l = 0; }
+            }
+            return l;
+        }
+        //取得QuertString並檢查是否為int
+        public int GetQueryStringInInt(string sTitle)
+        {
+            int i = 0;
+            if (Request.QueryString[sTitle] != null)
+            {
+                try { i = Convert.ToInt32(Request.QueryString[sTitle].ToString()); }
+                catch { i = 0; }
+            }
+            return i;
+        }
+        //取得QuertString並檢查是否為string
+        public string GetQueryStringInString(string sTitle)
+        {
+            string s = "";
+            if (Request.QueryString[sTitle] != null)
+                s = Request.QueryString[sTitle].ToString().Replace("'", "\"");
+            return s;
+        }
         //檢查Email格式
         public bool CheckEmail(string strIn)
         {
@@ -325,36 +358,7 @@ namespace Banner
                 return "../Photo/QRCode/" + NewPath;
             }
         }
-        //取得QuertString並檢查是否為long
-        public long GetQueryStringInLong(string sTitle)
-        {
-            long l = 0;
-            if (Request.QueryString[sTitle] != null)
-            {
-                try { l = Convert.ToInt64(Request.QueryString[sTitle].ToString()); }
-                catch { l = 0; }
-            }
-            return l;
-        }
-        //取得QuertString並檢查是否為int
-        public int GetQueryStringInInt(string sTitle)
-        {
-            int i = 0;
-            if (Request.QueryString[sTitle] != null)
-            {
-                try { i = Convert.ToInt32(Request.QueryString[sTitle].ToString()); }
-                catch { i = 0; }
-            }
-            return i;
-        }
-        //取得QuertString並檢查是否為string
-        public string GetQueryStringInString(string sTitle)
-        {
-            string s = "";
-            if (Request.QueryString[sTitle] != null)
-                s = Request.QueryString[sTitle].ToString().Replace("'", "\"");
-            return s;
-        }
+        
         //Linq->DataTable
         static DataTable LinqQueryToDataTable<T>(IEnumerable<T> query)
         {
@@ -736,6 +740,343 @@ namespace Banner
         public int GetMaxNum(int TotalCt, int NumCut)
         {
             return NumCut > 0 ? (TotalCt % NumCut == 0 ? (TotalCt / NumCut) + 1 : TotalCt / NumCut) : 0;
+        }
+        //發Email
+        public string SendMail(string toMail, string toName, string subject, string body)
+        {
+            try
+            {
+                var fromAddress = new MailAddress("bannerchurch22@gmail.com", "教會系統服務");
+                var fromPassword = "rgwwqagxmmbqvkkf";
+
+                //這邊改成 忘記帳號人的Request.Mail跟 對應到的User.Name
+                //var ToMail = Request.Mail;
+                //var ToName = select Name from User where Email1 = '"+Request.Mail+"';
+
+
+                var toAddress = new MailAddress(toMail, toName);
+                //---------------------
+
+
+                //var fromAddress = new MailAddress("allens0426@gmail.com", "教會系統服務");
+                //var toAddress = new MailAddress("allens0426@gmail.com", "ALLEN");
+                //const string fromPassword = "lxeyiqdmzieppnhj";//"Bannerchurch@2022";
+                //const string subject = "忘記帳號";
+                //const string body = "您的帳號=>OOOOO";
+
+                var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+                };
+                var message = new MailMessage(fromAddress, toAddress)
+                {
+                    Subject = subject,
+                    Body = body
+                };
+                smtp.Send(message);
+                return "";
+
+
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+        public string SendSNS(string toNumber,string title, string body)
+        {
+            try
+            {
+                var PhoneNumber = toNumber;
+                if (PhoneNumber.First() == '+')
+                {
+                    PhoneNumber = toNumber.Substring(1);
+                }
+                else if (PhoneNumber.First() == '0')
+                {
+                    PhoneNumber = "886" + PhoneNumber.Substring(1);
+                }
+
+                var sms = new SMSHttp();
+                var smsId = "gamma";
+                var smsPw = "Admin@1234";
+                sms.sendSMS(smsId, smsPw, title, body, "",
+                            "+" + PhoneNumber, "", "", "", false, false, false);
+                return "";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+        #endregion
+        #region 簡訊發送
+        /// <summary>
+        /// SMS
+        /// </summary>
+        public class SMSHttp
+        {
+            private string sendSMSUrl = "https://api.e8d.tw/API21/HTTP/sendSMS.ashx";
+            private string sendParamSMSUrl = "https://api.e8d.tw/API21/HTTP/SendParamSMS.ashx";
+            private string sendMMSUrl = "https://api.e8d.tw/API21/HTTP/MMS/sendMMS.ashx";
+            private string getCreditUrl = "https://api.e8d.tw/API21/HTTP/getCredit.ashx";
+            private string processMsg = "";
+            private string batchID = "";
+            private double credit = 0;
+
+            public SMSHttp()
+            {
+            }
+
+            /// <summary>
+            /// 傳送簡訊
+            /// </summary>
+            /// <param name="userID">帳號</param>
+            /// <param name="password">密碼</param>
+            /// <param name="subject">簡訊主旨，主旨不會隨著簡訊內容發送出去。用以註記本次發送之用途。可傳入空字串。</param>
+            /// <param name="content">簡訊發送內容(SMS一般、SMS參數、MMS一般簡訊需填寫)</param>
+            /// <param name="param">簡訊Param內容(參數、個人化(專屬)簡訊需填寫Json格式)</param>
+            /// <param name="mobile">接收人之手機號碼。格式為: +886900000001。多筆接收人時，請以半形逗點隔開( , )，如+886900000001,+886900000002。</param>
+            /// <param name="sendTime">簡訊預定發送時間。-立即發送：請傳入空字串。-預約發送：請傳入預計發送時間，若傳送時間小於系統接單時間，將不予傳送。格式為YYYYMMDDhhmnss；例如:預約2009/01/31 15:30:00發送，則傳入20090131153000。若傳遞時間已逾現在之時間，將立即發送。</param>
+            /// <param name="attachment">image base64</param>
+            /// <param name="type">圖檔副檔名</param>
+            /// <param name="isParam">是否為SMS參數簡訊</param>
+            /// <param name="isPersonal">是否為SMS個人化(專屬)簡訊</param>
+            /// <param name="isMMS">是否為MMS一般簡訊</param>
+            /// <returns>true:傳送成功；false:傳送失敗</returns>
+            public bool sendSMS(string userID, string password, string subject, string content, string param, string mobile, string sendTime, string attachment, string type, bool isParam, bool isPersonal, bool isMMS)
+            {
+                bool success = false;
+                StringBuilder postDataSb = new StringBuilder();
+                string resultString = string.Empty;
+                string[] split = null;
+
+                try
+                {
+                    #region UrlEncode
+                    subject = !isParam && !isPersonal ? HttpUtility.UrlEncode(subject) : subject;
+                    content = !isParam && !isPersonal ? HttpUtility.UrlEncode(content) : content;
+                    mobile = !isParam && !isPersonal ? HttpUtility.UrlEncode(mobile) : mobile;
+                    attachment = isMMS ? HttpUtility.UrlEncode(attachment) : attachment;
+                    #endregion
+
+                    #region 檢查時間格式
+                    if (!string.IsNullOrEmpty(sendTime))
+                    {
+                        try
+                        {
+                            //檢查傳送時間格式是否正確
+                            DateTime checkDt = DateTime.ParseExact(sendTime, "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture);
+                            if (!sendTime.Equals(checkDt.ToString("yyyyMMddHHmmss")))
+                            {
+                                processMsg = "傳送時間格式錯誤";
+                                return success;
+                            }
+                        }
+                        catch
+                        {
+                            processMsg = "傳送時間格式錯誤";
+                            return success;
+                        }
+                    }
+                    #endregion
+
+                    #region SMS一般簡訊
+                    if (!isParam && !isPersonal && !isMMS)
+                    {
+                        postDataSb.Append("UID=").Append(userID);
+                        postDataSb.Append("&PWD=").Append(password);
+                        postDataSb.Append("&SB=").Append(subject);
+                        postDataSb.Append("&MSG=").Append(content);
+                        postDataSb.Append("&DEST=").Append(mobile);
+                        postDataSb.Append("&ST=").Append(sendTime);
+                        resultString = httpPost(sendSMSUrl, postDataSb.ToString(), false);
+                    }
+                    #endregion
+
+                    #region SMS參數簡訊
+                    if (isParam)
+                    {
+                        //「發送內容」範例(msg)：測試%field1%%field2%
+                        //「Param內容」範例(param)：[{"Name":"test_A","Mobile":"+886900000001","Email":"testA@test.com.tw","SendTime":"29990109083000","Param":"A1|A2|||"},{"Name":"test_B","Mobile":"+886900000002","Email":"testB@test.com.tw","SendTime":"29990125173000","Param":"B1|B2|||"}]
+                        postDataSb.Append("{\"UID\":\"").Append(userID).Append("\",");
+                        postDataSb.Append("\"PWD\":\"").Append(password).Append("\",");
+                        postDataSb.Append("\"SB\":\"").Append(subject).Append("\",");
+                        postDataSb.Append("\"MSG\":\"").Append(content).Append("\",");
+                        postDataSb.Append("\"RecipientDataList\":").Append(param).Append("}");
+                        resultString = httpPost(sendParamSMSUrl, postDataSb.ToString(), isParam);
+                    }
+                    #endregion
+
+                    #region SMS個人化(專屬)簡訊
+                    if (isPersonal)
+                    {
+                        //「Param內容」範例(param)：[{"Name":"test_A","Mobile":"+886900000001","Email":"testA@test.com.tw","SendTime":"29990109083000","Param":"測試A1A2"},{"Name":"test_B","Mobile":"+886900000002","Email":"testB@test.com.tw","SendTime":"29990125173000","Param":"測試B1B2"}]
+                        postDataSb.Append("{\"UID\":\"").Append(userID).Append("\",");
+                        postDataSb.Append("\"PWD\":\"").Append(password).Append("\",");
+                        postDataSb.Append("\"SB\":\"").Append(subject).Append("\",");
+                        postDataSb.Append("\"RecipientDataList\":").Append(param).Append("}");
+                        resultString = httpPost(sendParamSMSUrl, postDataSb.ToString(), isPersonal);
+                    }
+                    #endregion
+
+                    #region MMS一般簡訊
+                    if (isMMS)
+                    {
+                        postDataSb.Append("UID=").Append(userID);
+                        postDataSb.Append("&PWD=").Append(password);
+                        postDataSb.Append("&SB=").Append(subject);
+                        postDataSb.Append("&MSG=").Append(content);
+                        postDataSb.Append("&DEST=").Append(mobile);
+                        postDataSb.Append("&ST=").Append(sendTime);
+                        postDataSb.Append("&ATTACHMENT=").Append(attachment);
+                        postDataSb.Append("&TYPE=").Append(type);
+                        resultString = httpPost(sendMMSUrl, postDataSb.ToString(), false);
+                    }
+                    #endregion
+
+                    processMsg = resultString;
+
+                    #region SMS、MMS一般簡訊發送結果
+                    if (!isParam && !isPersonal && !resultString.StartsWith("-"))
+                    {
+                        /* 
+                         * 傳送成功 回傳字串內容格式為：CREDIT,SENDED,COST,UNSEND,BATCH_ID，各值中間以逗號分隔。
+                         * CREDIT：發送後剩餘點數。負值代表發送失敗，系統無法處理該命令
+                         * SENDED：發送通數。
+                         * COST：本次發送扣除點數
+                         * UNSEND：無額度時發送的通數，當該值大於0而剩餘點數等於0時表示有部份的簡訊因無額度而無法被發送。
+                         * BATCH_ID：批次識別代碼。為一唯一識別碼，可藉由本識別碼查詢發送狀態。格式範例：220478cc-8506-49b2-93b7-2505f651c12e
+                         */
+                        split = resultString.Split(',');
+                        credit = Convert.ToDouble(split[0]);
+                        batchID = split[4];
+                        return success = true;
+                    }
+                    #endregion
+
+                    #region SMS參數、個人化(專屬)簡訊發送結果
+                    if ((isParam || isPersonal) && resultString.Contains("true"))
+                    {
+                        /* 
+                         * 傳送成功 回傳字串內容格式為：{"Result":true,"Status":"0","Msg":"CREDIT,SENDED,COST,UNSEND,BATCH_ID"}
+                         * CREDIT：發送後剩餘點數。負值代表發送失敗，系統無法處理該命令
+                         * SENDED：發送通數。
+                         * COST：本次發送扣除點數
+                         * UNSEND：無額度時發送的通數，當該值大於0而剩餘點數等於0時表示有部份的簡訊因無額度而無法被發送。
+                         * BATCH_ID：批次識別代碼。為一唯一識別碼，可藉由本識別碼查詢發送狀態。格式範例：220478cc-8506-49b2-93b7-2505f651c12e
+                         */
+                        int s = resultString.IndexOf("Msg") + 6;
+                        int e = resultString.Length - 2;
+                        split = resultString.Substring(s, e - s).Split(',');
+                        credit = Convert.ToDouble(split[0]);
+                        batchID = split[4];
+                        return success = true;
+                    }
+                    #endregion
+
+                    //傳送失敗
+                    processMsg = resultString;
+
+                }
+                catch (Exception ex)
+                {
+                    processMsg = ex.ToString();
+                }
+                return success;
+            }
+
+            /// <summary>
+            /// 取得帳號餘額
+            /// </summary>
+            /// <returns>true:取得成功；false:取得失敗</returns>
+            public bool getCredit(string userID, string password)
+            {
+                bool success = false;
+                try
+                {
+                    StringBuilder postDataSb = new StringBuilder();
+                    postDataSb.Append("UID=").Append(userID);
+                    postDataSb.Append("&PWD=").Append(password);
+
+                    string resultString = httpPost(getCreditUrl, postDataSb.ToString(), false);
+                    if (!resultString.StartsWith("-"))
+                    {
+                        credit = Convert.ToDouble(resultString);
+                        success = true;
+                    }
+                    else
+                    {
+                        processMsg = resultString;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    processMsg = ex.ToString();
+                }
+                return success;
+            }
+
+            private string httpPost(string url, string postData, bool isSendParamSMS)
+            {
+                string result = "";
+                try
+                {
+
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(url));
+                    request.Method = "POST";
+                    if (!isSendParamSMS)
+                    {
+                        request.ContentType = "application/x-www-form-urlencoded";
+                    }
+                    else
+                    {
+                        request.ContentType = "application/json";
+                    }
+                    byte[] bs = System.Text.Encoding.UTF8.GetBytes(postData);
+                    request.ContentLength = bs.Length;
+                    request.GetRequestStream().Write(bs, 0, bs.Length);
+                    //取得 WebResponse 的物件 然後把回傳的資料讀出
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    StreamReader sr = new StreamReader(response.GetResponseStream());
+                    result = sr.ReadToEnd();
+                }
+                catch (Exception ex)
+                {
+                    processMsg = ex.ToString();
+                }
+                return result;
+            }
+
+            public string ProcessMsg
+            {
+                get
+                {
+                    return processMsg;
+                }
+            }
+
+            public string BatchID
+            {
+                get
+                {
+                    return batchID;
+                }
+            }
+
+            public double Credit
+            {
+                get
+                {
+                    return credit;
+                }
+            }
         }
         #endregion
         #region 檢驗圖檔
@@ -1790,7 +2131,7 @@ namespace Banner
         #region MVC工具
         public void GetViewBag()
         {
-            ViewBag._Title = "旌旗教會 管理系統";
+            ViewBag._Title = "旌旗教會";
             ViewBag._KeyWord = "";
             ViewBag._Description = "";
 
@@ -1799,14 +2140,11 @@ namespace Banner
 
             if (NowURL.ToLower().Contains("/admin/"))
             {
-                ViewBag._Css1 = "";
-                string NowPath = Request.RawUrl.Split('?')[0];
-                /*var M = DC.Menu.FirstOrDefault(q => q.ItemID == "M__" && q.ActiveFlag && !q.DeleteFlag && q.URL == NowPath);
+                var M = DC.Menu.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && (q.URL == NowURL || q.URL == NowURL.Replace("_List.", "_Edit.")));
                 if (M != null)
-                    ViewBag._Title = M.Title;*/
+                    ViewBag._Title = M.Title;
             }
-            else
-                ViewBag._Css1 = "";
+
             ViewBag._Css2 = "";
 
             ViewBag._Logo = "";

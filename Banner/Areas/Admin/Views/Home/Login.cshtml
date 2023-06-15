@@ -1,0 +1,18 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Include/_MasterLogin.cshtml";
+}
+<h2>管理後台登入</h2>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    帳號:<input placeholder="請輸入帳號" name="txb_Login" />
+    密碼:<input placeholder="請輸入密碼" name="txb_Password" type="password" />
+    驗證碼:<input placeholder="請輸入右方檢驗碼" name="txb_ValidateCode" />
+    <img class="imgCaptcha" id="img_ValidateCode" src="/Admin/Home/ValidateCode" />
+    <a href="">點擊換一張</a>
+    <button type="submit">登入</button>
+    <a href="/Admin/Home/ForgetPassword">忘記密碼</a>|<a href="/Admin/Home/ForgetAccount">忘記帳號</a>
+</form>
+
+

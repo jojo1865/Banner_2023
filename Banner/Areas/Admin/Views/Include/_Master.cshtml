@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<body>
+    <div>
+        <table>
+            <tr>
+                <td style="width:200px;">
+                    @Html.Action("_LeftMenu", "Include")
+                </td>
+                <td>
+                    @RenderBody()
+                </td>
+            </tr>
+        </table>
+        
+    </div>
+
+    @Html.Action("_AlertMsg","Include")
+</body>
+</html>
