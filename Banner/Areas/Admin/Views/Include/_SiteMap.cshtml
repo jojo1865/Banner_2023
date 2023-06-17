@@ -1,0 +1,20 @@
+﻿@model List<Banner.Models.cMenu>
+@if (Model != null)
+{
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            @foreach (var M in Model.OrderByDescending(q => q.SortNo))
+            {
+                if (M.Url != "")
+                {
+                    <li class="breadcrumb-item"><a href="@M.Url">@M.Title</a></li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item active" aria-current="page">@M.Title</li>
+                }
+            }
+        </ol>
+    </nav>
+}
+

@@ -14,18 +14,18 @@ namespace Banner.Areas.Admin.Controllers
         {
             GetViewBag();
             if (GetACID() <= 0)
-            {
                 SetAlert("請先登入", 2, "/Admin/Home/Login");
-            }
+
             return View();
         }
         #region 登入
         public ActionResult Login()
         {
             GetViewBag();
-            //if (GetACID() > 0)
-            //    Response.Redirect("/Admin/Home/Index");
-
+            if (Request.Url.Host == "localhost")
+                if (GetACID() > 0)
+                    Response.Redirect("/Admin/Home/Index");
+            
             return View();
         }
         [HttpPost]
@@ -39,13 +39,13 @@ namespace Banner.Areas.Admin.Controllers
             string ValidateCode = FC.Get("txb_ValidateCode");
 
             if (Login.Replace(" ", "") == string.Empty)
-                Error += "請輸入帳號\n";
+                Error += "請輸入帳號</br>";
             if (PW.Replace(" ", "") == string.Empty)
-                Error += "請輸入密碼\n";
+                Error += "請輸入密碼</br>";
             if (ValidateCode.Replace(" ", "") == string.Empty)
-                Error += "請輸入檢查碼\n";
+                Error += "請輸入檢查碼</br>";
             else if (ValidateCode != GetSession("VNum"))
-                Error += "檢查碼輸入錯誤\n";
+                Error += "檢查碼輸入錯誤</br>";
             if (Error != "")
                 TempData["msg"] = Error;
             else
@@ -84,26 +84,26 @@ namespace Banner.Areas.Admin.Controllers
                                 SetSession("LoginCt", iLoginCt.ToString());
                                 if (iLoginCt < 5)
                                 {
-                                    SetAlert("您的密碼錯誤!!\\n您還有" + (5 - iLoginCt) + "次機會...");
+                                    SetAlert("您的密碼錯誤!!</br>您還有" + (5 - iLoginCt) + "次機會...");
                                 }
                                 else
                                 {
                                     AC.ActiveFlag = false;
                                     DC.SubmitChanges();
-                                    SetAlert("您登入錯誤太多次,帳號已被鎖定\\n請洽系統管理者協助解鎖...", 2);
+                                    SetAlert("您登入錯誤太多次,帳號已被鎖定</br>請洽系統管理者協助解鎖...", 2);
                                 }
                             }
                             else
                             {
                                 SetSession("LoginCt", "1");
-                                SetAlert("您的密碼錯誤!!\\n您還有4次機會...");
+                                SetAlert("您的密碼錯誤!!</br>您還有4次機會...");
                             }
                             SetSession("LoginAccount", Login);
                         }
 
                     }
                     else
-                        SetAlert("此帳號發生不明原因錯誤,請管理員協助排除", 2, "/Admin/Home/Login");
+                        SetAlert("此帳號發生不明原因錯誤</br>請管理員協助排除", 2, "/Admin/Home/Login");
                 }
                 else
                 {
@@ -141,8 +141,13 @@ namespace Banner.Areas.Admin.Controllers
                         AC.Password = HSM.Enc_1(PW.ToString());
                         AC.UpdDate = DT;
                         DC.SubmitChanges();
-
-                        SendMail(Email, AC.Name, CompanyTitle + "系統信", "您的新密碼為：" + PW.ToString() + "<br/>建議您登入後盡快更新密碼");
+                        string MailData = "親愛的旌旗家人 您好：</br></br>" +
+                            "這裡是【全球旌旗資訊網】自動發信系統</br></br>" +
+                            "您的新密碼為：{0}</br>" +
+                            "請立即登入，即可修改密碼。</br></br>" +
+                            "如需有任何問題，請寫信至itsupport@wwbch.org</br></br>" +
+                            "旌旗教會 敬上";
+                        SendMail(Email, AC.Name, "【全球旌旗資訊網】忘記密碼通知信", string.Format(MailData, PW.ToString()));
                         SetAlert("您的新密碼已發送,請查看您的信箱", 1, "/Admin/Home/Login");
                     }
                     else
@@ -162,9 +167,9 @@ namespace Banner.Areas.Admin.Controllers
                         AC.Password = HSM.Enc_1(PW.ToString());
                         AC.UpdDate = DT;
                         DC.SubmitChanges();
-                        SendSNS(CellPhone, CompanyTitle + "系統簡訊", "您的新密碼為：" + PW.ToString() + ",建議您登入後盡快更新密碼");
+                        SendSNS(CellPhone, "【全球旌旗資訊網】忘記密碼通知簡訊", "親愛的旌旗家人,您的新密碼為：" + PW.ToString() + ",請立即登入，即可修改密碼。");
 
-                        SetAlert("您的新密碼已發送,請查看您的簡訊", 1, "/Admin/Home/Login"); 
+                        SetAlert("您的新密碼已發送,請查看您的簡訊", 1, "/Admin/Home/Login");
                     }
                     else
                         SetAlert("查無帳號,請重新輸入", 3);
@@ -199,7 +204,12 @@ namespace Banner.Areas.Admin.Controllers
                     var AC = DC.Account.FirstOrDefault(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag && q.Contect.FirstOrDefault(p => p.ContectValue == Email && p.ContectType == 2) != null);
                     if (AC != null)
                     {
-                        SendMail(Email, AC.Name, CompanyTitle + "系統信", "您的帳號為：" + AC.Login);
+                        string MailData = "親愛的旌旗家人 您好：</br></br>" +
+                           "這裡是【全球旌旗資訊網】自動發信系統</br></br>" +
+                           "您的帳號為：{0}</br></br>" +
+                           "如需有任何問題，請寫信至itsupport@wwbch.org</br></br>" +
+                           "旌旗教會 敬上";
+                        SendMail(Email, AC.Name, "【全球旌旗資訊網】忘記帳號通知信", string.Format(MailData, AC.Login));
                         SetAlert("您的帳號已發送,請查看您的信箱", 1, "/Admin/Home/Login");
                     }
                     else
@@ -215,7 +225,7 @@ namespace Banner.Areas.Admin.Controllers
                     var AC = DC.Account.FirstOrDefault(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag && q.Contect.FirstOrDefault(p => p.ContectValue == CellPhone && p.ContectType == 1) != null);
                     if (AC != null)
                     {
-                        SendSNS(CellPhone, CompanyTitle + "系統簡訊", "您的帳號為：" + AC.Login );
+                        SendSNS(CellPhone, "【全球旌旗資訊網】忘記帳號通知簡訊", "親愛的旌旗家人您好,您的帳號為：" + AC.Login);
                         SetAlert("您的帳號已發送,請查看您的簡訊", 1, "/Admin/Home/Login");
                     }
                     else
@@ -257,5 +267,26 @@ namespace Banner.Areas.Admin.Controllers
         }
         #endregion
 
+        public string GetTreeToNext(string TargetTable, int ParentID, int SelectedID)
+        {
+            string sReturn = "";
+            switch (TargetTable)
+            {
+                case "OrganizeInfo":
+                    {
+                        var OIs = DC.OrganizeInfo.Where(q => q.ParentID == ParentID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.Title).ToList();
+                        var OI = OIs.FirstOrDefault(q => q.OIID == SelectedID);
+                        for (int i = 0; i < OIs.Count; i++)
+                        {
+                            if ((OI == null && i == 0) || OI != null && OIs[i].OIID == OI.OIID)
+                                sReturn += (sReturn == "" ? "" : ",") + "{'Text'='" + OIs[i].Title + "','Value'=" + OIs[i].OIID + ",'Selected'='T'}";
+                            else
+                                sReturn += (sReturn == "" ? "" : ",") + "{'Text'='" + OIs[i].Title + "','Value'=" + OIs[i].OIID + ",'Selected'='F'}";
+                        }
+                    }
+                    break;
+            }
+            return "[" + sReturn + "]";
+        }
     }
 }

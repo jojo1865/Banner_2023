@@ -1,0 +1,134 @@
+* {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.main {
+  width: 100%;
+  display: flex;
+}
+
+.left-area {
+  width: 50%;
+  height: 100vh;
+  background-color: #008bab;
+}
+
+.logo {
+  padding-top: 32px;
+  padding-left: 32px;
+}
+
+.main-icon {
+  width: 71.66%;
+  height: 516px;
+  margin-top: 143px;
+  margin-left: 11.66%;
+}
+
+.main-icon img {
+  width: 100%;
+}
+
+.right-area {
+  width: 50%;
+  height: 100vh;
+}
+
+.login-container {
+  margin-top: 132px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.backend-login-title {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.backend-login-title p {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 400;
+}
+
+.account-with-icon,
+.password-with-icon,
+.verify-with-icon {
+  display: flex;
+  align-items: center;
+  margin-top: 36px;
+}
+
+.account-with-icon img,
+.password-with-icon img,
+.verify-with-icon img {
+  margin-right: 12px;
+}
+
+.account-with-icon p,
+.password-with-icon p,
+.verify-with-icon p {
+  font-style: 15px;
+  line-height: 21px;
+  font-weight: 400;
+  margin-top: 16px;
+}
+
+.input {
+  width: 100%;
+  display: flex;
+}
+
+.verify-with-code img {
+  margin-left: 8px;
+}
+
+.login-container {
+  width: 65.277%;
+}
+
+.login-button-container {
+  text-align: center;
+  margin-top: 44px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  width: 40.41%;
+  background-color: #3764ac;
+}
+
+.forget-password-and-account {
+  display: flex;
+  justify-content: center;
+}
+
+.forget-password,
+.forget-account {
+  display: flex;
+  width: 64px;
+}
+
+.forget-password a,
+.forget-account a {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 400;
+}
+
+.border-line {
+  width: 1px;
+  height: 20px;
+  margin-left: 28px;
+  margin-right: 28px;
+  border: 1px solid #0c3176;
+}
+
+.input input {
+  flex: 1;
+}

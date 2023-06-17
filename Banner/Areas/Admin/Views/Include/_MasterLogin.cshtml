@@ -7,11 +7,10 @@
     <title>@ViewBag._Title</title>
 
     @Html.Action("_HeadInclude", "Include")
+    <link href="~/Areas/Admin/Content/CSS/login.css" rel="stylesheet" />
 </head>
-<body>
-    <div>
-        @RenderBody()
-    </div>
+<body class="bn-theme">
+    @RenderBody()
     @Html.Action("_AlertMsg", "Include")
 </body>
 </html>

@@ -1,16 +1,138 @@
-﻿.bassic_BackColor {
-    background-color: rgb(12, 49, 120);
+﻿/*
+    背景基本色:#008BAB 藍綠
+    按鈕基本色:#3f51b5 深藍
+*/
+
+:root {
+    --basic-bagrount-color: #008BAB;
+    --basic-button-color: #3f51b5;
+    --basic-bagrountgray-color :#CCC;
+}
+.bassic_BackgroundGrayColor {
+    background-color: var(--basic-bagrountgray-color);
 }
 
-#nav-tab button{
-    padding:20px 30px;
-}
-#nav-tab .active {
-    background-color: rgb(12, 49, 120);
-    color: white;
+.bassic_BackColor {
+    background-color: var(--basic-bagrount-color);
 }
 
-.tab-pane
-{
-    padding:30px;
+/**/
+.Top_Background {
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#008bab+50,252a34+100 */
+    background: rgb(0,139,171); /* Old browsers */
+    background: -moz-linear-gradient(left, var(--basic-bagrount-color) 50%, #252A34 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, var(--basic-bagrount-color) 50%,#252A34 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, var(--basic-bagrount-color) 50%,#252A34 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    height: 58px;
+    padding: 16px;
+}
+
+/*基本按鈕*/
+.btn_Basic {
+    /*color: #ffffff;
+    background-color: #3f51b5;
+    padding: 5px 10px;
+    width: 100px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    border: 2px solid #3f51b5;
+    margin: auto 2px;*/
+    width:fit-content;
+    display:inline !important;
+}
+
+    /*.btn_Basic:hover {
+        background-color: #6292D4;
+    }*/
+/*按鈕白底板*/
+.btn_Basic_W {
+    /*color: #3f51b5;
+    background-color: #ffffff;
+    padding: 5px 10px;
+    width: 100px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    border: 2px solid #3f51b5;
+    margin: auto 2px;*/
+    width: fit-content;
+    display: inline !important;
+}
+
+    /*.btn_Basic_W:hover {
+        color: #6292D4;
+    }*/
+
+/*Tab*/
+.tab-pane {
+    padding: 30px;
+}
+
+/*組織與職分管理*/
+.td_O {
+    float: left;
+    display: inline-block;
+}
+
+.td_O_Basic {
+    width: 100px;
+    text-align: center;
+    padding: 5px 10px;
+    border: 1px solid #0094ff;
+    color: #0094ff;
+}
+
+.td_O_Basic0 {
+    width: 100px;
+    height: 36px;
+}
+
+.td_O_Line1 {
+    border-right: 1px solid #0094ff;
+    width: 50px;
+    height: 36px;
+}
+
+.td_O_1 {
+    width: 50px;
+    height: 36px;
+}
+
+.td_O_Line2 {
+    border-bottom: 1px solid #0094ff;
+    width: 50px;
+    height: 18px;
+}
+
+.td_O_2 {
+    width: 50px;
+    height: 18px;
+}
+
+.div_Edit .row {
+    margin: 5px 0;
+}
+
+.div_Edit input[type=checkbox] {
+    margin-top: 10px;
+}
+
+/*組織篩選用上選單*/
+.div_UpTab a {
+    color: #999;
+    font-weight:800;
+}
+
+.div_UpTab .a_Select {
+    color: var(--basic-bagrount-color);
+}
+
+.div_UpTab .col {
+    border-bottom: 2px solid #FFFFFF;
+    padding: 15px 0;
+}
+
+.div_UpTab .col_Select {
+    border-bottom: 2px solid var(--basic-bagrount-color);
 }

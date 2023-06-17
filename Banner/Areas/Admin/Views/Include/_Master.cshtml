@@ -3,23 +3,27 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag._Title</title>
+    @Html.Action("_HeadInclude", "Include")
 
+    <link rel="stylesheet" href="@ViewBag._CSS1" />
 </head>
-<body>
-    <div>
-        <table>
-            <tr>
-                <td style="width:200px;">
-                    @Html.Action("_LeftMenu", "Include")
-                </td>
-                <td>
-                    @RenderBody()
-                </td>
-            </tr>
-        </table>
-        
-    </div>
+<body class="bn-theme">
+    @Html.Action("_LeftMenu", "Include")
 
-    @Html.Action("_AlertMsg","Include")
+    <main>
+        <div class="admin-navbar">
+            <a class="btn btn-primary" href="/Web/Home/Index">進入前台</a>
+            <img class="admin-navbar-avatar"
+                 src="~/Areas/Admin/Content/img/admin-navbar-avatar.svg"
+                 alt="" />
+
+            <a href="#" class="ms-3 me-3" style="color:white;">@ViewBag._UserName</a>
+        </div>
+        @Html.Action("_SiteMap", "Include")
+        @RenderBody()
+    </main>
+    @Html.Action("_AlertMsg", "Include")
+
 </body>
 </html>

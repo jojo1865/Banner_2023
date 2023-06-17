@@ -1,38 +1,126 @@
 ﻿@model Banner.Models.cMenu
-
-<ol>
-    @{
-        if (Model != null)
-        {
-            foreach (var M1 in Model.Items.OrderBy(q => q.SortNo))
-            {
-                <li>
-                    <a href="@M1.Url" class="@(M1.SelectFlag ? "Selected" : "")">@(M1.Title)</a>
-                    @if (M1.Items.Count() > 0)
+<div class="nav-group">
+    <nav class="nav-menu">
+        <a class="collapse-btn" id="a_SideMenu_button1"
+           data-bs-toggle="collapse"
+           href="#collapse-nav"
+           aria-expanded="true">
+            <span class="material-icons collapse-left-icon"> chevron_left</span>
+            <span class="material-icons collapse-right-icon">
+                chevron_right
+            </span>
+        </a>
+        <img class="nav-logo" src="~/Areas/Admin/Content/img/banner-icon.png" alt="" />
+        <ul>
+            @{
+                if (Model != null)
+                {
+                    foreach (var M1 in Model.Items.OrderBy(q => q.SortNo))
                     {
-                        <ol>
-                            @foreach (var M2 in M1.Items.OrderBy(q => q.SortNo))
-                            {
-                                <li>
-                                    <a href="@M2.Url" class="@(M2.SelectFlag ? "Selected" : "")">@(M2.Title)</a>
-                                    @if (M2.Items.Count() > 0)
-                                    {
-                                        <ol>
-                                            @foreach (var M3 in M2.Items.OrderBy(q => q.SortNo))
-                                            {
-                                                <li>
-                                                    <a href="@M3.Url" class="@(M3.SelectFlag ? "Selected" : "")">@(M3.Title)</a>
-                                                </li>
-                                            }
-                                        </ol>
-                                    }
-                                </li>
-                            }
-                        </ol>
+                        <li>
+                            <a href="@(M1.Url)" onclick="ShowMenu('div_Menu_@M1.SortNo');return false;" class="@(M1.SelectFlag ? "Selected" : "")">
+                                @if (M1.ImgUrl != "")
+                                {
+                                    <img class="menu-icon"
+                                         src="~/Areas/Admin/Content/img/@M1.ImgUrl"
+                                         alt="" />
+                                }
+                                <span class="menu-text">@(M1.Title)</span>
+                            </a>
+                        </li>
                     }
-                </li>
+                }
+            }
+        </ul>
+    </nav>
+    <nav id="collapse-nav"
+         class="nav-menu-secondary collapse show collapse-horizontal">
+        <div style="width: 276px;" id="div_SideMenu">
+            <a class="collapse-btn" id="a_SideMenu_button2"
+               data-bs-toggle="collapse"
+               href="#collapse-nav"
+               aria-expanded="true">
+                <span class="material-icons collapse-left-icon"> chevron_left</span>
+                <span class="material-icons collapse-right-icon">
+                    chevron_right
+                </span>
+            </a>
+            @{
+                if (Model != null)
+                {
+                    foreach (var M1 in Model.Items.OrderBy(q => q.SortNo))
+                    {
+                        if (M1.Items.Count() > 0)
+                        {
+                            <div id="div_Menu_@M1.SortNo" style="@(M1.SelectFlag ? "display:block;":"display:none;")">
+                                <h6 class="title">@M1.Title</h6>
+                                <ul>
+                                    @foreach (var M2 in M1.Items.OrderBy(q => q.SortNo))
+                                    {
+                                        <li class="menuitem @(M2.Items.Count>0 ? "more" :"")">
+                                            @{
+                                                if (M2.Items.Count > 0)
+                                                {
+                                                    <a data-bs-toggle="collapse" href="#collapse-submenu-@(M2.MenuID)" class="@(M2.SelectFlag ? "active" :"")">
+                                                        <div class="point"></div>
+                                                        <span class="menuitem-text">@M2.Title</span>
+                                                        <span class="material-icons"> chevron_right </span>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@M2.Url" class="@(M2.SelectFlag ? "active" :"")">
+                                                        <div class="point"></div>
+                                                        <span class="menuitem-text">@M2.Title</span>
+                                                        <span class="material-icons"> chevron_right </span>
+                                                    </a>
+                                                }
+                                            }
+
+                                            @if (M2.Items.Count > 0)
+                                            {
+                                                <div id="collapse-submenu-@(M2.MenuID)" class="submenu-container collapse">
+                                                    <ul>
+                                                        @foreach (var M3 in M2.Items.OrderBy(q => q.SortNo))
+                                                        {
+                                                            <li class="submenuitem">
+                                                                <a class="@(M3.SelectFlag ? "active":"")" href="@M3.Url">
+                                                                    <div class="line-container">
+                                                                        <div class="line"></div>
+                                                                    </div>
+                                                                    @M3.Title
+                                                                </a>
+                                                            </li>
+                                                        }
+
+                                                    </ul>
+                                                </div>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    }
+                }
+            }
+        </div>
+    </nav>
+</div>
+<script>
+    function ShowMenu(ID) {
+        var SideMenu = document.getElementById("div_SideMenu");
+        if (SideMenu.childNodes.length > 0) {
+            for (var i = 0; i < SideMenu.childNodes.length; i++) {
+                if (SideMenu.childNodes[i].nodeName == "DIV") {
+                    SideMenu.childNodes[i].style.display = "none";
+                }
             }
         }
+        document.getElementById("a_SideMenu_button2").setAttribute("aria-expanded", "true");
+        document.getElementById("a_SideMenu_button1").setAttribute("aria-expanded", "true");
+        document.getElementById("collapse-nav").classList.add("show");
+        document.getElementById(ID).style.display = "block";
+        
     }
-
-</ol>
+</script>

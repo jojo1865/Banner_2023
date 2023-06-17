@@ -14,8 +14,10 @@ namespace Banner.Models
     /// </summary>
     public class cMenu
     {
+        public int MenuID { get; set; }
         public string Title { get; set; }
         public string Url { get; set; }
+        public string ImgUrl { get; set; }
         public int SortNo { get; set; }
         public bool SelectFlag { get; set; }
         public List<cMenu> Items { get; set; }
@@ -29,7 +31,7 @@ namespace Banner.Models
         public int NumCut = 10;//分頁數字一次顯示幾個
         public int MaxNum = 0;//分頁數量最多多少
         public int TotalCt = 0;//全部共多少資料
-        public int NewPage = 1;
+        public int NowPage = 1;//目前所在頁數
         public string NowURL = "";
         public string ItemID = "";
         public int CID = 0;

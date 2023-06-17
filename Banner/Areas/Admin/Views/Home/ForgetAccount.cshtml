@@ -3,25 +3,61 @@
     Layout = "~/Areas/Admin/Views/Include/_MasterLogin.cshtml";
 }
 
-<h2>忘記帳號</h2>
-<form method="post">
-    @Html.AntiForgeryToken()
-
-    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-        <button class="nav-link active" id="tab_1" data-bs-toggle="tab" data-bs-target="#tab_1_space" type="button" role="tab" aria-controls="tab_2_space" aria-selected="true">Email</button>
-        <button class="nav-link" id="tab_2" data-bs-toggle="tab" data-bs-target="#tab_2_space" type="button" role="tab" aria-controls="tab_2_space" aria-selected="false">手機</button>
-    </div>
-    <div class="tab-content" id="div_Tab">
-        <div class="tab-pane fade show active" id="tab_1_space" role="tabpanel" aria-labelledby="tab_1" tabindex="0">
-            Email:<input name="txb_Email" placeholder="Email" type="email" value="@ViewBag._Temp1" />
-            <button name="btn_SendEmail" type="submit">發送Email</button>
-            <a href="/Admin/Home/Login">返回登入</a>
+<main class="main">
+    <div class="left-area">
+        <div class="logo">
+            <img src="~/Areas/Admin/Content/img/logo.png" alt="" />
         </div>
-        <div class="tab-pane fade" id="tab_2_space" role="tabpanel" aria-labelledby="tab_2" tabindex="1">
-            手機號碼:<input name="txb_CellPhone" placeholder="您的手機號碼" value="@ViewBag._Temp2" />
-            <button name="btn_SendPhone" type="submit">發送簡訊</button>
-            <a href="/Admin/Home/Login">返回登入</a>
+
+        <div class="main-icon">
+            <img src="~/Areas/Admin/Content/img/main.png" alt="" />
         </div>
     </div>
-</form>
+    <div class="right-area">
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <div class="login-container">
+                <div class="backend-login-title">
+                    <p>忘記帳號</p>
+                </div>
 
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <button class="nav-link active" id="tab_1" data-bs-toggle="tab" data-bs-target="#tab_1_space" type="button" role="tab" aria-controls="tab_2_space" aria-selected="true">Email</button>
+                    <button class="nav-link" id="tab_2" data-bs-toggle="tab" data-bs-target="#tab_2_space" type="button" role="tab" aria-controls="tab_2_space" aria-selected="false">手機</button>
+                </div>
+                <div class="tab-content" id="div_Tab">
+                    <div class="tab-pane fade show active" id="tab_1_space" role="tabpanel" aria-labelledby="tab_1" tabindex="0">
+                        <div class="account-with-icon">
+                            <img src="/public/assets/img/user.png" alt="" />
+                            <p>Email</p>
+                        </div>
+
+                        <div class="input">
+                            <input type="text" name="txb_Email" class="form-control input-underline" placeholder="Email" value="@ViewBag._Temp1" />
+                        </div>
+
+                        <div class="login-button-container">
+                            <button name="btn_SendEmail" type="submit" class="btn btn-primary btn-round me-2">發送Email</button>
+                            <a href="/Admin/Home/Login" class="btn btn-primary btn-round">返回登入</a>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane fade" id="tab_2_space" role="tabpanel" aria-labelledby="tab_2" tabindex="1">
+                        <div class="account-with-icon">
+                            <img src="/public/assets/img/user.png" alt="" />
+                            <p>手機號碼</p>
+                        </div>
+
+                        <div class="input">
+                            <input type="text" name="txb_CellPhone" class="form-control input-underline" placeholder="您的手機號碼" value="@ViewBag._Temp2" />
+                        </div>
+                        <div class="login-button-container">
+                            <button name="btn_SendPhone" type="submit" class="btn btn-primary btn-round me-2">發送簡訊</button>
+                            <a href="/Admin/Home/Login" class="btn btn-primary btn-round">返回登入</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>

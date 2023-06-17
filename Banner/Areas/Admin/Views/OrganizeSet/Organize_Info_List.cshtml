@@ -1,0 +1,63 @@
+﻿@model Banner.Areas.Admin.Controllers.OrganizeSetController.cOrganize_Info_List
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        @{
+            Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+            if (Model != null)
+            {
+                //上選單部分
+                if (Model.cOrganize != null)
+                {
+
+                    <div class="row div_UpTab">
+                        @foreach (var C in Model.cOrganize.Cs)
+                        {
+                            <div class="col text-center @C.ControlName">
+                                <a href="@C.URL" target="@C.Target" class="@C.CSS">@C.Title</a>
+                            </div>
+                        }
+                    </div>
+
+                }
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-6 p-2">
+                                <h3>位置</h3>
+                                @(Model.OTitle)
+                            </div>
+                            <div class="col-6  p-2">
+                                <h3>關鍵字搜尋</h3>
+                                <input type="text" class="form-control" id="txb_Key" style="width:60%; display:inline" value="@ViewBag._Key" />
+                                <a href="javascript:Search();" class="btn btn-primary btn-lg btn-round btn-submit">搜尋</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col pe-2 text-end">
+                                <a href="@(Model.sAddURL)" class="btn btn-primary btn-lg btn-round btn-submit">新增</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                </div>
+
+            }
+
+        }
+    </div>
+</div>
+<script>
+    function Search() {
+        location.href='@(ViewBag._URL + "?Key=")' + document.getElementById('txb_Key').value;
+    }
+</script>
+
+

@@ -21,6 +21,7 @@ using ZXing;
 using Banner.Models;
 using System.Net.Mail;
 using System.Net;
+using OfficeOpenXml;
 
 namespace Banner
 {
@@ -34,7 +35,7 @@ namespace Banner
         public string sFileName = "Files";//下載檔案資料夾名稱
         public string sAdminPhotoFilePath = "../../../";//從後台最底層到圖片存檔資料夾的回推路徑
         public string DateTimeFormat = "yyyy-MM-dd HH:mm";
-        public string CompanyTitle = "旌旗教會";
+        public string CompanyTitle = "【全球旌旗資訊網】";
         public bool bUsedNewName = true;
         public bool[] bGroup = new bool[] { false, false, false, false, false, false }; //權限
         public string Error = "";
@@ -127,6 +128,12 @@ namespace Banner
         {
             DelSession("ACID");
             DelCookie("ACID");
+        }
+        //檢查是否為Admin權限
+        public bool CheckAdmin(int ACID)
+        {
+            var PA = DC.M_Rool_Account.FirstOrDefault(q => q.ACID == ACID && q.Rool.RoolType == 4 && !q.DeleteFlag && q.ActiveFlag && (q.JoinDate >= q.CreDate && q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date));
+            return PA != null;
         }
         //取得被加密的名子
         public string CutName(string sName)
@@ -358,7 +365,6 @@ namespace Banner
                 return "../Photo/QRCode/" + NewPath;
             }
         }
-        
         //Linq->DataTable
         static DataTable LinqQueryToDataTable<T>(IEnumerable<T> query)
         {
@@ -388,7 +394,7 @@ namespace Banner
             }
             return tbl;
         }
-        
+
         //取得郵遞區號祖宗18代(由樹枝回朔到樹幹)
         public List<ZipCode> GetOldZip(long ZID, int ActiveType = 1, List<ZipCode> Zs = null)
         {
@@ -417,25 +423,15 @@ namespace Banner
             {
                 var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == ZID);
 
-                    var Z0 = DC.ZipCode.FirstOrDefault(q => q.ZID == Z.ParentID);
-                    if (Z0 != null)
-                        sOutput = Z.Code + Z0.Title + Z.Title;
-                    else
-                        sOutput = Z.Code + Z.Title;
-                
+                var Z0 = DC.ZipCode.FirstOrDefault(q => q.ZID == Z.ParentID);
+                if (Z0 != null)
+                    sOutput = Z.Code + Z0.Title + Z.Title;
+                else
+                    sOutput = Z.Code + Z.Title;
+
             }
             return sOutput;
         }
-        //取得前台網頁名稱
-        public string GetFrontPageName()
-        {
-            string PagePath = System.IO.Path.GetFileName(Request.PhysicalPath);
-            var Menus = DC.Menu.Where(q => q.ActiveFlag && !q.DeleteFlag && q.MenuType > 1).ToList();
-            if (Menus.Count > 0)
-                return Menus[0].Title;
-            else return "";
-        }
-        
 
         //換算日期格式,失敗回傳今天
         public DateTime CnahgeDateTime(string Input)
@@ -560,7 +556,7 @@ namespace Banner
 
             return CheckByte;
         }
-       
+
         //撿查信用卡(銀行ID,卡別)
         public string CheckCard(string CardNo)
         {
@@ -739,7 +735,7 @@ namespace Banner
         //計算分頁最高頁數
         public int GetMaxNum(int TotalCt, int NumCut)
         {
-            return NumCut > 0 ? (TotalCt % NumCut == 0 ? (TotalCt / NumCut) + 1 : TotalCt / NumCut) : 0;
+            return NumCut > 0 ? (TotalCt % NumCut > 0 ? (TotalCt / NumCut) + 1 : TotalCt / NumCut) : 0;
         }
         //發Email
         public string SendMail(string toMail, string toName, string subject, string body)
@@ -789,7 +785,7 @@ namespace Banner
             }
 
         }
-        public string SendSNS(string toNumber,string title, string body)
+        public string SendSNS(string toNumber, string title, string body)
         {
             try
             {
@@ -1971,7 +1967,7 @@ namespace Banner
             public System.Drawing.Color cFontColor = System.Drawing.Color.Black;//文字顏色
         }
         //將string[]轉成ExcelCell[]
-        public void WriteExcelFromString(string Title, ArrayList AL, bool bAdmin)
+        public void WriteExcelFromString(string Title, ArrayList AL)
         {
             ArrayList AL2 = new ArrayList();
             bool bTop = true;
@@ -1991,10 +1987,10 @@ namespace Banner
                 bTop = false;
                 AL2.Add(EC);
             }
-            WriteExcel(Title, AL2, bAdmin);
+            WriteExcel(Title, AL2);
         }
 
-        public void WriteCSVFromString(string Title, ArrayList AL, bool bAdmin, Encoding Code)
+        public void WriteCSVFromString(string Title, ArrayList AL, Encoding Code)
         {
             ArrayList AL2 = new ArrayList();
             foreach (string[] str in AL)
@@ -2007,19 +2003,18 @@ namespace Banner
                 }
                 AL2.Add(EC);
             }
-            WriteCSV(Title, AL2, bAdmin, Code);
+            WriteCSV(Title, AL2, Code);
         }
 
-        public void WriteExcel(string sTitle, ArrayList AL, bool bAdmin)
+        public void WriteExcel(string sTitle, ArrayList AL)
         {
             // 設定儲存檔名，不用設定副檔名，系統自動判斷 excel 版本，產生 .xls 或 .xlsx 副檔名
             //string pathFile = @"D:\test";
-            string FileName = DateTime.Now.ToString("yyyyMMddHHmmss") + sTitle + ".xlsx";
-            string s = bAdmin ? "../../" : "../";
-            string FilePath = s + "Files/Down/";
+            string FileName = sTitle + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx";
+            string FilePath = "/Files/Down/";
             CheckFileExist(Server.MapPath(FilePath));
             string pathFile = Server.MapPath(FilePath + FileName);
-
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             OfficeOpenXml.ExcelPackage p = new OfficeOpenXml.ExcelPackage();
             OfficeOpenXml.ExcelWorksheet sheet = p.Workbook.Worksheets.Add(sTitle);
@@ -2048,10 +2043,9 @@ namespace Banner
 
         }
         //匯出CSV的方法
-        public void WriteCSV(string sTitle, ArrayList AL, bool bAdmin, Encoding Code)
+        public void WriteCSV(string sTitle, ArrayList AL, Encoding Code)
         {
-            string s = bAdmin ? "../../" : "../";
-            string FilePath = Server.MapPath(s + "Files/Down/");
+            string FilePath = Server.MapPath("/Files/Down/");
             CheckFileExist(FilePath);
             string FileName = DateTime.Now.ToString("yyyyMMddHHmmss") + sTitle + ".csv";
             FileStream myFileStream = new FileStream(FilePath + FileName, FileMode.OpenOrCreate, FileAccess.Write);
@@ -2134,29 +2128,68 @@ namespace Banner
             ViewBag._Title = "旌旗教會";
             ViewBag._KeyWord = "";
             ViewBag._Description = "";
-
-            string NowURL = Request.Url.AbsoluteUri;
-            ViewBag._URL = NowURL;
-
-            if (NowURL.ToLower().Contains("/admin/"))
-            {
-                var M = DC.Menu.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && (q.URL == NowURL || q.URL == NowURL.Replace("_List.", "_Edit.")));
-                if (M != null)
-                    ViewBag._Title = M.Title;
-            }
-
-            ViewBag._Css2 = "";
-
+            ViewBag._UserName = "未知使用者";
             ViewBag._Logo = "";
             ViewBag._SysMsg = "";//用於系統後台系統提示訊息
-            ViewBag._UserName = "";
+
+            ViewBag._Power = bGroup;
             int ACID = GetACID();
-            if (ACID > 0)
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
+            if (AC != null)
+                ViewBag._UserName = AC.Name;
+
+            ViewBag._CSS1 = "~/Areas/Admin/Content/CSS/";
+            string NowURL = Request.Url.AbsolutePath;
+            ViewBag._URL = NowURL;
+            string ShortURL = Request.RawUrl;
+            if (ShortURL.ToLower().Contains("/admin/"))
             {
-                var U = DC.Account.FirstOrDefault(q => q.ACID == ACID);
-                if (U != null)
-                    ViewBag._UserName = U.Name;
+                ViewBag._CSS1 += ShortURL.Contains("_List") ? "list.css" : "form.css";
+                string[] ShortURLs = ShortURL.Replace("_Edit", "_List").Split('/');
+                string NewShortURL = "";
+                for (int i = 0; i < ShortURLs.Length; i++)
+                {
+                    if (i < 4)
+                        NewShortURL += ShortURLs[i] + "/";
+                }
+
+                var M = DC.Menu.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && (q.URL == ShortURL || q.URL.StartsWith(NewShortURL)));
+                if (M != null)
+                {
+                    ViewBag._Title = M.Title;
+                    //取得權限
+
+                    if (CheckAdmin(ACID))//此使用者擁有系統管理者權限
+                    {
+                        bGroup = new bool[] { true, true, true, true, true, true };
+                    }
+                    else
+                    {
+                        var MACs = from q in DC.M_Rool_Account.Where(q => q.ACID == ACID && q.ActiveFlag && (q.Rool.RoolType == 3 || q.Rool.RoolType == 4) && !q.DeleteFlag && (q.JoinDate >= q.CreDate && q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date))
+                                   join p in DC.M_Rool_Menu.Where(q => q.MID == M.MID)
+                                   on q.RID equals p.RID
+                                   select p;
+                        foreach (var MAC in MACs)
+                        {
+                            if (!bGroup[0] && MAC.ShowFlag)
+                                bGroup[0] = MAC.ShowFlag;
+                            if (!bGroup[1] && MAC.AddFlag)
+                                bGroup[1] = MAC.AddFlag;
+                            if (!bGroup[2] && MAC.EditFlag)
+                                bGroup[2] = MAC.EditFlag;
+                            if (!bGroup[3] && MAC.DeleteFlag)
+                                bGroup[3] = MAC.DeleteFlag;
+                            if (!bGroup[4] && MAC.PrintFlag)
+                                bGroup[4] = MAC.PrintFlag;
+                            if (!bGroup[5] && MAC.UploadFlag)
+                                bGroup[5] = MAC.UploadFlag;
+                        }
+                    }
+
+                    ViewBag._Power = bGroup;
+                }
             }
+
             TempData["UID"] = ACID;
             TempData["msg"] = "";
             TempData["msgtype"] = "";
@@ -2228,6 +2261,7 @@ namespace Banner
             }
 
         }
+
         #endregion
         #region 取得檢查碼
 

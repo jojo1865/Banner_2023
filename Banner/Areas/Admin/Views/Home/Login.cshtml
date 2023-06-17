@@ -2,17 +2,94 @@
 @{
     Layout = "~/Areas/Admin/Views/Include/_MasterLogin.cshtml";
 }
-<h2>管理後台登入</h2>
+<main class="main">
+    <div class="left-area">
+        <div class="logo">
+            <img src="~/Areas/Admin/Content/img/logo.png" alt="" />
+        </div>
 
-<form method="post">
-    @Html.AntiForgeryToken()
-    帳號:<input placeholder="請輸入帳號" name="txb_Login" />
-    密碼:<input placeholder="請輸入密碼" name="txb_Password" type="password" />
-    驗證碼:<input placeholder="請輸入右方檢驗碼" name="txb_ValidateCode" />
-    <img class="imgCaptcha" id="img_ValidateCode" src="/Admin/Home/ValidateCode" />
-    <a href="">點擊換一張</a>
-    <button type="submit">登入</button>
-    <a href="/Admin/Home/ForgetPassword">忘記密碼</a>|<a href="/Admin/Home/ForgetAccount">忘記帳號</a>
-</form>
+        <div class="main-icon">
+            <img src="~/Areas/Admin/Content/img/main.png" alt="" />
+        </div>
+    </div>
+    <div class="right-area">
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <div class="login-container">
+                <div class="backend-login-title">
+                    <p>旌旗教會後台</p>
+                </div>
+
+                <div class="account-with-icon">
+                    <img src="/public/assets/img/user.png" alt="" />
+                    <p>帳號</p>
+                </div>
+
+                <div class="input">
+                    <input type="text"  name="txb_Login" class="form-control input-underline" placeholder="帳號、身分證字號" />
+                </div>
+
+                <div class="password-with-icon">
+                    <img src="/public/assets/img/password.png" alt="" />
+                    <p>密碼</p>
+                </div>
+
+                <div class="input input-group">
+                    <input id="password" name="txb_Password"
+                           type="password"
+                           class="form-control input-underline"
+                           placeholder="請輸入密碼" />
+                    <div class="visibility-container">
+                        <span class="material-icons" onclick="togglePasswordVisibility()">
+                            visibility_off
+                        </span>
+                    </div>
+                </div>
+
+                <div class="verify-with-icon">
+                    <img src="/public/assets/img/verified.png" alt="" />
+                    <p>驗證碼</p>
+                </div>
+
+                <div class="input verify-with-code">
+                    <input type="text"  name="txb_ValidateCode"
+                           class="form-control input-underline verify-form"
+                           placeholder="請輸入右方驗證碼" />
+                    <img class="imgCaptcha" id="img_ValidateCode" src="/Admin/Home/ValidateCode" />
+                </div>
+            </div>
+
+            <div class="login-button-container">
+                <button class="btn btn-primary btn-round" type="submit">登入</button>
+            </div>
+
+            <div class="forget-password-and-account">
+                <div class="forget-password">
+                    <a href="/Admin/Home/ForgetPassword">忘記密碼</a>
+                </div>
+                <div class="border-line"></div>
+                <div class="forget-account">
+                    <a href="/Admin/Home/ForgetAccount">忘記帳號</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+<script>
+      function togglePasswordVisibility() {
+        const passwordInput = document.getElementById("password");
+        const visibility = document.querySelector(
+          ".visibility-container .material-icons"
+        );
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          visibility.textContent = "visibility";
+        } else {
+          passwordInput.type = "password";
+          visibility.textContent = "visibility_off";
+        }
+      }
+</script>
+
 
 

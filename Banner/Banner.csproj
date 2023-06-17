@@ -143,9 +143,6 @@
     <Compile Include="Areas\Admin\Controllers\OrganizeSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\SystemSetController.cs" />
     <Compile Include="Areas\Web\WebAreaRegistration.cs" />
-    <Compile Include="DataClasses.cs">
-      <DependentUpon>DataClasses.dbml</DependentUpon>
-    </Compile>
     <Compile Include="DataClasses.designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -161,7 +158,27 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\Admin\Content\CSS\bootstrap.css" />
+    <Content Include="Areas\Admin\Content\CSS\form.css" />
+    <Content Include="Areas\Admin\Content\CSS\global.css" />
+    <Content Include="Areas\Admin\Content\CSS\list.css" />
+    <Content Include="Areas\Admin\Content\CSS\login.css" />
     <Content Include="Areas\Admin\Content\CSS\WebStyle.css" />
+    <Content Include="Areas\Admin\Content\Img\admin-navbar-avatar.svg" />
+    <Content Include="Areas\Admin\Content\Img\banner-icon.png" />
+    <Content Include="Areas\Admin\Content\Img\eye-slash.png" />
+    <Content Include="Areas\Admin\Content\Img\form-menu-bg.png" />
+    <Content Include="Areas\Admin\Content\Img\heart-serve.png" />
+    <Content Include="Areas\Admin\Content\Img\lesson.png" />
+    <Content Include="Areas\Admin\Content\Img\line.png" />
+    <Content Include="Areas\Admin\Content\Img\logo.png" />
+    <Content Include="Areas\Admin\Content\Img\main.png" />
+    <Content Include="Areas\Admin\Content\Img\message-push.png" />
+    <Content Include="Areas\Admin\Content\Img\password.png" />
+    <Content Include="Areas\Admin\Content\Img\question.png" />
+    <Content Include="Areas\Admin\Content\Img\system-manage.png" />
+    <Content Include="Areas\Admin\Content\Img\team.png" />
+    <Content Include="Areas\Admin\Content\Img\user.png" />
+    <Content Include="Areas\Admin\Content\Img\verified.png" />
     <Content Include="Areas\Admin\Content\JS\bootstrap.js" />
     <Content Include="Areas\Admin\Content\JS\jquery-3.7.0.js" />
     <Content Include="bin\Antlr3.Runtime.dll" />
@@ -295,6 +312,12 @@
     <Content Include="Areas\Admin\Views\Include\_MasterLogin.cshtml" />
     <Content Include="Areas\Admin\Views\Home\ForgetAccount.cshtml" />
     <Content Include="Areas\Admin\Views\SystemSet\BackUser_List.cshtml" />
+    <Content Include="Areas\Admin\Views\OrganizeSet\Organize_Map_List.cshtml" />
+    <Content Include="Areas\Admin\Views\OrganizeSet\Organize_Map_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\OrganizeSet\Organize_Map_Print.cshtml" />
+    <Content Include="Areas\Admin\Views\OrganizeSet\Organize_Info_List.cshtml" />
+    <Content Include="Areas\Admin\Views\OrganizeSet\Organize_Info_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Include\_SiteMap.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -332,13 +355,13 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Areas\Admin\Content\Img\" />
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Views\OrganizeSet\" />
     <Folder Include="Areas\Web\Controllers\" />
     <Folder Include="Areas\Web\Data\" />
     <Folder Include="Areas\Web\Views\Shared\" />
     <Folder Include="Controllers\" />
+    <Folder Include="Files\Down\" />
+    <Folder Include="Photo\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
