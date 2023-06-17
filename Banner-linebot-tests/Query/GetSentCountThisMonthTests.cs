@@ -15,14 +15,14 @@ namespace Banner.LineBot.Tests.Query
         public async Task GetSentCountThisMonthTests_WillCheckQuota_AndReturnInt()
         {
             // Arrange
-            Uri quotaUri = new Uri("https://api.line.me/v2/bot/message/quota/consumption");
+            Uri consumptionUri = new Uri("https://api.line.me/v2/bot/message/quota/consumption");
             string accessToken = "test";
 
             int expectedInt = new Random().Next();
 
             HttpResponseMessage mockResponse = Arrange_MockResponse(expectedInt);
 
-            Mock<IHttpHandler> mockHttpHandler = Arrange_MockHttpHandler(quotaUri, mockResponse);
+            Mock<IHttpHandler> mockHttpHandler = Arrange_MockHttpHandler(consumptionUri, mockResponse);
 
             // Act
             IQueryLineBot bot = BotFactory.GetQueryLineBot(accessToken, mockHttpHandler.Object);
