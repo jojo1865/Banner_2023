@@ -1,6 +1,6 @@
-﻿@model Banner.Areas.Admin.Controllers.OrganizeSetController.cOrganize_Info_Edit
+﻿@model Banner.Areas.Admin.Controllers.OrganizeSetController.cMeeting_Location_Edit
 @{
-    ViewBag.Title = "Organize_Info_Edit";
+    ViewBag.Title = "Meeting_Location_Edit";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
 }
 
@@ -10,26 +10,26 @@
             <div class="form-header"><h5>@ViewBag._Title</h5></div>
             @if (Model != null)
             {
-                if (Model.OI != null)
+                if (Model.cML != null)
                 {
                     <form method="post" id="form1">
                         @Html.AntiForgeryToken()
                         <div class="form-body">
                             <div class="row text-center">
                                 <div class="col m-3">
-                                    @if ((((bool[])ViewBag._Power)[1] && Model.OI.OIID == 0) || (((bool[])ViewBag._Power)[2] && Model.OI.OIID > 0))
+                                    @if ((((bool[])ViewBag._Power)[1] && Model.cML.MLID == 0) || (((bool[])ViewBag._Power)[2] && Model.cML.MLID > 0))
                                     {
                                         <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn_Basic btn btn-primary btn-sm  btn-round">儲存</a>
                                     }
-                                    <a href="/Admin/OrganizeSet/Organize_Info_List/@Model.OI.Organize.ItemID/@Model.OI.OID/0" class="btn_Basic btn btn-outline-primary btn-sm btn-round">取消</a>
+                                    <a href="/Admin/OrganizeSet/Meeting_Location_List/@Model.OIID/0" class="btn_Basic btn btn-outline-primary btn-sm btn-round">取消</a>
                                 </div>
                             </div>
 
                             <div class="form-card-group">
                                 <div class="form-card">
                                     <div class="form-group">
-                                        <label>組織名稱<span>*</span></label>
-                                        @Html.TextBox("txb_Title", Model.OI.Title, new { @class = "form-control form-control-lg input-underline " })
+                                        <label>聚會點名稱<span>*</span></label>
+                                        @Html.TextBox("txb_Title", Model.cML.Title, new { @class = "form-control form-control-lg input-underline " })
                                     </div>
                                     @if (Model.OIParent.Count > 0)
                                     {
@@ -55,14 +55,31 @@
                                             </div>
                                         </div>
                                     }
-                                    <div class="form-group">
-                                        <label>職分主管<span>*</span></label>
-                                        @Html.DropDownList("ddl_ACID", Model.ACList, new { @class = "form-select form-select-lg" })
+                                <div class="form-group">
+                                    <label>表定聚會時間</label>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            @Html.DropDownList(Model.SH_ControlName, Model.SH_List, new { @class = "form-select form-select-lg", })
+                                        </div>
+                                        <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">點</span></div>
+                                        <div class="col-auto">
+                                            @Html.DropDownList(Model.SM_ControlName, Model.SM_List, new { @class = "form-select form-select-lg", })
+                                        </div>
+                                        <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">分 ～</span></div>
+                                        <div class="col-auto">
+                                            @Html.DropDownList(Model.EH_ControlName, Model.EH_List, new { @class = "form-select form-select-lg", })
+                                        </div>
+                                        <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">點</span></div>
+                                        <div class="col-auto">
+                                            @Html.DropDownList(Model.EM_ControlName, Model.EM_List, new { @class = "form-select form-select-lg", })
+                                        </div>
+                                        <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">分</span></div>
                                     </div>
-
+                                        
+                                    </div>
                                     <div class="form-group">
                                         <label>電話</label>
-                                        @Html.TextBox("txb_Phone", Model.C.ContectValue, new { @class = "form-control form-control-lg input-underline " })
+                                        @Html.TextBox("txb_Phone", Model.C.ContectValue, new { @class = "form-control input-underline " })
                                     </div>
 
                                     <div class="form-group">
@@ -77,7 +94,7 @@
                                                    new { @class = "form-select form-select-lg" })
                                             </div>
                                             <div class="col-8">
-                                                @Html.TextBox("txb_Address", Model.L.Address, new { @class = "form-control form-control-lg input-underline " })
+                                                @Html.TextBox("txb_Address", Model.L.Address, new { @class = "form-control input-underline " })
                                             </div>
                                         </div>
                                     </div>
@@ -87,20 +104,20 @@
                                         <div class="row">
                                             <div class="col-auto">
                                                 <div class="form-check form-check-inline">
-                                                    @Html.CheckBox("cbox_ActiveFlag", Model.OI.ActiveFlag, new { @class = "form-check-input" })
+                                                    @Html.CheckBox("cbox_ActiveFlag", Model.cML.ActiveFlag, new { @class = "form-check-input" })
                                                     @Html.Label("啟用中", new { @class = "form-check-labell" })
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    @if (Model.OI.OIID > 0 && ((bool[])ViewBag._Power)[3])
+                                    @if (Model.cML.MLID > 0 && ((bool[])ViewBag._Power)[3])
                                     {
                                         <div class="form-group">
                                             <label>刪除</label>
                                             <div class="row">
                                                 <div class="col-auto">
                                                     <div class="form-check form-check-inline">
-                                                        @Html.CheckBox("cbox_DeleteFlag", Model.OI.DeleteFlag, new { @class = "form-check-input" })
+                                                        @Html.CheckBox("cbox_DeleteFlag", Model.cML.DeleteFlag, new { @class = "form-check-input" })
                                                         @Html.Label("更新後刪除", new { @class = "form-check-label" })
                                                     </div>
                                                 </div>
@@ -112,11 +129,11 @@
 
                             <div class="row text-center">
                                 <div class="col m-3">
-                                    @if ((((bool[])ViewBag._Power)[1] && Model.OI.OIID == 0) || (((bool[])ViewBag._Power)[2] && Model.OI.OIID > 0))
+                                    @if ((((bool[])ViewBag._Power)[1] && Model.cML.MLID == 0) || (((bool[])ViewBag._Power)[2] && Model.cML.MLID > 0))
                                     {
                                         <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn_Basic btn btn-primary btn-sm btn-round">儲存</a>
                                     }
-                                    <a href="/Admin/OrganizeSet/Organize_Info_List/@Model.OI.Organize.ItemID/@Model.OI.OID/0" class="btn_Basic btn btn-outline-primary btn-sm btn-round">取消</a>
+                                    <a href="/Admin/OrganizeSet/Meeting_Location_List/@Model.OIID/0" class="btn_Basic btn btn-outline-primary btn-sm btn-round">取消</a>
                                 </div>
                             </div>
                         </div>
@@ -126,5 +143,4 @@
         </div>
     </div>
 </div>
-
 

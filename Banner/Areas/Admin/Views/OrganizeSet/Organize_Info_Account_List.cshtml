@@ -1,0 +1,20 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        @if (Model != null)
+        {
+            <div class="table-container">
+                @Html.Action("_TableList", "Include", new { cTL = Model })
+            </div>
+        }
+    </div>
+</div>
+

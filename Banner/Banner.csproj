@@ -160,6 +160,7 @@
     <Content Include="Areas\Admin\Content\CSS\bootstrap.css" />
     <Content Include="Areas\Admin\Content\CSS\form.css" />
     <Content Include="Areas\Admin\Content\CSS\global.css" />
+    <Content Include="Areas\Admin\Content\CSS\jquery.orgchart.css" />
     <Content Include="Areas\Admin\Content\CSS\list.css" />
     <Content Include="Areas\Admin\Content\CSS\login.css" />
     <Content Include="Areas\Admin\Content\CSS\WebStyle.css" />
@@ -181,6 +182,7 @@
     <Content Include="Areas\Admin\Content\Img\verified.png" />
     <Content Include="Areas\Admin\Content\JS\bootstrap.js" />
     <Content Include="Areas\Admin\Content\JS\jquery-3.7.0.js" />
+    <Content Include="Areas\Admin\Content\JS\jquery.orgchart.js" />
     <Content Include="bin\Antlr3.Runtime.dll" />
     <Content Include="bin\Antlr3.Runtime.pdb" />
     <Content Include="bin\Banner.dll" />
@@ -318,6 +320,10 @@
     <Content Include="Areas\Admin\Views\OrganizeSet\Organize_Info_List.cshtml" />
     <Content Include="Areas\Admin\Views\OrganizeSet\Organize_Info_Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Include\_SiteMap.cshtml" />
+    <Content Include="Areas\Admin\Views\OrganizeSet\Meeting_Location_List.cshtml" />
+    <Content Include="Areas\Admin\Views\OrganizeSet\Meeting_Location_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\OrganizeSet\Meeting_Location_Print.cshtml" />
+    <Content Include="Areas\Admin\Views\OrganizeSet\Organize_Info_Account_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

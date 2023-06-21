@@ -6,8 +6,9 @@
 :root {
     --basic-bagrount-color: #008BAB;
     --basic-button-color: #3f51b5;
-    --basic-bagrountgray-color :#CCC;
+    --basic-bagrountgray-color: #CCC;
 }
+
 .bassic_BackgroundGrayColor {
     background-color: var(--basic-bagrountgray-color);
 }
@@ -16,6 +17,9 @@
     background-color: var(--basic-bagrount-color);
 }
 
+a {
+    text-decoration: none;
+}
 /**/
 .Top_Background {
     /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#008bab+50,252a34+100 */
@@ -38,11 +42,11 @@
     border-radius: 20px;
     border: 2px solid #3f51b5;
     margin: auto 2px;*/
-    width:fit-content;
-    display:inline !important;
+    width: fit-content;
+    display: inline-flex !important;
 }
 
-    /*.btn_Basic:hover {
+/*.btn_Basic:hover {
         background-color: #6292D4;
     }*/
 /*按鈕白底板*/
@@ -60,7 +64,7 @@
     display: inline !important;
 }
 
-    /*.btn_Basic_W:hover {
+/*.btn_Basic_W:hover {
         color: #6292D4;
     }*/
 
@@ -121,11 +125,12 @@
 /*組織篩選用上選單*/
 .div_UpTab a {
     color: #999;
-    font-weight:800;
+    font-weight: 800;
 }
 
 .div_UpTab .a_Select {
-    color: var(--basic-bagrount-color);
+    /*color: var(--basic-bagrount-color);*/
+    color: #DF3A01;
 }
 
 .div_UpTab .col {
@@ -135,4 +140,123 @@
 
 .div_UpTab .col_Select {
     border-bottom: 2px solid var(--basic-bagrount-color);
+}
+
+div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
+    /*background-color: #00b900 !important;
+    border:none;*/
+}
+
+/*組織圖客製化覆蓋CSS*/
+.orgchart.l2r .node {
+    margin-top: 100px !important;
+}
+
+.edge, .topEdge, .rightEdge, .leftEdge, .bottomEdge {
+    display: none !important;
+}
+
+.node:hover, .node.focused {
+    background-color: unset !important;
+}
+
+.oci-menu {
+    display: none !important;
+}
+
+
+
+
+/*======================================================手機板======================================================*/
+@media(max-width:992px) {
+    /*表單RWD*/
+    .table_RWDStyle
+    {
+        width:100%;
+    }
+    .table_RWDStyle tr {
+        display: block;
+        border: 2px solid #CCC;
+        margin: 5px;
+        padding: 5px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+    }
+
+        .table_RWDStyle tr.Bgn {
+            display: none;
+        }
+
+        .table_RWDStyle tr td {
+            display: block;
+            border: unset;
+            padding: 3px;
+            text-align: left;
+        }
+
+            .table_RWDStyle tr td .lab_AreaTitleCell {
+                display: block;
+            }
+
+            .table_RWDStyle tr td textarea.form-control {
+                height: 80px;
+                width: 100%;
+                display: initial;
+            }
+
+            .table_RWDStyle tr td .form-control {
+                width: auto;
+                display: initial;
+            }
+
+            .table_RWDStyle tr td .lab_MobelTitle {
+                font-weight: 600;
+            }
+
+                .table_RWDStyle tr td .lab_MobelTitle:after {
+                    content: "：";
+                }
+
+    .table_EditStyle tr {
+        display: block;
+    }
+
+        .table_EditStyle tr td {
+            display: block;
+        }
+
+            .table_EditStyle tr td:first-child {
+                text-align: left;
+                margin: 2px;
+                font-weight: 600;
+            }
+
+    .table .pagination-container {
+        display: block;
+    }
+}
+
+/*======================================================桌機板======================================================*/
+@media(min-width:992px) {
+    .lab_MobelTitle {
+        display: none;
+    }
+    .table_RWDStyle {
+        width: 100%;
+    }
+
+    .table_RWDStyle tr td {
+        padding: 10px 5px;
+    }
+
+        .table_RWDStyle tr td textarea {
+            height: 60px;
+        }
+
+    .table_EditStyle tr td:first-child {
+        width: 120px;
+        text-align: right;
+        font-weight: 600;
+    }
 }

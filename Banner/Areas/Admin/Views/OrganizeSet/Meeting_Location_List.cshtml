@@ -1,0 +1,60 @@
+﻿@model Banner.Areas.Admin.Controllers.OrganizeSetController.cMLL
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+<link href="~/Areas/Admin/Content/CSS/jquery.orgchart.css" rel="stylesheet" />
+<link href="~/Areas/Admin/Content/CSS/orgchart.style.css" rel="stylesheet" />
+<!--主日聚會點-->
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        @if (Model != null)
+        {
+            <div class="search-form">
+                <div class="search-form-section">
+                    <div class="row">
+                        <div class="col-6 p-2">
+                            <Label>隸屬組織</Label><br />
+                            <Label>@Model.ThisTitle</Label>
+                        </div>
+                        <div class="col-6  p-2">
+                            <Label>選擇協會</Label>
+                            @Html.DropDownList(Model.ControlName, Model.OIList, new { @class = "form-select form-select-lg", @onchange = "ChangePage(this);" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col text-end p-2">
+                            <a href="/Admin/OrganizeSet/Meeting_Location_Print/@Model.OIID/0" class="btn_Basic btn btn-primary btn-round">匯出</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-start">
+                        <input type="hidden" value="@Model.TreeJson" id="hid_treedata" />
+                        <div id="chart-container">
+                            <!--樹狀圖顯示位置-->
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        }
+
+    </div>
+</div>
+
+<script>
+    function ChangePage(ddl) {
+        location.href = '/Admin/OrganizeSet/Meeting_Location_List/' + ddl.value + '/0';
+    }
+</script>
+
+
+

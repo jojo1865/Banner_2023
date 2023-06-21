@@ -26,20 +26,22 @@
                 <div class="search-form">
                     <div class="search-form-section">
                         <div class="row">
-                            <div class="col-6 p-2">
-                                <h3>位置</h3>
-                                @(Model.OTitle)
+                            <div class="col-0 p-2" style="display:none;">
+                                <Label>位置</Label><br />
+                                <Label>@(Model.OTitle)</Label>
                             </div>
-                            <div class="col-6  p-2">
-                                <h3>關鍵字搜尋</h3>
-                                <input type="text" class="form-control" id="txb_Key" style="width:60%; display:inline" value="@ViewBag._Key" />
-                                <a href="javascript:Search();" class="btn btn-primary btn-lg btn-round btn-submit">搜尋</a>
+                            <div class="col-12  p-2">
+                                <Label>關鍵字搜尋</Label>
+                                <input type="text" class="form-control form-control-lg input-underline" id="txb_Key" value="@ViewBag._Key" />
+
                             </div>
                         </div>
                     </div>
+
                     <div class="search-form-section">
                         <div class="row">
-                            <div class="col pe-2 text-end">
+                            <div class="d-flex justify-content-end">
+                                <a href="javascript:Search();" class="btn btn-primary btn-lg btn-round btn-submit me-2">搜尋</a>
                                 <a href="@(Model.sAddURL)" class="btn btn-primary btn-lg btn-round btn-submit">新增</a>
                             </div>
                         </div>

@@ -1,4 +1,11 @@
-﻿@{
+﻿<!--jquery-->
+<script src="~/Areas/Admin/Content/JS/jquery-3.7.0.js"></script>
+<script src="~/Areas/Admin/Content/JS/bootstrap.js"></script>
+<!--Sweet Alert-->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--orgchart 組織圖-->
+<script src="~/Areas/Admin/Content/JS/jquery.orgchart.js"></script>
+@{
     if (TempData["msg"].ToString() != "")
     {
         if (TempData["url"].ToString() != "")
@@ -66,3 +73,33 @@
         </script>
     }
 }
+
+<script type="text/javascript">
+    $(function () {
+        var treedata = JSON.parse(document.getElementById('hid_treedata').value);
+        $('#chart-container').orgchart({
+            'data': treedata,
+            'nodeContent': 'title',
+            'direction': 'l2r'
+        });
+    });
+</script>
+
+<script>
+    function Getddl(ddl) {
+        console.log(ddl.value);
+        $('#ddl_Zip2').html('');
+        $.ajax({
+            url: '/Admin/Home/GetZipSelect?ZID=' + ddl.value,
+            method: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                console.log(res);
+                $.each(res, function (index) {
+                    $('#ddl_Zip2').append('<option value="' + res[index].value + '">' + res[index].Text + '</option>');
+                });
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
+</script>

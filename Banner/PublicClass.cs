@@ -22,6 +22,8 @@ using Banner.Models;
 using System.Net.Mail;
 using System.Net;
 using OfficeOpenXml;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Banner
 {
@@ -396,7 +398,7 @@ namespace Banner
         }
 
         //取得郵遞區號祖宗18代(由樹枝回朔到樹幹)
-        public List<ZipCode> GetOldZip(long ZID, int ActiveType = 1, List<ZipCode> Zs = null)
+        public List<ZipCode> GetOldZip(int ZID, int ActiveType = 1, List<ZipCode> Zs = null)
         {
             var C = DC.ZipCode.FirstOrDefault(q => q.ZID == ZID && (ActiveType == 0 ? true : q.ActiveFlag == (ActiveType == 1)));
             if (C != null)
@@ -416,7 +418,7 @@ namespace Banner
             return Zs;
         }
         //由郵遞區號找前面的地址(限台灣
-        public string GetZipData(long ZID, bool ShowZipCodeFlag = false)
+        public string GetZipData(int ZID, bool ShowZipCodeFlag = false)
         {
             string sOutput = "";
             if (ZID > 1)
@@ -2197,6 +2199,10 @@ namespace Banner
             TempData["_url"] = NowURL;
         }
 
+        public void ChangeTitle(bool AddFlag)
+        {
+            ViewBag._Title += " " + (AddFlag ? "新增" : "編輯");
+        }
         /// <summary>
         /// 設定錯誤訊息彈跳視窗
         /// </summary>

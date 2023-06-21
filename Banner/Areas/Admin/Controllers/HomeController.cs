@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
+﻿using Newtonsoft.Json;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -134,7 +135,10 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (Email != "")
                 {
-                    var AC = DC.Account.FirstOrDefault(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag && q.Contect.FirstOrDefault(p => p.ContectValue == Email && p.ContectType == 2) != null);
+                    var AC = (from q in DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag)
+                              join p in DC.Contect.Where(q => q.ContectValue == Email && q.ContectType == 2 && q.TargetType == 2)
+                              on q.ACID equals p.TargetID
+                              select q).FirstOrDefault();
                     if (AC != null)
                     {
                         int PW = GetRand(1000000);
@@ -160,7 +164,11 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (CellPhone != "")
                 {
-                    var AC = DC.Account.FirstOrDefault(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag && q.Contect.FirstOrDefault(p => p.ContectValue == CellPhone && p.ContectType == 1) != null);
+                    var AC = (from q in DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag)
+                              join p in DC.Contect.Where(q => q.ContectValue == CellPhone && q.ContectType == 1 && q.TargetType == 2)
+                              on q.ACID equals p.TargetID
+                              select q).FirstOrDefault();
+
                     if (AC != null)
                     {
                         int PW = GetRand(1000000);
@@ -201,7 +209,10 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (Email != "")
                 {
-                    var AC = DC.Account.FirstOrDefault(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag && q.Contect.FirstOrDefault(p => p.ContectValue == Email && p.ContectType == 2) != null);
+                    var AC = (from q in DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag)
+                              join p in DC.Contect.Where(q => q.ContectValue == Email && q.ContectType == 2 && q.TargetType == 2)
+                              on q.ACID equals p.TargetID
+                              select q).FirstOrDefault();
                     if (AC != null)
                     {
                         string MailData = "親愛的旌旗家人 您好：</br></br>" +
@@ -222,7 +233,11 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (CellPhone != "")
                 {
-                    var AC = DC.Account.FirstOrDefault(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag && q.Contect.FirstOrDefault(p => p.ContectValue == CellPhone && p.ContectType == 1) != null);
+                    
+                    var AC = (from q in DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag)
+                              join p in DC.Contect.Where(q => q.ContectValue == CellPhone && q.ContectType == 1 && q.TargetType == 2)
+                              on q.ACID equals p.TargetID
+                              select q).FirstOrDefault();
                     if (AC != null)
                     {
                         SendSNS(CellPhone, "【全球旌旗資訊網】忘記帳號通知簡訊", "親愛的旌旗家人您好,您的帳號為：" + AC.Login);
@@ -266,7 +281,17 @@ namespace Banner.Areas.Admin.Controllers
             CreateCheckCodeImage(Code);
         }
         #endregion
+        #region 取得郵遞區號2
+        [HttpGet]
+        public string GetZipSelect(int ZID)
+        {
+            var Zs = from q in DC.ZipCode.Where(q => q.ParentID == ZID && q.ActiveFlag).OrderBy(q => q.Code)
+                     select new { value = q.ZID, Text = q.Code + " " + q.Title };
 
+            return JsonConvert.SerializeObject(Zs);
+        }
+        
+        #endregion
         public string GetTreeToNext(string TargetTable, int ParentID, int SelectedID)
         {
             string sReturn = "";
