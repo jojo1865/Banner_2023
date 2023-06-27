@@ -2133,12 +2133,16 @@ namespace Banner
             ViewBag._UserName = "未知使用者";
             ViewBag._Logo = "";
             ViewBag._SysMsg = "";//用於系統後台系統提示訊息
-
+            ViewBag._UserID = "0";
             ViewBag._Power = bGroup;
             int ACID = GetACID();
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             if (AC != null)
+            {
                 ViewBag._UserName = AC.Name;
+                ViewBag._UserID = ACID;
+            }
+                
 
             ViewBag._CSS1 = "~/Areas/Admin/Content/CSS/";
             string NowURL = Request.Url.AbsolutePath;
@@ -2319,5 +2323,17 @@ namespace Banner
         }
         #endregion
 
+
+        #region 旌旗
+        //取得某組織與旗下所有組織
+        public List<OrganizeInfo> GetThisOIsFromTree(ref List<OrganizeInfo> OIs, int PID)
+        {
+            var OIs_ = DC.OrganizeInfo.Where(q => q.ParentID == PID);
+            OIs.AddRange(OIs_.ToList());
+            foreach (var OI_ in OIs_)
+                GetThisOIsFromTree(ref OIs, OI_.OIID);
+            return OIs;
+        }
+        #endregion
     }
 }

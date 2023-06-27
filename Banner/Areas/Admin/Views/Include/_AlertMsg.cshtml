@@ -74,32 +74,3 @@
     }
 }
 
-<script type="text/javascript">
-    $(function () {
-        var treedata = JSON.parse(document.getElementById('hid_treedata').value);
-        $('#chart-container').orgchart({
-            'data': treedata,
-            'nodeContent': 'title',
-            'direction': 'l2r'
-        });
-    });
-</script>
-
-<script>
-    function Getddl(ddl) {
-        console.log(ddl.value);
-        $('#ddl_Zip2').html('');
-        $.ajax({
-            url: '/Admin/Home/GetZipSelect?ZID=' + ddl.value,
-            method: 'GET',
-            dataType: 'json',
-            success: function (res) {
-                console.log(res);
-                $.each(res, function (index) {
-                    $('#ddl_Zip2').append('<option value="' + res[index].value + '">' + res[index].Text + '</option>');
-                });
-            },
-            error: function (err) { console.log(err) },
-        })
-    }
-</script>

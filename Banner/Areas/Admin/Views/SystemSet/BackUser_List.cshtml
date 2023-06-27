@@ -1,13 +1,72 @@
-﻿
+﻿@model Banner.Areas.Admin.Controllers.SystemSetController.cBackUser_List
 @{
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
 }
 <!--帳號管理-->
-<h2>@ViewBag._Title</h2>
-<div>
-    <h3>篩選</h3>
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        <form method="post" id="form1">
+            @Html.AntiForgeryToken()
+            @if (Model != null)
+            {
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="row">
+                            @foreach (var LS in Model.LS)
+                            {
+                                <div class="col-6 p-2">
+                                    <Label>@LS.OTitle</Label>
+                                    @Html.DropDownList(LS.ControlName, LS.OIList, new { @class = "form-select form-select-lg", @onchange = "GetOIddl(this);" })
+                                </div>
+                            }
+                        </div>
+                        <div class="row">
+                            <div class="col-6  p-2">
+                                <Label>姓名</Label>
+                                <input type="text" class="form-control form-control-lg input-underline" id="txb_Name" value="@ViewBag._Name" />
+                            </div>
+                            <div class="col-6  p-2">
+                                <Label>帳號</Label>
+                                <input type="text" class="form-control form-control-lg input-underline" id="txb_Account" value="@ViewBag._Account" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6  p-2">
+                                <Label>行動電話</Label>
+                                <input type="text" class="form-control form-control-lg input-underline" id="txb_CellPhone" value="@ViewBag._CellPhone" />
+                            </div>
+                            <div class="col-6  p-2">
+                                <Label>性別</Label>
+                                <div class="form-control-lg">
+                                    @Html.RadioButton("rbl_Sex", 0, (bool)(ViewBag._Sex == 0), new { @class = "form-check-input" })
+                                    @Html.Label("全部")
+                                    @Html.RadioButton("rbl_Sex", 0, (bool)(ViewBag._Sex == 1), new { @class = "form-check-input" })
+                                    @Html.Label("男")
+                                    @Html.RadioButton("rbl_Sex", 0, (bool)(ViewBag._Sex == 2), new { @class = "form-check-input" })
+                                    @Html.Label("女")
+                                </div>
 
-</div>
-<div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="d-flex justify-content-end">
+                                <a href="javascript:Search();" class="btn btn-primary btn-lg btn-round btn-submit me-2">搜尋</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                </div>
+            }
+        </form>
+    </div>
 </div>
+

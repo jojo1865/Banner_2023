@@ -15,6 +15,12 @@ namespace Banner.Areas.Admin
         public override void RegisterArea(AreaRegistrationContext context)
         {
             context.MapRoute(
+                "Admin_default",
+                "Admin/{controller}/{action}/{ID}",
+                new { controller = "Home", action = "Index", ID = UrlParameter.Optional }
+            );
+
+            context.MapRoute(
                 "Admin_Item",
                 "Admin/{controller}/{action}/{ItemID}/{ID}",
                 new { controller = "Home", action = "Index", ItemID = UrlParameter.Optional, ID = UrlParameter.Optional }
@@ -32,13 +38,7 @@ namespace Banner.Areas.Admin
                 new { controller = "OrganizeSet", action = "Organize_Info_Edit", ItemID = UrlParameter.Optional, OID = UrlParameter.Optional, PID = UrlParameter.Optional, OIID = UrlParameter.Optional }
             );
 
-
-
-            context.MapRoute(
-                "Admin_default",
-                "Admin/{controller}/{action}/{ID}",
-                new { controller = "Home", action = "Index", ID = UrlParameter.Optional }
-            );
+            
         }
 
     }

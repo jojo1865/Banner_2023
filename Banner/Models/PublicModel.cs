@@ -62,5 +62,6 @@ namespace Banner.Models
         public string Value = "";
         public bool Disabled = false;
         public int SortNo = 0;
+        public List<cTableCell> cTCs = new List<cTableCell>();
     }
 }

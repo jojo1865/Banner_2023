@@ -78,7 +78,8 @@
     .orgchart .nodes {
         display: flex;
         list-style: none;
-        padding-left: 0;
+        
+        margin-top:-7px;
     }
 
     .orgchart .hierarchy {
@@ -89,8 +90,8 @@
         .orgchart .hierarchy::before {
             content: "";
             position: absolute;
-            top: 50px; /* -(background square size + half width of line) */
-            left: -12px;
+            top: 0px; /* -(background square size + half width of line) */
+            left: -38px;
             width: 100%;
             border-top: 2px solid #0094ff;
             box-sizing: border-box;
@@ -98,7 +99,7 @@
 
         .orgchart .hierarchy:first-child::before,
         .orgchart .hierarchy.isSiblingsCollapsed.left-sibs::before {
-            left: calc(50% - 12px);
+            left: calc(50% - 38px);
             width: calc(50% - 0px);
         }
 
@@ -131,10 +132,10 @@
     .orgchart .node:not(:only-child)::after {
         content: "";
         position: absolute;
-        bottom: -52px; /* -(background square size + node's border width) */
-        left: calc(50% - 12px);
+        bottom: 3px; /* -(background square size + node's border width) */
+        left: 20px;
         width: 2px;
-        height: 52px; /* background square size */
+        height: 22px; /* background square size */
         background-color: #0094ff;
     }
 
@@ -157,10 +158,10 @@
     .orgchart > ul > li > ul li > .node::before {
         content: "";
         position: absolute;
-        top: -50px; /* -(fallback value = background square size + border width of node) */
-        left: calc(50% - 12px);
+        top: 0px; /* -(fallback value = background square size + border width of node) */
+        left: 20px;
         width: 2px;
-        height: 50px; /* fallback value = background square size */
+        height: 22px; /* fallback value = background square size */
         background-color: #0094ff;
     }
 
@@ -231,7 +232,7 @@
 
     .orgchart .node .title {
         box-sizing: border-box;
-        width: 200px;
+        width: 150px;
         text-align: center;
         font-weight: bold;
         height: 36px;
@@ -273,7 +274,7 @@
 
     .orgchart .node .content {
         box-sizing: border-box;
-        width: 200px;
+        width: 150px;
         height: 72px;
         line-height: 25px;
         border: 1px solid #0094ff;

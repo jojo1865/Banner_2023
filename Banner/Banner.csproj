@@ -143,6 +143,7 @@
     <Compile Include="Areas\Admin\Controllers\OrganizeSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\SystemSetController.cs" />
     <Compile Include="Areas\Web\WebAreaRegistration.cs" />
+    <Compile Include="Controllers\StarHomeController.cs" />
     <Compile Include="DataClasses.designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -183,6 +184,7 @@
     <Content Include="Areas\Admin\Content\JS\bootstrap.js" />
     <Content Include="Areas\Admin\Content\JS\jquery-3.7.0.js" />
     <Content Include="Areas\Admin\Content\JS\jquery.orgchart.js" />
+    <Content Include="Areas\Admin\Content\JS\WebJavaScript.js" />
     <Content Include="bin\Antlr3.Runtime.dll" />
     <Content Include="bin\Antlr3.Runtime.pdb" />
     <Content Include="bin\Banner.dll" />
@@ -324,6 +326,7 @@
     <Content Include="Areas\Admin\Views\OrganizeSet\Meeting_Location_Edit.cshtml" />
     <Content Include="Areas\Admin\Views\OrganizeSet\Meeting_Location_Print.cshtml" />
     <Content Include="Areas\Admin\Views\OrganizeSet\Organize_Info_Account_List.cshtml" />
+    <Content Include="Areas\Admin\Views\SystemSet\BackUser_Edit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -358,6 +361,7 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.0.min.map" />
+    <Content Include="Views\StarHome\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -365,7 +369,6 @@
     <Folder Include="Areas\Web\Controllers\" />
     <Folder Include="Areas\Web\Data\" />
     <Folder Include="Areas\Web\Views\Shared\" />
-    <Folder Include="Controllers\" />
     <Folder Include="Files\Down\" />
     <Folder Include="Photo\" />
   </ItemGroup>

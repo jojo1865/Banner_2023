@@ -491,7 +491,14 @@ namespace Banner.Areas.Admin.Controllers
 
         private cOrganize_Info_Edit ReSetOrganizeInfo(string ItemID, int OID, int PID, int OIID, FormCollection FC)
         {
-            cOrganize_Info_Edit cIE = new cOrganize_Info_Edit();
+            var OIs__ = new List<OrganizeInfo>();
+            GetThisOIsFromTree(ref OIs__, OIID);
+
+            var ACs = from q in DC.Account.Where(q => !q.DeleteFlag).ToList()
+                      join p in OIs__.GroupBy(q=>q.ACID)
+                      on q.ACID equals p.Key
+                      select q;
+              cOrganize_Info_Edit cIE = new cOrganize_Info_Edit();
             if (OIID > 0)//更新
             {
                 cIE.OI = DC.OrganizeInfo.FirstOrDefault(q => q.OID == OID && q.OIID == OIID && !q.DeleteFlag);
@@ -501,7 +508,6 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     #region 主管列表
                     cIE.ACList = new List<SelectListItem>();
-                    var ACs = DC.Account.Where(q => !q.DeleteFlag);
                     foreach (var A in ACs.OrderBy(q => q.Name))
                         cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = A.Name, Selected = A.ACID == cIE.OI.ACID });
                     if (cIE.ACList.Count > 0)
@@ -614,7 +620,6 @@ namespace Banner.Areas.Admin.Controllers
                     cIE.OI.ParentID = PID;
                     #region 主管
                     cIE.ACList = new List<SelectListItem>();
-                    var ACs = DC.Account.Where(q => !q.DeleteFlag);
                     foreach (var A in ACs.OrderBy(q => q.Name))
                         cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = A.Name });
                     cIE.ACList[0].Selected = true;
@@ -667,6 +672,8 @@ namespace Banner.Areas.Admin.Controllers
 
             return cIE;
         }
+
+        
         #endregion
         #region 牧養組織與職分-成員列表
         public ActionResult Organize_Info_Account_List(string ItemID, int OID, int OIID)

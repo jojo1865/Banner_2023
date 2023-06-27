@@ -22,7 +22,7 @@
                         </div>
                         <div class="col-6  p-2">
                             <Label>選擇協會</Label>
-                            @Html.DropDownList(Model.ControlName, Model.OIList, new { @class = "form-select form-select-lg", @onchange = "ChangePage(this);" })
+                            @Html.DropDownList(Model.ControlName, Model.OIList, new { @class = "form-select form-select-lg", @onchange = "ChangeOI(this);" })
                         </div>
                     </div>
                     <div class="row">
@@ -36,7 +36,7 @@
                 <div class="row">
                     <div class="col-12 text-start">
                         <input type="hidden" value="@Model.TreeJson" id="hid_treedata" />
-                        <div id="chart-container">
+                        <div id="chart-container" style="padding-top:50px;">
                             <!--樹狀圖顯示位置-->
 
                         </div>
@@ -51,7 +51,7 @@
 </div>
 
 <script>
-    function ChangePage(ddl) {
+    function ChangeOI(ddl) {
         location.href = '/Admin/OrganizeSet/Meeting_Location_List/' + ddl.value + '/0';
     }
 </script>

@@ -18,12 +18,12 @@
                  src="~/Areas/Admin/Content/img/admin-navbar-avatar.svg"
                  alt="" />
 
-            <a href="#" class="ms-3 me-3">@ViewBag._UserName</a>
+            <a href="/Admin/SystemSet/BackUser_Edit/@TempData["UID"].ToString()" class="ms-3 me-3">@ViewBag._UserName</a>
         </div>
         @Html.Action("_SiteMap", "Include")
         @RenderBody()
     </main>
     @Html.Action("_AlertMsg", "Include")
-
+    <script src="~/Areas/Admin/Content/JS/WebJavaScript.js"></script>
 </body>
 </html>

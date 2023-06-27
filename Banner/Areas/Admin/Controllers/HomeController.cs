@@ -290,28 +290,17 @@ namespace Banner.Areas.Admin.Controllers
 
             return JsonConvert.SerializeObject(Zs);
         }
-        
+
         #endregion
-        public string GetTreeToNext(string TargetTable, int ParentID, int SelectedID)
+        #region 取得下一層組織選單
+        [HttpGet]
+        public string GetOISelect(int OIID)
         {
-            string sReturn = "";
-            switch (TargetTable)
-            {
-                case "OrganizeInfo":
-                    {
-                        var OIs = DC.OrganizeInfo.Where(q => q.ParentID == ParentID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.Title).ToList();
-                        var OI = OIs.FirstOrDefault(q => q.OIID == SelectedID);
-                        for (int i = 0; i < OIs.Count; i++)
-                        {
-                            if ((OI == null && i == 0) || OI != null && OIs[i].OIID == OI.OIID)
-                                sReturn += (sReturn == "" ? "" : ",") + "{'Text'='" + OIs[i].Title + "','Value'=" + OIs[i].OIID + ",'Selected'='T'}";
-                            else
-                                sReturn += (sReturn == "" ? "" : ",") + "{'Text'='" + OIs[i].Title + "','Value'=" + OIs[i].OIID + ",'Selected'='F'}";
-                        }
-                    }
-                    break;
-            }
-            return "[" + sReturn + "]";
+            var OIs = from q in DC.OrganizeInfo.Where(q => q.ParentID == OIID && q.ActiveFlag).OrderBy(q => q.Title)
+                     select new { value = q.OIID, Text = q.Title };
+
+            return JsonConvert.SerializeObject(OIs);
         }
+        #endregion
     }
 }
