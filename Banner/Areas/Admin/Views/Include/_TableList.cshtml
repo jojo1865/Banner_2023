@@ -222,7 +222,7 @@
                                 </div>
                                 <div class="pagesize-container">
                                     <label>每頁筆數</label>
-                                    <select class="form-select form-select-sm">
+                                    <select class="form-select form-select-sm" onchange="location.href = '@(sDomanPath + "NumCut=")' + this.value">
                                         @for (int j = 0; j < 8; j++)
                                         {
                                             int jCt = 5 * (j + 1);

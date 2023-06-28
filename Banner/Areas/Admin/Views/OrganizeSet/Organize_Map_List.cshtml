@@ -35,11 +35,11 @@
                                     <div class="col">
                                         @foreach (var C in R.Cs)
                                         {
-                                            <a href="@C.URL"><div class="td_O td_O_Basic">@C.Title</div></a>
+                                            <a href="@C.URL"><div class="td_O td_O_Basic1">@C.Title</div></a>
                                             if (!string.IsNullOrEmpty(C.ControlName))
                                             {
                                                 <div class="td_O td_O_Line2"></div>
-                                                <a href="@C.URL"><div class="td_O td_O_Basic">@C.ControlName</div></a>
+                                                <a href="@C.URL"><div class="td_O td_O_Basic1">@C.ControlName</div></a>
                                             }
                                             else
                                             {

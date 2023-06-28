@@ -147,6 +147,74 @@ namespace Banner.Areas.Admin.Controllers
         }
 
         #endregion
+
+
+        #region 取得/設定地點
+        public class cLocation
+        {
+            public List<SelectListItem> Z0List = new List<SelectListItem>();
+            public List<SelectListItem> Z1List = new List<SelectListItem>();
+            public List<SelectListItem> Z2List = new List<SelectListItem>();
+            public List<SelectListItem> Z3List = new List<SelectListItem>();
+            public string Address = "";
+        }
+        public cLocation SetLocation(int LID, FormCollection FC)
+        {
+            int ZID = 46;
+            string Address = "";
+            if (LID > 0)
+            {
+                var L = DC.Location.FirstOrDefault(q => q.LID == LID);
+                if (L != null)
+                {
+                    ZID = L.ZID;
+                    Address = L.Address;
+                }
+            }
+            cLocation cL = new cLocation();
+            cL.Z0List.Add(new SelectListItem { Text = "本國", Value = "10" });
+            cL.Z0List.Add(new SelectListItem { Text = "外國", Value = "2" });
+            cL.Z0List.Add(new SelectListItem { Text = "線上", Value = "116365" });
+            cL.Address = Address;
+            var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == ZID);
+            if (Z != null)
+            {
+                if (Z.GroupName == "國")
+                    cL.Z0List[1].Selected = true;
+                else if (Z.Title == "線上")
+                    cL.Z0List[2].Selected = true;
+                else
+                    cL.Z0List[0].Selected = true;
+            }
+            if (cL.Z0List[0].Selected)//本國
+            {
+                var Z1s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "縣市").OrderBy(q => q.Title);
+                foreach (var Z1 in Z1s)
+                    cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID == Z.ParentID });
+
+                var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z.ParentID).OrderBy(q => q.Title);
+                foreach (var Z2 in Z2s)
+                    cL.Z2List.Add(new SelectListItem { Text = Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID == Z.ZID });
+            }
+            //外國
+            var Z3s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國" && q.ZID != 10).OrderBy(q => q.ParentID).ThenBy(q => q.ZID);
+            foreach (var Z3 in Z3s)
+            {
+                cL.Z3List.Add(new SelectListItem { Text = Z3.Title, Value = Z3.ZID.ToString(), Selected = Z3.ZID == ZID });
+            }
+            return cL;
+        }
+        public PartialViewResult _Location(int LID)
+        {
+            return PartialView(SetLocation(LID,null));
+        }
+        [HttpPost]
+        public PartialViewResult _Location(int LID, FormCollection FC)
+        {
+            var cL = SetLocation(LID, FC);
+            return PartialView();
+        }
+        #endregion
         public PartialViewResult _HeadInclude()
         {
             return PartialView();

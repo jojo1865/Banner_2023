@@ -2,6 +2,9 @@
     背景基本色:#008BAB 藍綠
     按鈕基本色:#3f51b5 深藍
 */
+html, body {
+    height: 100%;
+}
 
 :root {
     --basic-bagrount-color: #008BAB;
@@ -79,22 +82,42 @@ a {
     display: inline-block;
 }
 
-.td_O_Basic {
-    width: 100px;
+.td_O_Basic1 {
+    width: 150px;
+    height: 60px;
     text-align: center;
-    padding: 5px 10px;
+    padding: 5px;
     border: 1px solid #0094ff;
     color: #0094ff;
+    line-height: 45px;
+}
+
+.td_O_Basic2 {
+    width: 160px;
+    height: 60px;
+    text-align: center;
+    padding: 5px;
+    border: 1px solid #0094ff;
+    color: #0094ff;
+    line-height: 20px;
+}
+
+.td_O_Line0 {
+    width: 75px;
+}
+
+.mb_10px {
+    margin-bottom: 10px;
 }
 
 .td_O_Basic0 {
-    width: 100px;
+    width: 150px;
     height: 36px;
 }
 
 .td_O_Line1 {
     border-right: 1px solid #0094ff;
-    width: 50px;
+    width: 75px;
     height: 36px;
 }
 
@@ -105,8 +128,20 @@ a {
 
 .td_O_Line2 {
     border-bottom: 1px solid #0094ff;
-    width: 50px;
-    height: 18px;
+    width: 30px;
+    height: 30px;
+}
+
+.td_O_Line3 {
+    border-left: 1px solid #0094ff;
+    width: 30px;
+    height: 29px;
+}
+
+.td_O_Line4 {
+    border-right: 1px solid #0094ff;
+    width: 30px;
+    height: 29px;
 }
 
 .td_O_2 {
@@ -142,13 +177,13 @@ a {
     border-bottom: 2px solid var(--basic-bagrount-color);
 }
 
-div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
-    /*background-color: #00b900 !important;
-    border:none;*/
-}
+/*div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
+    background-color: #00b900 !important;
+    border:none;
+}*/
 
 /*組織圖客製化覆蓋CSS*/
-.orgchart.l2r .node {
+/*.orgchart.l2r .node {
     margin-top: 0px !important;
 }
 
@@ -162,7 +197,7 @@ div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
 
 .oci-menu {
     display: none !important;
-}
+}*/
 
 /*按鈕等待*/
 @keyframes spin {
@@ -205,56 +240,96 @@ div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
 
 
 
+.div_OI_Outround {
+    width: 220px;
+    position: relative;
+}
+.div_OI_Outround_end {
+    width: 180px;
+    position: relative;
+}
+.div_OI_Top_0 {
+    float: left;
+}
+.div_OI_Top_1 {
+    border-left: 1px solid #0094ff;
+    float: left;
+}
+
+.div_OI_Button_0 {
+    border-top: 1px solid #0094ff;
+    float: left;
+}
+.div_OI_Button_1 {
+    border-left: 1px solid #0094ff;
+    border-top: 1px solid #0094ff;
+    float: left;
+}
+
+.div_OI_Info {
+    z-index: 10;
+    position: absolute;
+    top: calc(50% - 30px);
+    background-color: white;
+    left: 30px;
+}
+
+.div_OI_Info_end {
+    z-index: 10;
+    position:absolute;
+    background-color: white;
+    left: 30px;
+}
 /*======================================================手機板======================================================*/
 @media(max-width:992px) {
     /*表單RWD*/
-    .table_RWDStyle
-    {
-        width:100%;
-    }
-    .table_RWDStyle tr {
-        display: block;
-        border: 2px solid #CCC;
-        margin: 5px;
-        padding: 5px;
-        -webkit-border-radius: 5px;
-        -moz-border-radius: 5px;
-        border-radius: 5px;
+    .table_RWDStyle {
+        width: 100%;
     }
 
-        .table_RWDStyle tr.Bgn {
-            display: none;
-        }
-
-        .table_RWDStyle tr td {
+        .table_RWDStyle tr {
             display: block;
-            border: unset;
-            padding: 3px;
-            text-align: left;
+            border: 2px solid #CCC;
+            margin: 5px;
+            padding: 5px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
         }
 
-            .table_RWDStyle tr td .lab_AreaTitleCell {
+            .table_RWDStyle tr.Bgn {
+                display: none;
+            }
+
+            .table_RWDStyle tr td {
                 display: block;
+                border: unset;
+                padding: 3px;
+                text-align: left;
             }
 
-            .table_RWDStyle tr td textarea.form-control {
-                height: 80px;
-                width: 100%;
-                display: initial;
-            }
-
-            .table_RWDStyle tr td .form-control {
-                width: auto;
-                display: initial;
-            }
-
-            .table_RWDStyle tr td .lab_MobelTitle {
-                font-weight: 600;
-            }
-
-                .table_RWDStyle tr td .lab_MobelTitle:after {
-                    content: "：";
+                .table_RWDStyle tr td .lab_AreaTitleCell {
+                    display: block;
                 }
+
+                .table_RWDStyle tr td textarea.form-control {
+                    height: 80px;
+                    width: 100%;
+                    display: initial;
+                }
+
+                .table_RWDStyle tr td .form-control {
+                    width: auto;
+                    display: initial;
+                }
+
+                .table_RWDStyle tr td .lab_MobelTitle {
+                    font-weight: 600;
+                }
+
+                    .table_RWDStyle tr td .lab_MobelTitle:after {
+                        content: "：";
+                    }
 
     .table_EditStyle tr {
         display: block;
@@ -280,17 +355,18 @@ div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
     .lab_MobelTitle {
         display: none;
     }
+
     .table_RWDStyle {
         width: 100%;
     }
 
-    .table_RWDStyle tr td {
-        padding: 10px 5px;
-    }
-
-        .table_RWDStyle tr td textarea {
-            height: 60px;
+        .table_RWDStyle tr td {
+            padding: 10px 5px;
         }
+
+            .table_RWDStyle tr td textarea {
+                height: 60px;
+            }
 
     .table_EditStyle tr td:first-child {
         width: 120px;
@@ -298,5 +374,3 @@ div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
         font-weight: 600;
     }
 }
-
-

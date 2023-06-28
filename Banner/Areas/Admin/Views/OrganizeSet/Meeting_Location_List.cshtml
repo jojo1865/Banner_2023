@@ -2,8 +2,6 @@
 @{
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
 }
-<link href="~/Areas/Admin/Content/CSS/jquery.orgchart.css" rel="stylesheet" />
-<link href="~/Areas/Admin/Content/CSS/orgchart.style.css" rel="stylesheet" />
 <!--主日聚會點-->
 <div class="main-container">
     <div class="header-container">
@@ -32,18 +30,118 @@
                     </div>
                 </div>
             </div>
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 text-start">
-                        <input type="hidden" value="@Model.TreeJson" id="hid_treedata" />
-                        <div id="chart-container" style="padding-top:50px;">
-                            <!--樹狀圖顯示位置-->
-
+            if (Model.TreeLv == 4)
+            {
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 mt-2">
+                            <div class="row align-items-center">
+                                <div class="col-auto p-0" style="width:191px">
+                                    <div class="td_O td_O_Basic1">@Html.Raw(Model.Tree.name)</div>
+                                    <div class="td_O td_O_Line2"></div>
+                                </div>
+                                <div class="col-auto p-0">
+                                    @foreach (var T1 in Model.Tree.children)
+                                    {
+                                        int it = 0, ib = 0;
+                                        it = T1 == Model.Tree.children.First() ? 0 : 1;
+                                        ib = T1 == Model.Tree.children.Last() ? 0 : 1;
+                                        <div class="row align-items-center div_OI p-0">
+                                            <div class="col-auto div_OI_Outround h-100 p-0">
+                                                <div class="div_OI_Top_@it h-50 w-100"></div>
+                                                <div class="div_OI_Button_@ib h-50 w-100"></div>
+                                                <div class="td_O td_O_Basic2 div_OI_Info">@Html.Raw(T1.name)</div>
+                                            </div>
+                                            <div class="col-auto p-0">
+                                                @foreach (var T2 in T1.children)
+                                                {
+                                                    it = T2 == T1.children.First() ? 0 : 1;
+                                                    ib = T2 == T1.children.Last() ? 0 : 1;
+                                                    <div class="row align-items-center div_OI p-0">
+                                                        <div class="col-auto div_OI_Outround h-100">
+                                                            <div class="div_OI_Top_@it h-50 w-100"></div>
+                                                            <div class="div_OI_Button_@ib h-50 w-100"></div>
+                                                            <div class="td_O td_O_Basic1 div_OI_Info">
+                                                                <a href="@T2.url" title="@T2.title">@Html.Raw(T2.name)</a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-auto p-0">
+                                                            @foreach (var T3 in T2.children)
+                                                            {
+                                                                it = T3 == T2.children.First() ? 0 : 1;
+                                                                ib = T3 == T2.children.Last() ? 0 : 1;
+                                                                <div class="row align-items-center div_OI p-0">
+                                                                    <div class="col-auto div_OI_Outround_end h-100 mb-2 p-0">
+                                                                        <div class="div_OI_Top_@it h-50 w-100"></div>
+                                                                        <div class="div_OI_Button_@ib h-50 w-100"></div>
+                                                                        <div class="td_O td_O_Basic1 div_OI_Info_end">
+                                                                            <a href="@T3.url" title="@T3.title">@Html.Raw(T3.name)</a>
+                                                                        </div>
+                                                                        <div style="height:60px;"></div>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
+            }
+            else if (Model.TreeLv == 3)
+            {
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 mt-2">
+                            <div class="row align-items-center">
+                                <div class="col-auto p-0" style="width:201px">
+                                    <div class="td_O td_O_Basic2">@Html.Raw(Model.Tree.name)</div>
+                                    <div class="td_O td_O_Line2"></div>
+                                </div>
+                                <div class="col-auto p-0">
+                                    @foreach (var T1 in Model.Tree.children)
+                                    {
+                                        int it = 0, ib = 0;
+                                        it = T1 == Model.Tree.children.First() ? 0 : 1;
+                                        ib = T1 == Model.Tree.children.Last() ? 0 : 1;
+                                        <div class="row align-items-center div_OI p-0">
+                                            <div class="col-auto div_OI_Outround h-100 p-0">
+                                                <div class="div_OI_Top_@it h-50 w-100"></div>
+                                                <div class="div_OI_Button_@ib h-50 w-100"></div>
+                                                <div class="td_O td_O_Basic1 div_OI_Info">
+                                                    <a href="@T1.url" title="@T1.title">@Html.Raw(T1.name)</a>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto p-0" style="margin-left:11px;">
+                                                @foreach (var T2 in T1.children)
+                                                {
+                                                    it = T2 == T1.children.First() ? 0 : 1;
+                                                    ib = T2 == T1.children.Last() ? 0 : 1;
+                                                    <div class="row align-items-center div_OI p-0">
+                                                        <div class="col-auto div_OI_Outround_end h-100 mb-2 p-0">
+                                                            <div class="div_OI_Top_@it h-50 w-100"></div>
+                                                            <div class="div_OI_Button_@ib h-50 w-100"></div>
+                                                            <div class="td_O td_O_Basic1 div_OI_Info_end">
+                                                                <a href="@T2.url" title="@T2.title">@Html.Raw(T2.name)</a>
+                                                            </div>
+                                                            <div style="height:60px;"></div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
 
         }
 
@@ -54,7 +152,7 @@
     function ChangeOI(ddl) {
         location.href = '/Admin/OrganizeSet/Meeting_Location_List/' + ddl.value + '/0';
     }
-</script>
 
+</script>
 
 

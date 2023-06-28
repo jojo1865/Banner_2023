@@ -1,0 +1,166 @@
+﻿@model Banner.Areas.Admin.Controllers.AccountSetController.cAccount_List
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        <form method="post" id="form1">
+            @Html.AntiForgeryToken()
+            @if (Model != null)
+            {
+                <div class="search-form">
+                    <div class="search-form-section">
+
+                        <div class="row">
+                            @foreach (var LS in Model.LS_O)
+                            {
+                                <div class="col-6 p-2">
+                                    <Label>@LS.Title</Label>
+                                    @Html.DropDownList(LS.ControlName, LS.ddlList, new { @class = "form-select form-select-lg", @onchange = "GetOIddl(this);" })
+                                </div>
+                            }
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>姓名</label>
+                                    @Html.TextBox("txb_Name", @Model.Name, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>性別</label>
+                                    <div class="form-control-lg">
+                                        @Html.DropDownList(Model.LS_Sex.ControlName, Model.LS_Sex.ddlList, new { @class = "form-select form-select-lg" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>受洗狀態</label>
+                                    <div class="form-control-lg">
+                                        @Html.DropDownList(Model.LS_Baptized.ControlName, Model.LS_Baptized.ddlList, new { @class = "form-select form-select-lg" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>手機</label>
+                                    @Html.TextBox("txb_CellPhone", @Model.CellPhone, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!--
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>課程分類</label>
+                                    <select class="form-select form-select-lg">
+                                        <option selected disabled>請選擇</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>課程名稱</label>
+                                    <input class="form-control form-control-lg input-underline" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>事工團分類</label>
+                                    <select class="form-select form-select-lg">
+                                        <option selected disabled>請選擇</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>事工團名稱</label>
+                                    <input class="form-control form-control-lg input-underline" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>其他備註</label>
+                                    <input class="form-control form-control-lg input-underline" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>中低收入戶</label><br />
+                                    <div class="check-container">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               value="" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        -->
+                    <div class="search-form-section">
+                        <div class="d-flex justify-content-end">
+                            <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-round btn-submit me-2">搜尋</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <!--
+                    <div class="table-func-container">
+                        <button class="btn btn-outline-primary btn-sm btn-round">
+                            全選
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm btn-round">
+                            全不選
+                        </button>
+                        <div>&nbsp;</div>
+                        <button id="btn-export-sm"
+                                class="btn btn-primary btn-sm btn-round">
+                            <span class="material-icons"> print </span> 匯出
+                        </button>
+                        <button class="btn btn-primary btn-sm btn-round">
+                            <span class="material-icons"> print </span>匯出牧養歷程
+                        </button>
+                        <button class="btn btn-primary btn-sm btn-round">
+                            <span class="material-icons"> print </span>匯出課程歷程
+                        </button>
+                        <button class="btn btn-primary btn-sm btn-round">
+                            <span class="material-icons"> print </span>匯出事工歷程
+                        </button>
+                    </div>
+                        -->
+                    <div class="table-container">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                    </div>
+                </div>
+            }
+
+        </form>
+    </div>
+</div>
+

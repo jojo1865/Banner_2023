@@ -6,13 +6,13 @@
 <div class="main-container">
     <div class="form-container-list">
         <div class="form-container">
-            <div class="form-header"><h5>@ViewBag._Title</h5></div>
+            <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
             @if (Model != null)
             {
                 <form method="post" id="form1">
                     @Html.AntiForgeryToken()
                     <div class="form-body">
-                        <div class="row text-center">
+                        <div class="row text-center visually-hidden">
                             <div class="col m-3">
                                 @if ((((bool[])ViewBag._Power)[1] && Model.ACID == 0) || (((bool[])ViewBag._Power)[2] && Model.ACID > 0))
                                 {
@@ -64,7 +64,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                @if (Model.ACID > 0 && ((bool[])ViewBag._Power)[3])
+                                @if (Model.ACID > 0 && ((bool[])ViewBag._Power)[3] && false)
                                 {
                                     <div class="form-group">
                                         <label>刪除</label>

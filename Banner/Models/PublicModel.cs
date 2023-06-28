@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Banner.Models
 {
@@ -63,5 +64,13 @@ namespace Banner.Models
         public bool Disabled = false;
         public int SortNo = 0;
         public List<cTableCell> cTCs = new List<cTableCell>();
+    }
+    //下拉選單物件
+    public class ListSelect
+    {
+        public string Title = "";
+        public string ControlName = "";
+        public int SortNo = 0;
+        public List<SelectListItem> ddlList = new List<SelectListItem>();
     }
 }

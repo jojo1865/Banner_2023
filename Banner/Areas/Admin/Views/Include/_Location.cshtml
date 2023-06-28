@@ -1,0 +1,40 @@
+﻿@model Banner.Areas.Admin.Controllers.IncludeController.cLocation
+
+<div class="row">
+    <div class="col-2">
+        @Html.DropDownList("ddl_Zip0", Model.Z0List,
+           new { @class = "form-select form-select-lg", @onchange = "ShowArea(this);" })
+    </div>
+    @{
+        string ShowControl = "none";
+        if (Model.Z0List[0].Selected)
+        {
+            ShowControl = "block";
+        }
+    }
+    <div class="col-2 div_Zip0" style="display:@ShowControl">
+        @Html.DropDownList("ddl_Zip1", Model.Z1List,
+           new { @class = "form-select form-select-lg", @onchange = "GetZipddl(this);" })
+    </div>
+    <div class="col-2 div_Zip0" style="display:@ShowControl">
+        @Html.DropDownList("ddl_Zip2", Model.Z2List,
+           new { @class = "form-select form-select-lg" })
+    </div>
+    @{
+        ShowControl = "none";
+        if (Model.Z0List[1].Selected)
+        {
+            ShowControl = "block";
+        }
+    }
+    <div class="col-2 div_Zip1" style="display:@ShowControl">
+        @Html.DropDownList("ddl_Zip3", Model.Z3List,
+           new { @class = "form-select form-select-lg" })
+    </div>
+    <div class="col-6">
+        @Html.TextBox("txb_Address", Model.Address, new { @class = "form-control form-control-lg input-underline " })
+    </div>
+</div>
+<script>
+
+</script>

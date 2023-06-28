@@ -21,26 +21,20 @@ namespace Banner.Areas.Admin.Controllers
         {
             public cTableList cTL = new cTableList();
             public List<ListSelect> LS = new List<ListSelect>();
-            public string sAddURL = "";
+            public string sAddURL = "/Admin/SystemSet/BackUser_Edit";
+            public string Name = "";
+            public string Account = "";
+            public string CellPhone = "";
+            public int Sex = 0;
         }
-        public class ListSelect
-        {
-            public string OTitle = "";
-            public string ControlName = "";
-            public int SortNo = 0;
-            public List<SelectListItem> OIList = new List<SelectListItem>();
-        }
+        
         public ActionResult BackUser_List()
         {
             GetViewBag();
             cBackUser_List cBUL = new cBackUser_List();
-            cBUL.sAddURL = "/Admin/SystemSet/BackUser_Edit";
-            cBUL.LS = GetO(new List<ListSelect>(), 0, 0);
+            cBUL.LS = GetO();
             cBUL.cTL = GetBackUser(null);
-            ViewBag._Name = "";
-            ViewBag._Account = "";
-            ViewBag._CellPhone = "";
-            ViewBag._Sex = 0;
+
 
             return View(cBUL);
         }
@@ -50,13 +44,12 @@ namespace Banner.Areas.Admin.Controllers
         {
             GetViewBag();
             cBackUser_List cBUL = new cBackUser_List();
-            cBUL.sAddURL = "/Admin/SystemSet/BackUser_Edit";
-            cBUL.LS = GetO(new List<ListSelect>(), 0, 0);
+            cBUL.LS = GetO();
             cBUL.cTL = GetBackUser(FC);
-            ViewBag._Name = FC.Get("txb_Name");
-            ViewBag._Account = FC.Get("txb_Account");
-            ViewBag._CellPhone = FC.Get("txb_CellPhone");
-            ViewBag._Sex = FC.Get("rbl_Sex");
+            cBUL.Name = FC.Get("txb_Name");
+            cBUL.Account = FC.Get("txb_Account");
+            cBUL.CellPhone = FC.Get("txb_CellPhone");
+            cBUL.Sex = Convert.ToInt32(FC.Get("rbl_Sex"));
 
             return View(cBUL);
         }
@@ -164,29 +157,7 @@ namespace Banner.Areas.Admin.Controllers
             return cTL;
         }
 
-        //取得上方下拉選單
-        public List<ListSelect> GetO(List<ListSelect> Os, int SortNo, int PID = 0)
-        {
-            var O = DC.Organize.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ParentID == PID);
-            if (O != null)
-            {
-                ListSelect LS = new ListSelect();
-                LS.OTitle = O.Title;
-                LS.ControlName = "ddl_" + SortNo;
-                LS.SortNo = SortNo;
-                LS.OIList = new List<SelectListItem>();
-                if (PID == 1)
-                    LS.OIList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-                if (PID < 2)
-                    LS.OIList.AddRange((from q in DC.OrganizeInfo.Where(q => q.OID == O.OID).OrderBy(q => q.OIID)
-                                        select new SelectListItem { Text = q.Title, Value = q.OIID.ToString() }).ToList());
-                Os.Add(LS);
-
-                GetO(Os, SortNo + 1, O.OID);
-            }
-
-            return Os;
-        }
+        
         #endregion
         #region 帳號管理-新增/修改/刪除
         public class cBackUser_Edit

@@ -2328,11 +2328,90 @@ namespace Banner
         //取得某組織與旗下所有組織
         public List<OrganizeInfo> GetThisOIsFromTree(ref List<OrganizeInfo> OIs, int PID)
         {
-            var OIs_ = DC.OrganizeInfo.Where(q => q.ParentID == PID);
+            /*var OIs_ = DC.OrganizeInfo.Where(q => q.ParentID == PID);
             OIs.AddRange(OIs_.ToList());
             foreach (var OI_ in OIs_)
-                GetThisOIsFromTree(ref OIs, OI_.OIID);
+                GetThisOIsFromTree(ref OIs, OI_.OIID);*/
+            return GetThisOIsFromTree(PID);
+        }
+        public List<OrganizeInfo> GetThisOIsFromTree(int PID)
+        {
+            List<OrganizeInfo> OIs = new List<OrganizeInfo>();
+            var OIs_ = DC.OrganizeInfo.Where(q => !q.DeleteFlag && q.ActiveFlag).ToList();
+            var OIs__ = OIs_.Where(q => q.ParentID == PID).ToList();
+            while (OIs__.Count>0) 
+            {
+                OIs.AddRange(OIs__);
+                OIs__ = (from q in OIs__
+                        join p in OIs_
+                        on q.OIID equals p.ParentID
+                        select p).ToList();
+            };
+
             return OIs;
+        }
+
+
+        //取得全部組織組織下拉選單
+        public List<ListSelect> GetO(int OIID=0)
+        {
+            List<ListSelect> LSs = new List<ListSelect>();
+            var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
+            var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
+            int[] OIIDs = new int[10];
+            if(OIID > 0)
+            {
+                var OI_ = OIs.FirstOrDefault(q => q.OIID == OIID && !q.DeleteFlag && q.ActiveFlag);
+                if(OI_!=null)
+                {
+                    for(int i=OI_.OID; i>=0;i--)
+                    {
+                        OIIDs[i] = OI_.OIID;
+                        OI_ = OIs.FirstOrDefault(q => q.OIID == OI_.ParentID && !q.DeleteFlag && q.ActiveFlag);
+                        if (OI_ == null)
+                            break;
+                    }
+                }
+            }
+
+
+            int PID = 0;
+            int SortNo = 0;
+            do
+            {
+                var O = Os.FirstOrDefault(q => q.ParentID == PID);
+                if (O == null)
+                    break;
+                else
+                {
+                    PID = O.OID;
+                    ListSelect LS = new ListSelect();
+                    LS.Title = O.Title;
+                    LS.ControlName = "ddl_" + SortNo;
+                    LS.SortNo = SortNo;
+                    LS.ddlList = new List<SelectListItem>();
+                    if(OIID==0)
+                    {
+                        if (PID == 1)
+                            LS.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "-1", Selected = true });
+                        if (PID < 2)
+                            LS.ddlList.AddRange((from q in OIs.Where(q => q.OID == O.OID).OrderBy(q => q.OIID)
+                                                 select new SelectListItem { Text = q.Title, Value = q.OIID.ToString() }).ToList());
+                    }
+                    else
+                    {
+                        //var SubOIs = OIs.Where(q => q.OID == O.OID && q.ParentID == OIIDs[O.OID-1]).OrderBy(q => q.OIID);
+                        LS.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "-1" });
+                        LS.ddlList.AddRange((from q in OIs.Where(q => q.OID == O.OID && q.ParentID == OIIDs[O.OID-1]).OrderBy(q => q.OIID)
+                                             select new SelectListItem { Text = q.Title, Value = q.OIID.ToString(),Selected=q.OIID == OIIDs[q.OID] }).ToList());
+                    }
+                    LSs.Add(LS);
+
+                    SortNo++;
+                }
+            }while (true);
+            return LSs;
+
         }
         #endregion
     }

@@ -12,6 +12,7 @@ using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
+using System.Web.UI.WebControls;
 
 namespace Banner.Areas.Admin.Controllers
 {
@@ -417,8 +418,7 @@ namespace Banner.Areas.Admin.Controllers
             public Contect C = new Contect();
             public Location L = new Location();
 
-            public List<SelectListItem> Z1List = new List<SelectListItem>();
-            public List<SelectListItem> Z2List = new List<SelectListItem>();
+
         }
         public class ListSelect
         {
@@ -459,7 +459,6 @@ namespace Banner.Areas.Admin.Controllers
                 SetAlert(Error, 2);
             else
             {
-
                 cIE.OI.UpdDate = DT;
                 if (OIID == 0)
                 {
@@ -478,7 +477,6 @@ namespace Banner.Areas.Admin.Controllers
 
                 cIE.L.TargetType = 1;
                 cIE.L.TargetID = cIE.OI.OIID;
-                cIE.L.ZID = Convert.ToInt32(cIE.Z2List.First(q => q.Selected).Value);
                 if (cIE.L.LID == 0)
                     DC.Location.InsertOnSubmit(cIE.L);
                 DC.SubmitChanges();
@@ -491,14 +489,8 @@ namespace Banner.Areas.Admin.Controllers
 
         private cOrganize_Info_Edit ReSetOrganizeInfo(string ItemID, int OID, int PID, int OIID, FormCollection FC)
         {
-            var OIs__ = new List<OrganizeInfo>();
-            GetThisOIsFromTree(ref OIs__, OIID);
 
-            var ACs = from q in DC.Account.Where(q => !q.DeleteFlag).ToList()
-                      join p in OIs__.GroupBy(q=>q.ACID)
-                      on q.ACID equals p.Key
-                      select q;
-              cOrganize_Info_Edit cIE = new cOrganize_Info_Edit();
+            cOrganize_Info_Edit cIE = new cOrganize_Info_Edit();
             if (OIID > 0)//更新
             {
                 cIE.OI = DC.OrganizeInfo.FirstOrDefault(q => q.OID == OID && q.OIID == OIID && !q.DeleteFlag);
@@ -508,6 +500,12 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     #region 主管列表
                     cIE.ACList = new List<SelectListItem>();
+                    var OIs__ = new List<OrganizeInfo>();
+                    GetThisOIsFromTree(ref OIs__, OIID);
+                    var ACs = from q in DC.Account.Where(q => !q.DeleteFlag).ToList()
+                              join p in OIs__.GroupBy(q => q.ACID)
+                              on q.ACID equals p.Key
+                              select q;
                     foreach (var A in ACs.OrderBy(q => q.Name))
                         cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = A.Name, Selected = A.ACID == cIE.OI.ACID });
                     if (cIE.ACList.Count > 0)
@@ -574,32 +572,9 @@ namespace Banner.Areas.Admin.Controllers
                     #region 地址
                     var L = DC.Location.FirstOrDefault(q => q.TargetType == 1 && q.TargetID == OIID);
                     if (L != null)
-                    {
                         cIE.L = L;
-                        var Z1s = DC.ZipCode.Where(q => q.ParentID == 10 && q.ActiveFlag).OrderBy(q => q.Title).ToList();
-                        for (int i = 0; i < Z1s.Count; i++)
-                        {
-                            cIE.Z1List.Add(new SelectListItem { Text = Z1s[i].Title, Value = Z1s[i].ZID.ToString(), Selected = Z1s[i].ZID == L.ZipCode.ParentID });
-
-                            var Z2s = DC.ZipCode.Where(q => q.ParentID == L.ZipCode.ParentID && q.ActiveFlag).OrderBy(q => q.Code).ToList();
-                            for (int j = 0; j < Z2s.Count; j++)
-                                cIE.Z2List.Add(new SelectListItem { Text = Z2s[j].Code + " " + Z2s[j].Title, Value = Z2s[j].ZID.ToString(), Selected = Z2s[j].ZID == L.ZID });
-                        }
-                    }
                     else
-                    {
-                        var Z1s = DC.ZipCode.Where(q => q.ParentID == 10 && q.ActiveFlag).OrderBy(q => q.Title).ToList();
-                        for (int i = 0; i < Z1s.Count; i++)
-                        {
-                            cIE.Z1List.Add(new SelectListItem { Text = Z1s[i].Title, Value = Z1s[i].ZID.ToString(), Selected = i == 0 });
-                            if (i == 0)
-                            {
-                                var Z2s = DC.ZipCode.Where(q => q.ParentID == Z1s[i].ZID && q.ActiveFlag).OrderBy(q => q.Code).ToList();
-                                for (int j = 0; j < Z2s.Count; j++)
-                                    cIE.Z2List.Add(new SelectListItem { Text = Z2s[j].Code + " " + Z2s[j].Title, Value = Z2s[j].ZID.ToString(), Selected = j == 0 });
-                            }
-                        }
-                    }
+                        cIE.L = new Location { ZID = 46 };
                     #endregion
                     #region 電話
                     var C = DC.Contect.FirstOrDefault(q => q.TargetType == 1 && q.TargetID == OIID);
@@ -616,27 +591,68 @@ namespace Banner.Areas.Admin.Controllers
                 else
                 {
                     cIE.OI = new OrganizeInfo();
-                    cIE.OI.Organize = DC.Organize.FirstOrDefault(q => q.OID == OID);
+                    cIE.OI.Organize = O;
                     cIE.OI.ParentID = PID;
+                    #region 上層
+                    cIE.OIParent = new List<ListSelect>();
+                    int SortNo = 10;
+                    var OIP = DC.OrganizeInfo.Where(q => q.OID == O.ParentID && !q.DeleteFlag).OrderByDescending(q => q.OIID).FirstOrDefault();
+                    if (OIP != null)
+                    {
+                        int NowPID = OIP.ParentID;
+                        var OIs = DC.OrganizeInfo.Where(q => q.ParentID == NowPID && !q.DeleteFlag);
+                        do
+                        {
+                            if (OIs.Count() == 0 || SortNo < 0 || NowPID < 0)
+                                break;
+                            else
+                            {
+                                ListSelect cLS = new ListSelect();
+                                cLS.ControlName = "ddl_OIID_" + SortNo;
+                                cLS.SortNo = SortNo;
+                                foreach (var OI in OIs)
+                                {
+                                    if (OI.ParentID == NowPID)
+                                    {
+                                        OIP = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == NowPID && !q.DeleteFlag);
+                                        if (OIP != null)
+                                            NowPID = OIP.ParentID;
+                                        else
+                                            NowPID = -1;
+
+                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title, Value = OI.OIID.ToString(), Selected = true });
+                                    }
+                                    else
+                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title, Value = OI.OIID.ToString() });
+                                }
+
+
+                                if (SortNo == 10 && cLS.OIList.Count > 0)
+                                {
+                                    cLS.OIList.ForEach(q => q.Selected = false);
+                                    cLS.OIList.First().Selected = true;
+                                }
+
+                                cIE.OIParent.Add(cLS);
+                                SortNo--;
+                                OIs = DC.OrganizeInfo.Where(q => q.ParentID == NowPID && !q.DeleteFlag);
+                            }
+                        } while (true);
+                    }
+                    #endregion
+
                     #region 主管
+                    var ACs = from q in DC.Account.Where(q => !q.DeleteFlag)
+                              join p in DC.OrganizeInfo.Where(q => q.OID == O.OID && !q.DeleteFlag && q.ActiveFlag)
+                              on q.ACID equals p.ACID
+                              select q;
                     cIE.ACList = new List<SelectListItem>();
                     foreach (var A in ACs.OrderBy(q => q.Name))
                         cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = A.Name });
                     cIE.ACList[0].Selected = true;
                     #endregion
                     #region 地址
-                    var Z1s = DC.ZipCode.Where(q => q.ParentID == 10 && q.ActiveFlag).OrderBy(q => q.Title).ToList();
-                    for (int i = 0; i < Z1s.Count; i++)
-                    {
-                        cIE.Z1List.Add(new SelectListItem { Text = Z1s[i].Title, Value = Z1s[i].ZID.ToString(), Selected = (i == 0) });
-                        if (i == 0)
-                        {
-                            var Z2s = DC.ZipCode.Where(q => q.ParentID == Z1s[i].ZID && q.ActiveFlag).OrderBy(q => q.Code).ToList();
-                            for (int j = 0; j < Z2s.Count; j++)
-                                cIE.Z2List.Add(new SelectListItem { Text = Z2s[j].Code + " " + Z2s[j].Title, Value = Z2s[j].ZID.ToString(), Selected = (j == 0) });
-                            cIE.L = new Location { ZID = Z2s[0].ZID };
-                        }
-                    }
+                    cIE.L = new Location();
                     #endregion
                 }
             }
@@ -650,30 +666,18 @@ namespace Banner.Areas.Admin.Controllers
                 cIE.OI.ParentID = Convert.ToInt32(FC.Get("ddl_OIID_10"));
                 cIE.C.ContectValue = FC.Get("txb_Phone");
                 cIE.L.Address = FC.Get("txb_Address");
-                if (FC.Get("ddl_Zip1") != null)
-                {
-                    cIE.Z2List = new List<SelectListItem>();
-                    int Z1ID = Convert.ToInt32(FC.Get("ddl_Zip1"));
-                    cIE.Z1List.ForEach(q => q.Selected = false);
-                    cIE.Z1List.First(q => q.Value == Z1ID.ToString()).Selected = true;
-                    var Z2s = DC.ZipCode.Where(q => q.ParentID == Z1ID && q.ActiveFlag).OrderBy(q => q.Code).ToList();
-                    for (int j = 0; j < Z2s.Count; j++)
-                    {
-                        if (FC.Get("ddl_Zip2") == Z2s[j].ZID.ToString())
-                        {
-                            cIE.Z2List.Add(new SelectListItem { Text = Z2s[j].Code + " " + Z2s[j].Title, Value = Z2s[j].ZID.ToString(), Selected = true });
-                            cIE.L.ZipCode = Z2s[j];
-                        }
-                        else
-                            cIE.Z2List.Add(new SelectListItem { Text = Z2s[j].Code + " " + Z2s[j].Title, Value = Z2s[j].ZID.ToString() });
-                    }
-                }
+                if (FC.Get("ddl_Zip0") == "10")
+                    cIE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip2"));
+                else if (FC.Get("ddl_Zip0") == "2")
+                    cIE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip3"));
+                else
+                    cIE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip0"));
             }
 
             return cIE;
         }
 
-        
+
         #endregion
         #region 牧養組織與職分-成員列表
         public ActionResult Organize_Info_Account_List(string ItemID, int OID, int OIID)
@@ -772,11 +776,14 @@ namespace Banner.Areas.Admin.Controllers
             public int OIID = 0;
             public List<SelectListItem> OIList = new List<SelectListItem>();
             public string TreeJson = "";
+            public cTree Tree = new cTree();
+            public int TreeLv = 0;
         }
         public class cTree
         {
             public string name = "";
             public string title = "";
+            public string url = "";
             public List<cTree> children = new List<cTree>();
         }
         /// <summary>
@@ -809,38 +816,44 @@ namespace Banner.Areas.Admin.Controllers
             {
                 MLL.ThisTitle = POI.Title;
                 cTree T1 = new cTree();
-                T1.name = POI.Organize.Title;
-                T1.title = POI.Title.Replace("基督教", "</br>基督教");
+                T1.name = POI.Title.Replace("基督教", "</br>基督教");
+                T1.title = "";
                 T1.children = new List<cTree>();
                 var OIs = DC.OrganizeInfo.Where(q => q.OID == 2 && !q.DeleteFlag && q.ParentID == POI.OIID).OrderBy(q => q.OIID);
                 foreach (var OI in OIs)
                 {
                     var MLSs = DC.M_Location_Set.Where(q => q.SetType == 0 && q.TargetID == OI.OIID && !q.DeleteFlag && !q.Meeting_Location.DeleteFlag).Select(q => q.Meeting_Location).OrderBy(q => q.MLID);
                     cTree T2 = new cTree();
-                    T2.name = OI.Organize.Title;
-                    T2.title = OI.Title + " (" + MLSs.Count() + ")</br><a href='/Admin/OrganizeSet/Meeting_Location_Edit/" + OI.OIID + "/0' class='btn_Basic btn btn-primary btn-round'>新增</a>";
+                    T2.name = OI.Title + " (" + MLSs.Count() + ")";
+                    T2.title = "新增";
+                    T2.url = "/Admin/OrganizeSet/Meeting_Location_Edit/" + OI.OIID + "/0";
                     T2.children = new List<cTree>();
                     foreach (var MLS in MLSs)
                     {
                         T2.children.Add(new cTree
                         {
-                            name = "主日聚會點",
-                            title = MLS.Title + "</br><a href='/Admin/OrganizeSet/Meeting_Location_Edit/" + OI.OIID + "/" + MLS.MLID + "'  class='btn_Basic btn btn-primary btn-round'>編輯</a>"
+                            name = MLS.Title,
+                            title = "編輯",
+                            url = "/Admin/OrganizeSet/Meeting_Location_Edit/" + OI.OIID + "/" + MLS.MLID
                         });
                     }
-
                     T1.children.Add(T2);
                 }
 
                 T0.children.Add(T1);
             }
+            
             if (POIs.Count() == 1)
             {
+                MLL.Tree = T0.children[0];
+                MLL.TreeLv = 3;
                 MLL.TreeJson = JsonConvert.SerializeObject(T0.children[0]);
             }
             else
             {
                 MLL.ThisTitle = "全部主日聚會點";
+                MLL.Tree = T0;
+                MLL.TreeLv = 4;
                 MLL.TreeJson = JsonConvert.SerializeObject(T0);
             }
             return View(MLL);
@@ -856,8 +869,6 @@ namespace Banner.Areas.Admin.Controllers
             public Contect C = new Contect();
             public Location L = new Location();
             public int OIID = 0;
-            public List<SelectListItem> Z1List = new List<SelectListItem>();
-            public List<SelectListItem> Z2List = new List<SelectListItem>();
 
             public List<SelectListItem> SH_List = new List<SelectListItem>();
             public List<SelectListItem> SM_List = new List<SelectListItem>();
@@ -922,7 +933,6 @@ namespace Banner.Areas.Admin.Controllers
 
                 cMLE.L.TargetType = 3;
                 cMLE.L.TargetID = cMLE.cML.MLID;
-                cMLE.L.ZID = Convert.ToInt32(cMLE.Z2List.First(q => q.Selected).Value);
                 if (cMLE.L.LID == 0)
                     DC.Location.InsertOnSubmit(cMLE.L);
                 DC.SubmitChanges();
@@ -1019,32 +1029,9 @@ namespace Banner.Areas.Admin.Controllers
                     #region 地址
                     var L = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == ID);
                     if (L != null)
-                    {
                         cMLE.L = L;
-                        var Z1s = DC.ZipCode.Where(q => q.ParentID == 10 && q.ActiveFlag).OrderBy(q => q.Title).ToList();
-                        for (int i = 0; i < Z1s.Count; i++)
-                        {
-                            cMLE.Z1List.Add(new SelectListItem { Text = Z1s[i].Title, Value = Z1s[i].ZID.ToString(), Selected = Z1s[i].ZID == L.ZipCode.ParentID });
-
-                            var Z2s = DC.ZipCode.Where(q => q.ParentID == L.ZipCode.ParentID && q.ActiveFlag).OrderBy(q => q.Code).ToList();
-                            for (int j = 0; j < Z2s.Count; j++)
-                                cMLE.Z2List.Add(new SelectListItem { Text = Z2s[j].Code + " " + Z2s[j].Title, Value = Z2s[j].ZID.ToString(), Selected = Z2s[j].ZID == L.ZID });
-                        }
-                    }
                     else
-                    {
-                        var Z1s = DC.ZipCode.Where(q => q.ParentID == 10 && q.ActiveFlag).OrderBy(q => q.Title).ToList();
-                        for (int i = 0; i < Z1s.Count; i++)
-                        {
-                            cMLE.Z1List.Add(new SelectListItem { Text = Z1s[i].Title, Value = Z1s[i].ZID.ToString(), Selected = i == 0 });
-                            if (i == 0)
-                            {
-                                var Z2s = DC.ZipCode.Where(q => q.ParentID == Z1s[i].ZID && q.ActiveFlag).OrderBy(q => q.Code).ToList();
-                                for (int j = 0; j < Z2s.Count; j++)
-                                    cMLE.Z2List.Add(new SelectListItem { Text = Z2s[j].Code + " " + Z2s[j].Title, Value = Z2s[j].ZID.ToString(), Selected = j == 0 });
-                            }
-                        }
-                    }
+                        cMLE.L = new Location();
                     #endregion
                     #region 電話
                     var C = DC.Contect.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == ID);
@@ -1121,18 +1108,7 @@ namespace Banner.Areas.Admin.Controllers
                     }
                     #endregion
                     #region 地址
-                    var Z1s = DC.ZipCode.Where(q => q.ParentID == 10 && q.ActiveFlag).OrderBy(q => q.Title).ToList();
-                    for (int i = 0; i < Z1s.Count; i++)
-                    {
-                        cMLE.Z1List.Add(new SelectListItem { Text = Z1s[i].Title, Value = Z1s[i].ZID.ToString(), Selected = (i == 0) });
-                        if (i == 0)
-                        {
-                            var Z2s = DC.ZipCode.Where(q => q.ParentID == Z1s[i].ZID && q.ActiveFlag).OrderBy(q => q.Code).ToList();
-                            for (int j = 0; j < Z2s.Count; j++)
-                                cMLE.Z2List.Add(new SelectListItem { Text = Z2s[j].Code + " " + Z2s[j].Title, Value = Z2s[j].ZID.ToString(), Selected = (j == 0) });
-                            cMLE.L = new Location { ZID = Z2s[0].ZID };
-                        }
-                    }
+                    cMLE.L = new Location();
                     #endregion
                     #region 時間
                     for (int i = 0; i < 24; i++)
@@ -1161,24 +1137,12 @@ namespace Banner.Areas.Admin.Controllers
                 cMLE.cMLS.E_minute = Convert.ToInt32(FC.Get(cMLE.EM_ControlName));
                 cMLE.C.ContectValue = FC.Get("txb_Phone");
                 cMLE.L.Address = FC.Get("txb_Address");
-                if (FC.Get("ddl_Zip1") != null)
-                {
-                    cMLE.Z2List = new List<SelectListItem>();
-                    int Z1ID = Convert.ToInt32(FC.Get("ddl_Zip1"));
-                    cMLE.Z1List.ForEach(q => q.Selected = false);
-                    cMLE.Z1List.First(q => q.Value == Z1ID.ToString()).Selected = true;
-                    var Z2s = DC.ZipCode.Where(q => q.ParentID == Z1ID && q.ActiveFlag).OrderBy(q => q.Code).ToList();
-                    for (int j = 0; j < Z2s.Count; j++)
-                    {
-                        if (FC.Get("ddl_Zip2") == Z2s[j].ZID.ToString())
-                        {
-                            cMLE.Z2List.Add(new SelectListItem { Text = Z2s[j].Code + " " + Z2s[j].Title, Value = Z2s[j].ZID.ToString(), Selected = true });
-                            cMLE.L.ZipCode = Z2s[j];
-                        }
-                        else
-                            cMLE.Z2List.Add(new SelectListItem { Text = Z2s[j].Code + " " + Z2s[j].Title, Value = Z2s[j].ZID.ToString() });
-                    }
-                }
+                if (FC.Get("ddl_Zip0") == "10")
+                    cMLE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip2"));
+                else if (FC.Get("ddl_Zip0") == "2")
+                    cMLE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip3"));
+                else
+                    cMLE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip0"));
             }
             return cMLE;
         }

@@ -7,7 +7,7 @@
 <div class="main-container">
     <div class="form-container-list">
         <div class="form-container">
-            <div class="form-header"><h5>@ViewBag._Title</h5></div>
+            <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
             @if (Model != null)
             {
                 if (Model.cML != null)
@@ -15,7 +15,7 @@
                     <form method="post" id="form1">
                         @Html.AntiForgeryToken()
                         <div class="form-body">
-                            <div class="row text-center">
+                            <div class="row text-center visually-hidden">
                                 <div class="col m-3">
                                     @if ((((bool[])ViewBag._Power)[1] && Model.cML.MLID == 0) || (((bool[])ViewBag._Power)[2] && Model.cML.MLID > 0))
                                     {
@@ -55,27 +55,27 @@
                                             </div>
                                         </div>
                                     }
-                                <div class="form-group">
-                                    <label>表定聚會時間</label>
-                                    <div class="row">
-                                        <div class="col-auto">
-                                            @Html.DropDownList(Model.SH_ControlName, Model.SH_List, new { @class = "form-select form-select-lg", })
+                                    <div class="form-group  visually-hidden">
+                                        <label>表定聚會時間</label>
+                                        <div class="row">
+                                            <div class="col-auto">
+                                                @Html.DropDownList(Model.SH_ControlName, Model.SH_List, new { @class = "form-select form-select-lg", })
+                                            </div>
+                                            <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">點</span></div>
+                                            <div class="col-auto">
+                                                @Html.DropDownList(Model.SM_ControlName, Model.SM_List, new { @class = "form-select form-select-lg", })
+                                            </div>
+                                            <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">分 ～</span></div>
+                                            <div class="col-auto">
+                                                @Html.DropDownList(Model.EH_ControlName, Model.EH_List, new { @class = "form-select form-select-lg", })
+                                            </div>
+                                            <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">點</span></div>
+                                            <div class="col-auto">
+                                                @Html.DropDownList(Model.EM_ControlName, Model.EM_List, new { @class = "form-select form-select-lg", })
+                                            </div>
+                                            <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">分</span></div>
                                         </div>
-                                        <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">點</span></div>
-                                        <div class="col-auto">
-                                            @Html.DropDownList(Model.SM_ControlName, Model.SM_List, new { @class = "form-select form-select-lg", })
-                                        </div>
-                                        <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">分 ～</span></div>
-                                        <div class="col-auto">
-                                            @Html.DropDownList(Model.EH_ControlName, Model.EH_List, new { @class = "form-select form-select-lg", })
-                                        </div>
-                                        <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">點</span></div>
-                                        <div class="col-auto">
-                                            @Html.DropDownList(Model.EM_ControlName, Model.EM_List, new { @class = "form-select form-select-lg", })
-                                        </div>
-                                        <div class="col-auto pt-2"><span class="col-form-label col-form-label-lg">分</span></div>
-                                    </div>
-                                        
+
                                     </div>
                                     <div class="form-group">
                                         <label>電話</label>
@@ -84,19 +84,7 @@
 
                                     <div class="form-group">
                                         <label>地址</label>
-                                        <div class="row">
-                                            <div class="col-2">
-                                                @Html.DropDownList("ddl_Zip1", Model.Z1List,
-                                                   new { @class = "form-select form-select-lg", @onchange = "Getddl(this);" })
-                                            </div>
-                                            <div class="col-2">
-                                                @Html.DropDownList("ddl_Zip2", Model.Z2List,
-                                                   new { @class = "form-select form-select-lg" })
-                                            </div>
-                                            <div class="col-8">
-                                                @Html.TextBox("txb_Address", Model.L.Address, new { @class = "form-control input-underline " })
-                                            </div>
-                                        </div>
+                                        @Html.Action("_Location", "Include", new { LID = Model.L.LID })
                                     </div>
 
                                     <div class="form-group">
@@ -110,7 +98,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if (Model.cML.MLID > 0 && ((bool[])ViewBag._Power)[3])
+                                    @if (Model.cML.MLID > 0 && ((bool[])ViewBag._Power)[3] && false)
                                     {
                                         <div class="form-group">
                                             <label>刪除</label>
