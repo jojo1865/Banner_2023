@@ -27,12 +27,16 @@ function GetZipddl(ddl) {
 function ShowArea(ddl) {
     var Z0s = document.getElementsByClassName("div_Zip0");
     var Z1s = document.getElementsByClassName("div_Zip1");
+    var Z2s = document.getElementsByClassName("div_Zip2");
     if (ddl.value == 10)//本國
     {
         Array.prototype.forEach.call(Z0s, function (Z) {
-            Z.style.display = 'block';
+            Z.style.display = '';
         });
         Array.prototype.forEach.call(Z1s, function (Z) {
+            Z.style.display = 'none';
+        });
+        Array.prototype.forEach.call(Z2s, function (Z) {
             Z.style.display = 'none';
         });
     }
@@ -42,7 +46,10 @@ function ShowArea(ddl) {
             Z.style.display = 'none';
         });
         Array.prototype.forEach.call(Z1s, function (Z) {
-            Z.style.display = 'block';
+            Z.style.display = '';
+        });
+        Array.prototype.forEach.call(Z2s, function (Z) {
+            Z.style.display = 'none';
         });
     }
     else {
@@ -51,6 +58,9 @@ function ShowArea(ddl) {
         });
         Array.prototype.forEach.call(Z1s, function (Z) {
             Z.style.display = 'none';
+        });
+        Array.prototype.forEach.call(Z2s, function (Z) {
+            Z.style.display = '';
         });
     }
     return;

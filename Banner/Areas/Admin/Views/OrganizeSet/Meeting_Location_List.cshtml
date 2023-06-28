@@ -36,8 +36,8 @@
                     <div class="row">
                         <div class="col-12 mt-2">
                             <div class="row align-items-center">
-                                <div class="col-auto p-0" style="width:191px">
-                                    <div class="td_O td_O_Basic1">@Html.Raw(Model.Tree.name)</div>
+                                <div class="col-auto p-0" style="width:221px">
+                                    <div class="td_O td_O_Basic2">@Html.Raw(Model.Tree.name)</div>
                                     <div class="td_O td_O_Line2"></div>
                                 </div>
                                 <div class="col-auto p-0">
@@ -58,10 +58,10 @@
                                                     it = T2 == T1.children.First() ? 0 : 1;
                                                     ib = T2 == T1.children.Last() ? 0 : 1;
                                                     <div class="row align-items-center div_OI p-0">
-                                                        <div class="col-auto div_OI_Outround h-100">
+                                                        <div class="col-auto div_OI_Outround h-100 p-0">
                                                             <div class="div_OI_Top_@it h-50 w-100"></div>
                                                             <div class="div_OI_Button_@ib h-50 w-100"></div>
-                                                            <div class="td_O td_O_Basic1 div_OI_Info">
+                                                            <div class="td_O td_O_Basic2 div_OI_Info">
                                                                 <a href="@T2.url" title="@T2.title">@Html.Raw(T2.name)</a>
                                                             </div>
                                                         </div>
@@ -74,7 +74,7 @@
                                                                     <div class="col-auto div_OI_Outround_end h-100 mb-2 p-0">
                                                                         <div class="div_OI_Top_@it h-50 w-100"></div>
                                                                         <div class="div_OI_Button_@ib h-50 w-100"></div>
-                                                                        <div class="td_O td_O_Basic1 div_OI_Info_end">
+                                                                        <div class="td_O td_O_Basic2 div_OI_Info_end">
                                                                             <a href="@T3.url" title="@T3.title">@Html.Raw(T3.name)</a>
                                                                         </div>
                                                                         <div style="height:60px;"></div>
@@ -99,7 +99,7 @@
                     <div class="row">
                         <div class="col-12 mt-2">
                             <div class="row align-items-center">
-                                <div class="col-auto p-0" style="width:201px">
+                                <div class="col-auto p-0" style="width:221px">
                                     <div class="td_O td_O_Basic2">@Html.Raw(Model.Tree.name)</div>
                                     <div class="td_O td_O_Line2"></div>
                                 </div>
@@ -110,10 +110,10 @@
                                         it = T1 == Model.Tree.children.First() ? 0 : 1;
                                         ib = T1 == Model.Tree.children.Last() ? 0 : 1;
                                         <div class="row align-items-center div_OI p-0">
-                                            <div class="col-auto div_OI_Outround h-100 p-0">
+                                            <div class="col-auto div_OI_Outround_1 h-100 p-0">
                                                 <div class="div_OI_Top_@it h-50 w-100"></div>
                                                 <div class="div_OI_Button_@ib h-50 w-100"></div>
-                                                <div class="td_O td_O_Basic1 div_OI_Info">
+                                                <div class="td_O td_O_Basic2 div_OI_Info">
                                                     <a href="@T1.url" title="@T1.title">@Html.Raw(T1.name)</a>
                                                 </div>
                                             </div>
@@ -126,7 +126,7 @@
                                                         <div class="col-auto div_OI_Outround_end h-100 mb-2 p-0">
                                                             <div class="div_OI_Top_@it h-50 w-100"></div>
                                                             <div class="div_OI_Button_@ib h-50 w-100"></div>
-                                                            <div class="td_O td_O_Basic1 div_OI_Info_end">
+                                                            <div class="td_O td_O_Basic2 div_OI_Info_end">
                                                                 <a href="@T2.url" title="@T2.title">@Html.Raw(T2.name)</a>
                                                             </div>
                                                             <div style="height:60px;"></div>

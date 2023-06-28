@@ -1,40 +1,43 @@
 ﻿@model Banner.Areas.Admin.Controllers.IncludeController.cLocation
-
+@{string ShowControl = "none"; }
 <div class="row">
     <div class="col-2">
         @Html.DropDownList("ddl_Zip0", Model.Z0List,
            new { @class = "form-select form-select-lg", @onchange = "ShowArea(this);" })
     </div>
-    @{
-        string ShowControl = "none";
-        if (Model.Z0List[0].Selected)
-        {
-            ShowControl = "block";
-        }
-    }
-    <div class="col-2 div_Zip0" style="display:@ShowControl">
-        @Html.DropDownList("ddl_Zip1", Model.Z1List,
-           new { @class = "form-select form-select-lg", @onchange = "GetZipddl(this);" })
-    </div>
-    <div class="col-2 div_Zip0" style="display:@ShowControl">
-        @Html.DropDownList("ddl_Zip2", Model.Z2List,
-           new { @class = "form-select form-select-lg" })
-    </div>
-    @{
-        ShowControl = "none";
-        if (Model.Z0List[1].Selected)
-        {
-            ShowControl = "block";
-        }
-    }
-    <div class="col-2 div_Zip1" style="display:@ShowControl">
-        @Html.DropDownList("ddl_Zip3", Model.Z3List,
-           new { @class = "form-select form-select-lg" })
-    </div>
-    <div class="col-6">
-        @Html.TextBox("txb_Address", Model.Address, new { @class = "form-control form-control-lg input-underline " })
+    <div class="col-10">
+        @{ ShowControl = Model.Z0List[0].Selected ? "" : "display:none"; }
+        <div class="div_Zip0 row" style="@ShowControl">
+            <div class="col-3">
+                @Html.DropDownList("ddl_Zip1", Model.Z1List,
+                   new { @class = "form-select form-select-lg", @onchange = "GetZipddl(this);" })
+            </div>
+            <div class="col-3">
+                @Html.DropDownList("ddl_Zip2", Model.Z2List,
+                   new { @class = "form-select form-select-lg" })
+            </div>
+            <div class="col-6">
+                @Html.TextBox("txb_Address0", Model.Address0, new { @class = "form-control form-control-lg input-underline", @placeholder = "地址內容" })
+            </div>
+        </div>
+        @{ ShowControl = Model.Z0List[1].Selected ? "" : "display:none"; }
+        <div class="div_Zip1 row" style="@ShowControl">
+            <div class="col-4">
+                @Html.DropDownList("ddl_Zip3", Model.Z3List,
+                   new { @class = "form-select form-select-lg" })
+            </div>
+            <div class="col-4 div_Zip1">
+                @Html.TextBox("txb_Address1_1", Model.Address1_1, new { @class = "form-control form-control-lg input-underline", @placeholder="地址行1" })
+            </div>
+            <div class="col-4 div_Zip1">
+                @Html.TextBox("txb_Address1_2", Model.Address1_2, new { @class = "form-control form-control-lg input-underline", @placeholder = "地址行2" })
+            </div>
+        </div>
+        @{ ShowControl = Model.Z0List[2].Selected ? "" : "display:none"; }
+        <div class="div_Zip2 row" style="@ShowControl">
+            <div class="col-12 div_Zip2">
+                @Html.TextBox("txb_Address2", Model.Address2, new { @class = "form-control form-control-lg input-underline", @placeholder = "網址或ID" })
+            </div>
+        </div>
     </div>
 </div>
-<script>
-
-</script>

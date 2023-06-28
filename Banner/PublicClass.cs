@@ -284,6 +284,34 @@ namespace Banner
             //(10 - ((seed[0] + .... + seed[9]) % 10)) % 10 == 身分證字號的最後一碼
             return (10 - (seed.Sum() % 10)) % 10 == Convert.ToInt32(sID.Substring(9, 1));
         }
+        //檢查密碼-可檢查長度/大寫英文/小寫英文/數字/符號
+        public bool CheckPasswork(string Input)
+        {
+            char[] Cs= Input.ToCharArray();
+            bool English = false;
+            bool Number = false;
+            bool Up_English = false;
+            bool Low_Englich = false;
+            bool Length8 = Cs.Length >= 8;
+            bool Symbol = false;
+            for (int i=0;i<Cs.Length;i++)
+            {
+                if (!Number && char.IsDigit(Cs[i]))
+                    Number = true;
+                else if (!Up_English && char.IsUpper(Cs[i]))
+                    Up_English = true;
+                else if (!Low_Englich && char.IsLower(Cs[i]))
+                    Low_Englich = true;
+                else if(!Symbol && char.IsSymbol(Cs[i]))
+                    Symbol = true;
+
+                if (!English && (Up_English || Low_Englich))
+                    English = true;
+            }
+            
+
+            return Length8 && Up_English && Low_Englich && Number;
+        }
         //判斷這天星期幾
         public int GetDayNo(DateTime ThisDate)
         {

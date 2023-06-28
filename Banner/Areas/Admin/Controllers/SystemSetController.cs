@@ -190,6 +190,11 @@ namespace Banner.Areas.Admin.Controllers
             var N_ = DC.Account.FirstOrDefault(q => q.ACID != ID && !q.DeleteFlag && q.Login == cBUE.Login);
             if (N_ != null)
                 Error += "您輸入的帳號與他人重複,請重新輸入</br>";
+            else if(cBUE.PW!="")
+            {
+                if(!CheckPasswork(cBUE.PW))
+                    Error += "密碼必須為包含大小寫英文與數字的8碼以上字串</br>";
+            }
             if (Error != "")
                 SetAlert(Error, 2);
             else

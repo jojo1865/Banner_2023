@@ -45,8 +45,14 @@
                                         <div class="row">
                                             <div class="col-auto">
                                                 <div class="form-check form-check-inline">
-                                                    @Html.CheckBox("cbox_ActiveFlag", Model.O.ActiveFlag, new { @class = "form-check-input" })
-                                                    @Html.Label("啟用中", new { @class = "form-check-labell" })
+                                                    @Html.RadioButton("cbox_ActiveFlag", true, Model.O.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
+                                                    @Html.Label("啟用", new { @class = "form-check-labell", @for = "cbox_ActiveFlag1" })
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="form-check form-check-inline">
+                                                    @Html.RadioButton("cbox_ActiveFlag", false, !Model.O.ActiveFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
+                                                    @Html.Label("停用", new { @class = "form-check-labell", @for = "cbox_ActiveFlag2" })
                                                 </div>
                                             </div>
                                         </div>

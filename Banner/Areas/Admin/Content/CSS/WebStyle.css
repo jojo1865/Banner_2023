@@ -12,6 +12,11 @@ html, body {
     --basic-bagrountgray-color: #CCC;
 }
 
+/* CSS 3 標準 */
+::placeholder {
+    color: #CCC !important;
+}
+
 .bassic_BackgroundGrayColor {
     background-color: var(--basic-bagrountgray-color);
 }
@@ -93,13 +98,16 @@ a {
 }
 
 .td_O_Basic2 {
-    width: 160px;
+    width: 180px;
     height: 60px;
     text-align: center;
     padding: 5px;
     border: 1px solid #0094ff;
-    color: #0094ff;
-    line-height: 20px;
+    /*color: #0094ff;*/
+    color: #87898C;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 
 .td_O_Line0 {
@@ -177,28 +185,6 @@ a {
     border-bottom: 2px solid var(--basic-bagrount-color);
 }
 
-/*div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
-    background-color: #00b900 !important;
-    border:none;
-}*/
-
-/*組織圖客製化覆蓋CSS*/
-/*.orgchart.l2r .node {
-    margin-top: 0px !important;
-}
-
-.edge, .topEdge, .rightEdge, .leftEdge, .bottomEdge {
-    display: none !important;
-}
-
-.node:hover, .node.focused {
-    background-color: unset !important;
-}
-
-.oci-menu {
-    display: none !important;
-}*/
-
 /*按鈕等待*/
 @keyframes spin {
     to {
@@ -238,14 +224,21 @@ a {
         cursor: not-allowed;
     }
 
-
+.div_OI {
+    
+}
 
 .div_OI_Outround {
-    width: 220px;
+    width: 240px;
+    position: relative;
+    margin-right:11px;
+}
+.div_OI_Outround_1 {
+    width: 240px;
     position: relative;
 }
 .div_OI_Outround_end {
-    width: 180px;
+    width: 200px;
     position: relative;
 }
 .div_OI_Top_0 {
@@ -276,9 +269,26 @@ a {
 
 .div_OI_Info_end {
     z-index: 10;
-    position:absolute;
+    position: absolute;
     background-color: white;
     left: 30px;
+}
+
+    .div_OI_Info a:hover:after, .div_OI_Info_end a:hover:after,a_test {
+        content: '+';
+        border: 2px solid green;
+        color: green;
+        -webkit-border-radius: 20px;
+        -moz-border-radius: 20px;
+        border-radius: 20px;
+        padding:0 7px;
+        margin-left:2px;
+    }
+
+.form-select:disabled {
+    color: #282828;
+    opacity: 0.28;
+    background-color: #EDEDEE;
 }
 /*======================================================手機板======================================================*/
 @media(max-width:992px) {

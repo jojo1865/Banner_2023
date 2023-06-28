@@ -156,7 +156,7 @@ namespace Banner.Areas.Admin.Controllers
             public List<SelectListItem> Z1List = new List<SelectListItem>();
             public List<SelectListItem> Z2List = new List<SelectListItem>();
             public List<SelectListItem> Z3List = new List<SelectListItem>();
-            public string Address = "";
+            public string Address0 = "", Address1_1 = "", Address1_2 = "", Address2 = "";
         }
         public cLocation SetLocation(int LID, FormCollection FC)
         {
@@ -172,12 +172,37 @@ namespace Banner.Areas.Admin.Controllers
                 }
             }
             cLocation cL = new cLocation();
-            cL.Z0List.Add(new SelectListItem { Text = "本國", Value = "10" });
-            cL.Z0List.Add(new SelectListItem { Text = "外國", Value = "2" });
-            cL.Z0List.Add(new SelectListItem { Text = "線上", Value = "116365" });
-            cL.Address = Address;
+            cL.Z0List.Add(new SelectListItem { Text = "台灣", Value = "10" });
+            cL.Z0List.Add(new SelectListItem { Text = "國外", Value = "2" });
+            cL.Z0List.Add(new SelectListItem { Text = "線上", Value = "670" });
+            
+
+
+            var Z1s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "縣市").OrderBy(q => q.Title).ToList();
+            var Z3s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國" && q.ZID != 10).OrderBy(q => q.ParentID).ThenBy(q => q.ZID).ToList();
             var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == ZID);
-            if (Z != null)
+            if (FC != null)
+            {
+                cL.Z0List.First(q => q.Value == FC.Get("ddl_Zip0")).Selected = true;
+                cL.Address0 = FC.Get("txb_Address0");
+                cL.Address1_1 = FC.Get("txb_Address1_1");
+                cL.Address1_2 = FC.Get("txb_Address1_2");
+                cL.Address2 = FC.Get("txb_Address2");
+                //本國
+
+                foreach (var Z1 in Z1s)
+                    cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID.ToString() == FC.Get("ddl_Zip1") });
+
+                var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ParentID).OrderBy(q => q.Title);
+                foreach (var Z2 in Z2s)
+                    cL.Z2List.Add(new SelectListItem { Text = Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID.ToString() == FC.Get("ddl_Zip2") });
+
+                //外國
+
+                foreach (var Z3 in Z3s)
+                    cL.Z3List.Add(new SelectListItem { Text = Z3.Title, Value = Z3.ZID.ToString(), Selected = Z3.ZID.ToString() == FC.Get("ddl_Zip3") });
+            }
+            else if (Z != null)
             {
                 if (Z.GroupName == "國")
                     cL.Z0List[1].Selected = true;
@@ -185,34 +210,59 @@ namespace Banner.Areas.Admin.Controllers
                     cL.Z0List[2].Selected = true;
                 else
                     cL.Z0List[0].Selected = true;
-            }
-            if (cL.Z0List[0].Selected)//本國
-            {
-                var Z1s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "縣市").OrderBy(q => q.Title);
-                foreach (var Z1 in Z1s)
-                    cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID == Z.ParentID });
 
-                var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z.ParentID).OrderBy(q => q.Title);
-                foreach (var Z2 in Z2s)
-                    cL.Z2List.Add(new SelectListItem { Text = Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID == Z.ZID });
+                //本國
+                if (cL.Z0List[0].Selected)
+                {
+                    cL.Address0 = Address;
+                    foreach (var Z1 in Z1s)
+                        cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID == Z.ParentID });
+
+                    var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z.ParentID).OrderBy(q => q.Title);
+                    foreach (var Z2 in Z2s)
+                        cL.Z2List.Add(new SelectListItem { Text = Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID == Z.ZID });
+                }
+                else
+                {
+                    foreach (var Z1 in Z1s)
+                        cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1 == Z1s.First() });
+
+                    var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ZID).OrderBy(q => q.Title);
+                    foreach (var Z2 in Z2s)
+                        cL.Z2List.Add(new SelectListItem { Text = Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2 == Z2s.First() });
+                }
+
+                //外國
+                if (cL.Z0List[1].Selected)
+                {
+                    string[] str = Address.Split('%');
+                    cL.Address1_1 = str[0];
+                    cL.Address1_1 = str.Length==2 ? str[1] : "";
+                    foreach (var Z3 in Z3s)
+                        cL.Z3List.Add(new SelectListItem { Text = Z3.Title, Value = Z3.ZID.ToString(), Selected = Z3.ZID == ZID });
+                }
+                else
+                {
+                    foreach (var Z3 in Z3s)
+                        cL.Z3List.Add(new SelectListItem { Text = Z3.Title, Value = Z3.ZID.ToString(), Selected = Z3 == Z3s.First() });
+                }
+                //線上
+                if (cL.Z0List[2].Selected)
+                    cL.Address2 = Address;
             }
-            //外國
-            var Z3s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國" && q.ZID != 10).OrderBy(q => q.ParentID).ThenBy(q => q.ZID);
-            foreach (var Z3 in Z3s)
-            {
-                cL.Z3List.Add(new SelectListItem { Text = Z3.Title, Value = Z3.ZID.ToString(), Selected = Z3.ZID == ZID });
-            }
+
+
+
             return cL;
         }
         public PartialViewResult _Location(int LID)
         {
-            return PartialView(SetLocation(LID,null));
+            return PartialView(SetLocation(LID, null));
         }
         [HttpPost]
         public PartialViewResult _Location(int LID, FormCollection FC)
         {
-            var cL = SetLocation(LID, FC);
-            return PartialView();
+            return PartialView(SetLocation(LID, FC));
         }
         #endregion
         public PartialViewResult _HeadInclude()

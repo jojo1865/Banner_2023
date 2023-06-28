@@ -4,8 +4,6 @@
 <!--Sweet Alert-->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!--orgchart 組織圖-->
-<!---->
-<script src="~/Areas/Admin/Content/JS/jquery.orgchart.js"></script>
 @{
     if (TempData["msg"].ToString() != "")
     {
@@ -74,3 +72,27 @@
         </script>
     }
 }
+<script>
+    function SubmitConfirm() {
+        Swal.fire({
+            icon: 'warning',
+            html: '確定儲存修改?',
+            showDenyButton: true,
+            confirmButtonText: '確認',
+            denyButtonText: '取消'
+        }).then((result) => {
+            if (result.isconfirmed) {
+                document.getElementById('form1').submit();
+            }
+            else {
+                Swal.close();
+                const btns = document.querySelectorAll(".btn");
+                btns.forEach((btn) => {
+                    btn.disabled = false;
+                    btn.classList.remove("btn-loading");
+                });
+                return;
+            }
+        });
+    }
+</script>

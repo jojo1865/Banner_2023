@@ -787,7 +787,7 @@ namespace Banner.Areas.Admin.Controllers
             public List<cTree> children = new List<cTree>();
         }
         /// <summary>
-        /// 聚會點編輯/新增
+        /// 聚會點
         /// </summary>
         /// <param name="OIID">目前所在跟目錄的OIID</param>
         /// <param name="ID">無用</param>
@@ -842,7 +842,7 @@ namespace Banner.Areas.Admin.Controllers
 
                 T0.children.Add(T1);
             }
-            
+
             if (POIs.Count() == 1)
             {
                 MLL.Tree = T0.children[0];
@@ -892,12 +892,14 @@ namespace Banner.Areas.Admin.Controllers
             ChangeTitle(ID == 0);
             cMeeting_Location_Edit cMLE = ReSetMeetingLocationInfo(ItemID, ID, FC);
             if (cMLE.cML.Title == "")
-                Error = "請輸入聚會點名稱";
+                Error = "請輸入聚會點名稱</br>";
+            else if (cMLE.cML.Title.Length > 18)
+                Error = "聚會點名稱請輸入18字內</br>";
             else if (cMLE.cML.DeleteFlag)//刪除
             {
                 var MLS = DC.M_Location_Set.FirstOrDefault(q => !q.DeleteFlag && q.SetType == 0 && q.TargetID == cMLE.OIID);
                 if (MLS != null)
-                    Error = "請先移除使用此聚會點的組織資料後再行刪除";
+                    Error = "請先移除使用此聚會點的組織資料後再行刪除</br>";
             }
             if (Error != "")
                 SetAlert(Error, 2);
@@ -989,13 +991,14 @@ namespace Banner.Areas.Admin.Controllers
                         var OIs = DC.OrganizeInfo.Where(q => q.ParentID == NowPID && !q.DeleteFlag);
                         do
                         {
-                            if (OIs.Count() == 0 || SortNo < 0 || NowPID < 0)
+                            if (OIs.Count() == 0 || SortNo < 8 || NowPID < 0)
                                 break;
                             else
                             {
                                 ListSelect cLS = new ListSelect();
                                 cLS.ControlName = "ddl_OIID_" + SortNo;
                                 cLS.SortNo = SortNo;
+                                
                                 foreach (var OI in OIs)
                                 {
                                     if (OI.ParentID == NowPID)
