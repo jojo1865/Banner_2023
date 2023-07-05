@@ -1,0 +1,64 @@
+﻿@model Banner.Areas.Admin.Controllers.AccountSetController.cAccount_List
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        <form method="post" id="form1">
+            @Html.AntiForgeryToken()
+            @if (Model != null)
+            {
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>姓名</label>
+                                    @Html.TextBox("txb_Name", @Model.Name, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>性別</label>
+                                    @Html.DropDownList(Model.LS_Sex.ControlName, Model.LS_Sex.ddlList, new { @class = "form-select form-select-lg" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>入組狀態</label>
+                                    @Html.DropDownList(Model.LS_Group.ControlName, Model.LS_Group.ddlList, new { @class = "form-select form-select-lg" })
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>手機</label>
+                                    @Html.TextBox("txb_CellPhone", @Model.CellPhone, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="search-form-section">
+                        <div class="d-flex justify-content-end">
+                            <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-round btn-submit me-2">搜尋</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div class="table-container">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                    </div>
+                </div>
+            }
+
+        </form>
+    </div>
+</div>
+

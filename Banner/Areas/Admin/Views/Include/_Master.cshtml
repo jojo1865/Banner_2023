@@ -17,9 +17,13 @@
             <img class="admin-navbar-avatar"
                  src="~/Areas/Admin/Content/img/admin-navbar-avatar.svg"
                  alt="" />
-
-            <a href="/Admin/SystemSet/BackUser_Edit/@TempData["UID"].ToString()" class="ms-3 me-3">@ViewBag._UserName</a>
+            <a href="javascript:ShowUserMenu();" class="ms-3 me-3" onmousemove="ShowUserMenu()">@ViewBag._UserName</a>
+            <div class="div_BackUserMenu" id="BackUserMenu" onmousemove="ShowUserMenu()" onmouseout="CloseUserMenu()" style="display:none;">
+                <div class="div_UserMenuBtn mb-2"><a href="/Admin/Home/ChangePassword">修改密碼</a></div>
+                <div class="div_UserMenuBtn"><a href="javascript:LogoutCheck();">登出</a></div>
+            </div>
         </div>
+        
         @Html.Action("_SiteMap", "Include")
         @RenderBody()
     </main>

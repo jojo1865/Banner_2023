@@ -1,0 +1,46 @@
+﻿@model Banner.Areas.Admin.Controllers.IncludeController.cLocation
+<div class="form-group">
+    <label>居住國家</label>
+    @Html.DropDownList("ddl_Zip0", Model.Z0List,
+           new { @class = "form-select form-select-lg", @onchange = "ShowArea(this);" })
+</div>
+@{ string ShowControl = Model.Z0List[0].Selected ? "" : "display:none"; }
+<div class="row div_Zip0" style="@ShowControl">
+    <div class="col-6">
+        <div class="form-group">
+            <label>城市</label>
+            @Html.DropDownList("ddl_Zip1", Model.Z1List,
+                   new { @class = "form-select form-select-lg", @onchange = "GetZipddl(this);" })
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-group">
+            <label>地區</label>
+            @Html.DropDownList("ddl_Zip2", Model.Z2List,
+                  new { @class = "form-select form-select-lg" })
+        </div>
+    </div>
+</div>
+<div class="form-group div_Zip0" style="@ShowControl">
+    <label>詳細地址</label>
+    @Html.TextBox("txb_Address0", Model.Address0, new { @class = "form-control form-control-lg input-underline", @placeholder = "地址內容" })
+</div>
+@{ ShowControl = Model.Z0List[1].Selected ? "" : "display:none"; }
+<div class="row div_Zip1" style="@ShowControl">
+    <div class="col-6">
+        <div class="form-group">
+            <label>居住國家</label>
+            @Html.DropDownList("ddl_Zip3", Model.Z3List,
+                   new { @class = "form-select form-select-lg" })
+        </div>
+    </div>
+    
+</div>
+<div class="form-group div_Zip1" style="@ShowControl">
+    <label>地址行1</label>
+    @Html.TextBox("txb_Address1_1", Model.Address1_1, new { @class = "form-control form-control-lg input-underline", @placeholder = "地址第一行" })
+</div>
+<div class="form-group div_Zip1" style="@ShowControl">
+    <label>地址行2</label>
+    @Html.TextBox("txb_Address1_2", Model.Address1_2, new { @class = "form-control form-control-lg input-underline", @placeholder = "地址第二行" })
+</div>

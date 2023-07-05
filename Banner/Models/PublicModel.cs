@@ -73,4 +73,11 @@ namespace Banner.Models
         public int SortNo = 0;
         public List<SelectListItem> ddlList = new List<SelectListItem>();
     }
+    public class ListInput
+    {
+        public string Title = "";
+        public string ControlName = "";
+        public int SortNo = 0;
+        public string InputData = "";
+    }
 }

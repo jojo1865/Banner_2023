@@ -31,7 +31,8 @@ namespace Banner
     {
         public DataClassesDataContext DC { get; set; }
         public DateTime DT = DateTime.Now;
-        public string[] sWeeks = new string[] { "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六" };
+        public string[] sWeeks = new string[] {  "星期一", "星期二", "星期三", "星期四", "星期五", "星期六","星期日" };
+        public string[] sTimeSpans = new string[] { "上午", "下午", "晚上"};
         public string sPhotoFileName = "Photo";//圖片存檔資料夾名稱
         public string sNoPhoto = "/Photo/NoPhoto.jpg";
         public string sFileName = "Files";//下載檔案資料夾名稱
@@ -40,6 +41,41 @@ namespace Banner
         public string CompanyTitle = "【全球旌旗資訊網】";
         public bool bUsedNewName = true;
         public bool[] bGroup = new bool[] { false, false, false, false, false, false }; //權限
+        public static List<SelectListItem> ddl_EducationTypes = new List<SelectListItem> {
+                new SelectListItem{ Text="國小",Value="0",Selected=true},
+                new SelectListItem{ Text="國中",Value="1"},
+                new SelectListItem{ Text="高中職",Value="2"},
+                new SelectListItem{ Text="大專",Value="3"},
+                new SelectListItem{ Text="研究所",Value="4"}
+            };
+        public static List<SelectListItem> ddl_JobTypes = new List<SelectListItem> {
+                new SelectListItem{ Text="一般職業",Value="0",Selected=true},
+                new SelectListItem{ Text="農牧業",Value="1"},
+                new SelectListItem{ Text="漁業",Value="2"},
+                new SelectListItem{ Text="木材森林業",Value="3"},
+                new SelectListItem{ Text="礦業採石業",Value="4"},
+                new SelectListItem{ Text="交通運輸業",Value="5"},
+                new SelectListItem{ Text="餐旅業",Value="6"},
+                new SelectListItem{ Text="建築工程業",Value="7"},
+                new SelectListItem{ Text="製造業",Value="8"},
+                new SelectListItem{ Text="新聞廣告業",Value="9"},
+                new SelectListItem{ Text="衛生保健業",Value="10"},
+                new SelectListItem{ Text="娛樂業",Value="11"},
+                new SelectListItem{ Text="文教機關",Value="12"},
+                new SelectListItem{ Text="宗教團體",Value="13"},
+                new SelectListItem{ Text="公共事業",Value="14"},
+                new SelectListItem{ Text="一般商業",Value="15"},
+                new SelectListItem{ Text="服務業",Value="16"},
+                new SelectListItem{ Text="家庭管理",Value="17"},
+                new SelectListItem{ Text="治安人員",Value="18"},
+                new SelectListItem{ Text="軍人",Value="19"},
+                new SelectListItem{ Text="資訊業",Value="20"},
+                new SelectListItem{ Text="運動人員",Value="21"},
+                new SelectListItem{ Text="學生",Value="22"},
+                new SelectListItem{ Text="其他",Value="23"},
+            };
+        public string[] CommunityTitle = new string[] {"其他", "LineID", "InstagramID", "WeChat" };
+        public string[] JoinTitle = new string[] { "無意願", "已入組未落戶", "跟進中(已分發)", "被退回(未分發)", "跟進中(未分發)" };
         public string Error = "";
 
         public PublicClass()
@@ -134,7 +170,8 @@ namespace Banner
         //檢查是否為Admin權限
         public bool CheckAdmin(int ACID)
         {
-            var PA = DC.M_Rool_Account.FirstOrDefault(q => q.ACID == ACID && q.Rool.RoolType == 4 && !q.DeleteFlag && q.ActiveFlag && (q.JoinDate >= q.CreDate && q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date));
+            /*var PA = DC.M_Rool_Account.FirstOrDefault(q => q.ACID == ACID && q.Rool.RoolType == 4 && !q.DeleteFlag && q.ActiveFlag && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date));*/
+            var PA = GetMRAC(0, ACID).FirstOrDefault(q => q.Rool.RoolType == 4);
             return PA != null;
         }
         //取得被加密的名子
@@ -287,14 +324,14 @@ namespace Banner
         //檢查密碼-可檢查長度/大寫英文/小寫英文/數字/符號
         public bool CheckPasswork(string Input)
         {
-            char[] Cs= Input.ToCharArray();
+            char[] Cs = Input.ToCharArray();
             bool English = false;
             bool Number = false;
             bool Up_English = false;
             bool Low_Englich = false;
             bool Length8 = Cs.Length >= 8;
             bool Symbol = false;
-            for (int i=0;i<Cs.Length;i++)
+            for (int i = 0; i < Cs.Length; i++)
             {
                 if (!Number && char.IsDigit(Cs[i]))
                     Number = true;
@@ -302,13 +339,13 @@ namespace Banner
                     Up_English = true;
                 else if (!Low_Englich && char.IsLower(Cs[i]))
                     Low_Englich = true;
-                else if(!Symbol && char.IsSymbol(Cs[i]))
+                else if (!Symbol && char.IsSymbol(Cs[i]))
                     Symbol = true;
 
                 if (!English && (Up_English || Low_Englich))
                     English = true;
             }
-            
+
 
             return Length8 && Up_English && Low_Englich && Number;
         }
@@ -2170,15 +2207,15 @@ namespace Banner
                 ViewBag._UserName = AC.Name;
                 ViewBag._UserID = ACID;
             }
-                
 
-            ViewBag._CSS1 = "~/Areas/Admin/Content/CSS/";
+
+            ViewBag._CSS1 = "";
             string NowURL = Request.Url.AbsolutePath;
             ViewBag._URL = NowURL;
             string ShortURL = Request.RawUrl;
             if (ShortURL.ToLower().Contains("/admin/"))
             {
-                ViewBag._CSS1 += ShortURL.Contains("_List") ? "list.css" : "form.css";
+                ViewBag._CSS1 = "/Areas/Admin/Content/CSS/" + (ShortURL.Contains("_List") ? "list.css" : "form.css");
                 string[] ShortURLs = ShortURL.Replace("_Edit", "_List").Split('/');
                 string NewShortURL = "";
                 for (int i = 0; i < ShortURLs.Length; i++)
@@ -2199,7 +2236,11 @@ namespace Banner
                     }
                     else
                     {
-                        var MACs = from q in DC.M_Rool_Account.Where(q => q.ACID == ACID && q.ActiveFlag && (q.Rool.RoolType == 3 || q.Rool.RoolType == 4) && !q.DeleteFlag && (q.JoinDate >= q.CreDate && q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date))
+                        /*var MACs = from q in DC.M_Rool_Account.Where(q => q.ACID == ACID && q.ActiveFlag && (q.Rool.RoolType == 3 || q.Rool.RoolType == 4) && !q.DeleteFlag && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date))
+                                   join p in DC.M_Rool_Menu.Where(q => q.MID == M.MID)
+                                   on q.RID equals p.RID
+                                   select p;*/
+                        var MACs = from q in GetMRAC(0, ACID).Where(q => q.Rool.RoolType == 3 || q.Rool.RoolType == 4)
                                    join p in DC.M_Rool_Menu.Where(q => q.MID == M.MID)
                                    on q.RID equals p.RID
                                    select p;
@@ -2229,6 +2270,8 @@ namespace Banner
             TempData["msgtype"] = "";
             TempData["url"] = "";
             TempData["_url"] = NowURL;
+            TempData["OID"] = "0";//組織層級ID
+            TempData["OITitle"] = "";//組織搜尋用關鍵字
         }
 
         public void ChangeTitle(bool AddFlag)
@@ -2367,13 +2410,13 @@ namespace Banner
             List<OrganizeInfo> OIs = new List<OrganizeInfo>();
             var OIs_ = DC.OrganizeInfo.Where(q => !q.DeleteFlag && q.ActiveFlag).ToList();
             var OIs__ = OIs_.Where(q => q.ParentID == PID).ToList();
-            while (OIs__.Count>0) 
+            while (OIs__.Count > 0)
             {
                 OIs.AddRange(OIs__);
                 OIs__ = (from q in OIs__
-                        join p in OIs_
-                        on q.OIID equals p.ParentID
-                        select p).ToList();
+                         join p in OIs_
+                         on q.OIID equals p.ParentID
+                         select p).ToList();
             };
 
             return OIs;
@@ -2381,18 +2424,18 @@ namespace Banner
 
 
         //取得全部組織組織下拉選單
-        public List<ListSelect> GetO(int OIID=0)
+        public List<ListSelect> GetO(int OIID = 0)
         {
             List<ListSelect> LSs = new List<ListSelect>();
             var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
             var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
             int[] OIIDs = new int[10];
-            if(OIID > 0)
+            if (OIID > 0)
             {
                 var OI_ = OIs.FirstOrDefault(q => q.OIID == OIID && !q.DeleteFlag && q.ActiveFlag);
-                if(OI_!=null)
+                if (OI_ != null)
                 {
-                    for(int i=OI_.OID; i>=0;i--)
+                    for (int i = OI_.OID; i >= 0; i--)
                     {
                         OIIDs[i] = OI_.OIID;
                         OI_ = OIs.FirstOrDefault(q => q.OIID == OI_.ParentID && !q.DeleteFlag && q.ActiveFlag);
@@ -2418,7 +2461,7 @@ namespace Banner
                     LS.ControlName = "ddl_" + SortNo;
                     LS.SortNo = SortNo;
                     LS.ddlList = new List<SelectListItem>();
-                    if(OIID==0)
+                    if (OIID == 0)
                     {
                         if (PID == 1)
                             LS.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "-1", Selected = true });
@@ -2430,16 +2473,50 @@ namespace Banner
                     {
                         //var SubOIs = OIs.Where(q => q.OID == O.OID && q.ParentID == OIIDs[O.OID-1]).OrderBy(q => q.OIID);
                         LS.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "-1" });
-                        LS.ddlList.AddRange((from q in OIs.Where(q => q.OID == O.OID && q.ParentID == OIIDs[O.OID-1]).OrderBy(q => q.OIID)
-                                             select new SelectListItem { Text = q.Title, Value = q.OIID.ToString(),Selected=q.OIID == OIIDs[q.OID] }).ToList());
+                        LS.ddlList.AddRange((from q in OIs.Where(q => q.OID == O.OID && q.ParentID == OIIDs[O.OID - 1]).OrderBy(q => q.OIID)
+                                             select new SelectListItem { Text = q.Title, Value = q.OIID.ToString(), Selected = q.OIID == OIIDs[q.OID] }).ToList());
                     }
                     LSs.Add(LS);
 
                     SortNo++;
                 }
-            }while (true);
+            } while (true);
             return LSs;
 
+        }
+
+        public IQueryable<M_OI_Account> GetMOIAC(int OID = 0, int OIID = 0, int ACID = 0)
+        {
+            var MAs = DC.M_OI_Account.Where(q => !q.DeleteFlag &&
+            q.ActiveFlag &&
+            !q.OrganizeInfo.DeleteFlag &&
+            !q.OrganizeInfo.Organize.DeleteFlag &&
+            !q.Account.DeleteFlag &&
+            (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) &&
+            (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date));
+            if (OID > 0)
+                MAs = MAs.Where(q => q.OrganizeInfo.OID == OID);
+            if (OIID > 0)
+                MAs = MAs.Where(q => q.OIID == OIID);
+            if (ACID > 0)
+                MAs = MAs.Where(q => q.ACID == ACID);
+            return MAs;
+        }
+
+        public IQueryable<M_Rool_Account> GetMRAC(int RID = 0, int ACID = 0)
+        {
+            var MAs = DC.M_Rool_Account.Where(q => !q.DeleteFlag &&
+            q.ActiveFlag &&
+            !q.Rool.DeleteFlag &&
+            !q.Account.DeleteFlag &&
+            (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) &&
+            (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date));
+            if (RID > 0)
+                MAs = MAs.Where(q => q.RID == RID);
+            if (ACID > 0)
+                MAs = MAs.Where(q => q.ACID == ACID);
+
+            return MAs;
         }
         #endregion
     }

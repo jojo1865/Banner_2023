@@ -50,7 +50,7 @@
                                             <div class="col-auto div_OI_Outround h-100 p-0">
                                                 <div class="div_OI_Top_@it h-50 w-100"></div>
                                                 <div class="div_OI_Button_@ib h-50 w-100"></div>
-                                                <div class="td_O td_O_Basic2 div_OI_Info">@Html.Raw(T1.name)</div>
+                                                <div class="td_O td_O_Basic3 div_OI_Info">@Html.Raw(T1.name)</div>
                                             </div>
                                             <div class="col-auto p-0">
                                                 @foreach (var T2 in T1.children)
@@ -62,7 +62,9 @@
                                                             <div class="div_OI_Top_@it h-50 w-100"></div>
                                                             <div class="div_OI_Button_@ib h-50 w-100"></div>
                                                             <div class="td_O td_O_Basic2 div_OI_Info">
-                                                                <a href="@T2.url" title="@T2.title">@Html.Raw(T2.name)</a>
+                                                                <a href="@T2.url" title="@T2.title">
+                                                                    <img src="~/Areas/Admin/Content/Img/add.png" class="div_OI_img" />@Html.Raw(T2.name)
+                                                                </a>
                                                             </div>
                                                         </div>
                                                         <div class="col-auto p-0">
@@ -75,7 +77,9 @@
                                                                         <div class="div_OI_Top_@it h-50 w-100"></div>
                                                                         <div class="div_OI_Button_@ib h-50 w-100"></div>
                                                                         <div class="td_O td_O_Basic2 div_OI_Info_end">
-                                                                            <a href="@T3.url" title="@T3.title">@Html.Raw(T3.name)</a>
+                                                                            <a href="@T3.url" title="@T3.title" class="@T3.css">
+                                                                                <img src="~/Areas/Admin/Content/Img/pan.png" class="div_OI_img" />@Html.Raw(T3.name)
+                                                                            </a>
                                                                         </div>
                                                                         <div style="height:60px;"></div>
                                                                     </div>
@@ -100,7 +104,7 @@
                         <div class="col-12 mt-2">
                             <div class="row align-items-center">
                                 <div class="col-auto p-0" style="width:221px">
-                                    <div class="td_O td_O_Basic2">@Html.Raw(Model.Tree.name)</div>
+                                    <div class="td_O td_O_Basic3">@Html.Raw(Model.Tree.name)</div>
                                     <div class="td_O td_O_Line2"></div>
                                 </div>
                                 <div class="col-auto p-0">
@@ -114,7 +118,7 @@
                                                 <div class="div_OI_Top_@it h-50 w-100"></div>
                                                 <div class="div_OI_Button_@ib h-50 w-100"></div>
                                                 <div class="td_O td_O_Basic2 div_OI_Info">
-                                                    <a href="@T1.url" title="@T1.title">@Html.Raw(T1.name)</a>
+                                                    <a href="@T1.url" title="@T1.title"><img src="~/Areas/Admin/Content/Img/add.png" class="div_OI_img" />@Html.Raw(T1.name)</a>
                                                 </div>
                                             </div>
                                             <div class="col-auto p-0" style="margin-left:11px;">
@@ -127,7 +131,7 @@
                                                             <div class="div_OI_Top_@it h-50 w-100"></div>
                                                             <div class="div_OI_Button_@ib h-50 w-100"></div>
                                                             <div class="td_O td_O_Basic2 div_OI_Info_end">
-                                                                <a href="@T2.url" title="@T2.title">@Html.Raw(T2.name)</a>
+                                                                <a href="@T2.url" title="@T2.title" class="@T2.css"><img src="~/Areas/Admin/Content/Img/pan.png" class="div_OI_img" />@Html.Raw(T2.name)</a>
                                                             </div>
                                                             <div style="height:60px;"></div>
                                                         </div>

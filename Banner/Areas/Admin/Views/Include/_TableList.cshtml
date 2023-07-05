@@ -154,7 +154,7 @@
 
                                             case "checkbox"://checkbox
                                                 {
-                                                    <td>
+                                                    <td class="text-lg-center">
                                                         <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
                                                         <input id="@(C.ControlName + R.ID)" class="form-check-input" type="checkbox" disabled="@C.Disabled" name="@(C.ControlName + R.ID)" @(C.Value == "True" ? "checked" : "") aria-label="@(C.Title)">
                                                     </td>
@@ -202,8 +202,8 @@
                                         if (iMin <= 0) { iMin = 1; }
                                         if (Model.NowPage > 1)
                                         {
-                                            <a class="btn btn-outline-primary btn-sm btn-round" href="@(sDomanPath + "PageNo=1")">最前頁</a>
-                                            <a class="btn btn-outline-primary btn-sm btn-round" href="@(sDomanPath + "PageNo=" + (Model.NowPage - 1))">上頁</a>
+                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(1)">最前頁</a>
+                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.NowPage - 1))">上頁</a>
                                         }
                                         <span>
                                             第
@@ -215,14 +215,14 @@
                                         </span>
                                         if (Model.NowPage < Model.MaxNum)
                                         {
-                                            <a class="btn btn-outline-primary btn-sm btn-round" href="@(sDomanPath + "PageNo=" + (Model.NowPage + 1))">下頁</a>
-                                            <a class="btn btn-outline-primary btn-sm btn-round" href="@(sDomanPath + "PageNo=" + Model.MaxNum)">最末頁</a>
+                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.NowPage + 1))">下頁</a>
+                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.MaxNum))">最末頁</a>
                                         }
                                     }
                                 </div>
                                 <div class="pagesize-container">
                                     <label>每頁筆數</label>
-                                    <select class="form-select form-select-sm" onchange="location.href = '@(sDomanPath + "NumCut=")' + this.value">
+                                    <select class="form-select form-select-sm" name="ddl_ChangePageCut" onchange="ChangePageCut()">
                                         @for (int j = 0; j < 8; j++)
                                         {
                                             int jCt = 5 * (j + 1);
@@ -239,9 +239,13 @@
 
     }
 }
-
+<input type="hidden" name="hid_NextPage" id="hid_NextPage" value="1" />
 <script>
-    function ChangePageCut() {
-        location.href = document.getElementById('txb_hidDoman').value + 'NumCut=' + document.getElementById('ddl_ChangePageCut').value
+    function ChangePageCut(ddl_Page) {
+        document.getElementById('form1').submit();
+    }
+    function ChangePage(PageNo) {
+        document.getElementById('hid_NextPage').value = PageNo;
+        document.getElementById('form1').submit();
     }
 </script>

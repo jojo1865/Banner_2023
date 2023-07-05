@@ -13,6 +13,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using static Banner.Areas.Admin.Controllers.OrganizeSetController;
 
 namespace Banner.Areas.Admin.Controllers
 {
@@ -159,7 +160,7 @@ namespace Banner.Areas.Admin.Controllers
                         {
                             cME.OList.Add(new SelectListItem { Text = O.Title, Value = O.OID.ToString(), Selected = (cME.O.ParentID == O.OID), Disabled = (O.OID == ID) });
                             O = Os.FirstOrDefault(q => q.ParentID == O.OID);
-                            if (O == null)
+                            if (O == null || O.OID == 8)//排除小組~讓小組一定在最下面
                                 break;
                         } while (true);
                     }
@@ -177,7 +178,7 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         cME.OList.Add(new SelectListItem { Text = O.Title, Value = O.OID.ToString(), Selected = O.ParentID == 0 });
                         O = Os.FirstOrDefault(q => q.ParentID == O.OID);
-                        if (O == null)
+                        if (O == null || O.OID==8)//排除小組~讓小組一定在最下面
                             break;
                     } while (true);
                 }
@@ -255,27 +256,13 @@ namespace Banner.Areas.Admin.Controllers
             public cTableList cTL = new cTableList();
             public string sAddURL = "";
         }
-        public ActionResult Organize_Info_List(string ItemID, int OID, int OIID)
+        private cOrganize_Info_List GetOrganize_Info_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
-            GetViewBag();
-            string sKey = GetQueryStringInString("Key");
+            string sKey = FC != null ? FC.Get("txb_Key") : "";
             ViewBag._Key = sKey;
 
-            int iNumCut = GetQueryStringInInt("NumCut");
-            int iNowPage = GetQueryStringInInt("PageNo");
-            if (iNumCut <= 0)
-            {
-                if (GetCookie("NumCut") == "")
-                {
-                    iNumCut = 10;
-                    SetCookie("NumCut", iNumCut.ToString());
-                }
-                else
-                    iNumCut = Convert.ToInt32(GetCookie("NumCut"));
-            }
-            else
-                SetCookie("NumCut", iNumCut.ToString());
-            if (iNowPage <= 0) iNowPage = 1;
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
 
             cOrganize_Info_List cOL = new cOrganize_Info_List();
             cOL.sAddURL = "/Admin/OrganizeSet/Organize_Info_Edit/" + ItemID + "/" + OID + "/" + OIID + "/0";
@@ -284,7 +271,7 @@ namespace Banner.Areas.Admin.Controllers
             cOL.cTL.Title = "";
             cOL.cTL.NowPage = iNowPage;
             cOL.cTL.ItemID = ItemID;
-            cOL.cTL.NowURL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + OID + "/" + OIID + (sKey == "" ? "" : "?Key=" + sKey);
+            cOL.cTL.NowURL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + OID + "/" + OIID;
             cOL.cTL.NumCut = iNumCut;
             cOL.cTL.Rs = new List<cTableRow>();
 
@@ -385,7 +372,9 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 else
                 {
-                    int Ct = DC.M_OI_Account.Count(q => !q.DeleteFlag && q.OIID == N.OIID && (q.JoinDate >= q.CreDate && q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date));
+                    /*int Ct = DC.M_OI_Account.Count(q => !q.DeleteFlag && q.OIID == N.OIID && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date));*/
+
+                    int Ct = GetMOIAC(0, N.OIID, 0).Count();
                     if (Ct == 0)//沒有新成員
                         cTR.Cs.Add(new cTableCell { Value = "" });//等待分發名單中
                     else
@@ -404,9 +393,19 @@ namespace Banner.Areas.Admin.Controllers
             }
 
             #endregion
-
-
-            return View(cOL);
+            return cOL;
+        }
+        public ActionResult Organize_Info_List(string ItemID, int OID, int OIID)
+        {
+            GetViewBag();
+            return View(GetOrganize_Info_List(ItemID, OID, OIID, null));
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Organize_Info_List(string ItemID, int OID, int OIID, FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetOrganize_Info_List(ItemID, OID, OIID, FC));
         }
         #endregion
         #region 牧養組織與職分-新增/編輯/刪除
@@ -414,13 +413,13 @@ namespace Banner.Areas.Admin.Controllers
         {
             public OrganizeInfo OI = new OrganizeInfo();
             public List<SelectListItem> ACList = new List<SelectListItem>();
-            public List<ListSelect> OIParent = new List<ListSelect>();
+            public List<OIListSelect> OIParent = new List<OIListSelect>();
             public Contect C = new Contect();
             public Location L = new Location();
 
 
         }
-        public class ListSelect
+        public class OIListSelect
         {
             public string ControlName = "";
             public int SortNo = 0;
@@ -523,7 +522,7 @@ namespace Banner.Areas.Admin.Controllers
                     }
                     #endregion
                     #region 上層
-                    cIE.OIParent = new List<ListSelect>();
+                    cIE.OIParent = new List<OIListSelect>();
                     int SortNo = 10;
                     var OIP = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == cIE.OI.ParentID && !q.DeleteFlag);
                     if (OIP != null)
@@ -536,7 +535,7 @@ namespace Banner.Areas.Admin.Controllers
                                 break;
                             else
                             {
-                                ListSelect cLS = new ListSelect();
+                                OIListSelect cLS = new OIListSelect();
                                 cLS.ControlName = "ddl_OIID_" + SortNo;
                                 cLS.SortNo = SortNo;
                                 foreach (var OI in OIs)
@@ -594,7 +593,7 @@ namespace Banner.Areas.Admin.Controllers
                     cIE.OI.Organize = O;
                     cIE.OI.ParentID = PID;
                     #region 上層
-                    cIE.OIParent = new List<ListSelect>();
+                    cIE.OIParent = new List<OIListSelect>();
                     int SortNo = 10;
                     var OIP = DC.OrganizeInfo.Where(q => q.OID == O.ParentID && !q.DeleteFlag).OrderByDescending(q => q.OIID).FirstOrDefault();
                     if (OIP != null)
@@ -607,7 +606,7 @@ namespace Banner.Areas.Admin.Controllers
                                 break;
                             else
                             {
-                                ListSelect cLS = new ListSelect();
+                                OIListSelect cLS = new OIListSelect();
                                 cLS.ControlName = "ddl_OIID_" + SortNo;
                                 cLS.SortNo = SortNo;
                                 foreach (var OI in OIs)
@@ -680,25 +679,14 @@ namespace Banner.Areas.Admin.Controllers
 
         #endregion
         #region 牧養組織與職分-成員列表
-        public ActionResult Organize_Info_Account_List(string ItemID, int OID, int OIID)
+
+        private cTableList GetOrganize_Info_Account_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
-            GetViewBag();
             cTableList cTL = new cTableList();
-            int iNumCut = GetQueryStringInInt("NumCut");
-            int iNowPage = GetQueryStringInInt("PageNo");
-            if (iNumCut <= 0)
-            {
-                if (GetCookie("NumCut") == "")
-                {
-                    iNumCut = 10;
-                    SetCookie("NumCut", iNumCut.ToString());
-                }
-                else
-                    iNumCut = Convert.ToInt32(GetCookie("NumCut"));
-            }
-            else
-                SetCookie("NumCut", iNumCut.ToString());
-            if (iNowPage <= 0) iNowPage = 1;
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            string sKey = FC != null ? FC.Get("txb_Key") : "";
+            ViewBag._Key = sKey;
             cTL = new cTableList();
             cTL.Title = "";
             cTL.NowPage = iNowPage;
@@ -715,6 +703,8 @@ namespace Banner.Areas.Admin.Controllers
                 LeaderACID = OI.ACID;
             }
             var Ns = DC.M_OI_Account.Where(q => !q.DeleteFlag && q.OIID == OIID && !q.Account.DeleteFlag);
+            if (!string.IsNullOrEmpty(sKey))
+                Ns = Ns.Where(q => q.Account.Name.Contains(sKey));
 
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "會員資料", WidthPX = 100 });
@@ -730,12 +720,12 @@ namespace Banner.Areas.Admin.Controllers
 
             cTL.TotalCt = Ns.Count();
             cTL.MaxNum = GetMaxNum(cTL.TotalCt, cTL.NumCut);
-            Ns = Ns.OrderByDescending(q => q.OrganizeInfo.ACID == q.ACID).ThenByDescending(q => q.MOIAID).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.OrganizeInfo.ACID == q.ACID).ThenByDescending(q => q.MID).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut);
             foreach (var N in Ns)
             {
                 cTableRow cTR = new cTableRow();
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/Account/Account_Edit/" + N.ACID, Target = "_black", Value = "編輯" });//
-                cTR.Cs.Add(new cTableCell { Value = N.MOIAID.ToString() });//編號(ID)
+                cTR.Cs.Add(new cTableCell { Value = N.MID.ToString() });//編號(ID)
                 cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() });//會員ID
                 cTR.Cs.Add(new cTableCell { Value = N.Account.Name });//姓名
                 if (N.JoinDate == N.CreDate)
@@ -762,10 +752,21 @@ namespace Banner.Areas.Admin.Controllers
                     cTR.Cs.Add(new cTableCell { Value = "預計於" + B.BaptismDate.ToLongDateString() + "受洗" });//受洗狀態
                 cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
-
-            return View(cTL);
+            return cTL;
         }
 
+        public ActionResult Organize_Info_Account_List(string ItemID, int OID, int OIID)
+        {
+            GetViewBag();
+            return View(GetOrganize_Info_Account_List(ItemID, OID, OIID, null));
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Organize_Info_Account_List(string ItemID, int OID, int OIID, FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetOrganize_Info_Account_List(ItemID, OID, OIID, FC));
+        }
         #endregion
 
         #region 聚會地點-列表
@@ -784,6 +785,7 @@ namespace Banner.Areas.Admin.Controllers
             public string name = "";
             public string title = "";
             public string url = "";
+            public string css = "";
             public List<cTree> children = new List<cTree>();
         }
         /// <summary>
@@ -834,7 +836,8 @@ namespace Banner.Areas.Admin.Controllers
                         {
                             name = MLS.Title,
                             title = "編輯",
-                            url = "/Admin/OrganizeSet/Meeting_Location_Edit/" + OI.OIID + "/" + MLS.MLID
+                            url = "/Admin/OrganizeSet/Meeting_Location_Edit/" + OI.OIID + "/" + MLS.MLID,
+                            css = MLS.ActiveFlag ? "td_O_Basic3_Active" : "td_O_Basic3_UnActive"
                         });
                     }
                     T1.children.Add(T2);
@@ -865,7 +868,7 @@ namespace Banner.Areas.Admin.Controllers
         {
             public Meeting_Location cML = new Meeting_Location();
             public M_Location_Set cMLS = new M_Location_Set();
-            public List<ListSelect> OIParent = new List<ListSelect>();
+            public List<OIListSelect> OIParent = new List<OIListSelect>();
             public Contect C = new Contect();
             public Location L = new Location();
             public int OIID = 0;
@@ -918,6 +921,7 @@ namespace Banner.Areas.Admin.Controllers
                 cMLE.cMLS.UpdDate = DT;
                 if (ID == 0)
                 {
+                    cMLE.cMLS.TargetID = ItemID;
                     cMLE.cMLS.MLID = cMLE.cML.MLID;
                     cMLE.cMLS.DeleteFlag = false;
                     cMLE.cMLS.CreDate = cMLE.cML.UpdDate;
@@ -982,7 +986,7 @@ namespace Banner.Areas.Admin.Controllers
                     }
                     #endregion
                     #region 上層
-                    cMLE.OIParent = new List<ListSelect>();
+                    cMLE.OIParent = new List<OIListSelect>();
                     int SortNo = 10;
                     var OIP = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID && !q.DeleteFlag);
                     if (OIP != null)
@@ -995,10 +999,10 @@ namespace Banner.Areas.Admin.Controllers
                                 break;
                             else
                             {
-                                ListSelect cLS = new ListSelect();
+                                OIListSelect cLS = new OIListSelect();
                                 cLS.ControlName = "ddl_OIID_" + SortNo;
                                 cLS.SortNo = SortNo;
-                                
+
                                 foreach (var OI in OIs)
                                 {
                                     if (OI.ParentID == NowPID)
@@ -1063,8 +1067,9 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     cMLE.cML = new Meeting_Location();
                     cMLE.cML.Code = "";
+                    cMLE.cML.ActiveFlag = true;
                     #region 上層
-                    cMLE.OIParent = new List<ListSelect>();
+                    cMLE.OIParent = new List<OIListSelect>();
                     int SortNo = 10;
                     var OIP = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID && !q.DeleteFlag);
                     if (OIP != null)
@@ -1077,7 +1082,7 @@ namespace Banner.Areas.Admin.Controllers
                                 break;
                             else
                             {
-                                ListSelect cLS = new ListSelect();
+                                OIListSelect cLS = new OIListSelect();
                                 cLS.ControlName = "ddl_OIID_" + SortNo;
                                 cLS.SortNo = SortNo;
                                 foreach (var OI in OIs)
@@ -1112,6 +1117,7 @@ namespace Banner.Areas.Admin.Controllers
                     #endregion
                     #region 地址
                     cMLE.L = new Location();
+                    cMLE.L.Address = "";
                     #endregion
                     #region 時間
                     for (int i = 0; i < 24; i++)
@@ -1133,19 +1139,29 @@ namespace Banner.Areas.Admin.Controllers
                 cMLE.cML.Title = FC.Get("txb_Title");
                 cMLE.cML.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
                 cMLE.cML.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
-                cMLE.cMLS.TargetID = Convert.ToInt32(FC.Get("ddl_OIID_10"));
+                cMLE.cMLS.TargetID = cMLE.cML.MLID;//Convert.ToInt32(FC.Get("ddl_OIID_10"));
                 cMLE.cMLS.S_hour = Convert.ToInt32(FC.Get(cMLE.SH_ControlName));
                 cMLE.cMLS.S_minute = Convert.ToInt32(FC.Get(cMLE.SM_ControlName));
                 cMLE.cMLS.E_hour = Convert.ToInt32(FC.Get(cMLE.EH_ControlName));
                 cMLE.cMLS.E_minute = Convert.ToInt32(FC.Get(cMLE.EM_ControlName));
                 cMLE.C.ContectValue = FC.Get("txb_Phone");
-                cMLE.L.Address = FC.Get("txb_Address");
+
                 if (FC.Get("ddl_Zip0") == "10")
+                {
                     cMLE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip2"));
+                    cMLE.L.Address = FC.Get("txb_Address0");
+                }
                 else if (FC.Get("ddl_Zip0") == "2")
+                {
                     cMLE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip3"));
+                    cMLE.L.Address = FC.Get("txb_Address1_1") + "%" + FC.Get("txb_Address1_2");
+                }
                 else
+                {
                     cMLE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip0"));
+                    cMLE.L.Address = FC.Get("txb_Address2");
+                }
+
             }
             return cMLE;
         }

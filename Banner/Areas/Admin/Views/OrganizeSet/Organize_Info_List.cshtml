@@ -23,34 +23,36 @@
                     </div>
 
                 }
-                <div class="search-form">
-                    <div class="search-form-section">
-                        <div class="row">
-                            <div class="col-0 p-2" style="display:none;">
-                                <Label>位置</Label><br />
-                                <Label>@(Model.OTitle)</Label>
-                            </div>
-                            <div class="col-12  p-2">
-                                <Label>關鍵字搜尋</Label>
-                                <input type="text" class="form-control form-control-lg input-underline" id="txb_Key" value="@ViewBag._Key" />
+                <form method="post" id="form1">
+                    @Html.AntiForgeryToken()
+                    <div class="search-form">
+                        <div class="search-form-section">
+                            <div class="row">
+                                <div class="col-0 p-2" style="display:none;">
+                                    <Label>位置</Label><br />
+                                    <Label>@(Model.OTitle)</Label>
+                                </div>
+                                <div class="col-12  p-2">
+                                    <Label>關鍵字搜尋</Label>
+                                    <input type="text" class="form-control form-control-lg input-underline" name="txb_Key" value="@ViewBag._Key" />
 
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="search-form-section">
+                            <div class="row">
+                                <div class="d-flex justify-content-end">
+                                    <a href="javascript:Search();" class="btn btn-primary btn-lg btn-round btn-submit me-2">搜尋</a>
+                                    <a href="@(Model.sAddURL)" class="btn btn-primary btn-lg btn-round btn-submit">新增</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="search-form-section">
-                        <div class="row">
-                            <div class="d-flex justify-content-end">
-                                <a href="javascript:Search();" class="btn btn-primary btn-lg btn-round btn-submit me-2">搜尋</a>
-                                <a href="@(Model.sAddURL)" class="btn btn-primary btn-lg btn-round btn-submit">新增</a>
-                            </div>
-                        </div>
+                    <div class="table-container">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
                     </div>
-                </div>
-                <div class="table-container">
-                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
-                </div>
-
+                </form>
             }
 
         }
@@ -58,7 +60,7 @@
 </div>
 <script>
     function Search() {
-        location.href='@(ViewBag._URL + "?Key=")' + document.getElementById('txb_Key').value;
+        document.getElementById('form1').submit();
     }
 </script>
 

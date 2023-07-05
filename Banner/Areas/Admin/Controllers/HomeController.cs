@@ -23,10 +23,16 @@ namespace Banner.Areas.Admin.Controllers
         public ActionResult Login()
         {
             GetViewBag();
-            if (Request.Url.Host == "localhost")
-                if (GetACID() > 0)
-                    Response.Redirect("/Admin/Home/Index");
-            
+            if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
+            {
+                if (GetACID() <= 0)
+                {
+                    LogInAC(1);
+                    SetBrowserData("UserName", "系統管理者");
+                }
+                Response.Redirect("/Admin/Home/Index");
+            }
+
             return View();
         }
         [HttpPost]
@@ -44,9 +50,9 @@ namespace Banner.Areas.Admin.Controllers
             if (PW.Replace(" ", "") == string.Empty)
                 Error += "請輸入密碼</br>";
             if (ValidateCode.Replace(" ", "") == string.Empty)
-                Error += "請輸入檢查碼</br>";
+                Error += "請輸入驗證碼</br>";
             else if (ValidateCode != GetSession("VNum"))
-                Error += "檢查碼輸入錯誤</br>";
+                Error += "驗證碼輸入錯誤</br>";
             if (Error != "")
                 TempData["msg"] = Error;
             else
@@ -71,7 +77,7 @@ namespace Banner.Areas.Admin.Controllers
 
                             SetBrowserData("ACID", AC.ACID.ToString());
                             SetBrowserData("UserName", AC.Name.ToString());
-                            SetAlert(AC.Name + "歡迎回來", 1, "/Admin/Home/Index");
+                            SetAlert(AC.Name + " 歡迎回來", 1, "/Admin/Home/Index");
                         }
                         else
                         {
@@ -112,7 +118,7 @@ namespace Banner.Areas.Admin.Controllers
                     DelSession("LoginAccount");
                     LogInAC(AC.ACID);
                     SetBrowserData("UserName", AC.Name.ToString());
-                    SetAlert(AC.Name + "歡迎回來", 1, "/Admin/Home/Index");
+                    SetAlert(AC.Name + " 歡迎回來", 1, "/Admin/Home/Index");
                 }
             }
             return View();
@@ -233,7 +239,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (CellPhone != "")
                 {
-                    
+
                     var AC = (from q in DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag)
                               join p in DC.Contect.Where(q => q.ContectValue == CellPhone && q.ContectType == 1 && q.TargetType == 2)
                               on q.ACID equals p.TargetID
@@ -261,12 +267,68 @@ namespace Banner.Areas.Admin.Controllers
         {
             GetViewBag();
             LogOutAC();
-            if (GetACID() <= 0)
-                SetAlert("您已登出", 1, "/Admin/Home/Index");
+            //if (GetACID() <= 0)
+            SetAlert("您已登出", 1, "/Admin/Home/Login");
 
             return View();
         }
 
+        #endregion
+        #region 變更密碼
+        public ActionResult ChangePassword()
+        {
+            GetViewBag();
+            if (GetACID() <= 0)
+                SetAlert("請先登入", 2, "/Admin/Home/Login");
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ChangePassword(FormCollection FC)
+        {
+            GetViewBag();
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == GetACID() && !q.DeleteFlag);
+            string Old = FC.Get("txb_Old");
+            string New1 = FC.Get("txb_New1");
+            string New2 = FC.Get("txb_New2");
+            if (AC == null)
+                SetAlert("請先登入", 2, "/Admin/Home/Login");
+            else
+            {
+                AC.Password = HSM.Enc_1(New1);
+                AC.UpdDate = DT;
+                AC.SaveACID = AC.ACID;
+                DC.SubmitChanges();
+
+                SetAlert("變更密碼完成", 1, "/Admin/Home/Index");
+            }
+
+            return View();
+        }
+        public string CheckPasswordInput(int ACID, string Old, string New1, string New2)
+        {
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
+            if (AC == null)
+                Error += "請先登入</br>";
+            else if (Old == "")
+                Error += "請輸入舊密碼</br>";
+            else if (New1 == "")
+                Error += "請輸入新密碼</br>";
+            else if (New2 == "")
+                Error += "請再次輸入新密碼</br>";
+            else
+            {
+                if (HSM.Enc_1(Old) != AC.Password)
+                    Error += "舊密碼輸入錯誤</br>";
+                else if (!CheckPasswork(New1))
+                    Error += "密碼必須為包含大小寫英文與數字的8碼以上字串</br>";
+                else if (New1 != New2)
+                    Error += "新密碼與重複輸入的不同</br>";
+            }
+
+
+            return Error;
+        }
         #endregion
         #region 取得檢查碼
         //取得/設定檢查碼
@@ -281,14 +343,24 @@ namespace Banner.Areas.Admin.Controllers
             CreateCheckCodeImage(Code);
         }
         #endregion
-        #region 取得郵遞區號2
+        #region 取得地址下層選單
         [HttpGet]
         public string GetZipSelect(int ZID)
         {
             var Zs = from q in DC.ZipCode.Where(q => q.ParentID == ZID && q.ActiveFlag).OrderBy(q => q.Code)
-                     select new { value = q.ZID, Text = q.Code + " " + q.Title };
+                     select new { value = q.ZID, Text = q.Code + " " + q.Title, Code = q.Code };
 
             return JsonConvert.SerializeObject(Zs);
+        }
+
+        #endregion
+        #region 取得郵遞區號 或 電話國碼
+        [HttpGet]
+        public string GetZipCode(int ZID)
+        {
+            var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == ZID && q.ActiveFlag);
+
+            return Z == null ? "" : Z.Code;
         }
 
         #endregion
@@ -297,10 +369,38 @@ namespace Banner.Areas.Admin.Controllers
         public string GetOISelect(int OIID)
         {
             var OIs = from q in DC.OrganizeInfo.Where(q => q.ParentID == OIID && q.ActiveFlag).OrderBy(q => q.Title)
-                     select new { value = q.OIID, Text = q.Title };
+                      select new { value = q.OIID, Text = q.Title };
 
             return JsonConvert.SerializeObject(OIs);
         }
+        #endregion
+        #region 用關鍵字查組織
+        [HttpGet]
+        public string GetOIList(int ACID, string Key)
+        {
+            if (Key.Length > 1 && !Key.Contains(")"))
+            {
+                var OIs_G = from q in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID==8 && (q.Title.StartsWith(Key) || q.OIID.ToString().StartsWith(Key)))
+                            group q by new { q.OIID, q.Title } into g
+                            select new { g.Key.OIID, g.Key.Title };
+                var OIs = from q in OIs_G.OrderByDescending(q => q.OIID)
+                          select new { value = "(" + q.OIID + ")" + q.Title };
+
+                if (ACID > 0)
+                {
+                    var MOIAs = from q in DC.M_OI_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && !q.ActiveFlag)
+                                group q by new { q.OIID, q.OrganizeInfo.Title } into g
+                                select new { value = "(" + g.Key.OIID + ")" + g.Key.Title };
+                    if (MOIAs.Count() > 0)
+                        OIs = OIs.Except(MOIAs);//排除參加過的小組
+                }
+
+                return JsonConvert.SerializeObject(OIs);
+            }
+            else
+                return "[]";
+        }
+
         #endregion
     }
 }

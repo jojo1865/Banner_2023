@@ -1,0 +1,88 @@
+﻿@model Banner.Areas.Admin.Controllers.AccountSetController.cAccount_New_Edit
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+    if (Model != null)
+    {
+        <div class="main-container">
+            <div class="form-container-list">
+                <div class="form-container">
+                    <div class="form-header"><h5>新人管理 / 分發</h5></div>
+                    <div class="form-body">
+                        <form method="post" id="form1">
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-card-group">
+                                <div class="form-card">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label>姓名</label>
+                                                @Html.Label(Model.Name, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label>會友手機</label>
+                                                @Html.Label(Model.PhonoNo, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label>選擇分發小組</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-auto">
+                                                    <label for="@Model.OIddl.ControlName" class="col-form-label">1.</label>
+                                                </div>
+                                                <div class="col-auto">
+                                                    @Html.DropDownList(Model.OIddl.ControlName, Model.OIddl.ddlList, new { @class = "form-select form-select-lg" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-auto">
+                                                    <label for="@Model.InputControlName" class="col-form-label">2.</label>
+                                                </div>
+                                                <div class="col-auto">
+                                                    @Html.TextBox(Model.InputControlName, Model.InputOIData, new { @class = "form-control form-control-lg input-underline", @list = "ddl_OIs", @placeholder = "請輸入小組名稱或編號", @onkeyup = "GetOIList(" + Model.ACID + ",this);" })
+                                                    <datalist id="ddl_OIs" name="ddl_OIs">
+                                                    </datalist>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+}
+<div class="action-bar">
+    @if (Model != null)
+    {
+        if (((bool[])ViewBag._Power)[1] || ((bool[])ViewBag._Power)[2])
+        {
+            <div class="btn btn-primary btn-lg btn-round">
+                <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Admin/Content/Img/save.svg" alt="" />儲存</a>
+            </div>
+        }
+        <div class="btn btn-outline-primary btn-lg btn-round">
+            <a href="/Admin/AccountSet/Account_New_List/0"><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />取消</a>
+        </div>
+    }
+</div>

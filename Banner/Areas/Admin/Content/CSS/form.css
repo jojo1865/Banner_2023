@@ -1,5 +1,6 @@
 main {
   padding: 0 30px;
+  position: initial;
 }
 
 main .main-container {
@@ -16,7 +17,7 @@ main .main-container {
   flex-direction: row;
 }
 
-.form-container .chg-pwd-container {
+.chg-pwd-container {
   display: flex;
   align-items: center;
   height: 100%;
@@ -29,4 +30,8 @@ main .main-container {
 
 .visibility-container {
   height: 100%;
+}
+
+.body-container {
+  padding-bottom: 104px;
 }

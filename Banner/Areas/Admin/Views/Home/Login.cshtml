@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="input">
-                    <input type="text"  name="txb_Login" class="form-control input-underline" placeholder="帳號、身分證字號" />
+                    @Html.TextBox("txb_Login", "", new { @class = "form-control input-underline", @placeholder = "帳號、身分證字號" })
                 </div>
 
                 <div class="password-with-icon">
@@ -35,12 +35,9 @@
                 </div>
 
                 <div class="input input-group">
-                    <input id="password" name="txb_Password"
-                           type="password"
-                           class="form-control input-underline"
-                           placeholder="請輸入密碼" />
+                    @Html.Password("txb_Password", "", new { @class = "form-control input-underline", @placeholder = "請輸入密碼" })
                     <div class="visibility-container">
-                        <span class="material-icons" onclick="togglePasswordVisibility()">
+                        <span class="material-icons" onclick="togglePasswordVisibility(this,'txb_Password')">
                             visibility_off
                         </span>
                     </div>
@@ -52,9 +49,7 @@
                 </div>
 
                 <div class="input verify-with-code">
-                    <input type="text"  name="txb_ValidateCode"
-                           class="form-control input-underline verify-form"
-                           placeholder="請輸入右方驗證碼" />
+                    @Html.TextBox("txb_ValidateCode", "", new { @class = "form-control input-underline verify-form", @placeholder = "請輸入右方驗證碼" })
                     <img class="imgCaptcha" id="img_ValidateCode" src="/Admin/Home/ValidateCode" />
                 </div>
             </div>
@@ -62,33 +57,33 @@
             <div class="login-button-container">
                 <button class="btn btn-primary btn-round" type="submit">登入</button>
             </div>
-
-            <div class="forget-password-and-account">
-                <div class="forget-password">
-                    <a href="/Admin/Home/ForgetPassword">忘記密碼</a>
-                </div>
-                <div class="border-line"></div>
-                <div class="forget-account">
-                    <a href="/Admin/Home/ForgetAccount">忘記帳號</a>
-                </div>
-            </div>
         </form>
+        <div class="forget-password-and-account">
+            <div class="forget-password">
+                <a href="/Admin/Home/ForgetPassword">忘記密碼</a>
+            </div>
+            <div class="border-line"></div>
+            <div class="forget-account">
+                <a href="/Admin/Home/ForgetAccount">忘記帳號</a>
+            </div>
+        </div>
+
     </div>
 </main>
 <script>
-      function togglePasswordVisibility() {
-        const passwordInput = document.getElementById("password");
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById("txb_Password");
         const visibility = document.querySelector(
-          ".visibility-container .material-icons"
+            ".visibility-container .material-icons"
         );
         if (passwordInput.type === "password") {
-          passwordInput.type = "text";
-          visibility.textContent = "visibility";
+            passwordInput.type = "text";
+            visibility.textContent = "visibility";
         } else {
-          passwordInput.type = "password";
-          visibility.textContent = "visibility_off";
+            passwordInput.type = "password";
+            visibility.textContent = "visibility_off";
         }
-      }
+    }
 </script>
 
 

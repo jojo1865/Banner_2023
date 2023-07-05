@@ -1,0 +1,12 @@
+﻿
+@model List<SelectListItem>
+<div class="row">
+    <div class="col-6">
+        <Label>組織名稱</Label>
+        @Html.TextBox("txb_OITitle", TempData["OITitle"], new { @class = "form-control form-control-lg input-underline" })
+    </div>
+    <div class="col-6">
+        <Label>組織層級</Label>
+        @Html.DropDownList("ddl_O", Model, new { @class = "form-select form-select-lg" })
+    </div>
+</div>

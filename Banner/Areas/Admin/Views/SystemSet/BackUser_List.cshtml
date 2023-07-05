@@ -15,19 +15,11 @@
             {
                 <div class="search-form">
                     <div class="search-form-section">
-                        <div class="row">
-                            @foreach (var LS in Model.LS)
-                            {
-                                <div class="col-6 p-2">
-                                    <Label>@LS.Title</Label>
-                                    @Html.DropDownList(LS.ControlName, LS.ddlList, new { @class = "form-select form-select-lg", @onchange = "GetOIddl(this);" })
-                                </div>
-                            }
-                        </div>
+                        @Html.Action("_OrganizeFilter", "Include")
                         <div class="row">
                             <div class="col-6  p-2">
                                 <Label>姓名</Label>
-                                @Html.TextBox("txb_Name", @Model.Name,new { @class = "form-control form-control-lg input-underline" })
+                                @Html.TextBox("txb_Name", @Model.Name, new { @class = "form-control form-control-lg input-underline" })
 
                             </div>
                             <div class="col-6  p-2">

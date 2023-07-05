@@ -1,13 +1,4 @@
-﻿/*產生組織聚會點圖樣*/
-$(function () {
-    var treedata = JSON.parse(document.getElementById('hid_treedata').value);
-    $('#chart-container').orgchart({
-        'data': treedata,
-        'nodeContent': 'title',
-        'direction': 'l2r'
-    });
-});
-/*取得鄉鎮市區*/
+﻿/*取得鄉鎮市區*/
 function GetZipddl(ddl) {
     console.log(ddl.value);
     $('#ddl_Zip2').html('');
@@ -24,6 +15,39 @@ function GetZipddl(ddl) {
         error: function (err) { console.log(err) },
     })
 }
+/*取得郵遞區號*/
+function GetZipCode(ddl) {
+    console.log(ddl.value);
+    $('#lab_ZipCode').html('');
+    $.ajax({
+        url: '/Admin/Home/GetZipCode?ZID=' + ddl.value,
+        method: 'GET',
+        dataType: 'text',
+        success: function (res) {
+            console.log(res);
+            $('#lab_ZipCode').html(res);
+        },
+        error: function (err) { console.log(err) },
+    })
+}
+/*用關鍵字搜尋小組 */
+function GetOIList(ACID,txb) {
+    $.ajax({
+        url: '/Admin/Home/GetOIList?ACID='+ACID+'&Key=' + txb.value,
+        method: 'GET',
+        dataType: 'json',
+        success: function (res) {
+            $('#ddl_OIs').html('');
+            console.log(res);
+            $.each(res, function (index) {
+                $('#ddl_OIs').append('<option title="' + index + '" value="' + res[index].value + '">' + res[index].value + '</option>');
+            });
+            return;
+        },
+        error: function (err) { console.log(err) },
+    })
+}
+/*顯示地址的不同項目區塊 */
 function ShowArea(ddl) {
     var Z0s = document.getElementsByClassName("div_Zip0");
     var Z1s = document.getElementsByClassName("div_Zip1");
@@ -106,4 +130,93 @@ window.onload = function () {
     Array.prototype.forEach.call(divs, function (div) {
         div.style.height = div.clientHeight + 'px';
     });
+}
+/*取消密碼顯示*/
+function togglePasswordVisibility(visibility, controlid) {
+    const passwordInput = document.getElementById(controlid);
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        visibility.textContent = "visibility";
+    } else {
+        passwordInput.type = "password";
+        visibility.textContent = "visibility_off";
+    }
+}
+/*確定送出修改 */
+function SubmitConfirm() {
+    Swal.fire({
+        icon: 'warning',
+        html: '確定儲存修改?',
+        showDenyButton: true,
+        confirmButtonText: '確認',
+        denyButtonText: '取消'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('form1').submit();
+        }
+        else {
+            Swal.close();
+            const btns = document.querySelectorAll(".btn");
+            btns.forEach((btn) => {
+                btn.disabled = false;
+                btn.classList.remove("btn-loading");
+            });
+            return;
+        }
+    });
+}
+function ShowUserMenu() {
+    document.getElementById('BackUserMenu').style.display = "";
+}
+
+function CloseUserMenu() {
+    document.getElementById('BackUserMenu').style.display = "none";
+}
+
+function LogoutCheck() {
+    Swal.fire({
+        icon: 'warning',
+        html: '確定登出?',
+        showDenyButton: true,
+        confirmButtonText: '確認',
+        denyButtonText: '取消'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.location.href = '/Admin/Home/Logout';
+        }
+        else {
+            Swal.close();
+            return;
+        }
+    });
+}
+
+function CheckInput(ACID) {
+
+    var sOld = document.getElementById('txb_Old').value;
+    var sNew1 = document.getElementById('txb_New1').value;
+    var sNew2 = document.getElementById('txb_New2').value;
+    $.ajax({
+        url: '/Admin/Home/CheckPasswordInput?ACID=' +ACID+'&Old=' + sOld + '&New1=' + sNew1 + '&New2=' + sNew2,
+        method: 'GET',
+        dataType: 'text',
+        success: function (res) {
+            //console.log(res);
+            if (res == '') {
+                SubmitConfirm();
+            } else {
+                const btns = document.querySelectorAll(".btn");
+                btns.forEach((btn) => {
+                    btn.disabled = false;
+                    btn.classList.remove("btn-loading");
+                });
+
+                Swal.fire({
+                    icon: 'error',
+                    html: res
+                });
+            }
+        },
+        error: function (err) { console.log(err) },
+    })
 }

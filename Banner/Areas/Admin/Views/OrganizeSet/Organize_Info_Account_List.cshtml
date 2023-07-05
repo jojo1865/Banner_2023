@@ -11,57 +11,31 @@
     <div class="body-container">
         @if (Model != null)
         {
-            <div class="search-form">
-                <div class="search-form-section">
-                    <div class="row">
-                        <div class="col-0 p-2">
-                            <Label>組織</Label>
-                            @if (Model.OIParent.Count > 0)
-                            {
-                                <div class="form-group">
-                                    <label>上層組織<span>*</span></label>
-                                    <div class="row">
-                                        @foreach (var LS in Model.OIParent.OrderBy(q => q.SortNo))
-                                        {
-                                            if (LS == Model.OIParent.OrderByDescending(q => q.SortNo).First())
-                                            {
-                                                <div class="col ps-0" id="@("div_"+LS.SortNo)">
-                                                    @Html.DropDownList(LS.ControlName, LS.OIList, new { @class = "form-select form-select-lg", })
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="col ps-0" id="@("div_"+LS.SortNo)">
-                                                    @Html.DropDownList(LS.ControlName, LS.OIList, new { @class = "form-select form-select-lg", disabled = "disabled" })
-                                                </div>
-                                            }
-
-                                        }
-                                    </div>
-                                </div>
-                            }
+            <form method="post" id="form1">
+                @Html.AntiForgeryToken()
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-12  p-2">
+                                <Label>關鍵字搜尋</Label>
+                                <input type="text" class="form-control form-control-lg input-underline" name="txb_Key" value="@ViewBag._Key" />
+                            </div>
                         </div>
-                        <div class="col-12  p-2">
-                            <Label>關鍵字搜尋</Label>
-                            <input type="text" class="form-control form-control-lg input-underline" id="txb_Key" value="@ViewBag._Key" />
+                    </div>
 
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="d-flex justify-content-end">
+                                <a href="javascript:Search();" class="btn btn-primary btn-lg btn-round btn-submit me-2">搜尋</a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="search-form-section">
-                    <div class="row">
-                        <div class="d-flex justify-content-end">
-                            <a href="javascript:Search();" class="btn btn-primary btn-lg btn-round btn-submit me-2">搜尋</a>
-                            <a href="@(Model.sAddURL)" class="btn btn-primary btn-lg btn-round btn-submit">新增</a>
-                        </div>
-                    </div>
+                <div class="table-container">
+                    @Html.Action("_TableList", "Include", new { cTL = Model })
                 </div>
-            </div>
-
-            <div class="table-container">
-                @Html.Action("_TableList", "Include", new { cTL = Model })
-            </div>
+            </form>
         }
     </div>
 </div>

@@ -20,21 +20,20 @@ namespace Banner.Areas.Admin.Controllers
         public class cBackUser_List
         {
             public cTableList cTL = new cTableList();
-            public List<ListSelect> LS = new List<ListSelect>();
             public string sAddURL = "/Admin/SystemSet/BackUser_Edit";
             public string Name = "";
             public string Account = "";
             public string CellPhone = "";
             public int Sex = 0;
+            public int OID = 0;
+            public string OTitle = "";
         }
         
         public ActionResult BackUser_List()
         {
             GetViewBag();
             cBackUser_List cBUL = new cBackUser_List();
-            cBUL.LS = GetO();
             cBUL.cTL = GetBackUser(null);
-
 
             return View(cBUL);
         }
@@ -44,12 +43,15 @@ namespace Banner.Areas.Admin.Controllers
         {
             GetViewBag();
             cBackUser_List cBUL = new cBackUser_List();
-            cBUL.LS = GetO();
             cBUL.cTL = GetBackUser(FC);
             cBUL.Name = FC.Get("txb_Name");
             cBUL.Account = FC.Get("txb_Account");
             cBUL.CellPhone = FC.Get("txb_CellPhone");
             cBUL.Sex = Convert.ToInt32(FC.Get("rbl_Sex"));
+            cBUL.OID = Convert.ToInt32(FC.Get("ddl_O"));
+            cBUL.OTitle = FC.Get("txb_OITitle");
+            TempData["OID"] = cBUL.OID;
+            TempData["OITitle"] = cBUL.OTitle;
 
             return View(cBUL);
         }
@@ -100,27 +102,21 @@ namespace Banner.Areas.Admin.Controllers
                         Ns = Ns.Where(q => q.ManFlag == (FC.Get("rbl_Sex") == "1"));
 
 
-                int iOIID = 0, j = 0;
-                for (int i = 0; i < 10; i++)
+                int iOID = Convert.ToInt32(FC.Get("ddl_O"));
+                string OITitle = FC.Get("txb_OITitle");
+                if (iOID > 0 || OITitle!="")
                 {
-                    string str = FC.Get("ddl_" + i);
-                    if (!string.IsNullOrEmpty(str))
-                    {
-                        try
-                        {
-                            j = Convert.ToInt32(str);
-                            if (j > 0)
-                                iOIID = j;
-                        }
-                        catch { }
-                    }
-                }
-                if (iOIID > 0)
-                {
-                    var OIs = new List<OrganizeInfo>();
-                    GetThisOIsFromTree(ref OIs, iOIID);
+                    var OIs = DC.OrganizeInfo.Where(q =>q.ActiveFlag && !q.DeleteFlag);
+                    if (OITitle != "")
+                        OIs = OIs.Where(q => q.Title.Contains(OITitle));
+                    if (iOID > 0)
+                        OIs = OIs.Where(q => q.OID == iOID);
                     var IDs = OIs.GroupBy(q => q.OIID).Select(q => q.Key);
-                    var Ms = from q in DC.M_OI_Account.Where(q => !q.DeleteFlag && (q.JoinDate >= q.CreDate && q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date))
+                    /*var Ms = from q in DC.M_OI_Account.Where(q => !q.DeleteFlag && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date))
+                             join p in IDs
+                             on q.OIID equals p
+                             select q;*/
+                    var Ms = from q in GetMOIAC()
                              join p in IDs
                              on q.OIID equals p
                              select q;
@@ -211,44 +207,51 @@ namespace Banner.Areas.Admin.Controllers
                     N.SaveACID = GetACID();
                     DC.SubmitChanges();
 
-                    var MAs = DC.M_Rool_Account.Where(q => q.ACID == ID && !q.DeleteFlag && (q.JoinDate >= q.CreDate && q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date)).ToList();
+                    /*var MAs = DC.M_Rool_Account.Where(q => q.ACID == ID && !q.DeleteFlag && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date)).ToList();*/
+                    var MAs = GetMRAC(0, ID).ToList();
                     foreach (var B in cBUE.RList)
                     {
                         var MA = MAs.FirstOrDefault(q => q.RID.ToString() == B.Value);
-                        if (MA == null && B.Selected)
+                        if(MA == null)
                         {
-                            MA = new M_Rool_Account
+                            if(B.Selected)
                             {
-                                ACID = ID,
-                                RID = Convert.ToInt32(B.Value),
-                                JoinDate = DT,
-                                LeaveDate = DT,
-                                Note = "",
-                                ActiveFlag = true,
-                                DeleteFlag = false,
-                                CreDate = DT,
-                                UpdDate = DT,
-                                SaveACID = GetACID()
-                            };
-                            DC.M_Rool_Account.InsertOnSubmit(MA);
-                            DC.SubmitChanges();
+                                MA = new M_Rool_Account
+                                {
+                                    ACID = ID,
+                                    RID = Convert.ToInt32(B.Value),
+                                    JoinDate = DT,
+                                    LeaveDate = DT,
+                                    Note = "",
+                                    ActiveFlag = true,
+                                    DeleteFlag = false,
+                                    CreDate = DT,
+                                    UpdDate = DT,
+                                    SaveACID = GetACID()
+                                };
+                                DC.M_Rool_Account.InsertOnSubmit(MA);
+                                DC.SubmitChanges();
+                            }
                         }
-                        else if (!MA.ActiveFlag && B.Selected)
+                        else
                         {
-                            MA.ActiveFlag = true;
-                            MA.JoinDate = DT;
-                            MA.LeaveDate = MA.CreDate;
-                            MA.UpdDate = DT;
-                            MA.SaveACID = GetACID();
+                            if(!B.Selected)
+                            {
+                                MA.ActiveFlag = false;
+                                MA.DeleteFlag = true;
+                                MA.LeaveDate = MA.UpdDate = DT;
+                                
+                            }
+                            else if(!MA.ActiveFlag)
+                            {
+                                MA.ActiveFlag = true;
+                                MA.JoinDate = DT;
+                                MA.LeaveDate = MA.CreDate;
+                                MA.UpdDate = DT;
+                                MA.SaveACID = GetACID();
+                            }
                             DC.SubmitChanges();
-                        }
-                        else if (MA != null && !B.Selected)
-                        {
-                            MA.ActiveFlag = false;
-                            MA.DeleteFlag = true;
-                            MA.LeaveDate = MA.UpdDate = DT;
-                            DC.SubmitChanges();
-                        }
+                        }                   
                     }
                 }
                 SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/SystemSet/BackUser_List");
@@ -284,7 +287,8 @@ namespace Banner.Areas.Admin.Controllers
                 SetAlert("查無資料,請重新操作", 2, "/Admin/SystemSet/BackUser_List");
             cBUE.RList = new List<SelectListItem>();
             var Rs = DC.Rool.Where(q => (q.RoolType == 3 || q.RoolType == 4) && !q.DeleteFlag && q.ActiveFlag).OrderBy(q => q.RID);
-            var MAs = DC.M_Rool_Account.Where(q => q.ACID == ID && !q.DeleteFlag && (q.JoinDate >= q.CreDate && q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date)).ToList();
+            /*var MAs = DC.M_Rool_Account.Where(q => q.ACID == ID && !q.DeleteFlag && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date)).ToList();*/
+            var MAs = GetMRAC(0, ID).ToList();
             foreach (var R in Rs)
             {
                 var MA = MAs.FirstOrDefault(q => q.RID == R.RID);
