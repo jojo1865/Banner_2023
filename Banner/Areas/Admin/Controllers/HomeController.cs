@@ -61,14 +61,14 @@ namespace Banner.Areas.Admin.Controllers
                 var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.BackUsedFlag && q.Login == Login && q.Password == EncPW);
                 if (AC == null)
                 {
-                    AC = DC.Account.Where(q => q.Login == Login).OrderByDescending(q => q.CreDate).FirstOrDefault();
+                    AC = DC.Account.Where(q => q.Login == Login && q.ActiveFlag && !q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
                     if (AC == null)
                         SetAlert("此帳號不存在", 2);
-                    else if (AC.DeleteFlag)
+                    /*else if (AC.DeleteFlag)
                         SetAlert("此帳號已被移除", 2);
                     else if (!AC.ActiveFlag)
-                        SetAlert("此帳號已被關閉", 2);
-                    else if (AC.Password != EncPW)
+                        SetAlert("此帳號已被關閉", 2);*/
+                    else if(AC.Password != EncPW)
                     {
                         if (AC.Password == "")//資料庫中無密碼,所以依據此次輸入設定新密碼
                         {
@@ -91,7 +91,7 @@ namespace Banner.Areas.Admin.Controllers
                                 SetSession("LoginCt", iLoginCt.ToString());
                                 if (iLoginCt < 5)
                                 {
-                                    SetAlert("您的密碼錯誤!!</br>您還有" + (5 - iLoginCt) + "次機會...");
+                                    SetAlert("您的密碼錯誤!!</br>您還有" + (5 - iLoginCt) + "次機會...</br>建議您使用忘記密碼功能", 2,"/Admin/Home/ForgetPassWord/");
                                 }
                                 else
                                 {
@@ -109,8 +109,7 @@ namespace Banner.Areas.Admin.Controllers
                         }
 
                     }
-                    else
-                        SetAlert("此帳號發生不明原因錯誤</br>請管理員協助排除", 2, "/Admin/Home/Login");
+                    
                 }
                 else
                 {

@@ -1,0 +1,75 @@
+﻿<!--jquery-->
+<script src="~/Areas/Admin/Content/JS/jquery-3.7.0.js"></script>
+<script src="~/Areas/Admin/Content/JS/bootstrap.js"></script>
+<!--Sweet Alert-->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--orgchart 組織圖-->
+@{
+    if (TempData["msg"].ToString() != "")
+    {
+        if (TempData["url"].ToString() != "")
+        {
+            if (TempData["msgtype"].ToString() != "")
+            {
+                <script type="text/javascript">
+                        var message = @Html.Raw(Json.Encode(TempData["msg"]));
+                        var type =@Html.Raw(Json.Encode(TempData["msgtype"]));
+                        var url = @Html.Raw(Json.Encode(TempData["url"]));
+                        Swal.fire({
+                            icon:type,
+                            html: message
+                        }).then((result) => {
+                            if (result.value) {
+                                location.href = url;
+                            }
+                        });
+                </script>
+            }
+            else
+            {
+                <script type="text/javascript">
+                        var message = @Html.Raw(Json.Encode(TempData["msg"]));
+                        var url = @Html.Raw(Json.Encode(TempData["url"]));
+                    Swal.fire({
+                            html: message
+                        }).then((result) => {
+                            if (result.value) {
+                                location.href = url;
+                            }
+                        });
+                </script>
+            }
+        }
+        else
+        {
+            if (TempData["msgtype"].ToString() != "")
+            {
+                <script type="text/javascript">
+                        var message = @Html.Raw(Json.Encode(TempData["msg"]));
+                        var type=@Html.Raw(Json.Encode(TempData["msgtype"]));
+                        Swal.fire({
+                            icon:type,
+                            html: message
+                        });
+                </script>
+            }
+            else
+            {
+                <script type="text/javascript">
+                        var message = @Html.Raw(Json.Encode(TempData["msg"]));
+                        Swal.fire({
+                            html: message
+                        });
+                </script>
+            }
+        }
+    }
+    else if (TempData["url"].ToString() != "")
+    {
+        <script type="text/javascript">
+                var url = @Html.Raw(Json.Encode(TempData["url"]));
+                location.href = url;
+        </script>
+    }
+}
+

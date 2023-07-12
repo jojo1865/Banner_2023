@@ -3,6 +3,7 @@
     <label>居住國家</label>
     @Html.DropDownList("ddl_Zip0", Model.Z0List,
            new { @class = "form-select form-select-lg", @onchange = "ShowArea(this);" })
+    @Html.Hidden("hid_LID",Model.LID)
 </div>
 @{ string ShowControl = Model.Z0List[0].Selected ? "" : "display:none"; }
 <div class="row div_Zip0" style="@ShowControl">

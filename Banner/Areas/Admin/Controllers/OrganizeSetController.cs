@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.Drawing;
 using System.Linq;
 using System.Net.Mime;
 using System.Runtime.ConstrainedExecution;
@@ -53,6 +54,7 @@ namespace Banner.Areas.Admin.Controllers
                     C.Title = O.Title;
                     C.ControlName = O.JobTitle;
                     C.URL = "/Admin/OrganizeSet/Organize_Map_Edit/" + ItemID + "/" + O.OID;
+                    C.CSS = O.ActiveFlag ? "td_O_Basic3_Active" : "td_O_Basic3_UnActive";
                     R.Cs.Add(C);
 
                     cTL.Rs.Add(R);
@@ -178,7 +180,7 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         cME.OList.Add(new SelectListItem { Text = O.Title, Value = O.OID.ToString(), Selected = O.ParentID == 0 });
                         O = Os.FirstOrDefault(q => q.ParentID == O.OID);
-                        if (O == null || O.OID==8)//排除小組~讓小組一定在最下面
+                        if (O == null || O.OID == 8)//排除小組~讓小組一定在最下面
                             break;
                     } while (true);
                 }
@@ -251,22 +253,33 @@ namespace Banner.Areas.Admin.Controllers
         #region 牧養組織與職分-列表
         public class cOrganize_Info_List
         {
+            public int OID = 0;
             public string OTitle = "";
-            public cTableRow cOrganize = new cTableRow();
+            //public cTableRow cOrganize = new cTableRow();
             public cTableList cTL = new cTableList();
             public string sAddURL = "";
         }
         private cOrganize_Info_List GetOrganize_Info_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
-            string sKey = FC != null ? FC.Get("txb_Key") : "";
-            ViewBag._Key = sKey;
-
+            string sKey = "";
+            if (FC != null)
+            {
+                sKey = FC.Get("txb_OTitle");
+                OID = Convert.ToInt32(FC.Get("ddl_O"));
+            }
+            
+            //檢查目前組織OID跟OIID是否對的上,對不上表示使用的搜尋,把OIID歸零處理
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID && q.OID == OID && !q.DeleteFlag);
+            if (OI == null)
+                OIID = 0;
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
 
             cOrganize_Info_List cOL = new cOrganize_Info_List();
             cOL.sAddURL = "/Admin/OrganizeSet/Organize_Info_Edit/" + ItemID + "/" + OID + "/" + OIID + "/0";
-            cOL.cOrganize = new cTableRow();
+            cOL.OID = OID;
+            cOL.OTitle = sKey;
+            //cOL.cOrganize = new cTableRow();
             cOL.cTL = new cTableList();
             cOL.cTL.Title = "";
             cOL.cTL.NowPage = iNowPage;
@@ -275,68 +288,40 @@ namespace Banner.Areas.Admin.Controllers
             cOL.cTL.NumCut = iNumCut;
             cOL.cTL.Rs = new List<cTableRow>();
 
-            #region 上選單
+
             string ParentTitle = "上層名稱";
             string NowTitle = "本層名稱";
-            var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == ItemID).ToList();
-            var O = Os.FirstOrDefault(q => q.ParentID == 0);
-            int iTab = 0;
-            int iNowOSort = 0;
-            if (O != null)
+            int POID = 0;
+            var O_ = DC.Organize.FirstOrDefault(q => q.OID == OID);
+            if (O_ != null)
             {
-                if (OID == 0)
-                    OID = O.OID;
-                do
+                NowTitle = O_.Title;
+                var O_Up = DC.Organize.FirstOrDefault(q => q.OID == O_.ParentID && !q.DeleteFlag);
+                if (O_Up != null)
                 {
-                    cOL.cOrganize.Cs.Add(new cTableCell
-                    {
-                        Value = O.OID.ToString(),
-                        Title = O.Title,
-                        SortNo = iTab++,
-                        Target = "_self",
-                        URL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + O.OID + "/0",
-                        CSS = (OID == O.OID ? "a_Select" : ""),
-                        ControlName = (OID == O.OID ? "col_Select" : ""),
-                    });
-                    if (OID == O.OID)
-                    {
-                        NowTitle = O.Title;
-                        var PO = DC.Organize.FirstOrDefault(q => q.OID == O.ParentID);
-                        if (PO != null)
-                            ParentTitle = PO.Title;
-                        else
-                            ParentTitle = "";
-                        var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID);
-                        if (OI != null)
-                            cOL.OTitle = OI.Title;
-                        else
-                            cOL.OTitle = O.Title;
-                        iNowOSort = iTab;
-                    }
-
-                    O = Os.FirstOrDefault(q => q.ParentID == O.OID);
-                    if (O == null)
-                        break;
-                } while (true);
+                    POID = O_Up.OID;
+                    ParentTitle = O_Up.Title;
+                }
+                else
+                    ParentTitle = "";
             }
-            #endregion
+            var O_Next = DC.Organize.FirstOrDefault(q => q.ParentID == OID);
             #region 搜尋內容
-            var Ns = DC.OrganizeInfo.Where(q => q.OID == OID);
+            var Ns = DC.OrganizeInfo.Where(q => !q.DeleteFlag);
+            if (OID > 0)
+                Ns = Ns.Where(q => q.OID == OID);
             if (OIID > 0)
                 Ns = Ns.Where(q => q.ParentID == OIID);
             if (sKey != "")
                 Ns = Ns.Where(q => q.Title.Contains(sKey));
 
+
             string sNextTitle = "下層組織";
-            var _Last = cOL.cOrganize.Cs.OrderByDescending(q => q.Value).FirstOrDefault();
-            if (_Last != null)
-            {
-                if (_Last.Value == OID.ToString())
-                    sNextTitle = "組員數量";
-            }
+            if (OID == 8)
+                sNextTitle = "組員數量";
 
             var TopTitles = new List<cTableCell>();
-            TopTitles.Add(new cTableCell { Title = "", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "控制", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "編號(ID)", WidthPX = 100 });
             if (ParentTitle != "")
                 TopTitles.Add(new cTableCell { Title = ParentTitle });
@@ -349,7 +334,7 @@ namespace Banner.Areas.Admin.Controllers
 
             cOL.cTL.TotalCt = Ns.Count();
             cOL.cTL.MaxNum = GetMaxNum(cOL.cTL.TotalCt, cOL.cTL.NumCut);
-            Ns = Ns.OrderByDescending(q => q.CreDate).Skip((iNowPage - 1) * cOL.cTL.NumCut).Take(cOL.cTL.NumCut);
+            Ns = Ns.OrderBy(q=>q.OID).ThenByDescending(q => q.CreDate).Skip((iNowPage - 1) * cOL.cTL.NumCut).Take(cOL.cTL.NumCut);
 
             foreach (var N in Ns)
             {
@@ -358,17 +343,17 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/OrganizeSet/Organize_Info_Edit/" + ItemID + "/" + N.OID + "/" + N.ParentID + "/" + N.OIID, Target = "_self", Value = "編輯" });//
                 cTR.Cs.Add(new cTableCell { Value = N.OIID.ToString() });//編號(ID)
                 if (ParentTitle != "")
-                    cTR.Cs.Add(new cTableCell { Value = NP != null ? NP.Title : "" });//上層名稱
-                cTR.Cs.Add(new cTableCell { Value = N.Title + (N.BusinessType == 1 ? "(外展)" : "") });//本層名稱
+                    cTR.Cs.Add(new cTableCell { Value = NP != null ? (NP.OID == POID ? NP.Title + NP.Organize.Title : "[" + NP.Title + NP.Organize.Title + "]") : "" });//上層名稱
+                cTR.Cs.Add(new cTableCell { Value = N.Title + N.Organize.Title + (N.BusinessType == 1 ? "(外展)" : "") });//本層名稱
                 if (sNextTitle == "下層組織")
                 {
-                    var O_Next = cOL.cOrganize.Cs.Where(q => q.SortNo >= iNowOSort).OrderBy(q => q.SortNo).FirstOrDefault();
+                    //var O_Next = cOL.cOrganize.Cs.Where(q => q.SortNo >= iNowOSort).OrderBy(q => q.SortNo).FirstOrDefault();
 
                     int Ct = DC.OrganizeInfo.Count(q => !q.DeleteFlag && q.ParentID == N.OIID);
                     if (Ct == 0)//若還沒有下層,可直接新增
                         cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "btn_Basic_W", URL = "/Admin/OrganizeSet/Organize_Info_Edit/" + ItemID + "/" + N.OID + "/" + N.OIID + "/0", Value = "新增" });
                     else//引導到下層
-                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + (O_Next != null ? O_Next.Value : "0") + "/" + N.OIID, Value = "(" + Ct + ")" });//下層組織
+                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + (O_Next != null ? O_Next.OID : 0) + "/" + N.OIID, Value = "(" + Ct + ")" });//下層組織
                 }
                 else
                 {
@@ -524,11 +509,24 @@ namespace Banner.Areas.Admin.Controllers
                     #region 上層
                     cIE.OIParent = new List<OIListSelect>();
                     int SortNo = 10;
-                    var OIP = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == cIE.OI.ParentID && !q.DeleteFlag);
+                    int NowPID = 0;
+                    var O_Now = cIE.OI.Organize;//目前組織
+                    var O_P = DC.Organize.FirstOrDefault(q => q.OID == O_Now.ParentID);//目前的上一層組織
+                    if (O_P.OID != cIE.OI.OID)//中間有別的層級
+                    {
+                        var OI_P = DC.OrganizeInfo.Where(q => q.OID == O_P.OID && q.ParentID == cIE.OI.ParentID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OIID).FirstOrDefault();
+                        if (OI_P != null)
+                            NowPID = OI_P.OIID;
+                    }
+                    else
+                        NowPID = cIE.OI.ParentID;
+
+                    var OIP = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == NowPID && !q.DeleteFlag);
                     if (OIP != null)
                     {
-                        int NowPID = OIP.ParentID;
-                        var OIs = DC.OrganizeInfo.Where(q => q.ParentID == NowPID && !q.DeleteFlag);
+                        NowPID = OIP.ParentID;
+
+                        var OIs = DC.OrganizeInfo.Where(q => q.ParentID == NowPID && !q.DeleteFlag && q.OIID != cIE.OI.OIID);
                         do
                         {
                             if (OIs.Count() == 0 || SortNo < 0 || NowPID < 0)
@@ -548,17 +546,20 @@ namespace Banner.Areas.Admin.Controllers
                                         else
                                             NowPID = -1;
 
-                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title, Value = OI.OIID.ToString(), Selected = true });
+                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = true });
                                     }
                                     else
-                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title, Value = OI.OIID.ToString() });
+                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString() });
                                 }
 
 
                                 if (SortNo == 10)
                                 {
                                     cLS.OIList.ForEach(q => q.Selected = false);
-                                    cLS.OIList.Find(q => q.Value == cIE.OI.ParentID.ToString()).Selected = true;
+                                    if (cLS.OIList.FirstOrDefault(q => q.Value == cIE.OI.ParentID.ToString()) != null)
+                                        cLS.OIList.First(q => q.Value == cIE.OI.ParentID.ToString()).Selected = true;
+                                    else
+                                        cLS.OIList[0].Selected = true;
                                 }
 
                                 cIE.OIParent.Add(cLS);
@@ -592,6 +593,7 @@ namespace Banner.Areas.Admin.Controllers
                     cIE.OI = new OrganizeInfo();
                     cIE.OI.Organize = O;
                     cIE.OI.ParentID = PID;
+                    cIE.OI.ActiveFlag = true;
                     #region 上層
                     cIE.OIParent = new List<OIListSelect>();
                     int SortNo = 10;
@@ -619,10 +621,10 @@ namespace Banner.Areas.Admin.Controllers
                                         else
                                             NowPID = -1;
 
-                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title, Value = OI.OIID.ToString(), Selected = true });
+                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = true });
                                     }
                                     else
-                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title, Value = OI.OIID.ToString() });
+                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString() });
                                 }
 
 
@@ -645,10 +647,13 @@ namespace Banner.Areas.Admin.Controllers
                               join p in DC.OrganizeInfo.Where(q => q.OID == O.OID && !q.DeleteFlag && q.ActiveFlag)
                               on q.ACID equals p.ACID
                               select q;
+                    if (ACs.Count() == 0)
+                        ACs = DC.Account.Where(q => q.ACID == 1);
                     cIE.ACList = new List<SelectListItem>();
                     foreach (var A in ACs.OrderBy(q => q.Name))
                         cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = A.Name });
                     cIE.ACList[0].Selected = true;
+
                     #endregion
                     #region 地址
                     cIE.L = new Location();
@@ -699,7 +704,7 @@ namespace Banner.Areas.Admin.Controllers
             var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID && q.OID == OID && !q.DeleteFlag);
             if (OI != null)
             {
-                ViewBag._Title = OI.Title + (OI.BusinessType == 1 ? "(外展)" : "") + " 成員列表";
+                ViewBag._Title = OI.Title + OI.Organize.Title + (OI.BusinessType == 1 ? "(外展)" : "") + " 成員列表";
                 LeaderACID = OI.ACID;
             }
             var Ns = DC.M_OI_Account.Where(q => !q.DeleteFlag && q.OIID == OIID && !q.Account.DeleteFlag);
@@ -708,7 +713,7 @@ namespace Banner.Areas.Admin.Controllers
 
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "會員資料", WidthPX = 100 });
-            TopTitles.Add(new cTableCell { Title = "編號(ID)", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "成員ID", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "會員ID", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "姓名" });
             TopTitles.Add(new cTableCell { Title = "加入日期" });
@@ -724,8 +729,8 @@ namespace Banner.Areas.Admin.Controllers
             foreach (var N in Ns)
             {
                 cTableRow cTR = new cTableRow();
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/Account/Account_Edit/" + N.ACID, Target = "_black", Value = "編輯" });//
-                cTR.Cs.Add(new cTableCell { Value = N.MID.ToString() });//編號(ID)
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_black", Value = "編輯" });//
+                cTR.Cs.Add(new cTableCell { Value = N.MID.ToString() });//成員ID
                 cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() });//會員ID
                 cTR.Cs.Add(new cTableCell { Value = N.Account.Name });//姓名
                 if (N.JoinDate == N.CreDate)
@@ -735,8 +740,8 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 else
                 {
-                    cTR.Cs.Add(new cTableCell { Value = N.JoinDate.ToShortDateString() });//加入日期
-                    cTR.Cs.Add(new cTableCell { Value = N.LeaveDate == N.CreDate ? "" : N.LeaveDate.ToShortDateString() });//離開日期
+                    cTR.Cs.Add(new cTableCell { Value = N.JoinDate.ToString(DateFormat) });//加入日期
+                    cTR.Cs.Add(new cTableCell { Value = N.LeaveDate == N.CreDate ? "" : N.LeaveDate.ToString(DateFormat) });//離開日期
                 }
                 if (N.OrganizeInfo.ACID == N.ACID)
                     cTR.Cs.Add(new cTableCell { Value = "小組長", CSS = "btn btn-outline-success" });//職務
@@ -818,7 +823,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 MLL.ThisTitle = POI.Title;
                 cTree T1 = new cTree();
-                T1.name = POI.Title.Replace("基督教", "</br>基督教");
+                T1.name = POI.Title.Replace("基督教", "</br>基督教") + POI.Organize.Title;
                 T1.title = "";
                 T1.children = new List<cTree>();
                 var OIs = DC.OrganizeInfo.Where(q => q.OID == 2 && !q.DeleteFlag && q.ParentID == POI.OIID).OrderBy(q => q.OIID);
@@ -826,7 +831,7 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     var MLSs = DC.M_Location_Set.Where(q => q.SetType == 0 && q.TargetID == OI.OIID && !q.DeleteFlag && !q.Meeting_Location.DeleteFlag).Select(q => q.Meeting_Location).OrderBy(q => q.MLID);
                     cTree T2 = new cTree();
-                    T2.name = OI.Title + " (" + MLSs.Count() + ")";
+                    T2.name = OI.Title + OI.Organize.Title + " (" + MLSs.Count() + ")";
                     T2.title = "新增";
                     T2.url = "/Admin/OrganizeSet/Meeting_Location_Edit/" + OI.OIID + "/0";
                     T2.children = new List<cTree>();
@@ -1013,10 +1018,10 @@ namespace Banner.Areas.Admin.Controllers
                                         else
                                             NowPID = -1;
 
-                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title, Value = OI.OIID.ToString(), Selected = true });
+                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = true });
                                     }
                                     else
-                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title, Value = OI.OIID.ToString() });
+                                        cLS.OIList.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString() });
                                 }
 
 
@@ -1192,7 +1197,7 @@ namespace Banner.Areas.Admin.Controllers
                 var cMLs = from q in DC.OrganizeInfo.Where(q => q.ParentID == POI.OIID && q.OID == 2 && !q.DeleteFlag)
                            join p in DC.M_Location_Set.Where(q => !q.DeleteFlag && q.SetType == 0)
                            on q.OIID equals p.TargetID
-                           select new { q.OIID, OTitle = q.Title, p.MLID, MLTitle = p.Meeting_Location.Title, p.ActiveFlag, p.CreDate, p.UpdDate, p.SaveACID };
+                           select new { q.OIID, OITitle = q.Title, p.MLID, MLTitle = p.Meeting_Location.Title, p.ActiveFlag, p.CreDate, p.UpdDate, p.SaveACID, OTitle = q.Organize.Title };
                 var ACs = (from q in DC.Account
                            join p in cMLs
                            on q.ACID equals p.SaveACID
@@ -1211,8 +1216,8 @@ namespace Banner.Areas.Admin.Controllers
                 foreach (var cML in cMLs.OrderBy(q => q.OIID).ThenBy(q => q.MLID))
                 {
                     ALS = new ArrayList();
-                    ALS.Add(POI.Title);
-                    ALS.Add(cML.OTitle);
+                    ALS.Add(POI.Title + POI.Organize.Title);
+                    ALS.Add(cML.OITitle + cML.OTitle);
                     ALS.Add(cML.MLTitle);
                     var C = Cs.FirstOrDefault(q => q.MLID == cML.MLID);
                     ALS.Add(C != null ? C.ContectValue : "");

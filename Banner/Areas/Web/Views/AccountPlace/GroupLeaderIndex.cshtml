@@ -1,0 +1,194 @@
+﻿
+@{
+    ViewBag.Title = "GroupLeaderIndex";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="section-container">
+    <nav class="breadcrumb-nav">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Web/AccountPlace/GroupData_Index">小組資訊</a></li>
+            <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+            <li class="breadcrumb-item"><a href="/Web/AccountPlace/GroupData_List">組員名單管理</a></li>
+        </ol>
+    </nav>
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">小組資訊</h5>
+    </div>
+    <div class="tabs">
+        <div class="tab">
+            <img src="/Areas/Web/Content/img/home-edit.svg"
+                 alt="" />小組聚會資訊更新
+        </div>
+        <div class="tab active">
+            <img src="/Areas/Web/Content/img/people-edit.svg"
+                 alt="" />組員名單管理
+        </div>
+        <div class="tab">
+            <img src="/Areas/Web/Content/img/meet-check.svg"
+                 alt="" />小組聚會登記
+        </div>
+        <div class="tab">
+            <img src="/Areas/Web/Content/img/stat.svg"
+                 alt="" />小組聚會統計
+        </div>
+    </div>
+    <div class="sub-tabs">
+        <div class="tab">
+            <button class="btn btn-primary btn-sm btn-round">小組名單</button>
+            <button class="btn btn-outline-primary btn-sm btn-round">
+                新人名單
+            </button>
+            <button class="btn btn-outline-primary btn-sm btn-round">
+                待受洗名單
+            </button>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+        <th width="200">操作</th>
+        <th>職分</th>
+        <th>姓名</th>
+        <th>性別</th>
+        <th>生日</th>
+        <th>手機</th>
+        <th>受洗狀態</th>
+        <th>備註</th>
+        <th>代理人設定</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>小組長</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>已受洗</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="btn btn-primary btn-round disabled">
+                        移除
+                    </button>
+                    <button class="btn btn-primary btn-round disabled">
+                        編輯
+                    </button>
+                </td>
+                <td>小組員</td>
+                <td>張阿方</td>
+                <td>男</td>
+                <td>1979.03.10</td>
+                <td>0963111100</td>
+                <td>已受洗</td>
+                <td></td>
+                <td>
+                    <input class="form-check-input" type="checkbox" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="btn btn-primary btn-round disabled">
+                        移除
+                    </button>
+                    <button class="btn btn-primary btn-round disabled">
+                        編輯
+                    </button>
+                </td>
+                <td>小組員</td>
+                <td>王小小</td>
+                <td>女</td>
+                <td>1979.03.10</td>
+                <td>0963111111</td>
+                <td>未受洗</td>
+                <td></td>
+                <td>
+                    <input class="form-check-input" type="checkbox" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="btn btn-primary btn-round disabled">
+                        移除
+                    </button>
+                    <button class="btn btn-primary btn-round disabled">
+                        編輯
+                    </button>
+                </td>
+                <td>小組員</td>
+                <td>張阿大</td>
+                <td>男</td>
+                <td>1979.03.10</td>
+                <td>0963111777</td>
+                <td>未受洗</td>
+                <td></td>
+                <td>
+                    <input class="form-check-input" type="checkbox" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="btn btn-primary btn-round disabled">
+                        移除
+                    </button>
+                    <button class="btn btn-primary btn-round disabled">
+                        編輯
+                    </button>
+                </td>
+                <td>小組員</td>
+                <td>黃小明</td>
+                <td>男</td>
+                <td>1979.03.10</td>
+                <td>0963114400</td>
+                <td>未受洗</td>
+                <td></td>
+                <td>
+                    <input class="form-check-input" type="checkbox" value="" />
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="10">
+                    <div class="pagination-container">
+                        <div class="aux-empty">&nbsp;</div>
+                        <div class="pagination-button-group">
+                            <button class="btn btn-outline-primary btn-sm btn-round">
+                                最前頁
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm btn-round">
+                                上頁
+                            </button>
+                            <span>
+                                第
+                                <span class="current-page">1</span> /
+                                <span class="total-page">3</span>
+                                頁，共
+                                <span class="total">10</span>
+                                筆
+                            </span>
+                            <button class="btn btn-outline-primary btn-sm btn-round">
+                                下頁
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm btn-round">
+                                最後頁
+                            </button>
+                        </div>
+                        <div class="pagesize-container">
+                            <label>每頁筆數</label>
+                            <select class="form-select form-select-sm">
+                                <option selected value="10">10</option>
+                                <option value="30">30</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

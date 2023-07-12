@@ -1,12 +1,24 @@
 ﻿
 @model List<SelectListItem>
 <div class="row">
-    <div class="col-6">
-        <Label>組織名稱</Label>
-        @Html.TextBox("txb_OITitle", TempData["OITitle"], new { @class = "form-control form-control-lg input-underline" })
+    <div class="col-xxl-auto col-lg-6 col-12">
+        <div class="row">
+            <div class="col-auto ms-0 me-0">
+                <label class="form-control-lg ps-0 pe-0">組織：</label>
+            </div>
+            <div class="col-auto ms-0 me-0">
+                @Html.TextBox("txb_OTitle", (string)ViewBag._OTitle, new { @class = "form-control form-control-lg input-underline", @placeholder = "組織名稱關鍵字" })
+            </div>
+        </div>
     </div>
-    <div class="col-6">
-        <Label>組織層級</Label>
-        @Html.DropDownList("ddl_O", Model, new { @class = "form-select form-select-lg" })
+    <div class="col-xxl-auto col-lg-6 col-12">
+        @if (ViewBag._LockFlag == 1)
+        {
+            @Html.DropDownList("ddl_O", Model, new { @class = "form-select form-select-lg", disabled= "disabled" })
+        }
+        else
+        {
+            @Html.DropDownList("ddl_O", Model, new { @class = "form-select form-select-lg" })
+        }
     </div>
 </div>

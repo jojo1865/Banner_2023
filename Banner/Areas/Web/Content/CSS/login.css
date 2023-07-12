@@ -1,0 +1,247 @@
+* {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.main {
+  width: 100%;
+  display: flex;
+}
+
+.left-area {
+  width: 50%;
+  height: 100vh;
+  background-color: #008bab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.forestage .left-area {
+  background: #0c3176;
+}
+
+.logo {
+  padding-top: 32px;
+  padding-left: 32px;
+  width: 100%;
+}
+
+.main-icon {
+  width: 71.66%;
+  margin-top: 143px;
+  flex: 1;
+}
+
+.main-icon img {
+  width: 100%;
+}
+
+.right-area {
+  width: 50%;
+  height: 100vh;
+}
+
+.login-container {
+  margin-top: 132px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.backend-login-title {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.backend-login-title p {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 400;
+}
+
+.account-with-icon,
+.password-with-icon,
+.verify-with-icon {
+  display: flex;
+  align-items: center;
+  margin-top: 36px;
+}
+
+.account-with-icon img,
+.password-with-icon img,
+.verify-with-icon img {
+  margin-right: 12px;
+}
+
+.account-with-icon p,
+.password-with-icon p,
+.verify-with-icon p {
+  font-style: 15px;
+  line-height: 21px;
+  font-weight: 400;
+  margin-top: 16px;
+}
+
+.input {
+  width: 100%;
+  display: flex;
+}
+
+.verify-with-code img {
+  margin-left: 8px;
+}
+
+.login-container {
+  width: 65.277%;
+}
+
+.login-button-container {
+  text-align: center;
+  margin-top: 44px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  width: 40.41%;
+  background-color: #3764ac;
+}
+
+.forget-password-and-account {
+  display: flex;
+  justify-content: center;
+}
+
+.forget-password,
+.forget-account {
+  display: flex;
+  width: 64px;
+}
+
+.forget-password a,
+.forget-account a {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 400;
+}
+
+.border-line {
+  width: 1px;
+  height: 20px;
+  margin-left: 28px;
+  margin-right: 28px;
+  border: 1px solid #0c3176;
+}
+
+.input input {
+  flex: 1;
+}
+
+.is-member-or-not {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
+}
+
+.is-member-or-not p {
+  margin: auto 0;
+  color: rgba(40, 40, 40, 0.38);
+  font-size: 15px;
+  line-height: 140%;
+}
+
+.gray-middle-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(40, 40, 40, 0.38);
+}
+
+.sign-up-button-container {
+  text-align: center;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-outline-primary {
+  width: 40.41%;
+}
+
+.child-sign-up {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.child-sign-up p {
+  color: #008bab;
+}
+
+.btn-login,
+.btn-register {
+  min-width: 292px;
+}
+
+/* 中網 */
+@media only screen and (min-width: 576px) and (max-width: 991px) {
+  .main,
+  .left-area,
+  .right-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-icon {
+    width: 45%;
+    height: auto;
+    margin-top: 24px;
+    margin-bottom: 48px;
+  }
+
+  .login-container {
+    margin-top: 36px;
+  }
+
+  .child-sign-up {
+    margin-bottom: 133px;
+  }
+}
+
+/* 小網 */
+@media only screen and (max-width: 575px) {
+  .main,
+  .left-area,
+  .right-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-icon {
+    width: 58.93%;
+    height: auto;
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
+  .login-container {
+    margin-top: 24px;
+  }
+
+  .backend-login-title {
+    margin-bottom: 36px;
+  }
+
+  .child-sign-up {
+    margin-bottom: 71px;
+  }
+}

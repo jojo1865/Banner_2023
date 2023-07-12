@@ -223,9 +223,9 @@
                                 <div class="pagesize-container">
                                     <label>每頁筆數</label>
                                     <select class="form-select form-select-sm" name="ddl_ChangePageCut" onchange="ChangePageCut()">
-                                        @for (int j = 0; j < 8; j++)
+                                        @for (int j = 0; j < 5; j++)
                                         {
-                                            int jCt = 5 * (j + 1);
+                                            int jCt = 10 * (j + 1);
                                             <option value="@jCt" @(Model.NumCut == jCt ? "selected" : "")>@jCt</option>
                                         }
                                     </select>

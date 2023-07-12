@@ -27,10 +27,6 @@ namespace Banner.Areas.Admin.Controllers
             }
             else
             {
-                /*var Rs = from q in DC.Rool.Where(q => q.ActiveFlag && !q.DeleteFlag && (q.RoolType == 3 || q.RoolType == 4))
-                         join p in DC.M_Rool_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date))
-                         on q.RID equals p.RID
-                         select q;*/
                 var Rs = from q in DC.Rool.Where(q => q.ActiveFlag && !q.DeleteFlag && (q.RoolType == 3 || q.RoolType == 4))
                          join p in GetMRAC(0, ACID)
                          on q.RID equals p.RID
@@ -160,24 +156,50 @@ namespace Banner.Areas.Admin.Controllers
         }
 
         #endregion
-        #region 取得組織下拉選單
-        public PartialViewResult _OrganizeFilter()
+        #region 篩選組織用選單
+        public PartialViewResult _OrganizeFilter(int OID, string OTitle, bool LockFlag = false)
         {
             List<SelectListItem> OList = new List<SelectListItem>();
 
-            OList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = TempData["OID"].ToString() == "0" });
-            var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
-            foreach (var O in Os)
-                OList.Add(new SelectListItem { Text = O.Title, Value = O.OID.ToString(), Selected = TempData["OID"].ToString() == O.OID.ToString() });
-
+            OList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = OID == 0 });
+            var Os = DC.Organize.Where(q => !q.DeleteFlag).ToList();
+            int PID = 0;
+            while (true)
+            {
+                var O = Os.FirstOrDefault(q => q.ParentID == PID);
+                if (O == null)
+                    break;
+                else
+                {
+                    OList.Add(new SelectListItem { Text = O.Title, Value = O.OID.ToString(), Selected = OID == O.OID, Disabled = !O.ActiveFlag });
+                    PID = O.OID;
+                }
+            };
+            ViewBag._LockFlag = LockFlag ? 1 : 0;
+            ViewBag._OTitle = OTitle;
             return PartialView(OList);
         }
 
         #endregion
+        #region 篩選電話用選單
+        public PartialViewResult _PhoneNoFilter(string PhoneNo, string PhoneTitle, int ZID)
+        {
+            List<SelectListItem> ZipList = new List<SelectListItem>();
 
+            ZipList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = ZID == 0 });
+            var Ns = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國").OrderBy(q => q.ZID).ToList();
+            foreach (var N in Ns)
+                ZipList.Add(new SelectListItem { Text = N.Title + "(" + N.Code + ")", Value = N.ZID.ToString(), Selected = ZID == N.ZID });
+
+            ViewBag._PhoneNo = PhoneNo;
+            ViewBag._PhoneTitle = PhoneTitle;
+            return PartialView(ZipList);
+        }
+        #endregion
         #region 取得/設定地點
         public class cLocation
         {
+            public int LID = 0;
             public List<SelectListItem> Z0List = new List<SelectListItem>();
             public List<SelectListItem> Z1List = new List<SelectListItem>();
             public List<SelectListItem> Z2List = new List<SelectListItem>();
@@ -305,6 +327,7 @@ namespace Banner.Areas.Admin.Controllers
                 }
             }
             cLocation cL = new cLocation();
+            cL.LID = LID;
             cL.Z0List.Add(new SelectListItem { Text = "台灣", Value = "10" });
             cL.Z0List.Add(new SelectListItem { Text = "國外", Value = "2" });
 
@@ -313,10 +336,14 @@ namespace Banner.Areas.Admin.Controllers
             var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == ZID);
             if (FC != null)
             {
-                cL.Z0List.First(q => q.Value == FC.Get("ddl_Zip0")).Selected = true;
-                cL.Address0 = FC.Get("txb_Address0");
-                cL.Address1_1 = FC.Get("txb_Address1_1");
-                cL.Address1_2 = FC.Get("txb_Address1_2");
+                try
+                {
+                    cL.Z0List.First(q => q.Value == FC.Get("ddl_Zip0")).Selected = true;
+                    cL.Address0 = FC.Get("txb_Address0");
+                    cL.Address1_1 = FC.Get("txb_Address1_1");
+                    cL.Address1_2 = FC.Get("txb_Address1_2");
+                }
+                catch { }
                 cL.Address2 = "";
                 //本國
 

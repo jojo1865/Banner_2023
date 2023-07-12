@@ -16,33 +16,31 @@
                 <div class="search-form">
                     <div class="search-form-section">
                         <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>姓名</label>
-                                    @Html.TextBox("txb_Name", @Model.Name, new { @class = "form-control form-control-lg input-underline" })
-                                </div>
+                            <div class="col-xxl-3 col-lg-6 col-12">
+                                @Html.TextBox("txb_Name", @Model.Name, new { @class = "form-control form-control-lg input-underline", @placeholder = "姓名關鍵字" })
                             </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>性別</label>
-                                    @Html.DropDownList(Model.LS_Sex.ControlName, Model.LS_Sex.ddlList, new { @class = "form-select form-select-lg" })
+                            <div class="col-xxl-6 col-lg-6 col-12">
+                                @Html.Action("_PhoneNoFilter", "Include", new { PhoneNo = Model.CellPhone, PhoneTitle = "輸入手機號碼", ZID = Model.CellPhoneZipID })
+                            </div>
+                            <div class="col-xxl-3 col-lg-6 col-12">
+                                <div class="form-control-lg">
+                                    <label>性別：</label>
+                                    @Html.RadioButton("rbl_Sex", 0, (Model.Sex == 0), new { @class = "form-check-input" })
+                                    @Html.Label("全部")
+                                    @Html.RadioButton("rbl_Sex", 1, (Model.Sex == 1), new { @class = "form-check-input" })
+                                    @Html.Label("男")
+                                    @Html.RadioButton("rbl_Sex", 2, (Model.Sex == 2), new { @class = "form-check-input" })
+                                    @Html.Label("女")
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>入組狀態</label>
-                                    @Html.DropDownList(Model.LS_Group.ControlName, Model.LS_Group.ddlList, new { @class = "form-select form-select-lg" })
-                                </div>
+                            <div class="col-auto">
+                                <label class="form-control-lg ps-0 pe-0">入組狀態：</label>
                             </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>手機</label>
-                                    @Html.TextBox("txb_CellPhone", @Model.CellPhone, new { @class = "form-control form-control-lg input-underline" })
-                                </div>
+                            <div class="col-auto">
+                                @Html.DropDownList(Model.LS_Group.ControlName, Model.LS_Group.ddlList, new { @class = "form-select form-select-lg" })
                             </div>
-
                         </div>
                     </div>
                     <div class="search-form-section">

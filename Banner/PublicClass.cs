@@ -24,6 +24,7 @@ using System.Net;
 using OfficeOpenXml;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Data.SqlTypes;
 
 namespace Banner
 {
@@ -37,6 +38,7 @@ namespace Banner
         public string sNoPhoto = "/Photo/NoPhoto.jpg";
         public string sFileName = "Files";//下載檔案資料夾名稱
         public string sAdminPhotoFilePath = "../../../";//從後台最底層到圖片存檔資料夾的回推路徑
+        public string DateFormat = "yyyy-MM-dd";
         public string DateTimeFormat = "yyyy-MM-dd HH:mm";
         public string CompanyTitle = "【全球旌旗資訊網】";
         public bool bUsedNewName = true;
@@ -76,7 +78,9 @@ namespace Banner
             };
         public string[] CommunityTitle = new string[] {"其他", "LineID", "InstagramID", "WeChat" };
         public string[] JoinTitle = new string[] { "無意願", "已入組未落戶", "跟進中(已分發)", "被退回(未分發)", "跟進中(未分發)" };
+        public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
         public string Error = "";
+        public int iChildAge = 12;
 
         public PublicClass()
         {
@@ -373,7 +377,6 @@ namespace Banner
             DateTime DT_ = DateTime.Now;
             TaiwanLunisolarCalendar tlc = new TaiwanLunisolarCalendar();
             // 取得目前支援的農曆日曆到幾年幾月幾日( 2051-02-10 )
-            //       tlc.MaxSupportedDateTime.ToShortDateString();
             if (DT.Date < tlc.MaxSupportedDateTime.Date)
             {
                 // 取得今天的農曆年月日
@@ -2200,12 +2203,14 @@ namespace Banner
             ViewBag._SysMsg = "";//用於系統後台系統提示訊息
             ViewBag._UserID = "0";
             ViewBag._Power = bGroup;
+            ViewBag._Login = "";
             int ACID = GetACID();
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             if (AC != null)
             {
                 ViewBag._UserName = AC.Name;
                 ViewBag._UserID = ACID;
+                ViewBag._Login = AC.Login;
             }
 
 
@@ -2399,10 +2404,6 @@ namespace Banner
         //取得某組織與旗下所有組織
         public List<OrganizeInfo> GetThisOIsFromTree(ref List<OrganizeInfo> OIs, int PID)
         {
-            /*var OIs_ = DC.OrganizeInfo.Where(q => q.ParentID == PID);
-            OIs.AddRange(OIs_.ToList());
-            foreach (var OI_ in OIs_)
-                GetThisOIsFromTree(ref OIs, OI_.OIID);*/
             return GetThisOIsFromTree(PID);
         }
         public List<OrganizeInfo> GetThisOIsFromTree(int PID)
@@ -2467,14 +2468,14 @@ namespace Banner
                             LS.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "-1", Selected = true });
                         if (PID < 2)
                             LS.ddlList.AddRange((from q in OIs.Where(q => q.OID == O.OID).OrderBy(q => q.OIID)
-                                                 select new SelectListItem { Text = q.Title, Value = q.OIID.ToString() }).ToList());
+                                                 select new SelectListItem { Text = q.Title + q.Organize.Title, Value = q.OIID.ToString() }).ToList());
                     }
                     else
                     {
                         //var SubOIs = OIs.Where(q => q.OID == O.OID && q.ParentID == OIIDs[O.OID-1]).OrderBy(q => q.OIID);
                         LS.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "-1" });
                         LS.ddlList.AddRange((from q in OIs.Where(q => q.OID == O.OID && q.ParentID == OIIDs[O.OID - 1]).OrderBy(q => q.OIID)
-                                             select new SelectListItem { Text = q.Title, Value = q.OIID.ToString(), Selected = q.OIID == OIIDs[q.OID] }).ToList());
+                                             select new SelectListItem { Text = q.Title + q.Organize.Title, Value = q.OIID.ToString(), Selected = q.OIID == OIIDs[q.OID] }).ToList());
                     }
                     LSs.Add(LS);
 
@@ -2484,7 +2485,7 @@ namespace Banner
             return LSs;
 
         }
-
+        //取得會員或組織的對應名單
         public IQueryable<M_OI_Account> GetMOIAC(int OID = 0, int OIID = 0, int ACID = 0)
         {
             var MAs = DC.M_OI_Account.Where(q => !q.DeleteFlag &&

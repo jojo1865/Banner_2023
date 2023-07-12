@@ -1,0 +1,93 @@
+﻿@model Banner.Areas.Admin.Controllers.AccountSetController.cAccount_Baptized_Edit
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+    if (Model != null)
+    {
+        <div class="main-container">
+            <div class="form-container-list">
+                <div class="form-container">
+                    <div class="form-header"><h5>@ViewBag._Title</h5></div>
+                    <div class="form-body">
+                        <form method="post" id="form1">
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-card-group">
+                                <div class="form-card">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label>姓名</label>
+                                                @Html.Label(Model.Name, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label>會友手機</label>
+                                                @Html.Label(Model.PhonoNo, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label>小組名稱</label>
+                                                @Html.Label(Model.OITitle, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if (Model.OldDate != "")
+                                    {
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="form-group">
+                                                    <label>原定受洗日期</label>
+                                                    @Html.Label(Model.OldDate, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label>變更受洗日期</label>
+                                                @Html.TextBox(Model.InputControlName, Model.NewDate, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入日期", @type = "date" })
+
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label>預計受洗日期</label>
+                                                @Html.TextBox(Model.InputControlName, Model.NewDate, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入日期", @type = "date" })
+
+                                            </div>
+                                        </div>
+                                    }
+
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+}
+<div class="action-bar">
+    @if (Model != null)
+    {
+        if (((bool[])ViewBag._Power)[1] || ((bool[])ViewBag._Power)[2])
+        {
+            <div class="btn btn-primary btn-lg btn-round">
+                <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Admin/Content/Img/save.svg" alt="" />儲存</a>
+            </div>
+        }
+        <div class="btn btn-outline-primary btn-lg btn-round">
+            <a href="/Admin/AccountSet/Account_New_List/0"><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />取消</a>
+        </div>
+    }
+</div>

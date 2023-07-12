@@ -190,6 +190,7 @@ a {
 .div_BackUserMenu {
     width: 150px;
     padding: 10px;
+    margin-left:-50px;
     background-color:#FFF;
     text-align: center;
     position: absolute;

@@ -1,0 +1,12 @@
+﻿@model List<Banner.Models.cMenu>
+<ul class="menu">
+    @if (Model != null)
+    {
+        foreach (var M in Model.OrderBy(q=>q.SortNo))
+        {
+            <li>
+                <a class="menu-link @(M.SelectFlag ? "active": "")" href="@M.Url">@M.Title</a>
+            </li>
+        }
+    }
+</ul>

@@ -16,7 +16,7 @@
                     <div class="col m-3">
                         @if (((bool[])ViewBag._Power)[1])
                         {
-                            <a href="/Admin/OrganizeSet/Organize_Map_Edit/@(Model.ItemID)/0" class="btn_Basic btn btn-primary btn-round">新增組織及職分</a>
+                            <a href="/Admin/OrganizeSet/Organize_Map_Edit/@(Model.ItemID)/0" class="btn_Basic btn btn-primary btn-round">新增組織與職分</a>
                         }
                         @if (((bool[])ViewBag._Power)[4])
                         {
@@ -35,11 +35,11 @@
                                     <div class="col">
                                         @foreach (var C in R.Cs)
                                         {
-                                            <a href="@C.URL"><div class="td_O td_O_Basic1"><img src="~/Areas/Admin/Content/Img/pan.png" class="div_OI_img" />@C.Title</div></a>
+                                            <a href="@C.URL"><div class="td_O td_O_Basic1 @C.CSS"><img src="~/Areas/Admin/Content/Img/pan.png" class="div_OI_img" />@C.Title</div></a>
                                             if (!string.IsNullOrEmpty(C.ControlName))
                                             {
                                                 <div class="td_O td_O_Line2"></div>
-                                                <a href="@C.URL"><div class="td_O td_O_Basic1"><img src="~/Areas/Admin/Content/Img/pan.png" class="div_OI_img" />@C.ControlName</div></a>
+                                                <div class="td_O td_O_Basic1">@C.ControlName</div>
                                             }
                                             else
                                             {

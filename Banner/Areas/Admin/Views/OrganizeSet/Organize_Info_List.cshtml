@@ -9,38 +9,16 @@
             Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
             if (Model != null)
             {
-                //上選單部分
-                if (Model.cOrganize != null)
-                {
 
-                    <div class="row div_UpTab">
-                        @foreach (var C in Model.cOrganize.Cs)
-                        {
-                            <div class="col text-center @C.ControlName">
-                                <a href="@C.URL" target="@C.Target" class="@C.CSS">@C.Title</a>
-                            </div>
-                        }
-                    </div>
-
-                }
                 <form method="post" id="form1">
                     @Html.AntiForgeryToken()
                     <div class="search-form">
                         <div class="search-form-section">
                             <div class="row">
-                                <div class="col-0 p-2" style="display:none;">
-                                    <Label>位置</Label><br />
-                                    <Label>@(Model.OTitle)</Label>
-                                </div>
-                                <div class="col-12  p-2">
-                                    <Label>關鍵字搜尋</Label>
-                                    <input type="text" class="form-control form-control-lg input-underline" name="txb_Key" value="@ViewBag._Key" />
-
+                                <div class="col-xxl-8 col">
+                                    @Html.Action("_OrganizeFilter", "Include", new { OID = Model.OID, OTitle = Model.OTitle })
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="search-form-section">
                             <div class="row">
                                 <div class="d-flex justify-content-end">
                                     <a href="javascript:Search();" class="btn btn-primary btn-lg btn-round btn-submit me-2">搜尋</a>

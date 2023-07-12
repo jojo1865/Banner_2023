@@ -632,21 +632,21 @@ main .main-container {
   margin-left: 64px;
 }
 
-.form-menu .menuitem > a {
-  color: #87898c;
-  background: url(/public/assets/img/form-menu-bg.png);
-  width: 125px;
-  height: 27px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  font-size: 16px;
-  line-height: 22px;
-  white-space: nowrap;
-  margin: 4px 24px;
-  font-weight: 700;
-}
+    .form-menu .menuitem > a {
+        color: #87898c;
+        background: url(/Areas/Admin/Content/img/form-menu-bg.png);
+        width: 125px;
+        height: 27px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 16px;
+        line-height: 22px;
+        white-space: nowrap;
+        margin: 4px 24px;
+        font-weight: 700;
+    }
 
 .form-menu > ul > li {
   margin-top: 16px;

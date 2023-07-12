@@ -15,38 +15,33 @@
             {
                 <div class="search-form">
                     <div class="search-form-section">
-                        @Html.Action("_OrganizeFilter", "Include")
                         <div class="row">
-                            <div class="col-6  p-2">
-                                <Label>姓名</Label>
-                                @Html.TextBox("txb_Name", @Model.Name, new { @class = "form-control form-control-lg input-underline" })
-
+                            <div class="col-xxl-6 col">
+                                @Html.Action("_OrganizeFilter", "Include", new { OID = Model.OID, OTitle = Model.OTitle, LockFlag = false })
                             </div>
-                            <div class="col-6  p-2">
-                                <Label>帳號</Label>
-                                @Html.TextBox("txb_Account", @Model.Account, new { @class = "form-control form-control-lg input-underline" })
+                            <div class="col-xxl-6 col">
+                                @Html.Action("_PhoneNoFilter", "Include", new { PhoneNo = Model.CellPhone, PhoneTitle = "輸入手機號碼", ZID = Model.CellPhoneZipID })
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6  p-2">
-                                <Label>行動電話</Label>
-                                @Html.TextBox("txb_CellPhone", @Model.CellPhone, new { @class = "form-control form-control-lg input-underline" })
                             </div>
-                            <div class="col-6  p-2">
-                                <Label>性別</Label>
-                                <div class="form-control-lg">
-                                    @Html.RadioButton("rbl_Sex", 0, (Model.Sex == 0), new { @class = "form-check-input" })
-                                    @Html.Label("全部")
-                                    @Html.RadioButton("rbl_Sex", 1, (Model.Sex == 1), new { @class = "form-check-input" })
-                                    @Html.Label("男")
-                                    @Html.RadioButton("rbl_Sex", 2, (Model.Sex == 2), new { @class = "form-check-input" })
-                                    @Html.Label("女")
+                            <div class="row">
+                                <div class="col-xxl-4 col-lg-6 col-12">
+                                    @Html.TextBox("txb_Name", @Model.Name, new { @class = "form-control form-control-lg input-underline", @placeholder = "姓名關鍵字" })
                                 </div>
-
+                                <div class="col-xxl-4 col-lg-6 col-12">
+                                    @Html.TextBox("txb_Account", @Model.Account, new { @class = "form-control form-control-lg input-underline", @placeholder = "帳號" })
+                                </div>
+                                <div class="col-xxl-4 col-lg-6 col-12">
+                                    <div class="form-control-lg">
+                                        @Html.RadioButton("rbl_Sex", 0, (Model.Sex == 0), new { @class = "form-check-input" })
+                                        @Html.Label("全部")
+                                        @Html.RadioButton("rbl_Sex", 1, (Model.Sex == 1), new { @class = "form-check-input" })
+                                        @Html.Label("男")
+                                        @Html.RadioButton("rbl_Sex", 2, (Model.Sex == 2), new { @class = "form-check-input" })
+                                        @Html.Label("女")
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
                     <div class="search-form-section">
                         <div class="row">
                             <div class="d-flex justify-content-end">

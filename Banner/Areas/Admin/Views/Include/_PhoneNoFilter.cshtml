@@ -1,0 +1,17 @@
+﻿@model List<SelectListItem>
+<div class="row">
+    <div class="col-xxl-auto col-lg-6 col-12">
+        <div class="row">
+            <div class="col-auto ms-0 me-0">
+                <label class="form-control-lg ps-0 pe-0">電話國碼：</label>
+            </div>
+            <div class="col-auto ms-0 me-0">
+                @Html.DropDownList("ddl_PhoneZip", Model, new { @class = "form-select form-select-lg ms-0 me-0", style="max-width:200px" })
+            </div>
+        </div>
+    </div>
+    <div class="col-xxl-auto col-lg-6 col-12">
+        @Html.TextBox("txb_PhoneNo", (string)ViewBag._PhoneNo, new { @class = "form-control form-control-lg input-underline", @placeholder = (string)ViewBag._PhoneTitle })
+    </div>
+</div>
+

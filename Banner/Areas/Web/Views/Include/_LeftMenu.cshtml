@@ -1,0 +1,14 @@
+﻿@model List<Banner.Models.cMenu>
+
+<ul class="menu">
+    @foreach (var M in Model)
+    {
+        <li>
+            <a class="menu-link @(M.SelectFlag?"active":"")" href="@M.Url">
+                <img class="menu-icon @(M.SelectFlag?"menu-icon-active":"")"
+                     src="@(M.SelectFlag?M.ImgUrl.Replace(".svg","-active.svg"):M.ImgUrl)"
+                     alt="@M.Title" />@M.Title
+            </a>
+        </li>
+    }
+</ul>

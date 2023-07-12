@@ -97,6 +97,12 @@ btns.forEach((btn) => {
         btn.classList.add("btn-loading");
     });
 });
+function ClearLoading() {
+    btns.forEach((btn) => {
+        btn.disabled = false;
+        btn.classList.remove("btn-loading");
+    });
+}
 
 /*取得組織選單*/
 function GetOIddl(ddl) {
@@ -156,11 +162,7 @@ function SubmitConfirm() {
         }
         else {
             Swal.close();
-            const btns = document.querySelectorAll(".btn");
-            btns.forEach((btn) => {
-                btn.disabled = false;
-                btn.classList.remove("btn-loading");
-            });
+            ClearLoading();
             return;
         }
     });
@@ -190,7 +192,7 @@ function LogoutCheck() {
         }
     });
 }
-
+//換密碼檢查
 function CheckInput(ACID) {
 
     var sOld = document.getElementById('txb_Old').value;
@@ -205,18 +207,21 @@ function CheckInput(ACID) {
             if (res == '') {
                 SubmitConfirm();
             } else {
-                const btns = document.querySelectorAll(".btn");
-                btns.forEach((btn) => {
-                    btn.disabled = false;
-                    btn.classList.remove("btn-loading");
-                });
-
                 Swal.fire({
                     icon: 'error',
                     html: res
                 });
+                ClearLoading();
             }
         },
         error: function (err) { console.log(err) },
     })
+}
+//動態顯示資訊
+function SetAlertNote(Msg) {
+    Swal.fire({
+        icon: 'Info',
+        html: Msg
+    });
+    ClearLoading();
 }

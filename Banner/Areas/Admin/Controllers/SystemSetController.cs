@@ -24,6 +24,7 @@ namespace Banner.Areas.Admin.Controllers
             public string Name = "";
             public string Account = "";
             public string CellPhone = "";
+            public int CellPhoneZipID = 0;
             public int Sex = 0;
             public int OID = 0;
             public string OTitle = "";
@@ -46,10 +47,11 @@ namespace Banner.Areas.Admin.Controllers
             cBUL.cTL = GetBackUser(FC);
             cBUL.Name = FC.Get("txb_Name");
             cBUL.Account = FC.Get("txb_Account");
-            cBUL.CellPhone = FC.Get("txb_CellPhone");
+            cBUL.CellPhone = FC.Get("txb_PhoneNo");
+            cBUL.CellPhoneZipID = Convert.ToInt32(FC.Get("ddl_Zip"));
             cBUL.Sex = Convert.ToInt32(FC.Get("rbl_Sex"));
             cBUL.OID = Convert.ToInt32(FC.Get("ddl_O"));
-            cBUL.OTitle = FC.Get("txb_OITitle");
+            cBUL.OTitle = FC.Get("txb_OTitle");
             TempData["OID"] = cBUL.OID;
             TempData["OITitle"] = cBUL.OTitle;
 
@@ -91,11 +93,26 @@ namespace Banner.Areas.Admin.Controllers
                     Ns = Ns.Where(q => q.Name.Contains(FC.Get("txb_Name")));
                 if (!string.IsNullOrEmpty(FC.Get("txb_Account")))
                     Ns = Ns.Where(q => q.Login.Contains(FC.Get("txb_Account")));
-                if (!string.IsNullOrEmpty(FC.Get("txb_CellPhone")))
-                    Ns = from q in Ns
-                         join p in DC.Contect.Where(q => q.TargetType == 2 && q.ContectType == 1 && q.ContectValue.Contains(FC.Get("txb_CellPhone"))).GroupBy(q => q.TargetID)
-                         on q.ACID equals p.Key
-                         select q;
+                if (!string.IsNullOrEmpty(FC.Get("txb_PhoneNo")))
+                {
+                    string PhoneNo = FC.Get("txb_PhoneNo");
+                    int ZipID = Convert.ToInt32(FC.Get("ddl_PhoneZip"));
+                    if(ZipID>0)
+                    {
+                        Ns = from q in Ns
+                             join p in DC.Contect.Where(q => q.TargetType == 2 && q.ContectType == 1 && q.ContectValue.Contains(PhoneNo) && q.ZID == ZipID).GroupBy(q => q.TargetID)
+                             on q.ACID equals p.Key
+                             select q;
+                    }
+                    else
+                    {
+                        Ns = from q in Ns
+                             join p in DC.Contect.Where(q => q.TargetType == 2 && q.ContectType == 1 && q.ContectValue.Contains(PhoneNo)).GroupBy(q => q.TargetID)
+                             on q.ACID equals p.Key
+                             select q;
+                    }
+                }
+                    
 
                 if (!string.IsNullOrEmpty(FC.Get("rbl_Sex")))
                     if (FC.Get("rbl_Sex") != "0")
@@ -103,7 +120,7 @@ namespace Banner.Areas.Admin.Controllers
 
 
                 int iOID = Convert.ToInt32(FC.Get("ddl_O"));
-                string OITitle = FC.Get("txb_OITitle");
+                string OITitle = FC.Get("txb_OTitle");
                 if (iOID > 0 || OITitle!="")
                 {
                     var OIs = DC.OrganizeInfo.Where(q =>q.ActiveFlag && !q.DeleteFlag);
@@ -128,7 +145,7 @@ namespace Banner.Areas.Admin.Controllers
             }
 
             var TopTitles = new List<cTableCell>();
-            TopTitles.Add(new cTableCell { Title = "", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "控制", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "姓名" });
             TopTitles.Add(new cTableCell { Title = "性別" });
             TopTitles.Add(new cTableCell { Title = "帳號" });
