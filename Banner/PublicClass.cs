@@ -32,8 +32,8 @@ namespace Banner
     {
         public DataClassesDataContext DC { get; set; }
         public DateTime DT = DateTime.Now;
-        public string[] sWeeks = new string[] {  "星期一", "星期二", "星期三", "星期四", "星期五", "星期六","星期日" };
-        public string[] sTimeSpans = new string[] { "上午", "下午", "晚上"};
+        public string[] sWeeks = new string[] { "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" };
+        public string[] sTimeSpans = new string[] { "上午", "下午", "晚上" };
         public string sPhotoFileName = "Photo";//圖片存檔資料夾名稱
         public string sNoPhoto = "/Photo/NoPhoto.jpg";
         public string sFileName = "Files";//下載檔案資料夾名稱
@@ -76,7 +76,7 @@ namespace Banner
                 new SelectListItem{ Text="學生",Value="22"},
                 new SelectListItem{ Text="其他",Value="23"},
             };
-        public string[] CommunityTitle = new string[] {"其他", "LineID", "InstagramID", "WeChat" };
+        public string[] CommunityTitle = new string[] { "其他", "LineID", "InstagramID", "WeChat" };
         public string[] JoinTitle = new string[] { "無意願", "已入組未落戶", "跟進中(已分發)", "被退回(未分發)", "跟進中(未分發)" };
         public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
         public string Error = "";
@@ -2204,6 +2204,8 @@ namespace Banner
             ViewBag._UserID = "0";
             ViewBag._Power = bGroup;
             ViewBag._Login = "";
+            ViewBag._GroupTitle = "小組資訊";
+            string NowURL = Request.Url.AbsolutePath;
             int ACID = GetACID();
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             if (AC != null)
@@ -2211,11 +2213,28 @@ namespace Banner
                 ViewBag._UserName = AC.Name;
                 ViewBag._UserID = ACID;
                 ViewBag._Login = AC.Login;
+                #region 上層
+                string GroupMapTitle = "";
+                var OIs = DC.OrganizeInfo.Where(q => q.ACID == AC.ACID && q.OID == 8 && q.ActiveFlag && !q.DeleteFlag);
+                string sOIID = GetBrowserData("TargetGroupID");
+                if (sOIID != "")
+                    OIs = OIs.Where(q => q.OIID.ToString() == sOIID);
+                var OI = OIs.OrderByDescending(q => q.OIID).FirstOrDefault();
+                while (OI != null)
+                {
+                    if (OI.OID == 8)
+                        GroupMapTitle = "<span class='font-bold'>" + OI.Title + OI.Organize.Title + (OI.BusinessType == 1 ? "(外展)" : "") + "</span>";
+                    else
+                        GroupMapTitle = OI.Title + OI.Organize.Title + (GroupMapTitle == "" ? "" : "/" + GroupMapTitle);
+                    OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID && q.ActiveFlag && !q.DeleteFlag && q.OID > 1);
+                }
+                ViewBag._GroupTitle = GroupMapTitle;
+                #endregion
             }
-
+            else if (!NowURL.ToLower().Contains("/home/login") || !NowURL.ToLower().Contains("/home/logout"))
+                SetAlert("請先登入", 2, (NowURL.ToLower().StartsWith("/web/") ? "/Web/Home/Login" : "/Admin/Home/Login"));
 
             ViewBag._CSS1 = "";
-            string NowURL = Request.Url.AbsolutePath;
             ViewBag._URL = NowURL;
             string ShortURL = Request.RawUrl;
             if (ShortURL.ToLower().Contains("/admin/"))
@@ -2269,6 +2288,8 @@ namespace Banner
                     ViewBag._Power = bGroup;
                 }
             }
+
+
 
             TempData["UID"] = ACID;
             TempData["msg"] = "";
@@ -2503,6 +2524,17 @@ namespace Banner
                 MAs = MAs.Where(q => q.ACID == ACID);
             return MAs;
         }
+
+        /*public IQueryable<Organize> GetMO2AC(int ACID)
+        {
+            var Os = DC.M_O2_Account.Where(q=>
+            q.ACID == ACID && 
+            !q.DeleteFlag && 
+            q.ActiveFlag &&
+            q.Organize.OID==
+            )
+                     
+        }*/
 
         public IQueryable<M_Rool_Account> GetMRAC(int RID = 0, int ACID = 0)
         {

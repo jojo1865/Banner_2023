@@ -190,7 +190,6 @@ a {
 .div_BackUserMenu {
     width: 150px;
     padding: 10px;
-    margin-left:-50px;
     background-color:#FFF;
     text-align: center;
     position: absolute;
@@ -331,6 +330,11 @@ a {
 }
 .lab_gray {
     color: var(--bs-gray-500);
+}
+.div_NoDataMsg {
+    color: #3764ac;
+    font-size:20px;
+    font-weight:600;
 }
 /*======================================================手機板======================================================*/
 @media(max-width:992px) {

@@ -58,7 +58,7 @@
                                                         break;
                                                     case "linkbutton"://linkbutton
                                                         {
-                                                            <a href="@C_.URL" target="@C_.Target" class="btn btn-primary  btn-submit btn-round btn_Basic">@C_.Value</a>
+                                                            <a href="@C_.URL" target="@C_.Target" class="btn btn-primary btn-round btn_Basic">@C_.Value</a>
                                                         }
                                                         break;
                                                 }
@@ -96,16 +96,6 @@
                                                     </td>
                                                 }
                                                 break;
-
-                                            case "activebutton"://button
-                                                {
-                                                    <td>
-                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                        <a href="javascript:;" class="@C.CSS" onclick="@C.URL">@C.Value</a>
-                                                    </td>
-                                                }
-                                                break;
-
                                             case "Media"://Media
                                                 {
                                                     <td>
@@ -214,8 +204,8 @@
                                         if (iMin <= 0) { iMin = 1; }
                                         if (Model.NowPage > 1)
                                         {
-                                            <a class="btn btn-outline-primary btn-submit btn-sm btn-round" href="#" onclick="ChangePage(1)">最前頁</a>
-                                            <a class="btn btn-outline-primary btn-submit btn-sm btn-round" href="#" onclick="ChangePage(@(Model.NowPage - 1))">上頁</a>
+                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(1)">最前頁</a>
+                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.NowPage - 1))">上頁</a>
                                         }
                                         <span>
                                             第
@@ -227,8 +217,8 @@
                                         </span>
                                         if (Model.NowPage < Model.MaxNum)
                                         {
-                                            <a class="btn btn-outline-primary btn-submit btn-sm btn-round" href="#" onclick="ChangePage(@(Model.NowPage + 1))">下頁</a>
-                                            <a class="btn btn-outline-primary btn-submit btn-sm btn-round" href="#" onclick="ChangePage(@(Model.MaxNum))">最末頁</a>
+                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.NowPage + 1))">下頁</a>
+                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.MaxNum))">最末頁</a>
                                         }
                                     }
                                 </div>

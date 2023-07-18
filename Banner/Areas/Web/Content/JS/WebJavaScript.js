@@ -80,7 +80,25 @@ btns.forEach((btn) => {
         btn.classList.add("btn-loading");
     });
 });
-
+/*確定送出修改 */
+function SubmitConfirm() {
+    Swal.fire({
+        icon: 'warning',
+        html: '確定儲存修改?',
+        showDenyButton: true,
+        confirmButtonText: '確認',
+        denyButtonText: '取消'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('form1').submit();
+        }
+        else {
+            Swal.close();
+            ClearLoading();
+            return;
+        }
+    });
+}
 function ClearLoading() {
     btns.forEach((btn) => {
         btn.disabled = false;

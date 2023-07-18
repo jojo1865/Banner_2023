@@ -80,4 +80,20 @@ namespace Banner.Models
         public int SortNo = 0;
         public string InputData = "";
     }
+
+    public class cLocation
+    {
+        public int LID = 0;
+        public List<SelectListItem> Z0List = new List<SelectListItem>();
+        public List<SelectListItem> Z1List = new List<SelectListItem>();
+        public List<SelectListItem> Z2List = new List<SelectListItem>();
+        public List<SelectListItem> Z3List = new List<SelectListItem>();
+        public string Address0 = "", Address1_1 = "", Address1_2 = "", Address2 = "";
+    }
+    public class c_ContectEdit
+    {
+        public Contect C = new Contect();
+        public string InputNote = "";
+        public List<SelectListItem> SLIs = new List<SelectListItem>();
+    }
 }

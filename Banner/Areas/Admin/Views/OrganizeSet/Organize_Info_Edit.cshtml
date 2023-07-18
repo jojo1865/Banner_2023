@@ -8,59 +8,74 @@
     <div class="form-container-list">
         <div class="form-container">
             <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
+            @Html.Action("_OrganizeTopList", "Include")
             @if (Model != null)
             {
                 if (Model.OI != null)
                 {
+                    string HideCss = "";
+                    if (Model.OI.Organize.JobTitle == "")
+                    {
+                        HideCss = "visually-hidden";
+                    }
                     <form method="post" id="form1">
                         @Html.AntiForgeryToken()
                         <div class="form-body">
                             <div class="form-card-group">
                                 <div class="form-card">
-
-                                    @if (Model.OIParent.Count > 0)
+                                    @if (Model.UpOIList != "")
                                     {
                                         <div class="form-group">
                                             <label>上層組織<span>*</span></label>
-                                            <div class="row">
-                                                @foreach (var LS in Model.OIParent.OrderBy(q => q.SortNo))
-                                                {
-                                                    if (LS == Model.OIParent.OrderByDescending(q => q.SortNo).First())
-                                                    {
-                                                        <div class="col ps-0" id="@("div_"+LS.SortNo)">
-                                                            @Html.DropDownList(LS.ControlName, LS.OIList, new { @class = "form-select form-select-lg", })
-                                                        </div>
-                                                    }
-                                                    else
-                                                    {
-                                                        <div class="col ps-0" id="@("div_"+LS.SortNo)">
-                                                            @Html.DropDownList(LS.ControlName, LS.OIList, new { @class = "form-select form-select-lg", disabled = "disabled" })
-                                                        </div>
-                                                    }
+                                            <div class="form-control-lg">@Model.UpOIList</div>
+                                        </div>
 
-                                                }
+                                    }
+                                    <div class="form-group">
+                                        <label>組織名稱@("(本層:" + Model.OI.Organize.Title+")")<span>*</span></label>
+                                        @Html.TextBox("txb_Title", Model.OI.Title, new { @class = "form-control form-control-lg input-underline " })
+                                    </div>
+                                    <div class="form-group @HideCss">
+                                        <label>職分主管@("("+Model.OI.Organize.JobTitle + ")")<span>*</span></label>
+                                        @Html.DropDownList("ddl_ACID", Model.ACList, new { @class = "form-select form-select-lg" })
+                                    </div>
+                                    @if (Model.OI.OID <= 2)
+                                    {
+                                        <div class="form-group">
+                                            <label>地址</label>
+                                            @Html.Action("_Location_Meeting", "Include", new { LID = Model.L.LID })
+                                        </div>
+                                        <div class="form-group">
+                                            <label>電話</label>
+                                            @Html.Action("_ContectEdit", "Include", new { C = Model.C })
+                                        </div>
+                                    }
+                                    else if (Model.OI.OID == 8 && Model.OI.OIID > 0)
+                                    {
+                                        <div class="form-group">
+                                            <label>地址</label><br />
+                                            @Html.Raw(Model.L_str)
+                                        </div>
+                                        <div class="form-group">
+                                            <label>電話</label><br />
+                                            @Model.C_str
+                                        </div>
+                                    }
+
+                                    @if (Model.OI.OID == 8)
+                                    {
+                                        <div class="form-group">
+
+                                            <div class="row">
+                                                <div class="col-auto">
+                                                    <div class="form-check form-check-inline">
+                                                        @Html.CheckBox("cbox_Business", Model.OI.BusinessType == 1, new { @id = "cbox_Business", @class = "form-check-input" })
+                                                        @Html.Label("外展", new { @class = "form-check-label", @for = "cbox_Business" })
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     }
-                                    <div class="form-group">
-                                        <label>組織名稱<span>*</span></label>
-                                        @Html.TextBox("txb_Title", Model.OI.Title, new { @class = "form-control form-control-lg input-underline " })
-                                    </div>
-                                    <div class="form-group">
-                                        <label>職分主管<span>*</span></label>
-                                        @Html.DropDownList("ddl_ACID", Model.ACList, new { @class = "form-select form-select-lg" })
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>電話</label>
-                                        @Html.TextBox("txb_Phone", Model.C.ContectValue, new { @class = "form-control form-control-lg input-underline " })
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>地址</label>
-                                        @Html.Action("_Location_Meeting", "Include", new {LID=Model.L.LID})
-                                    </div>
-
                                     <div class="form-group">
                                         <label>啟用狀態</label>
                                         <div class="row">
@@ -109,12 +124,8 @@
     {
         if ((((bool[])ViewBag._Power)[1] && Model.OI.OIID == 0) || (((bool[])ViewBag._Power)[2] && Model.OI.OIID > 0))
         {
-            <div class="btn btn-primary btn-lg btn-round">
-                <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Admin/Content/Img/save.svg" alt="" />儲存</a>
-            </div>
+            <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-submit btn-lg btn-round"><img src="/Areas/Admin/Content/Img/save.svg" alt="" />儲存</a>
         }
-        <div class="btn btn-outline-primary btn-lg btn-round">
-            <a href="/Admin/OrganizeSet/Organize_Info_List/@Model.OI.Organize.ItemID/@Model.OI.OID/0"><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />取消</a>
-        </div>
+        <a href="/Admin/OrganizeSet/Organize_Info_List/@Model.OI.Organize.ItemID/@Model.OI.OID/0" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />取消</a>
     }
 </div>

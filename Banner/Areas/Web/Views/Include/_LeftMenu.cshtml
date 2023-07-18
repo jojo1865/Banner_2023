@@ -3,12 +3,56 @@
 <ul class="menu">
     @foreach (var M in Model)
     {
-        <li>
-            <a class="menu-link @(M.SelectFlag?"active":"")" href="@M.Url">
-                <img class="menu-icon @(M.SelectFlag?"menu-icon-active":"")"
-                     src="@(M.SelectFlag?M.ImgUrl.Replace(".svg","-active.svg"):M.ImgUrl)"
-                     alt="@M.Title" />@M.Title
-            </a>
-        </li>
-    }
+        if (M.Items.Count == 0)
+        {
+            <li class="menuitem">
+                <a class="menu-link @(M.SelectFlag?"active":"")" href="@M.Url">
+                    <img class="menu-icon @(M.SelectFlag?"menu-icon-active":"")"
+                         src="@(M.SelectFlag?M.ImgUrl.Replace(".svg","-active.svg"):M.ImgUrl)"
+                         alt="@M.Title" />@M.Title
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="menuitem">
+                    <a class="menu-link @(M.SelectFlag?"active":"")" href="#collapse-submenu" data-bs-toggle="collapse">
+                        <img class="menu-icon @(M.SelectFlag?"menu-icon-active":"")"
+                             src="@(M.SelectFlag?M.ImgUrl.Replace(".svg","-active.svg"):M.ImgUrl)"
+                             alt="@M.Title" />@M.Title
+                        </a>
+
+                        <ul id="collapse-submenu" class="submenu collapse @(M.SelectFlag?"show":"")">
+                            @foreach (var CM in M.Items)
+                            {
+                                if (CM.Items.Count == 0)
+                                {
+                                    <li class="submenuitem">
+                                        <a class="menu-link @(CM.SelectFlag ? "active" : "")" href="@CM.Url"> - @CM.Title</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="submenuitem">
+                                        <a class="menu-link @(CM.SelectFlag ? "active" : "")"
+                                           data-bs-toggle="collapse"
+                                           href="#collapse-submenu-lv2">
+                                            - @CM.Title
+                                        </a>
+                                        <ul id="collapse-submenu-lv2" class="submenu collapse @(CM.SelectFlag?"show":"")">
+                                            @foreach (var CCM in CM.Items)
+                                            {
+                                                <li class="submenuitem">
+                                                    <a class="menu-link @(CCM.SelectFlag ? "active" : "")" href="@CCM.Url"> - @CCM.Title </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </li>
+                }
+
+            }
 </ul>

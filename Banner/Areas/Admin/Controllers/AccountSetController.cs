@@ -98,26 +98,12 @@ namespace Banner.Areas.Admin.Controllers
         public cTableList GetAccountTable(int iType, FormCollection FC)
         {
             cTableList cTL = new cTableList();
-            int iNumCut = GetQueryStringInInt("NumCut");
-            int iNowPage = GetQueryStringInInt("PageNo");
-            if (iNumCut <= 0)
-            {
-                if (GetCookie("NumCut") == "")
-                {
-                    iNumCut = 10;
-                    SetCookie("NumCut", iNumCut.ToString());
-                }
-                else
-                    iNumCut = Convert.ToInt32(GetCookie("NumCut"));
-            }
-            else
-                SetCookie("NumCut", iNumCut.ToString());
-            if (iNowPage <= 0) iNowPage = 1;
-            cTL = new cTableList();
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+
             cTL.Title = "";
             cTL.NowPage = iNowPage;
             cTL.ItemID = "";
-
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
 

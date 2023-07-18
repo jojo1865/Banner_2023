@@ -84,6 +84,12 @@ namespace Banner
     partial void InsertFamily(Family instance);
     partial void UpdateFamily(Family instance);
     partial void DeleteFamily(Family instance);
+    partial void InsertM_O_Account(M_O_Account instance);
+    partial void UpdateM_O_Account(M_O_Account instance);
+    partial void DeleteM_O_Account(M_O_Account instance);
+    partial void InsertM_O2_Account(M_O2_Account instance);
+    partial void UpdateM_O2_Account(M_O2_Account instance);
+    partial void DeleteM_O2_Account(M_O2_Account instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -261,6 +267,29 @@ namespace Banner
 				return this.GetTable<Family>();
 			}
 		}
+		
+		public System.Data.Linq.Table<M_O_Account> M_O_Account
+		{
+			get
+			{
+				return this.GetTable<M_O_Account>();
+			}
+		}
+		
+		public System.Data.Linq.Table<M_O2_Account> M_O2_Account
+		{
+			get
+			{
+				return this.GetTable<M_O2_Account>();
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.sp_GetOI2List")]
+		public ISingleResult<sp_GetOI2ListResult> sp_GetOI2List([global::System.Data.Linq.Mapping.ParameterAttribute(Name="ACID", DbType="Int")] System.Nullable<int> aCID)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), aCID);
+			return ((ISingleResult<sp_GetOI2ListResult>)(result.ReturnValue));
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Account")]
@@ -327,6 +356,10 @@ namespace Banner
 		
 		private EntitySet<Family> _Family;
 		
+		private EntitySet<M_O_Account> _M_O_Account;
+		
+		private EntitySet<M_O2_Account> _M_O2_Account;
+		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -385,6 +418,8 @@ namespace Banner
 			this._Account_Note = new EntitySet<Account_Note>(new Action<Account_Note>(this.attach_Account_Note), new Action<Account_Note>(this.detach_Account_Note));
 			this._Baptized = new EntitySet<Baptized>(new Action<Baptized>(this.attach_Baptized), new Action<Baptized>(this.detach_Baptized));
 			this._Family = new EntitySet<Family>(new Action<Family>(this.attach_Family), new Action<Family>(this.detach_Family));
+			this._M_O_Account = new EntitySet<M_O_Account>(new Action<M_O_Account>(this.attach_M_O_Account), new Action<M_O_Account>(this.detach_M_O_Account));
+			this._M_O2_Account = new EntitySet<M_O2_Account>(new Action<M_O2_Account>(this.attach_M_O2_Account), new Action<M_O2_Account>(this.detach_M_O2_Account));
 			OnCreated();
 		}
 		
@@ -912,6 +947,32 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_O_Account", Storage="_M_O_Account", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<M_O_Account> M_O_Account
+		{
+			get
+			{
+				return this._M_O_Account;
+			}
+			set
+			{
+				this._M_O_Account.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_O2_Account", Storage="_M_O2_Account", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<M_O2_Account> M_O2_Account
+		{
+			get
+			{
+				return this._M_O2_Account;
+			}
+			set
+			{
+				this._M_O2_Account.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -1023,6 +1084,30 @@ namespace Banner
 		}
 		
 		private void detach_Family(Family entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_M_O_Account(M_O_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_M_O_Account(M_O_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_M_O2_Account(M_O2_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_M_O2_Account(M_O2_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -3972,6 +4057,10 @@ namespace Banner
 		
 		private EntitySet<OrganizeInfo> _OrganizeInfo;
 		
+		private EntitySet<M_O_Account> _M_O_Account;
+		
+		private EntitySet<M_O2_Account> _M_O2_Account;
+		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -4001,6 +4090,8 @@ namespace Banner
 		public Organize()
 		{
 			this._OrganizeInfo = new EntitySet<OrganizeInfo>(new Action<OrganizeInfo>(this.attach_OrganizeInfo), new Action<OrganizeInfo>(this.detach_OrganizeInfo));
+			this._M_O_Account = new EntitySet<M_O_Account>(new Action<M_O_Account>(this.attach_M_O_Account), new Action<M_O_Account>(this.detach_M_O_Account));
+			this._M_O2_Account = new EntitySet<M_O2_Account>(new Action<M_O2_Account>(this.attach_M_O2_Account), new Action<M_O2_Account>(this.detach_M_O2_Account));
 			OnCreated();
 		}
 		
@@ -4217,6 +4308,32 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Organize_M_O_Account", Storage="_M_O_Account", ThisKey="OID", OtherKey="OID")]
+		public EntitySet<M_O_Account> M_O_Account
+		{
+			get
+			{
+				return this._M_O_Account;
+			}
+			set
+			{
+				this._M_O_Account.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Organize_M_O2_Account", Storage="_M_O2_Account", ThisKey="OID", OtherKey="OID")]
+		public EntitySet<M_O2_Account> M_O2_Account
+		{
+			get
+			{
+				return this._M_O2_Account;
+			}
+			set
+			{
+				this._M_O2_Account.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -4244,6 +4361,30 @@ namespace Banner
 		}
 		
 		private void detach_OrganizeInfo(OrganizeInfo entity)
+		{
+			this.SendPropertyChanging();
+			entity.Organize = null;
+		}
+		
+		private void attach_M_O_Account(M_O_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Organize = this;
+		}
+		
+		private void detach_M_O_Account(M_O_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Organize = null;
+		}
+		
+		private void attach_M_O2_Account(M_O2_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Organize = this;
+		}
+		
+		private void detach_M_O2_Account(M_O2_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.Organize = null;
@@ -6340,6 +6481,656 @@ namespace Banner
 			if ((this.PropertyChanged != null))
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.M_O_Account")]
+	public partial class M_O_Account : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _MID;
+		
+		private int _OID;
+		
+		private int _ACID;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<Organize> _Organize;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnMIDChanging(int value);
+    partial void OnMIDChanged();
+    partial void OnOIDChanging(int value);
+    partial void OnOIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public M_O_Account()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._Organize = default(EntityRef<Organize>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int MID
+		{
+			get
+			{
+				return this._MID;
+			}
+			set
+			{
+				if ((this._MID != value))
+				{
+					this.OnMIDChanging(value);
+					this.SendPropertyChanging();
+					this._MID = value;
+					this.SendPropertyChanged("MID");
+					this.OnMIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OID", DbType="Int NOT NULL")]
+		public int OID
+		{
+			get
+			{
+				return this._OID;
+			}
+			set
+			{
+				if ((this._OID != value))
+				{
+					if (this._Organize.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOIDChanging(value);
+					this.SendPropertyChanging();
+					this._OID = value;
+					this.SendPropertyChanged("OID");
+					this.OnOIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_O_Account", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.M_O_Account.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.M_O_Account.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Organize_M_O_Account", Storage="_Organize", ThisKey="OID", OtherKey="OID", IsForeignKey=true)]
+		public Organize Organize
+		{
+			get
+			{
+				return this._Organize.Entity;
+			}
+			set
+			{
+				Organize previousValue = this._Organize.Entity;
+				if (((previousValue != value) 
+							|| (this._Organize.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Organize.Entity = null;
+						previousValue.M_O_Account.Remove(this);
+					}
+					this._Organize.Entity = value;
+					if ((value != null))
+					{
+						value.M_O_Account.Add(this);
+						this._OID = value.OID;
+					}
+					else
+					{
+						this._OID = default(int);
+					}
+					this.SendPropertyChanged("Organize");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.M_O2_Account")]
+	public partial class M_O2_Account : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _MID;
+		
+		private int _OID;
+		
+		private int _ACID;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<Organize> _Organize;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnMIDChanging(int value);
+    partial void OnMIDChanged();
+    partial void OnOIDChanging(int value);
+    partial void OnOIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public M_O2_Account()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._Organize = default(EntityRef<Organize>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int MID
+		{
+			get
+			{
+				return this._MID;
+			}
+			set
+			{
+				if ((this._MID != value))
+				{
+					this.OnMIDChanging(value);
+					this.SendPropertyChanging();
+					this._MID = value;
+					this.SendPropertyChanged("MID");
+					this.OnMIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OID", DbType="Int NOT NULL")]
+		public int OID
+		{
+			get
+			{
+				return this._OID;
+			}
+			set
+			{
+				if ((this._OID != value))
+				{
+					if (this._Organize.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOIDChanging(value);
+					this.SendPropertyChanging();
+					this._OID = value;
+					this.SendPropertyChanged("OID");
+					this.OnOIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_O2_Account", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.M_O2_Account.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.M_O2_Account.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Organize_M_O2_Account", Storage="_Organize", ThisKey="OID", OtherKey="OID", IsForeignKey=true)]
+		public Organize Organize
+		{
+			get
+			{
+				return this._Organize.Entity;
+			}
+			set
+			{
+				Organize previousValue = this._Organize.Entity;
+				if (((previousValue != value) 
+							|| (this._Organize.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Organize.Entity = null;
+						previousValue.M_O2_Account.Remove(this);
+					}
+					this._Organize.Entity = value;
+					if ((value != null))
+					{
+						value.M_O2_Account.Add(this);
+						this._OID = value.OID;
+					}
+					else
+					{
+						this._OID = default(int);
+					}
+					this.SendPropertyChanged("Organize");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	public partial class sp_GetOI2ListResult
+	{
+		
+		private System.Nullable<int> _OIID;
+		
+		public sp_GetOI2ListResult()
+		{
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int")]
+		public System.Nullable<int> OIID
+		{
+			get
+			{
+				return this._OIID;
+			}
+			set
+			{
+				if ((this._OIID != value))
+				{
+					this._OIID = value;
+				}
 			}
 		}
 	}

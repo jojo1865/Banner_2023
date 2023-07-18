@@ -3,10 +3,13 @@ using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.WebPages.Html;
+using SelectListItem = System.Web.Mvc.SelectListItem;
 
 namespace Banner.Areas.Admin.Controllers
 {
@@ -196,17 +199,38 @@ namespace Banner.Areas.Admin.Controllers
             return PartialView(ZipList);
         }
         #endregion
-        #region 取得/設定地點
-        public class cLocation
-        {
-            public int LID = 0;
-            public List<SelectListItem> Z0List = new List<SelectListItem>();
-            public List<SelectListItem> Z1List = new List<SelectListItem>();
-            public List<SelectListItem> Z2List = new List<SelectListItem>();
-            public List<SelectListItem> Z3List = new List<SelectListItem>();
-            public string Address0 = "", Address1_1 = "", Address1_2 = "", Address2 = "";
-        }
+        #region 取得/設定聯絡方式
 
+        public PartialViewResult _ContectEdit(Contect C)
+        {
+            c_ContectEdit cN = new c_ContectEdit();
+            if (C == null)
+            {
+                C = new Contect
+                {
+                    TargetType = 0,
+                    TargetID = 0,
+                    ZID = 10,
+                    ContectType = 0,
+                    ContectValue = ""
+                };
+            }
+            cN.C = C;
+            cN.SLIs = new List<SelectListItem>();
+            cN.SLIs.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = C.ZID == 0 });
+            var Ns = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國").OrderBy(q => q.ZID).ToList();
+            foreach (var N in Ns)
+                cN.SLIs.Add(new SelectListItem { Text = N.Title + "(" + N.Code + ")", Value = N.ZID.ToString(), Selected = C.ZID == N.ZID });
+
+            
+            if (C.ContectType == 0)
+                cN.InputNote = "請輸入電話號碼";
+            else if (C.ContectType == 1)
+                cN.InputNote = "請輸入手機";
+            else
+                cN.InputNote = "請輸入Email";
+            return PartialView(cN);
+        }
         #endregion
         #region 聚會點
         public cLocation SetLocation_Meeting(int LID, FormCollection FC)
@@ -415,10 +439,25 @@ namespace Banner.Areas.Admin.Controllers
             return PartialView(SetLocation_User(LID, FC));
         }
         #endregion
+        #region 目前組織架構參考表
+        public PartialViewResult _OrganizeTopList()
+        {
+            List<ListInput> SLs = new List<ListInput>();
+            var OI = DC.Organize.FirstOrDefault(q => q.ParentID == 0 && !q.DeleteFlag);
+            while (OI != null)
+            {
+                SLs.Add(new ListInput { Title = OI.Title + (string.IsNullOrEmpty(OI.JobTitle) ? "" : "-" + OI.JobTitle) });
+                OI = DC.Organize.FirstOrDefault(q => q.ParentID == OI.OID);
+            }
+            
+            return PartialView(SLs);
+        }
+        #endregion
         public PartialViewResult _HeadInclude()
         {
             return PartialView();
         }
+        
 
     }
 }

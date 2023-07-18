@@ -158,13 +158,13 @@ main .main-bg {
 }
 
 .body-nav {
-  margin-top: 4px;
-  border: 1px solid #9da2aa40;
-  box-shadow: 0px 1px 5px 0px #97999e1f;
-  box-shadow: 0px 0px 2px 0px #00000033;
-  height: calc(100vh - 84px - 80px - 4px);
-  width: 248px;
-  padding: 32px 0px 32px 16px;
+    margin-top: 4px;
+    border: 1px solid #9da2aa40;
+    box-shadow: 0px 1px 5px 0px #97999e1f;
+    box-shadow: 0px 0px 2px 0px #00000033;
+    height: calc(100vh - 84px - 80px - 4px);
+    width: 248px;
+    padding: 32px 0px;
 }
 
 .body-nav .menu {
@@ -183,10 +183,11 @@ main .main-bg {
   gap: 8px;
 }
 
-.body-nav .menu-link.active {
-  color: #3764ac;
-  border-right: 4px solid #3764ac;
-}
+    .body-nav .menu-link.active {
+        color: #3764ac;
+        border-right: 4px solid #3764ac;
+        background: white;
+    }
 
 .body-nav .menu-icon-active {
   display: none;
@@ -196,9 +197,17 @@ main .main-bg {
   display: none;
 }
 
-.body-nav .menu-link.active .menu-icon.menu-icon-active {
-  display: block;
-}
+    .body-nav .menu-link.active .menu-icon.menu-icon-active {
+        display: block;
+    }
+
+    .body-nav .submenu .menu-link {
+        padding-left: 48px;
+    }
+
+    .body-nav .submenu .submenu .menu-link {
+        padding-left: 80px;
+    }
 
 .body-container {
   display: flex;

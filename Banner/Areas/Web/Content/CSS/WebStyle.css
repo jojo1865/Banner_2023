@@ -19,6 +19,7 @@
 .div_UserMenu {
     width: 150px;
     padding: 10px;
+    margin-left: -50px;
     background-color: #FFF;
     text-align: center;
     position: absolute;
@@ -41,6 +42,46 @@
     .div_UserMenuBtn:hover {
         background-color: var(--basic-bagrountgray-color);
     }
+/*Form加入*/
+main {
+    padding: 0;
+    height:auto;
+}
+
+.section-card {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    gap: 16px;
+}
+
+.header-container {
+    /*margin-top: 32px;*/
+}
+
+    .header-container:first-child {
+        margin-top: 0;
+    }
+
+.btn-verify-phone,
+.btn-verify-email {
+    margin-top: 6px;
+}
+.action-bar {
+    width: 100%;
+}
+.body-container{
+    padding:0 48px;
+}
+
+.lab_gray {
+    color: var(--bs-gray-500);
+}
+
+.lab_DarkBlue {
+    color: var(--bs-secondary);
+}
+
 /*按鈕等待*/
 @keyframes spin {
     to {
@@ -50,7 +91,74 @@
 /*======================================================手機板======================================================*/
 @media(max-width:992px) {
     .left-area {
-        display:none !important;
+        display: none !important;
+    }
+
+    /*表單RWD*/
+    .table_RWDStyle {
+        width: 100%;
+    }
+
+        .table_RWDStyle tr {
+            display: block;
+            border: 2px solid #CCC;
+            margin: 5px;
+            padding: 5px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+        }
+
+            .table_RWDStyle tr.Bgn {
+                display: none;
+            }
+
+            .table_RWDStyle tr td {
+                display: block;
+                border: unset;
+                padding: 3px;
+                text-align: left;
+            }
+
+                .table_RWDStyle tr td .lab_AreaTitleCell {
+                    display: block;
+                }
+
+                .table_RWDStyle tr td textarea.form-control {
+                    height: 80px;
+                    width: 100%;
+                    display: initial;
+                }
+
+                .table_RWDStyle tr td .form-control {
+                    width: auto;
+                    display: initial;
+                }
+
+                .table_RWDStyle tr td .lab_MobelTitle {
+                    font-weight: 600;
+                }
+
+                    .table_RWDStyle tr td .lab_MobelTitle:after {
+                        content: "：";
+                    }
+
+    .table_EditStyle tr {
+        display: block;
+    }
+
+        .table_EditStyle tr td {
+            display: block;
+        }
+
+            .table_EditStyle tr td:first-child {
+                text-align: left;
+                margin: 2px;
+                font-weight: 600;
+            }
+
+    .table .pagination-container {
+        display: block;
     }
 }
 
@@ -58,6 +166,28 @@
 /*======================================================桌機板======================================================*/
 @media(min-width:992px) {
     .img_Login_logo {
-        display:none;
+        display: none;
+    }
+
+    .lab_MobelTitle {
+        display: none;
+    }
+
+    .table_RWDStyle {
+        width: 100%;
+    }
+
+        .table_RWDStyle tr td {
+            padding: 10px 5px;
+        }
+
+            .table_RWDStyle tr td textarea {
+                height: 60px;
+            }
+
+    .table_EditStyle tr td:first-child {
+        width: 120px;
+        text-align: right;
+        font-weight: 600;
     }
 }

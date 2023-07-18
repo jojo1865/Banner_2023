@@ -4,10 +4,8 @@
     <meta charset="utf-8" />
     <title>全球旌旗資訊網</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     @Html.Action("_HeadInclude", "Include")
-    <link href="@ViewBag._CSS1" rel="stylesheet" />
-    <link rel="stylesheet" href="/Areas/Web/Content/css/forestage.css" />
-    <link rel="stylesheet" href="/Areas/Web/Content/css/list.css" />
 </head>
 <body class="bn-theme">
     <nav class="header-nav">
@@ -18,7 +16,7 @@
             @Html.Action("_TopMenu", "Include")
         </div>
         <div class="header-item">
-            <a href="/Admin/Home/Login" class="btn btn-outline-primary btn-round btn-lg">進入後台</a>
+            <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="btn btn-outline-primary btn-round btn-lg" target="_blank">進入後台</a>
             <div class="profile">
                 <div class="profile-body">
                     <span class="account"> @ViewBag._Login </span>
@@ -34,16 +32,14 @@
             </div>
         </div>
     </nav>
-    <main class="body">
+    <main class="body" style="position: relative;">
         <img class="main-bg"
              src="/Areas/Web/Content/img/body-bg.svg"
              alt="" />
-        <nav class="body-nav">
+        <nav class="body-nav" style="overflow-y:auto;">
             @Html.Action("_LeftMenu", "Include")
         </nav>
-        <div class="body-container">
-            @RenderBody()
-        </div>
+        @RenderBody()
     </main>
     <!--置底-->
     <nav class="footer-nav">

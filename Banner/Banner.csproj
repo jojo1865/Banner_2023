@@ -253,6 +253,7 @@
     <Content Include="Areas\Web\Content\Img\basic-data-active.svg" />
     <Content Include="Areas\Web\Content\Img\basic-data.svg" />
     <Content Include="Areas\Web\Content\Img\body-bg.svg" />
+    <Content Include="Areas\Web\Content\Img\cancel.svg" />
     <Content Include="Areas\Web\Content\Img\cloud.svg" />
     <Content Include="Areas\Web\Content\Img\eye-slash.png" />
     <Content Include="Areas\Web\Content\Img\facebook.svg" />
@@ -286,6 +287,7 @@
     <Content Include="Areas\Web\Content\Img\people-edit.svg" />
     <Content Include="Areas\Web\Content\Img\question.png" />
     <Content Include="Areas\Web\Content\Img\right.svg" />
+    <Content Include="Areas\Web\Content\Img\save.svg" />
     <Content Include="Areas\Web\Content\Img\stat.svg" />
     <Content Include="Areas\Web\Content\Img\step-basic-data-active.svg" />
     <Content Include="Areas\Web\Content\Img\step-basic-data.svg" />
@@ -472,8 +474,23 @@
     <Content Include="Areas\Web\Views\Home\Index.cshtml" />
     <Content Include="Areas\Web\Views\Include\_TopMenu.cshtml" />
     <Content Include="Areas\Web\Views\Include\_LeftMenu.cshtml" />
-    <Content Include="Areas\Web\Views\AccountPlace\Index.cshtml" />
-    <Content Include="Areas\Web\Views\AccountPlace\GroupLeaderIndex.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\Index_Default.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupData_Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Include\_ContectEdit.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_TableList.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_GroupTopMenu.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_AccountPlaceTop.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_Location_Meeting.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupData_Aldult_List.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupData_Aldult_Remove.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupData_Aldult_Edit.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupData_New_List.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupData_New_Edit.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupData_New_Remove.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupData_Baptized_List.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupData_Baptized_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Include\_OrganizeTopList.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_ContectEdit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

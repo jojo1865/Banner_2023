@@ -2,7 +2,10 @@
 using OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Net.Mime;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 
@@ -19,11 +22,25 @@ namespace Banner.Areas.Admin.Controllers
 
             return View();
         }
+        #region 作弊登入
+        public void LoginACID()
+        {
+            int ACID = GetQueryStringInInt("ACID");
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
+            if(AC!=null)
+            {
+                SetBrowserData("ACID", AC.ACID.ToString());
+                SetBrowserData("UserName", AC.Name.ToString());
+                Response.Redirect("/Admin/Home/Index");
+            }
+            
+        }
+        #endregion
         #region 登入
         public ActionResult Login()
         {
             GetViewBag();
-            if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
+            /*if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
             {
                 if (GetACID() <= 0)
                 {
@@ -32,7 +49,9 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 Response.Redirect("/Admin/Home/Index");
             }
-
+            else if(Request.Url.Host == "web-banner.viuto-aiot.com")
+                Response.Redirect("/Web/Home/Index");
+            */
             return View();
         }
         [HttpPost]
@@ -68,7 +87,7 @@ namespace Banner.Areas.Admin.Controllers
                         SetAlert("此帳號已被移除", 2);
                     else if (!AC.ActiveFlag)
                         SetAlert("此帳號已被關閉", 2);*/
-                    else if(AC.Password != EncPW)
+                    else if (AC.Password != EncPW)
                     {
                         if (AC.Password == "")//資料庫中無密碼,所以依據此次輸入設定新密碼
                         {
@@ -91,7 +110,7 @@ namespace Banner.Areas.Admin.Controllers
                                 SetSession("LoginCt", iLoginCt.ToString());
                                 if (iLoginCt < 5)
                                 {
-                                    SetAlert("您的密碼錯誤!!</br>您還有" + (5 - iLoginCt) + "次機會...</br>建議您使用忘記密碼功能", 2,"/Admin/Home/ForgetPassWord/");
+                                    SetAlert("您的密碼錯誤!!</br>您還有" + (5 - iLoginCt) + "次機會...</br>建議您使用忘記密碼功能", 2, "/Admin/Home/ForgetPassWord/");
                                 }
                                 else
                                 {
@@ -109,7 +128,7 @@ namespace Banner.Areas.Admin.Controllers
                         }
 
                     }
-                    
+
                 }
                 else
                 {
@@ -379,7 +398,7 @@ namespace Banner.Areas.Admin.Controllers
         {
             if (Key.Length > 1 && !Key.Contains(")"))
             {
-                var OIs_G = from q in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID==8 && (q.Title.StartsWith(Key) || q.OIID.ToString().StartsWith(Key)))
+                var OIs_G = from q in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8 && (q.Title.StartsWith(Key) || q.OIID.ToString().StartsWith(Key)))
                             group q by new { q.OIID, q.Title } into g
                             select new { g.Key.OIID, g.Key.Title };
                 var OIs = from q in OIs_G.OrderByDescending(q => q.OIID)
@@ -400,6 +419,180 @@ namespace Banner.Areas.Admin.Controllers
                 return "[]";
         }
 
+        #endregion
+        #region 更新啟用狀態
+        public string ChangeActive(string TableName,int ID)
+        {
+            string Msg = "NG";
+            switch(TableName)
+            {
+                case "OrganizeInfo":
+                    {
+                        var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == ID);
+                        if (OI != null)
+                        {
+                            OI.ActiveFlag = !OI.ActiveFlag;
+                            OI.UpdDate = DT;
+                            OI.SaveACID = GetACID();
+                            DC.SubmitChanges();
+
+                            Msg = "OK";
+                        }
+                        else
+                            Msg = "查無此組織";
+                    }
+                    break;
+            }
+            return Msg;
+        }
+        #endregion
+        #region 新增資料
+        public void SetAC()
+        {
+            DateTime DT_ = Convert.ToDateTime("2023/7/1");
+            /*for (int i = 1; i < 4; i++)
+            {
+                var O = DC.Organize.FirstOrDefault(q => q.OID == 8);
+                var R = DC.Rool.FirstOrDefault(q => q.RID == 13);
+                string sLogin = "Test" + O.OID.ToString().PadLeft(2, '0') + i.ToString().PadLeft(2, '0');
+                string Phone = "0912345678";
+                Account AC = new Account
+                {
+                    Login = sLogin,
+                    Password = HSM.Enc_1(sLogin),
+                    Name = O.JobTitle + i,
+                    ManFlag = i % 2 == 0,
+                    IDNumber = "",
+                    IDType = 0,
+                    Birthday = DT_.AddYears(-23),
+                    EducationType = 0,
+                    JobType = 0,
+                    MarriageType = 0,
+                    MarriageNote = "",
+                    BaptizedType = 0,
+                    GroupType = "",
+                    BackUsedFlag = false,
+                    ActiveFlag = true,
+                    DeleteFlag = false,
+                    CreDate = DT_,
+                    UpdDate = DT_,
+                    SaveACID = 1,
+                    OldID = 0
+                };
+                DC.Account.InsertOnSubmit(AC);
+                DC.SubmitChanges();
+
+                while (O != null)
+                {
+                    M_O_Account M = new M_O_Account
+                    {
+                        Organize = O,
+                        Account = AC,
+                        ActiveFlag = true,
+                        DeleteFlag = false,
+                        CreDate = DT_.AddDays(-1 * O.OID),
+                        UpdDate = DT_.AddDays(-1 * O.OID),
+                        SaveACID = 1
+                    };
+                    DC.M_O_Account.InsertOnSubmit(M);
+                    DC.SubmitChanges();
+                    O = DC.Organize.FirstOrDefault(q => q.ParentID == O.OID);
+                }
+
+                Contect Con = new Contect
+                {
+                    TargetType = 2,
+                    TargetID = AC.ACID,
+                    ZID = 10,
+                    ContectType = 1,
+                    ContectValue = Phone
+                };
+                DC.Contect.InsertOnSubmit(Con);
+                DC.SubmitChanges();
+
+                M_Rool_Account MR = new M_Rool_Account
+                {
+                    Account = AC,
+                    Rool = R,
+                    JoinDate = DT_,
+                    LeaveDate = DT_,
+                    Note = "",
+                    ActiveFlag = true,
+                    DeleteFlag = false,
+                    CreDate = DT_,
+                    UpdDate = DT_,
+                    SaveACID = 1
+                };
+                DC.M_Rool_Account.InsertOnSubmit(MR);
+                DC.SubmitChanges();
+
+                //小組長
+                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == 1982 + i);
+                if(OI!=null)
+                {
+                    OI.Account = AC;
+                    DC.SubmitChanges();
+                }
+            }*/
+            for (int i = 1; i < 6; i++)
+            {
+                var R = DC.Rool.FirstOrDefault(q => q.RID == 1);
+                string sLogin = "User00" + i.ToString().PadLeft(2, '0');
+                string Phone = "0912345678";
+                Account AC = new Account
+                {
+                    Login = sLogin,
+                    Password = HSM.Enc_1(sLogin),
+                    Name = "會員" + i,
+                    ManFlag = i % 2 == 0,
+                    IDNumber = "",
+                    IDType = 0,
+                    Birthday = DT_.AddYears(-23),
+                    EducationType = 0,
+                    JobType = 0,
+                    MarriageType = 0,
+                    MarriageNote = "",
+                    BaptizedType = 0,
+                    GroupType = "有意願",
+                    BackUsedFlag = false,
+                    ActiveFlag = true,
+                    DeleteFlag = false,
+                    CreDate = DT_,
+                    UpdDate = DT_,
+                    SaveACID = 1,
+                    OldID = 0
+                };
+                DC.Account.InsertOnSubmit(AC);
+                DC.SubmitChanges();
+
+                Contect Con = new Contect
+                {
+                    TargetType = 2,
+                    TargetID = AC.ACID,
+                    ZID = 10,
+                    ContectType = 1,
+                    ContectValue = Phone
+                };
+                DC.Contect.InsertOnSubmit(Con);
+                DC.SubmitChanges();
+
+                M_Rool_Account MR = new M_Rool_Account
+                {
+                    Account = AC,
+                    Rool = R,
+                    JoinDate = DT_,
+                    LeaveDate = DT_,
+                    Note = "",
+                    ActiveFlag = true,
+                    DeleteFlag = false,
+                    CreDate = DT_,
+                    UpdDate = DT_,
+                    SaveACID = 1
+                };
+                DC.M_Rool_Account.InsertOnSubmit(MR);
+                DC.SubmitChanges();
+            }
+        }
         #endregion
     }
 }

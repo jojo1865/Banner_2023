@@ -1,0 +1,57 @@
+﻿@model Banner.Account_Note
+@{
+    ViewBag.Title = "GroupLeaderIndex";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+<div class="body-container">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/AccountPlace/GroupData_Index">小組資訊</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/AccountPlace/GroupData_Aldult_List">組員名單管理</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/AccountPlace/GroupData_New_List">新人名單</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">駁回</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">@Html.Raw(ViewBag._GroupTitle) - 駁回</h5>
+        </div>
+        @Html.Action("_GroupTopMenu", "Include")
+        <div class="container">
+            <div class="section-card">
+                <form method="post" id="form1">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label>組員名稱</label>
+                        @Html.Label((Model.Account != null ? Model.Account.Name : ""), new { @class = "form-control form-control-lg input-underlin lab_gray" })
+                    </div>
+                    <div class="form-group">
+                        <label>駁回原因</label>
+                        @Html.TextArea("txb_Note", Model.Note, new { @class = "form-control form-control-lg input-underlin", maxlength = "200", @style = "height:250px" })
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="action-bar">
+    @if (Model != null)
+    {
+        if ((((bool[])ViewBag._Power)[1] && Model.ANID == 0) || (((bool[])ViewBag._Power)[2] && Model.ANID > 0) || true)
+        {
+            <div class="btn btn-primary btn-lg btn-round">
+                <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
+            </div>
+        }
+        <div class="btn btn-outline-primary btn-lg btn-round">
+            <a href="/Web/AccountPlace/GroupData_New_List"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />取消</a>
+        </div>
+    }
+</div>

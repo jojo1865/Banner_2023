@@ -90,17 +90,20 @@ function ShowArea(ddl) {
     return;
 }
 /*產生按鈕等待圖示 */
-const btns = document.querySelectorAll(".btn");
+
+const btns = document.querySelectorAll(".btn-submit");
 btns.forEach((btn) => {
     btn.addEventListener("click", () => {
         btn.disabled = true;
         btn.classList.add("btn-loading");
+        console.log('Add loading CSS');
     });
 });
 function ClearLoading() {
     btns.forEach((btn) => {
         btn.disabled = false;
         btn.classList.remove("btn-loading");
+        console.log('Remove loading CSS');
     });
 }
 
@@ -224,4 +227,24 @@ function SetAlertNote(Msg) {
         html: Msg
     });
     ClearLoading();
+}
+//資料啟用/停用
+function ChangeActive(TargetControl,TableName, ID) {
+    $.ajax({
+        url: '/Admin/Home/ChangeActive?TableName=' + TableName + '&ID=' + ID,
+        method: 'GET',
+        dataType: 'text',
+        success: function (res) {
+            if (TargetControl.classList.contains('btn-outline-success')) {
+                TargetControl.classList.replace('btn-outline-success', 'btn-outline-danger');
+                TargetControl.innerHTML = '停用';
+            }
+            else {
+                TargetControl.classList.replace('btn-outline-danger', 'btn-outline-success');
+                TargetControl.innerHTML = '啟用';
+            }
+        },
+        error: function (err) { console.log(err) },
+    })
+    
 }

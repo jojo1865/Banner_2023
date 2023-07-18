@@ -1,0 +1,9 @@
+﻿@model List<Banner.Models.ListInput>
+<div class="row mt-2 mb-2 text-center">
+    @foreach (var M in Model)
+    {
+        <div class="col">
+            <label class="font-bold">@M.Title</label>
+        </div>
+    }
+</div>

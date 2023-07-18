@@ -1,0 +1,29 @@
+﻿
+@{
+    ViewBag.Title = "GroupData_Aldult_List";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/AccountPlace/GroupData_Index">小組資訊</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/AccountPlace/GroupData_Aldult_List">組員名單管理</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">@Html.Raw(ViewBag._GroupTitle)</h5>
+        </div>
+        @Html.Action("_GroupTopMenu", "Include")
+        <div class="w-100 mt-2">
+            <form method="post" id="form1">
+                @Html.AntiForgeryToken()
+                @Html.Action("_TableList", "Include", new { cTL = Model })
+            </form>
+        </div>
+    </div>
+</div>
+

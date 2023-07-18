@@ -61,21 +61,8 @@ namespace Banner.Areas.Admin.Controllers
         private cTableList GetBackUser(FormCollection FC)
         {
             cTableList cTL = new cTableList();
-            int iNumCut = GetQueryStringInInt("NumCut");
-            int iNowPage = GetQueryStringInInt("PageNo");
-            if (iNumCut <= 0)
-            {
-                if (GetCookie("NumCut") == "")
-                {
-                    iNumCut = 10;
-                    SetCookie("NumCut", iNumCut.ToString());
-                }
-                else
-                    iNumCut = Convert.ToInt32(GetCookie("NumCut"));
-            }
-            else
-                SetCookie("NumCut", iNumCut.ToString());
-            if (iNowPage <= 0) iNowPage = 1;
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             cTL = new cTableList();
             cTL.Title = "";
             cTL.NowPage = iNowPage;
@@ -83,8 +70,6 @@ namespace Banner.Areas.Admin.Controllers
             cTL.NowURL = "/Admin/SystemSet/BackUser_List";
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
-
-
 
             var Ns = DC.Account.Where(q => !q.DeleteFlag && q.BackUsedFlag);
             if (FC != null)

@@ -5,6 +5,7 @@
         <h5 class="header font-bold">@ViewBag._Title</h5>
     </div>
     <div class="body-container">
+        @Html.Action("_OrganizeTopList", "Include")
         @{
             Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
             if (Model != null)
@@ -22,7 +23,7 @@
                             <div class="row">
                                 <div class="d-flex justify-content-end">
                                     <a href="javascript:Search();" class="btn btn-primary btn-lg btn-round btn-submit me-2">搜尋</a>
-                                    <a href="@(Model.sAddURL)" class="btn btn-primary btn-lg btn-round btn-submit">新增</a>
+                                    <!--<a href="@(Model.sAddURL)" class="btn btn-primary btn-lg btn-round btn-submit">新增協會</a>-->
                                 </div>
                             </div>
                         </div>
