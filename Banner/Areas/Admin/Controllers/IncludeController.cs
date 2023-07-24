@@ -222,7 +222,7 @@ namespace Banner.Areas.Admin.Controllers
             foreach (var N in Ns)
                 cN.SLIs.Add(new SelectListItem { Text = N.Title + "(" + N.Code + ")", Value = N.ZID.ToString(), Selected = C.ZID == N.ZID });
 
-            
+
             if (C.ContectType == 0)
                 cN.InputNote = "請輸入電話號碼";
             else if (C.ContectType == 1)
@@ -232,7 +232,7 @@ namespace Banner.Areas.Admin.Controllers
             return PartialView(cN);
         }
         #endregion
-        #region 聚會點
+        #region 地址-聚會點
         public cLocation SetLocation_Meeting(int LID, FormCollection FC)
         {
             int ZID = 46;
@@ -266,7 +266,7 @@ namespace Banner.Areas.Admin.Controllers
                 foreach (var Z1 in Z1s)
                     cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID.ToString() == FC.Get("ddl_Zip1") });
 
-                var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ParentID).OrderBy(q => q.Title);
+                var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ParentID).OrderBy(q => q.Code);
                 foreach (var Z2 in Z2s)
                     cL.Z2List.Add(new SelectListItem { Text = Z2.Code + " " + Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID.ToString() == FC.Get("ddl_Zip2") });
 
@@ -336,7 +336,7 @@ namespace Banner.Areas.Admin.Controllers
             return PartialView(SetLocation_Meeting(LID, FC));
         }
         #endregion
-        #region 地址
+        #region 地址-使用者
         public cLocation SetLocation_User(int LID, FormCollection FC)
         {
             int ZID = 46;
@@ -440,16 +440,26 @@ namespace Banner.Areas.Admin.Controllers
         }
         #endregion
         #region 目前組織架構參考表
-        public PartialViewResult _OrganizeTopList()
+        public PartialViewResult _OrganizeTopList(int OID = 0)
         {
             List<ListInput> SLs = new List<ListInput>();
-            var OI = DC.Organize.FirstOrDefault(q => q.ParentID == 0 && !q.DeleteFlag);
-            while (OI != null)
+            var O = DC.Organize.FirstOrDefault(q => q.ParentID == 0 && !q.DeleteFlag);
+            while (O != null)
             {
-                SLs.Add(new ListInput { Title = OI.Title + (string.IsNullOrEmpty(OI.JobTitle) ? "" : "-" + OI.JobTitle) });
-                OI = DC.Organize.FirstOrDefault(q => q.ParentID == OI.OID);
+                string CSS = "";
+                if (!O.ActiveFlag)
+                    CSS = "lab_gray";
+                if (OID != 0)
+                {
+                    if (O.OID == OID)
+                        CSS = "lab_DarkBlue";
+                }
+
+
+                SLs.Add(new ListInput { Title = O.Title + (string.IsNullOrEmpty(O.JobTitle) ? "" : "-" + O.JobTitle), ControlName = CSS });
+                O = DC.Organize.FirstOrDefault(q => q.ParentID == O.OID);
             }
-            
+
             return PartialView(SLs);
         }
         #endregion
@@ -457,7 +467,7 @@ namespace Banner.Areas.Admin.Controllers
         {
             return PartialView();
         }
-        
+
 
     }
 }

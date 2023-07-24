@@ -1,0 +1,118 @@
+﻿@model Banner.Areas.Web.Controllers.AccountPlaceController.cAccountPlace_Index
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+<style>
+    .section-container {
+        margin-top: 56px;
+        gap: 48px;
+    }
+    /*組織與職分管理*/
+    /*.td_O {
+        display: inline-block;
+    }
+
+    .td_O_Basic1 {
+        width: 150px;
+        height: 60px;
+        text-align: center;
+        padding: 5px;
+        line-height: 45px;
+        border: 1px solid #0094ff;
+        color: #0094ff;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+    }
+
+    .td_Border_left {
+        background-color: #0094ff;
+        height: 30px;
+        width: 1px;
+    }
+
+    .td_Border_Top_Side {
+        border-top: 1px solid #0094ff;
+        border-left: 1px solid #0094ff;
+        border-right: 1px solid #0094ff;
+        height: 30px;
+    }*/
+</style>
+<div class="body-container pt-3">
+    @if (Model != null)
+    {
+        <div class="section-container">
+            <section class="section w-100">
+                <div class="section-header">
+                    會員職分
+                </div>
+                @foreach (var ML in Model.cMLs)
+                {
+                    <div class="section-body">
+                        <div class="section-card">
+                            <div class="card-info">
+                                <div class="d-flex align-items-center">
+                                    <img class="avatar" src="/Areas/Web/Content/Img/avatar.svg" />
+                                    <ul class="rank">
+                                        <li># @ML.JobTitle</li>
+                                    </ul>
+                                </div>
+                                <div class="card-info-footer">
+                                    @ML.OIList
+                                </div>
+                            </div>
+
+                            <div class="card-info-separate">&nbsp;</div>
+                            <div class="card-info">
+                                <div class="card-info-header">@(ML.GroupTitle)聚會資訊</div>
+                                <div class="card-info-body">
+                                    <span>聚會日：<span>@ML.Week</span></span>
+                                    <span>聚會時間：<span>@ML.Time</span></span>
+                                    <span>聚會地點：<span>@ML.Location</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </section>
+            <section class="section w-100 d-none">
+                <div class="section-header vw-75">
+                    小組資訊-樹狀圖
+                </div>
+                <div class="section-body">
+                    <div class="section-card">
+                        <div class="location-container">
+                            <img src="/Areas/Web/Content/Img/location.svg" alt="">
+                            台中旌旗教會分堂
+                        </div>
+                    </div>
+                    <div class="section-card">
+                        <table class="w-100">
+                            <tr>
+                                <td align="center" colspan="2"><div class="td_O td_O_Basic1">XX牧區(48)</div></td>
+                            </tr>
+                            <tr>
+                                <td align="center" colspan="2"><div class="td_Border_left"></div></td>
+                            </tr>
+                            <tr>
+                                <td align="center" colspan="2"><div class="w-50 td_Border_Top_Side"></div></td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <div class="td_O td_O_Basic1">XX督區(48)</div>
+
+                                </td>
+                                <td align="center">
+                                    <div class="td_O td_O_Basic1">XX督區(48)</div>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+    }
+</div>

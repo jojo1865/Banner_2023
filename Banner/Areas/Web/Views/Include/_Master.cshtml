@@ -25,7 +25,7 @@
                 <div class="profile-action">
                     <a href="javascript:ShowUserMenu();" class="material-icons" onmousemove="ShowUserMenu()"> arrow_drop_down </a>
                     <div class="div_UserMenu" id="UserMenu" onmousemove="ShowUserMenu()" onmouseout="CloseUserMenu()" style="display:none;">
-                        <div class="div_UserMenuBtn mb-2"><a href="/Web/Home/ChangePassword">修改密碼</a></div>
+                        <div class="div_UserMenuBtn mb-2 d-none"><a href="/Web/Home/ChangePassword">修改密碼</a></div>
                         <div class="div_UserMenuBtn"><a href="javascript:LogoutCheck();">登出</a></div>
                     </div>
                 </div>
@@ -33,9 +33,7 @@
         </div>
     </nav>
     <main class="body" style="position: relative;">
-        <img class="main-bg"
-             src="/Areas/Web/Content/img/body-bg.svg"
-             alt="" />
+        <img class="main-bg" src="/Areas/Web/Content/img/body-bg.svg" alt="" />
         <nav class="body-nav" style="overflow-y:auto;">
             @Html.Action("_LeftMenu", "Include")
         </nav>

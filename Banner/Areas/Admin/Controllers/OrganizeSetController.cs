@@ -90,11 +90,17 @@ namespace Banner.Areas.Admin.Controllers
             var cOE = ReSetOrganize(ItemID, ID, FC);
             if (cOE.O.Title == "")
                 Error += "請輸入組織名稱</br>";
-            else if (cOE.O.DeleteFlag)//刪除
+            else if (!cOE.O.ActiveFlag || cOE.O.DeleteFlag)//刪除
             {
-                var OI = DC.OrganizeInfo.FirstOrDefault(q => !q.DeleteFlag && q.OID == cOE.O.OID);
+                var OI = DC.OrganizeInfo.FirstOrDefault(q =>q.ActiveFlag && !q.DeleteFlag && q.OID == cOE.O.OID);
                 if (OI != null)
                     Error += "請先移除此組織等級的組織資料後再行刪除</br>";
+                else if(cOE.O.OID == 8)
+                {
+                    var Ms = DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OrganizeInfo.OID == cOE.O.OID);
+                    if(Ms.Count()>0)
+                        Error += "請先移除所有小組層級的會友後再行刪除</br>";
+                }
             }
             else if (cOE.O.OID == cOE.NewParentID)
                 Error += "您不能指定自己為自己的上層組織</br>";
@@ -392,13 +398,19 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Value = N.Title + N.Organize.Title + (N.BusinessType == 1 ? "(外展)" : "") });//本層名稱
                 if (OID != 8)
                 {
-                    var NextOIs = DC.OrganizeInfo.Where(q => !q.DeleteFlag && q.ParentID == N.OIID);
+                    var NextOIs = DC.OrganizeInfo.Where(q => !q.DeleteFlag && q.ParentID == N.OIID).ToList();
                     if (NextTitle != "下層名稱")
                     {
-
+                        
                         int Ct = NextOIs.Count();
+                        
                         if (Ct > 0)//引導到下層
-                            cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + NextOIs.ToList()[0].OID + "/" + N.OIID, Value = Ct.ToString() });//下層組織
+                        {
+                            string sCt = Ct.ToString();
+                            if (NextOIs[0].Organize.Title != NextTitle)
+                                sCt = "[" + Ct + "]";
+                            cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + NextOIs.ToList()[0].OID + "/" + N.OIID, Value = sCt });//下層組織
+                        }
                         else
                             cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + NextOIs.ToList()[0].OID + "/" + N.OIID, Value = "0" });//下層組織
                     }
@@ -498,7 +510,6 @@ namespace Banner.Areas.Admin.Controllers
                     DC.OrganizeInfo.InsertOnSubmit(cIE.OI);
                 }
                 DC.SubmitChanges();
-
                 if (OID <= 2)
                 {
                     cIE.C.TargetType = 1;
@@ -566,49 +577,44 @@ namespace Banner.Areas.Admin.Controllers
                         OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID);
                     }
                     #endregion
-                    #region 地址
-                    var L = DC.Location.FirstOrDefault(q => q.TargetType == 1 && q.TargetID == OIID);
-                    if (L != null)
+                    #region 查聚會點
+                    var MLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.TargetID == cIE.OI.OIID && q.ActiveFlag && !q.DeleteFlag);
+                    if (MLS != null)
                     {
-                        cIE.L = L;
-                        switch (L.ZipCode.GroupName)
+                        #region 地址
+                        var L = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MID);
+                        if (L != null)
                         {
-                            case "鄉鎮市區":
-                                {
-                                    cIE.L_str = GetZipData(L.ZID, true) + L.Address;
-                                }
-                                break;
-                            case "洲":
-                                {
-                                    cIE.L_str = "海外" + L.Address.Replace("%", "</br>");
-                                }
-                                break;
-                            case "網路":
-                                {
-                                    cIE.L_str = L.ZipCode.Title + L.Address;
-                                }
-                                break;
-
+                            cIE.L = L;
+                            cIE.L_str = GetLocationString(L);
                         }
+                        else
+                            cIE.L = new Location { ZID = 10 };
+
+                        #endregion
+                        #region 電話
+                        var C = DC.Contect.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MID);
+                        if (C != null)
+                        {
+                            cIE.C = C;
+
+                            if (C.ZID > 0)
+                            {
+                                var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == C.ZID);
+                                cIE.C_str = (Z != null ? (Z.Title + "(" + Z.Code + ")") : "") + C.ContectValue;
+                            }
+                        }
+                        else
+                            cIE.C = new Contect { ZID = 10, ContectType = 0, ContectValue = "" };
+                        #endregion
                     }
                     else
-                        cIE.L = new Location { ZID = 46 };
-
-                    #endregion
-                    #region 電話
-                    var C = DC.Contect.FirstOrDefault(q => q.TargetType == 1 && q.TargetID == OIID);
-                    if (C != null)
                     {
-                        cIE.C = C;
-
-                        if (C.ZID > 0)
-                        {
-                            var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == C.ZID);
-                            cIE.C_str = (Z != null ? (Z.Title + "(" + Z.Code + ")") : "") + C.ContectValue;
-                        }
+                        cIE.C = new Contect { ZID = 10, ContectType = 0, ContectValue = "" };
+                        cIE.L = new Location { ZID = 10, Address = "" };
                     }
-
                     #endregion
+
                 }
             }
             else//新增
@@ -644,9 +650,9 @@ namespace Banner.Areas.Admin.Controllers
                     cIE.ACList[0].Selected = true;
 
                     #endregion
-                    #region 地址
-                    cIE.L = new Location();
-                    cIE.L.ZID = 10;
+                    #region 地址/電話
+                    cIE.C = new Contect { ZID = 10, ContectType = 0, ContectValue = "" };
+                    cIE.L = new Location { ZID = 10, Address = "" };
                     #endregion
                 }
             }
@@ -658,10 +664,12 @@ namespace Banner.Areas.Admin.Controllers
                 cIE.OI.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
                 cIE.OI.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
                 cIE.OI.BusinessType = GetViewCheckBox(FC.Get("cbox_Business")) ? 1 : 0;
-                cIE.C.ContectValue = FC.Get("txb_PhoneNo");
-                cIE.C.ZID = Convert.ToInt32(FC.Get("ddl_PhoneZip"));
+                
                 if (cIE.OI.OID <= 2)
                 {
+                    cIE.C.ContectValue = FC.Get("txb_PhoneNo");
+                    cIE.C.ZID = Convert.ToInt32(FC.Get("ddl_PhoneZip"));
+
                     if (FC.Get("ddl_Zip0") == "10")
                     {
                         cIE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip2"));
@@ -789,14 +797,7 @@ namespace Banner.Areas.Admin.Controllers
             public cTree Tree = new cTree();
             public int TreeLv = 0;
         }
-        public class cTree
-        {
-            public string name = "";
-            public string title = "";
-            public string url = "";
-            public string css = "";
-            public List<cTree> children = new List<cTree>();
-        }
+        
         /// <summary>
         /// 聚會點
         /// </summary>

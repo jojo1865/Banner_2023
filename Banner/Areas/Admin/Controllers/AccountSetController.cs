@@ -145,7 +145,8 @@ namespace Banner.Areas.Admin.Controllers
                 case 4://受洗
                     {
                         cTL.NowURL = "/Admin/AccountSet/Account_Baptized_List";
-                        Ns = Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.BaptizedType == 0);
+                        //Ns = Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.BaptizedType == 0);//小朋友不能受洗
+                        Ns = Ns.Where(q => q.BaptizedType == 0);//小朋友可以受洗
                     }
                     break;
             }
@@ -384,7 +385,8 @@ namespace Banner.Areas.Admin.Controllers
                     case 1://成人
                         {
                             cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
-                            cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_black", Value = "編輯" });//
+                            //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_black", Value = "編輯" });
+                            cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_black", Value = "檢視" });//檢視
                             var OI_8 = GetMOIAC(8, 0, N.ACID).FirstOrDefault();
                             if (OI_8 != null)
                             {
@@ -1125,8 +1127,14 @@ namespace Banner.Areas.Admin.Controllers
             return N;
         }
 
-
+        [HttpGet]
         public ActionResult Account_Aldult_Edit(int ID)
+        {
+            GetViewBag();
+            return View(GerAccountData(ID, null));
+        }
+        [HttpGet]
+        public ActionResult Account_Aldult_Info(int ID)
         {
             GetViewBag();
             return View(GerAccountData(ID, null));

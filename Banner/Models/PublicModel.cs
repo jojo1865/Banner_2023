@@ -96,4 +96,17 @@ namespace Banner.Models
         public string InputNote = "";
         public List<SelectListItem> SLIs = new List<SelectListItem>();
     }
+    /// <summary>
+    /// 樹狀圖結構
+    /// </summary>
+    public class cTree
+    {
+        public string name = "";
+        public string title = "";
+        public string url = "";
+        public string css = "";
+        public int SortNo = 0;
+        public int LV = 0;
+        public List<cTree> children = new List<cTree>();
+    }
 }

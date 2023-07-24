@@ -1,7 +1,9 @@
 ﻿using Banner.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
@@ -46,6 +48,22 @@ namespace Banner.Areas.Web.Controllers
                 s += (i == 3 ? sPath[i].Replace("/", "") : sPath[i]);
             return s;
         }
+        public int GetOIID()
+        {
+            int OIID = 0;
+            string[] sPath = Request.Url.Segments;
+            if (sPath[2].ToLower() == "groupplace/")
+            {
+                if (GetBrowserData("OIID") != "")
+                    OIID = Convert.ToInt32(GetBrowserData("OIID"));
+                if (sPath.Length == 5)
+                {
+                    if (sPath[3].ToLower() == "index/" || sPath[3].ToLower().Contains("_list/"))
+                        OIID = Convert.ToInt32(sPath[4]);
+                }
+            }
+            return OIID;
+        }
         public PartialViewResult _TopMenu()
         {
             var Ms = DC.Menu.Where(q => q.ParentID == 0 && q.ActiveFlag && !q.DeleteFlag);
@@ -62,7 +80,10 @@ namespace Banner.Areas.Web.Controllers
                 Ms = Ms.Where(q => q.MenuType == 1);
             Ms = Ms.OrderBy(q => q.SortNo);
 
+            int OIID = GetOIID();
+
             string ThisController = GetThisController();
+            string ThisActive = GetThisAction();
             List<cMenu> cMs = new List<cMenu>();
             foreach (var M in Ms)
             {
@@ -75,11 +96,31 @@ namespace Banner.Areas.Web.Controllers
                     SortNo = M.SortNo,
                     SelectFlag = M.URL.StartsWith(ThisController)
                 };
-                cMs.Add(cM);
-            }
-            if (cMs.FirstOrDefault(q => q.SelectFlag) == null)
-                cMs[0].SelectFlag = true;
 
+                if (M.MenuType == 2)
+                {
+                    var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8).OrderBy(q => q.OIID);
+                    foreach (var OI in OIs)
+                    {
+                        cM = new cMenu
+                        {
+                            MenuID = M.MID,
+                            Title = OI.Title + M.Title,
+                            Url = M.URL + "/" + OI.OIID,
+                            ImgUrl = M.ImgURL,
+                            SortNo = M.SortNo,
+                            SelectFlag = M.URL.StartsWith(ThisController) && OI.OIID == OIID
+                        };
+                        cMs.Add(cM);
+                    }
+                }
+                else
+                    cMs.Add(cM);
+            }
+            //if (cMs.Count > 0 && cMs.FirstOrDefault(q => q.SelectFlag) == null)
+            //   cMs[0].SelectFlag = true;
+            if (ACID == 0)
+                SetAlert("請先登入", 3, "/Web/Home/Login");
             return PartialView(cMs);
         }
         #endregion
@@ -87,6 +128,9 @@ namespace Banner.Areas.Web.Controllers
         public PartialViewResult _LeftMenu()
         {
             List<cMenu> cMs = new List<cMenu>();
+
+            int OIID = GetOIID();
+
             string[] ThisPath = Request.Url.Segments;
             string ThisController = GetThisController();
             var PM = DC.Menu.FirstOrDefault(q => q.ParentID == 0 && q.ActiveFlag && !q.DeleteFlag && q.URL.StartsWith(ThisController));
@@ -105,7 +149,6 @@ namespace Banner.Areas.Web.Controllers
                 else
                     Ms = Ms.Where(q => q.MenuType == 1);
                 Ms = Ms.OrderBy(q => q.SortNo);
-                // /Web/AccountPlace/Index/123
                 string NowShortPath = GetThisAction().Replace("_Edit", "").Replace("_List", "").Replace("_Info", "").Replace("_Remove", "");
                 //NowShortPath = NowShortPath.Replace("_Aldult", "").Replace("_Baptized", "").Replace("_New", "");
                 foreach (var M in Ms)
@@ -115,13 +158,14 @@ namespace Banner.Areas.Web.Controllers
                     {
                         MenuID = M.MID,
                         Title = M.Title,
-                        Url = M.URL,
+                        Url = M.URL + (OIID > 0 ? "/" + OIID : ""),
                         ImgUrl = M.ImgURL,
                         SortNo = M.SortNo,
                         SelectFlag = M.URL.StartsWith(NowShortPath) || CM_ != null,
                         Items = new List<cMenu>()
                     };
-                    var CMs = DC.Menu.Where(q => q.ParentID == M.MID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.SortNo);
+                    //2023/7/19 取消左側多層次選單
+                    /*var CMs = DC.Menu.Where(q => q.ParentID == M.MID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.SortNo);
                     foreach (var CM in CMs)
                     {
                         cMenu cCM = new cMenu
@@ -154,10 +198,10 @@ namespace Banner.Areas.Web.Controllers
                         if (cCM.SelectFlag && !cM.SelectFlag)
                             cM.SelectFlag = true;
                         cM.Items.Add(cCM);
-                    }
+                    }*/
                     cMs.Add(cM);
                 }
-                if (cMs.FirstOrDefault(q => q.SelectFlag) == null)
+                if (cMs.FirstOrDefault(q => q.SelectFlag) == null && cMs.Count() > 0)
                     cMs[0].SelectFlag = true;
             }
 
@@ -165,6 +209,7 @@ namespace Banner.Areas.Web.Controllers
             return PartialView(cMs);
         }
         #endregion
+
         public PartialViewResult _HeadInclude()
         {
             return PartialView();
@@ -220,7 +265,7 @@ namespace Banner.Areas.Web.Controllers
             return PartialView(cMs);
         }
         #endregion
-        #region 聚會點
+        #region 地址-聚會點
         public cLocation SetLocation_Meeting(int LID, FormCollection FC)
         {
             int ZID = 46;
@@ -254,7 +299,7 @@ namespace Banner.Areas.Web.Controllers
                 foreach (var Z1 in Z1s)
                     cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID.ToString() == FC.Get("ddl_Zip1") });
 
-                var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ParentID).OrderBy(q => q.Title);
+                var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ParentID).OrderBy(q => q.Code);
                 foreach (var Z2 in Z2s)
                     cL.Z2List.Add(new SelectListItem { Text = Z2.Code + " " + Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID.ToString() == FC.Get("ddl_Zip2") });
 
@@ -322,6 +367,109 @@ namespace Banner.Areas.Web.Controllers
         public PartialViewResult _Location_Meeting(int LID, FormCollection FC)
         {
             return PartialView(SetLocation_Meeting(LID, FC));
+        }
+        #endregion
+        #region 地址-使用者
+        public cLocation SetLocation_User(int LID, FormCollection FC)
+        {
+            int ZID = 46;
+            string Address = "";
+            if (LID > 0)
+            {
+                var L = DC.Location.FirstOrDefault(q => q.LID == LID);
+                if (L != null)
+                {
+                    ZID = L.ZID;
+                    Address = L.Address;
+                }
+            }
+            cLocation cL = new cLocation();
+            cL.LID = LID;
+            cL.Z0List.Add(new SelectListItem { Text = "台灣", Value = "10" });
+            cL.Z0List.Add(new SelectListItem { Text = "國外", Value = "2" });
+
+            var Z1s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "縣市").OrderBy(q => q.Title).ToList();
+            var Z3s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國" && q.ZID != 10).OrderBy(q => q.ParentID).ThenBy(q => q.ZID).ToList();
+            var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == ZID);
+            if (FC != null)
+            {
+                try
+                {
+                    cL.Z0List.First(q => q.Value == FC.Get("ddl_Zip0")).Selected = true;
+                    cL.Address0 = FC.Get("txb_Address0");
+                    cL.Address1_1 = FC.Get("txb_Address1_1");
+                    cL.Address1_2 = FC.Get("txb_Address1_2");
+                }
+                catch { }
+                cL.Address2 = "";
+                //本國
+
+                foreach (var Z1 in Z1s)
+                    cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID.ToString() == FC.Get("ddl_Zip1") });
+
+                var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ParentID).OrderBy(q => q.Title);
+                foreach (var Z2 in Z2s)
+                    cL.Z2List.Add(new SelectListItem { Text = Z2.Code + " " + Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID.ToString() == FC.Get("ddl_Zip2") });
+
+                //外國
+
+                foreach (var Z3 in Z3s)
+                    cL.Z3List.Add(new SelectListItem { Text = Z3.Title, Value = Z3.ZID.ToString(), Selected = Z3.ZID.ToString() == FC.Get("ddl_Zip3") });
+            }
+            else if (Z != null)
+            {
+                if (Z.GroupName == "國")
+                    cL.Z0List[1].Selected = true;
+                else
+                    cL.Z0List[0].Selected = true;
+
+                //本國
+                if (cL.Z0List[0].Selected)
+                {
+                    cL.Address0 = Address;
+                    foreach (var Z1 in Z1s)
+                        cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID == Z.ParentID });
+
+                    var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z.ParentID).OrderBy(q => q.Title);
+                    foreach (var Z2 in Z2s)
+                        cL.Z2List.Add(new SelectListItem { Text = Z2.Code + " " + Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID == Z.ZID });
+                }
+                else
+                {
+                    foreach (var Z1 in Z1s)
+                        cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1 == Z1s.First() });
+
+                    var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ZID).OrderBy(q => q.Title);
+                    foreach (var Z2 in Z2s)
+                        cL.Z2List.Add(new SelectListItem { Text = Z2.Code + " " + Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2 == Z2s.First() });
+                }
+
+                //外國
+                if (cL.Z0List[1].Selected)
+                {
+                    string[] str = Address.Split('%');
+                    cL.Address1_1 = str[0];
+                    cL.Address1_2 = str.Length == 2 ? str[1] : "";
+                    foreach (var Z3 in Z3s)
+                        cL.Z3List.Add(new SelectListItem { Text = Z3.Title, Value = Z3.ZID.ToString(), Selected = Z3.ZID == ZID });
+                }
+                else
+                {
+                    foreach (var Z3 in Z3s)
+                        cL.Z3List.Add(new SelectListItem { Text = Z3.Title, Value = Z3.ZID.ToString(), Selected = Z3 == Z3s.First() });
+                }
+            }
+
+            return cL;
+        }
+        public PartialViewResult _Location_User(int LID)
+        {
+            return PartialView(SetLocation_User(LID, null));
+        }
+        [HttpPost]
+        public PartialViewResult _Location_User(int LID, FormCollection FC)
+        {
+            return PartialView(SetLocation_User(LID, FC));
         }
         #endregion
         #region 取得/設定聯絡方式

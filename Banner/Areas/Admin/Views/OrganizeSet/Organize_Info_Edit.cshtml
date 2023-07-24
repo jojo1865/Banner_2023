@@ -8,7 +8,6 @@
     <div class="form-container-list">
         <div class="form-container">
             <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
-            @Html.Action("_OrganizeTopList", "Include")
             @if (Model != null)
             {
                 if (Model.OI != null)
@@ -18,6 +17,7 @@
                     {
                         HideCss = "visually-hidden";
                     }
+                    @Html.Action("_OrganizeTopList", "Include", new { OID = Model.OI.OID })
                     <form method="post" id="form1">
                         @Html.AntiForgeryToken()
                         <div class="form-body">

@@ -2233,6 +2233,7 @@ namespace Banner
             }
             else if (!NowURL.ToLower().Contains("/home/login") || !NowURL.ToLower().Contains("/home/logout"))
                 SetAlert("請先登入", 2, (NowURL.ToLower().StartsWith("/web/") ? "/Web/Home/Login" : "/Admin/Home/Login"));
+            ViewBag._OIID = 0;
 
             ViewBag._CSS1 = "";
             ViewBag._URL = NowURL;
@@ -2550,6 +2551,39 @@ namespace Banner
                 MAs = MAs.Where(q => q.ACID == ACID);
 
             return MAs;
+        }
+        //取得地址的字串
+        public string GetLocationString(Location L)
+        {
+            string str = "";
+            if (L != null)
+            {
+                switch (L.ZipCode.GroupName)
+                {
+                    case "鄉鎮市區":
+                        {
+                            str = GetZipData(L.ZID, true) + L.Address;
+                        }
+                        break;
+                    case "洲":
+                        {
+                            str = "海外" + L.Address.Replace("%", "</br>");
+                        }
+                        break;
+                    case "網路":
+                        {
+                            str = L.ZipCode.Title + L.Address;
+                        }
+                        break;
+                    default:
+                        {
+                            str = L.Address;
+                        }
+                        break;
+                }
+            }
+
+            return str;
         }
         #endregion
     }

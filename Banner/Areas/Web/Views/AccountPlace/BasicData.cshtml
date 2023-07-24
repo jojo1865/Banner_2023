@@ -1,0 +1,422 @@
+﻿@model Banner.Areas.Web.Controllers.AccountPlaceController.cAccount_Basic
+@{
+    string StyleAdd = "";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+<style>
+    main {
+        padding: 0;
+        position: relative;
+    }
+
+    .section-card {
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        gap: 16px;
+    }
+
+    .header-container {
+        margin-top: 32px;
+    }
+
+        .header-container:first-child {
+            margin-top: 0;
+        }
+
+    .btn-verify-phone,
+    .btn-verify-email {
+        margin-top: 6px;
+    }
+
+    .action-bar {
+        width: 100%;
+    }
+
+    .alertbtn {
+        line-height: 4px !important;
+    }
+</style>
+<div class="body-container" style="height: calc(100vh - 164px); padding-bottom:84px;">
+    <div class="section-container">
+
+        <form method="post" id="form1">
+            @Html.AntiForgeryToken()
+
+            <div class="row w-100">
+                <div class="col-6">
+                    <div class="form-card-group">
+                        <div class="header-container no-border">
+                            <div class="header-left-border"></div>
+                            <h5 class="header font-bold">帳戶資訊</h5>
+                        </div>
+                        <div class="section-card">
+                            <div class="form-group">
+                                <label>帳號<span>*</span></label>
+                                <input id="txb_Login" class="form-control form-control-lg input-underline" />
+                            </div>
+                            <div class="row">
+                                <div class="col-10 d-flex">
+                                    <div class="form-group" style="flex: 1">
+                                        <label>密碼<span>*</span></label>
+                                        <input id="txb_Password" type="password" class="form-control form-control-lg input-underline" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>&nbsp;</label>
+                                        <div class="visibility-container">
+                                            <span class="material-icons"
+                                                  onclick="togglePasswordVisibility(this,'txb_Password')">
+                                                visibility_off
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="form-group password-form-group">
+                                        <label>&nbsp;</label>
+                                        <div class="chg-pwd-container">
+                                            @Html.Hidden("hid_ACID", Model.AC.ACID.ToString())
+                                            <button class="form-control btn btn-primary btn-round" onclick="return SavePW();">
+                                                變更密碼
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-card-group">
+                        <div class="header-container no-border">
+                            <div class="header-left-border"></div>
+                            <h5 class="header font-bold">個人資料</h5>
+                        </div>
+                        <div class="section-card">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label>姓名<span>*</span></label>
+                                        @Html.TextBox("txb_Name", Model.AC.Name, new { @class = "form-control form-control-lg input-underline" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>性別<span>*</span></label><br />
+                                <div class="form-check form-check-inline">
+                                    @Html.RadioButton("cbox_Sex", true, Model.AC.ManFlag, new { @id = "cbox_Sex1", @class = "form-check-input" })
+                                    @Html.Label("男", new { @class = "form-check-label", @for = "cbox_Sex1" })
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    @Html.RadioButton("cbox_Sex", false, !Model.AC.ManFlag, new { @id = "cbox_Sex2", @class = "form-check-input" })
+                                    @Html.Label("女", new { @class = "form-check-label", @for = "cbox_Sex2" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>身分證字號 (或居留證 / 護照號碼)</label>
+                                @Html.TextBox("txb_IDNumber", Model.AC.IDNumber, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入身分證字號或居留證 / 護照號碼" })
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group" style="flex: 1">
+                                        <label>出生年月日 (西元)<span>*</span></label>
+                                        @Html.TextBox("txb_Birthday", Model.AC.Birthday.ToString("yyyy-MM-dd"), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>教育程度</label>
+                                @Html.DropDownList("ddl_EducationTypes", Model.EducationTypes, new { @class = "form-select form-select-lg" })
+                            </div>
+                            <div class="form-group">
+                                <label>職業</label>
+                                @Html.DropDownList("ddl_JobTypes", Model.JobTypes, new { @class = "form-select form-select-lg" })
+                            </div>
+                            <div class="form-group">
+                                <label>婚姻</label>
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("rbl_MarriageType", 0, Model.AC.MarriageType == 0, new { @id = "rbl_MarriageFlag0", @class = "form-check-input" })
+                                            @Html.Label("單身", new { @class = "form-check-label", @for = "rbl_MarriageFlag0" })
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("rbl_MarriageType", 1, Model.AC.MarriageType == 1, new { @id = "rbl_MarriageFlag1", @class = "form-check-input" })
+                                            @Html.Label("已婚", new { @class = "form-check-label", @for = "rbl_MarriageFlag1" })
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("rbl_MarriageType", 2, Model.AC.MarriageType == 2, new { @id = "rbl_MarriageFlag2", @class = "form-check-input" })
+                                            @Html.Label("其他", new { @class = "form-check-label", @for = "rbl_MarriageFlag2" })
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-group m-0">
+                                            @Html.TextBox("txb_MarriageNote", Model.AC.MarriageNote, new { @class = "form-control form-control-lg input-underline", @placeholder = "自填" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-card-group">
+                        <div class="header-container no-border">
+                            <div class="header-left-border"></div>
+                            <h5 class="header font-bold">社群資料</h5>
+                        </div>
+                        <div class="section-card">
+                            <label>社群帳號<span>*</span></label>
+                            @foreach (var CM in Model.Coms.OrderByDescending(q => q.SortNo))
+                            {
+                                <div class="form-group">
+                                    <label>@CM.Title</label>
+                                    @Html.TextBox(CM.ControlName, CM.InputData, new { @class = "form-control form-control-lg input-underline", @placeholder = (CM.SortNo == 0 ? "若沒有社群帳號請填寫：無" : "請輸入" + CM.Title) })
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-card-group">
+                        <div class="header-container no-border">
+                            <div class="header-left-border"></div>
+                            <h5 class="header font-bold">信仰資料</h5>
+                        </div>
+                        <div class="section-card">
+                            <div class="form-group">
+                                <label>受洗狀態<span>*</span></label>
+                                <div class="form-check">
+                                    @Html.RadioButton("rbl_BaptizedType", 1, Model.AC.BaptizedType > 0, new { @id = "rbl_Baptized2", @class = "form-check-input", @onchange = "ShowBaptizedTypeddl(this)" })
+                                    @Html.Label("已受洗", new { @class = "form-check-label", @for = "rbl_Baptized2" })
+                                </div>
+                                @{
+                                    if (Model.AC.BaptizedType == 0)
+                                    {
+                                        StyleAdd = "display:none";
+                                    }
+                                }
+                                @Html.DropDownList("ddl_BaptizedType", Model.BaptizedTypes, new { @class = "form-select form-select-lg select-baptism-status", @style = StyleAdd })
+                                <div class="form-check">
+                                    @Html.RadioButton("rbl_BaptizedType", 0, Model.AC.BaptizedType == 0, new { @id = "rbl_Baptized1", @class = "form-check-input", @onchange = "HideBaptizedTypeddl(this)" })
+                                    @Html.Label("未受洗", new { @class = "form-check-label", @for = "rbl_Baptized1" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-card">
+                            <div class="form-group">
+                                <label>旌旗主日聚會點<span>*</span></label>
+                                @Html.DropDownList("ddl_ML", Model.MLs, new { @class = "form-select form-select-lg select-baptism-status" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-card-group">
+                        <div class="header-container no-border">
+                            <div class="header-left-border"></div>
+                            <h5 class="header font-bold">入組意願調查</h5>
+                        </div>
+                        @{
+                            var htmlAT_cbox = new Dictionary<string, object>();
+                            var htmlAT_ddl = new Dictionary<string, object>();
+                            if (Model.JoinGroupType == 2)
+                            {
+                                htmlAT_cbox.Add("disabled", "disabled");
+                                htmlAT_cbox.Add("class", "form-check-input");
+                                htmlAT_cbox.Add("id", "");
+
+                                htmlAT_ddl.Add("disabled", "disabled");
+                                htmlAT_ddl.Add("class", "form-select form-select-lg select-baptism-status");
+                            }
+                            else
+                            {
+                                htmlAT_cbox.Add("class", "form-check-input");
+                                htmlAT_cbox.Add("id", "");
+
+                                htmlAT_ddl.Add("class", "form-select form-select-lg select-baptism-status");
+                            }
+                        }
+                        <div class="section-card">
+                            <div class="form-check form-check-inline">
+                                @{ htmlAT_cbox["id"] = "rbut_GroupFlag1";}
+                                @Html.RadioButton("rbut_GroupFlag", 0, Model.JoinGroupType == 0, htmlAT_cbox)
+                                @Html.Label("只是訪客，暫無入組意願", new { @class = "form-check-label", @for = "rbut_GroupFlag1" })
+                            </div>
+                            <div class="form-check form-check-inline">
+                                @{ htmlAT_cbox["id"] = "rbut_GroupFlag2";}
+                                @Html.RadioButton("rbut_GroupFlag", 1, Model.JoinGroupType == 1, htmlAT_cbox)
+                                @Html.Label("對加入小組有意願", new { @class = "form-check-label", @for = "rbut_GroupFlag2" })
+                                @{
+                                    for (int i = 0; i < 2; i++)
+                                    {
+                                        var _cJGWs = Model.cJGWs.Where(q => q.JoinType == (i + 1)).OrderBy(q => q.SortNo);
+                                        var _cJGW = _cJGWs.First();
+                                        <div class="inner">
+                                            <div class="form-check">
+                                                @{ htmlAT_cbox["id"] = "cbox_JoinGroupWish" + _cJGW.JoinType;}
+                                                @Html.CheckBox("cbox_JoinGroupWish", _cJGW.SelectFalg, htmlAT_cbox)
+                                                @Html.Label(_cJGW.GroupTitle, new { @class = "form-check-label", @for = "cbox_JoinGroupWish" + _cJGW.JoinType })
+                                            </div>
+                                            <div class="inner border-dotted">
+                                                @foreach (var cJGW in _cJGWs)
+                                                {
+                                                    <div class="row">
+                                                        <div class="col-2">
+                                                            <div class="form-group">
+                                                                <label>志願序</label>
+                                                                <br />
+                                                                <div class="volunteer"><label>@cJGW.SortNo<span>@(cJGW.SortNo == 1 ? "*" : "")</span></label></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-5">
+                                                            <div class="form-group">
+                                                                <label>星期</label>
+                                                                @Html.DropDownList(cJGW.ddl_Weekly.ControlName, cJGW.ddl_Weekly.ddlList, htmlAT_ddl)
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-5">
+                                                            <div class="form-group">
+                                                                <label>時段</label>
+                                                                @Html.DropDownList(cJGW.ddl_Time.ControlName, cJGW.ddl_Time.ddlList, htmlAT_ddl)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+
+                            </div>
+
+                            <div class="form-check form-check-inline">
+                                @{
+                                    htmlAT_cbox["id"] = "rbut_GroupFlag3";
+                                    htmlAT_cbox.Remove("disabled");
+                                }
+                                @Html.RadioButton("rbut_GroupFlag", 2, Model.JoinGroupType == 2, htmlAT_cbox)
+                                @Html.Label("已參加小組", new { @class = "form-check-label", @for = "rbut_GroupFlag3" })
+                                <br />
+                                @Html.Label("txb_GroupNo", Model.GroupNo, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                <br />
+                                <div class="text-end">
+                                    <span class="lab_info">若未知小組編號，請洽詢小組長</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row w-100" style="margin-top: 32px">
+                <div class="col-12">
+                    <div class="header-container no-pb">
+                        <div class="header-left-border"></div>
+                        <h5 class="header font-bold">通訊資料</h5>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="section-card">
+                        <label>通信地址<span>*</span></label>
+                        @Html.Action("_Location_User", "Include", new { LID = Model.L.LID })
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="section-card">
+                        @foreach (var Con in Model.Cons.OrderBy(q => q.SortNo))
+                        {
+                            if (Con.C.ContectType == 0 || Con.C.ContectType == 1)//手機或市話
+                            {
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>@(Con.Title)<span>@(Con.RequiredFlag ? "*" : "")</span></label>
+                                            @Html.DropDownList(Con.ControlName1, Con.Zips, new { @class = "form-select form-select-lg select-baptism-status" })
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>&nbsp;</label>
+                                            @Html.TextBox(Con.ControlName2, Con.C.ContectValue, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入" + Con.Title })
+
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="d-none">
+                                            @Html.CheckBox("cbox_PhoneCheck")
+                                        </div>
+                                    </div>
+                                    @if (Con.RequiredFlag)
+                                    {
+                                        <div class="col-auto" id="div_Checkbtn_Phone" style="display:block;">
+                                            <button class="btn btn-primary btn-round btn-sm btn-verify-phone" onclick="return SendSNSCheckPhone(@Con.ControlName1,@Con.ControlName2, 'lab_HidPhoneNo', 'txb_InputCheckCode_Phone','cbox_PhoneCheck', 'div_Checkbtn_Phone', 'div_Success_Phone','div_Miss_Phone')">
+                                                取得手機驗證碼
+                                            </button>
+                                        </div>
+                                        <div class="col-auto" id="div_Success_Phone" style="display:none;">
+                                            <img src="/Areas/Web/Content/Img/step-check.svg" /><span style="color: #116A2C">驗證成功</span>
+                                        </div>
+                                        <div class="col-auto" id="div_Miss_Phone" style="display:none;">
+                                            <img src="/Areas/Web/Content/Img/step-warning.svg" /><span style="color: red">驗證失敗</span>
+                                        </div>
+                                    }
+
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-group">
+                                    <label>@(Con.Title)<span>@(Con.RequiredFlag ? "*" : "")</span></label>
+                                    @Html.TextBox(Con.ControlName2, Con.C.ContectValue, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入" + Con.Title })
+                                    @if (Con.RequiredFlag)
+                                    {
+                                        <div class="row">
+                                            <div class="col"></div>
+                                            <div class="col-auto">
+                                                <button class="btn btn-primary btn-round btn-sm btn-verify-email">
+                                                    電子郵件驗證
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+<div class="action-bar">
+    @if ((((bool[])ViewBag._Power)[1] && Model.AC.ACID == 0) || (((bool[])ViewBag._Power)[2] && Model.AC.ACID > 0) || true)
+    {
+        <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
+    }
+    <a href="/Web/AccountPlace/Index" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />取消</a>
+</div>
+
+<div id="div_PhoneCheck" class="d-none">
+    <div style="width:420px;">
+        <div class="row">
+            <div class="col text-start pb-2" style="border-bottom:2px solid darkblue;">已傳送驗證碼至</div>
+        </div>
+        <div class="row mt-2 mb-4">
+            <div class="col-6 text-start">
+                <img src="~/Areas/Web/Content/Img/ic_baseline-phone-iphone.svg" /><span name="lab_HidPhoneNo"></span>
+            </div>
+            <div class="col-6 text-end">
+                <a>重新傳送驗證碼</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col fw-bold text-start">輸入驗證碼</div>
+        </div>
+        <div class="row">
+            <div class="col text-start">
+                <input class="form-control form-control-lg input-underline" name="txb_InputCheckCode_Phone" />
+            </div>
+        </div>
+
+    </div>
+</div>

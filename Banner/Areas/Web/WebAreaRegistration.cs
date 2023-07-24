@@ -16,8 +16,8 @@ namespace Banner.Areas.Web
         {
             context.MapRoute(
                 "Web_default",
-                "Web/{controller}/{action}/{id}",
-                new { action = "Index", id = UrlParameter.Optional }
+                "Web/{controller}/{action}/{ID}",
+                new { action = "Index", ID = UrlParameter.Optional }
             );
         }
     }

@@ -48,13 +48,6 @@ main {
     height:auto;
 }
 
-.section-card {
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
-    gap: 16px;
-}
-
 .header-container {
     /*margin-top: 32px;*/
 }
@@ -73,7 +66,9 @@ main {
 .body-container{
     padding:0 48px;
 }
-
+.lab_info {
+    color: var(--bs-info);
+}
 .lab_gray {
     color: var(--bs-gray-500);
 }
@@ -81,7 +76,11 @@ main {
 .lab_DarkBlue {
     color: var(--bs-secondary);
 }
-
+.div_NoDataMsg {
+    color: #3764ac;
+    font-size: 20px;
+    font-weight: 600;
+}
 /*按鈕等待*/
 @keyframes spin {
     to {

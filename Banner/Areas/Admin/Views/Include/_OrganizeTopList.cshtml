@@ -3,7 +3,7 @@
     @foreach (var M in Model)
     {
         <div class="col">
-            <label class="font-bold">@M.Title</label>
+            <label class="font-bold @(M.ControlName)">@M.Title</label>
         </div>
     }
 </div>

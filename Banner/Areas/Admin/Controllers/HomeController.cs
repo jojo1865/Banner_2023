@@ -40,7 +40,7 @@ namespace Banner.Areas.Admin.Controllers
         public ActionResult Login()
         {
             GetViewBag();
-            /*if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
+            if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
             {
                 if (GetACID() <= 0)
                 {
@@ -51,7 +51,7 @@ namespace Banner.Areas.Admin.Controllers
             }
             else if(Request.Url.Host == "web-banner.viuto-aiot.com")
                 Response.Redirect("/Web/Home/Index");
-            */
+            
             return View();
         }
         [HttpPost]
@@ -431,12 +431,24 @@ namespace Banner.Areas.Admin.Controllers
                         var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == ID);
                         if (OI != null)
                         {
-                            OI.ActiveFlag = !OI.ActiveFlag;
-                            OI.UpdDate = DT;
-                            OI.SaveACID = GetACID();
-                            DC.SubmitChanges();
+                            var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ParentID == OI.OIID);
+                            if (OIs.Count() > 0)
+                                Msg = "請先移除此組織下的組織才可停用";
+                            else if(OI.OID == 8)
+                            {
+                                var Ms = OI.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag);
+                                if(Ms.Count()>0)
+                                    Msg = "請先移除此小組內的成員才可停用";
+                            }
+                            if(Msg == "")
+                            {
+                                OI.ActiveFlag = !OI.ActiveFlag;
+                                OI.UpdDate = DT;
+                                OI.SaveACID = GetACID();
+                                DC.SubmitChanges();
 
-                            Msg = "OK";
+                                Msg = "OK";
+                            }
                         }
                         else
                             Msg = "查無此組織";

@@ -5,12 +5,11 @@
         <h5 class="header font-bold">@ViewBag._Title</h5>
     </div>
     <div class="body-container">
-        @Html.Action("_OrganizeTopList", "Include")
         @{
             Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
             if (Model != null)
             {
-
+                @Html.Action("_OrganizeTopList", "Include", new { OID = Model.OID })
                 <form method="post" id="form1">
                     @Html.AntiForgeryToken()
                     <div class="search-form">

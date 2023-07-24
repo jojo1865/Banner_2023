@@ -8,9 +8,9 @@
     <div class="section-container">
         <nav class="breadcrumb-nav">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/Web/AccountPlace/GroupData_Index">小組資訊</a></li>
+                <li class="breadcrumb-item"><a href="/Web/GroupPlace/Index/@ViewBag._OIID">小組資訊</a></li>
                 <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
-                <li class="breadcrumb-item"><a href="/Web/AccountPlace/GroupData_Aldult_List">組員名單管理</a></li>
+                <li class="breadcrumb-item"><a href="">小組名單</a></li>
             </ol>
         </nav>
         <div class="header-container">
@@ -21,7 +21,6 @@
         <div class="w-100 mt-2">
             <form method="post" id="form1">
                 @Html.AntiForgeryToken()
-                <span class="lab_DarkBlue">．落戶原則：小組員需4次聚會議以上，再進行落戶。</span>
                 @Html.Action("_TableList", "Include", new { cTL = Model })
             </form>
         </div>

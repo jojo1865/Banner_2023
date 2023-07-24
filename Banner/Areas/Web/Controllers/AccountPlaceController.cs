@@ -1,11 +1,13 @@
 ﻿using Antlr.Runtime;
 using Banner.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
+using static Banner.Areas.Admin.Controllers.AccountSetController;
 using static Banner.Areas.Admin.Controllers.OrganizeSetController;
 
 namespace Banner.Areas.Web.Controllers
@@ -13,746 +15,537 @@ namespace Banner.Areas.Web.Controllers
     public class AccountPlaceController : PublicClass
     {
         int ACID = 0;
-        // GET: Web/AccountPlace
-
+        #region 會員中心-首頁
+        public class cAccountPlace_Index
+        {
+            public List<cMeetingMsg> cMLs = new List<cMeetingMsg>();
+            //public cTree Tree = new cTree();
+        }
+        public class cMeetingMsg
+        {
+            public string JobTitle = "";
+            public string OIList = "";
+            public string GroupTitle = "";
+            public string Week = "";
+            public string Time = "";
+            public string Location = "";
+        }
         public ActionResult Index()
         {
             GetViewBag();
             ACID = GetACID();
+            cAccountPlace_Index N = new cAccountPlace_Index();
+            N.cMLs = new List<cMeetingMsg>();
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag);
-            if (AC == null)
-                SetAlert("請先登入", 2, "/Web/Home/Login");
-            else
-                Response.Redirect("/Web/AccountPlace/GroupData_Index");
-            return View("Index_Default");
+            if (AC != null)
+            {
+
+                var MOIs = GetMOIAC(0, 0, ACID);
+                foreach (var MOI in MOIs)
+                {
+                    cMeetingMsg cM = new cMeetingMsg
+                    {
+                        JobTitle = MOI.OrganizeInfo.ACID == ACID ? "小組長" : "小組員",
+                        OIList = "",
+                        GroupTitle = MOI.OrganizeInfo.Title + MOI.OrganizeInfo.Organize.Title,
+                        Week = "--",
+                        Time = "--",
+                        Location = "--",
+                    };
+                    #region 小組層級
+
+                    string sOITitle = MOI.OrganizeInfo.Title + MOI.OrganizeInfo.Organize.Title + "(" + MOI.OrganizeInfo.Organize.Title + "編號:" + MOI.OrganizeInfo.OIID.ToString().PadLeft(5, '0') + ")";
+                    var OI_ = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == MOI.OrganizeInfo.ParentID && !q.DeleteFlag && q.ActiveFlag && q.OID > 4);
+                    while (OI_ != null)
+                    {
+                        sOITitle = OI_.Title + OI_.Organize.Title + "/" + sOITitle;
+                        OI_ = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI_.ParentID && !q.DeleteFlag && q.ActiveFlag && q.OID > 4);
+                    }
+                    cM.OIList = sOITitle;
+                    #endregion
+                    #region 小組聚會點
+
+                    var MLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.TargetID == MOI.OIID && q.ActiveFlag && !q.DeleteFlag);
+                    if (MLS != null)
+                    {
+                        cM.Week = sWeeks[MLS.WeeklyNo];
+                        cM.Time = MLS.S_hour.ToString().PadLeft(2, '0') + ":" +
+                            MLS.S_minute.ToString().PadLeft(2, '0') + "~" +
+                            MLS.E_hour.ToString().PadLeft(2, '0') + ":" +
+                            MLS.E_minute.ToString().PadLeft(2, '0');
+
+                        var L = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MID);
+                        cM.Location = GetLocationString(L);
+                    }
+
+                    #endregion
+                    N.cMLs.Add(cM);
+                }
+            }
+
+            return View(N);
         }
-        public ActionResult Index_Default()
+        #endregion
+        #region 會員中心-基本資料
+        public class cAccount_Basic
         {
-            GetViewBag();
-            return View();
-        }
-        #region 小組資訊-首頁-聚會資料
-        public class cGroupData_Index
-        {
-            public M_Location_Set MS = new M_Location_Set();
-            public List<SelectListItem> SLIs = new List<SelectListItem>();
-            public Location L = new Location();
             public Account AC = new Account();
+            public List<SelectListItem> EducationTypes = ddl_EducationTypes;//教育程度
+            public List<SelectListItem> JobTypes = ddl_JobTypes;//職業
+            //受洗狀態
+            public List<SelectListItem> BaptizedTypes = new List<SelectListItem> {
+                new SelectListItem{ Text="旌旗受洗",Value="1",Selected=true},
+                new SelectListItem{ Text="非旌旗受洗",Value="2"}
+            };
+            public List<SelectListItem> MLs = new List<SelectListItem>();//主日聚會點
+            public List<ListInput> Coms = new List<ListInput>();//社群帳號
+            public List<cContect> Cons = new List<cContect>();//通訊資料
+            public Location L = new Location(); //通信地址
+
+            public int JoinGroupType = 0;//入組意願調查選擇
+            public List<cJoinGroupWish> cJGWs = new List<cJoinGroupWish>();//加入小組有意願選項
+            public string GroupNo = "";//想加入小組的編號           
+        }
+        public class cContect
+        {
+            public string Title = "";
+            public string ControlName1 = "";
+            public string ControlName2 = "";
+            public bool RequiredFlag = false;
+            public int SortNo = 0;
             public Contect C = new Contect();
+            public List<SelectListItem> Zips = new List<SelectListItem>();
         }
-        [HttpGet]
-        public ActionResult GroupData_Index()
+        public class cJoinGroupWish
         {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-            cGroupData_Index N = new cGroupData_Index();
-            N.AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
-            if (N.AC == null)
-                SetAlert("請先登入", 2, "/Web/Home/Login");
+            public bool SelectFalg = false;
+            public int JoinType = 0;
+            public int SortNo = 0;
+            public string GroupTitle = "";
+            public JoinGroupWish JGW = new JoinGroupWish();
+            public ListSelect ddl_Weekly = new ListSelect();
+            public ListSelect ddl_Time = new ListSelect();
+        }
+        public cAccount_Basic GerAccountData(int ID, FormCollection FC)
+        {
+            var N = new cAccount_Basic();
+            ViewBag._CSS1 = "~/Areas/Web/Content/css/form.css";
+            #region 物件初始化
+
+            //主日聚會點初始化
+            N.MLs.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
+            N.MLs.AddRange((from q in DC.M_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag && q.SetType == 0)
+                            select new SelectListItem { Text = q.Meeting_Location.Title, Value = q.MLID.ToString() }).ToList());
+            //社群帳號初始化
+            N.Coms = new List<ListInput>();
+            for (int i = 0; i < CommunityTitle.Length; i++)
+                N.Coms.Add(new ListInput { Title = CommunityTitle[i], SortNo = i, ControlName = "txb_Com_" + i, InputData = "" });
+            //聯絡方式初始化
+            var SLI = (from q in DC.ZipCode.Where(q => q.GroupName == "國" && q.ActiveFlag && q.Title != "線上").OrderBy(q => q.ParentID).ThenBy(q => q.Code)
+                       select new SelectListItem { Text = q.Title + q.Code, Value = q.ZID.ToString(), Selected = q.ZID == 10 }).ToList();
+            string sSLI = JsonConvert.SerializeObject(SLI);
+
+            //List<SelectListItem>_SLI = JsonConvert.DeserializeObject<List<SelectListItem>>(sSLI);
+            N.Cons = new List<cContect>
+                {
+                    new cContect{Title="手機號碼",ControlName1="ddl_Zip_Con0",ControlName2 = "txb_Value_Con0",RequiredFlag=true,SortNo=0,C=new Contect { TargetID = ID, TargetType = 2, ContectType = 1, CID = 0, ContectValue = "",ZID=10 },Zips = (JsonConvert.DeserializeObject<List<SelectListItem>>(sSLI))},//手機1
+                    new cContect{Title="手機號碼2",ControlName1="ddl_Zip_Con1",ControlName2 = "txb_Value_Con1",SortNo=1,C=new Contect { TargetID = ID, TargetType = 2, ContectType = 1, CID = 0, ContectValue = "",ZID=10 },Zips = (JsonConvert.DeserializeObject<List<SelectListItem>>(sSLI))},//手機2
+                    new cContect{Title="電話(市話)",ControlName1="ddl_Zip_Con2",ControlName2 = "txb_Value_Con2",SortNo=2,C=new Contect { TargetID = ID, TargetType = 2, ContectType = 0, CID = 0, ContectValue = "",ZID=10 },Zips =(JsonConvert.DeserializeObject<List<SelectListItem>>(sSLI))},//市話
+                    new cContect{Title="Email",ControlName2 = "txb_Value_Con3",RequiredFlag=true,SortNo=3,C=new Contect { TargetID = ID, TargetType = 2, ContectType = 2, CID = 0, ContectValue = "",ZID=1 },Zips = null},//Email1
+                    new cContect{Title="Email2",ControlName2 = "txb_Value_Con4",SortNo=4,C=new Contect { TargetID = ID, TargetType = 2, ContectType = 2, CID = 0, ContectValue = "",ZID=1 },Zips = null}//Email2
+                };
+            //加入小組有意願選項初始化
+            N.cJGWs = new List<cJoinGroupWish>();
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 1; j < 4; j++)
+                {
+                    cJoinGroupWish cJ = new cJoinGroupWish();
+                    cJ.JGW = new JoinGroupWish
+                    {
+                        ACID = ID,
+                        JoinType = (i + 1),
+                        SortNo = j,
+                        WeeklyNo = 0,
+                        TimeNo = 0
+                    };
+                    cJ.GroupTitle = i == 0 ? "實體" : "線上";
+                    cJ.JoinType = (i + 1);
+                    cJ.SortNo = j;
+                    cJ.ddl_Weekly = new ListSelect
+                    {
+                        Title = "星期",
+                        SortNo = j,
+                        ControlName = "ddl_Join" + i + "_WeeklyNo_" + j,
+                        ddlList = new List<SelectListItem>()
+                    };
+                    cJ.ddl_Time = new ListSelect
+                    {
+                        Title = "時段",
+                        SortNo = j,
+                        ControlName = "ddl_Join" + i + "_TimeNo_" + j,
+                        ddlList = new List<SelectListItem>()
+                    };
+                    cJ.ddl_Weekly.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
+                    cJ.ddl_Time.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
+                    for (int k = 0; k < sWeeks.Length; k++)
+                        cJ.ddl_Weekly.ddlList.Add(new SelectListItem { Text = sWeeks[k], Value = (k + 1).ToString() });
+                    for (int k = 0; k < sTimeSpans.Length; k++)
+                        cJ.ddl_Time.ddlList.Add(new SelectListItem { Text = sTimeSpans[k], Value = (k + 1).ToString() });
+                    N.cJGWs.Add(cJ);
+                }
+            }
+            #endregion
+            #region 會員資料填入
+
+            N.AC = DC.Account.FirstOrDefault(q => q.ACID == ID && !q.DeleteFlag);
+            if (N.AC == null && ID > 0)
+                Error += "此帳號已被移除";
+            else if (ID == 0)
+            {
+                N.AC = new Account
+                {
+                    Birthday = DT,
+                    ManFlag = true,
+                    MarriageType = 0,
+                };
+                N.L = new Location();
+                N.GroupNo = "";
+
+            }
             else
             {
-                for (int i = 0; i < sWeeks.Length; i++)
-                    N.SLIs.Add(new SelectListItem { Text = sWeeks[i], Value = (i + 1).ToString(), Selected = i == 0 });
-                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag);
-                if (OI == null)
-                    SetAlert("您尚未被指定為某小組的小組長,無法進行設定", 2, "/Web/AccountPlace/Index_Default");
-                else
+                #region 基本資料
+
+                //教育程度
+                N.EducationTypes.ForEach(q => q.Selected = false);
+                N.EducationTypes.First(q => q.Value == N.AC.EducationType.ToString()).Selected = true;
+                //職務
+                N.JobTypes.ForEach(q => q.Selected = false);
+                N.JobTypes.First(q => q.Value == N.AC.JobType.ToString()).Selected = true;
+                //受洗狀況
+                if (N.AC.BaptizedType > 0)
                 {
-                    N.MS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.TargetID == OI.OIID && !q.DeleteFlag);
-                    if (N.MS == null)
+                    N.BaptizedTypes[0].Selected = N.AC.BaptizedType == 1;
+                    N.BaptizedTypes[1].Selected = N.AC.BaptizedType == 2;
+                }
+                //主日聚會點
+                if (FC == null)
+                {
+                    var ML = (from q in DC.M_ML_Account.Where(q => !q.DeleteFlag && q.ACID == N.AC.ACID)
+                              join p in DC.M_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SetType == 0)
+                              on q.MLID equals p.MLID
+                              select q).FirstOrDefault();
+                    if (ML != null)
                     {
-                        N.MS = new M_Location_Set
+                        if (N.MLs.FirstOrDefault(q => q.Value == ML.MLID.ToString()) != null)
                         {
-                            Meeting_Location = new Meeting_Location { Code = OI.OIID.ToString().PadLeft(6, '0'), Title = OI.Title + OI.Organize.Title + "聚會點" },
-                            SetType = 1,
-                            TargetID = OI.OIID,
-                            WeeklyNo = 7,
-                            TimeNo = 0,
-                            S_hour = 9,
-                            S_minute = 0,
-                            E_hour = 12,
-                            E_minute = 0
-                        };
-                        N.L = new Location { ZID = 10, Address = "", LID = 0 };
-                        N.C = new Contect { ZID = 10, ContectType=0 };
+                            N.MLs.ForEach(q => q.Selected = false);
+                            N.MLs.First(q => q.Value == ML.MLID.ToString()).Selected = true;
+                        }
                     }
-                    else
-                    {
-                        N.L = DC.Location.FirstOrDefault(q => q.TargetID == N.MS.MID && q.TargetType == 3);
-                        if (N.L == null)
-                            N.L = new Location { ZID = 10, Address = "", LID = 0 };
-                        N.C = DC.Contect.FirstOrDefault(q => q.TargetID == N.MS.MID && q.TargetType == 3);
-                        if(N.C == null)
-                            N.C = new Contect { ZID = 10, ContectType = 0 };
-                    }
-
-                    N.SLIs.ForEach(q => q.Selected = false);
-                    N.SLIs.First(q => q.Value == N.MS.WeeklyNo.ToString()).Selected = true;
                 }
-            }
-            return View(N);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult GroupData_Index(FormCollection FC)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-            cGroupData_Index N = new cGroupData_Index();
-            N.AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
-            for (int i = 0; i < sWeeks.Length; i++)
-                N.SLIs.Add(new SelectListItem { Text = sWeeks[i], Value = (i + 1).ToString(), Selected = i == 0 });
-
-            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag);
-            if (OI != null)
-            {
-                N.MS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.TargetID == OI.OIID && !q.DeleteFlag);
-                if (N.MS == null)
+                //社群狀況
+                if (FC == null)
                 {
-                    N.MS = new M_Location_Set
+                    var CMs = N.AC.Community.ToList();
+                    for (int i = 0; i < CommunityTitle.Length; i++)
                     {
-                        Meeting_Location = new Meeting_Location
+                        var CM = CMs.FirstOrDefault(q => q.CommunityType == i);
+                        if (CM != null)
+                            N.Coms[i].InputData = CM.CommunityValue;
+                    }
+                }
+                //地址
+                var L = DC.Location.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == ID);
+                if (L != null)
+                    N.L = L;
+                else
+                    N.L = new Location();
+                #endregion
+                #region 聯絡方式
+                var Cons = DC.Contect.Where(q => q.TargetType == 2 && q.TargetID == ID).OrderBy(q => q.ContectType).ToList();
+
+                if (Cons.Count() > 0)
+                {
+                    int iSort = 0;
+                    foreach (var Con in Cons.Where(q => q.ContectType == 1))
+                    {
+                        var Con_ = N.Cons.FirstOrDefault(q => q.SortNo == iSort);
+                        if (Con_ != null)
                         {
-                            Code = OI.OIID.ToString().PadLeft(6, '0'),
-                            Title = OI.Title + OI.Organize.Title + "聚會點",
-                            ActiveFlag = true,
-                            DeleteFlag = false,
-                            CreDate = DT,
-                            UpdDate = DT,
-                            SaveACID = ACID
-                        },
-                        SetType = 1,
-                        TargetID = OI.OIID,
-                        WeeklyNo = 7,
-                        TimeNo = 0,
-                        S_hour = 9,
-                        S_minute = 0,
-                        E_hour = 12,
-                        E_minute = 0,
-                        ActiveFlag = true,
-                        DeleteFlag = false,
-                        CreDate = DT,
-                        UpdDate = DT,
-                        SaveACID = ACID
-                    };
-                    N.L = new Location { ZID = 10, Address = "", LID = 0 };
-                    N.C = new Contect { ZID = 10, ContectType = 0 };
+                            Con_.C = Con;
+                            if (Con.ZID != 10 && Con.ZID != 1)
+                            {
+                                Con_.Zips.ForEach(q => q.Selected = false);
+                                Con_.Zips.First(q => q.Value == Con.ZID.ToString()).Selected = true;
+                            }
+                        }
+
+                        iSort++;
+                        if (iSort >= 2) break;
+                    }
+                    foreach (var Con in Cons.Where(q => q.ContectType == 0))
+                    {
+                        var Con_ = N.Cons.FirstOrDefault(q => q.SortNo == iSort);
+                        if (Con_ != null)
+                        {
+                            Con_.C = Con;
+                            if (Con.ZID != 10 && Con.ZID != 1)
+                            {
+                                Con_.Zips.ForEach(q => q.Selected = false);
+                                Con_.Zips.First(q => q.Value == Con.ZID.ToString()).Selected = true;
+                            }
+                        }
+
+                        iSort++;
+                        if (iSort >= 3) break;
+                    }
+                    foreach (var Con in Cons.Where(q => q.ContectType == 2))
+                    {
+                        var Con_ = N.Cons.FirstOrDefault(q => q.SortNo == iSort);
+                        if (Con_ != null)
+                        {
+                            Con_.C = Con;
+                            if (Con.ZID != 10 && Con.ZID != 1)
+                            {
+                                Con_.Zips.ForEach(q => q.Selected = false);
+                                Con_.Zips.First(q => q.Value == Con.ZID.ToString()).Selected = true;
+                            }
+                        }
+                        iSort++;
+                        if (iSort >= 5) break;
+                    }
                 }
+                #endregion
+                #region 入組意願調查
+                var MOIACs = GetMOIAC(0, 0, ID);
+                if (MOIACs.Count() == 0)
+                    N.JoinGroupType = 0;
                 else
                 {
-                    N.L = DC.Location.FirstOrDefault(q => q.TargetID == N.MS.MID && q.TargetType == 3);
-                    if (N.L == null)
-                        N.L = new Location { ZID = 10, Address = "", LID = 0 };
-                    N.C = DC.Contect.FirstOrDefault(q => q.TargetID == N.MS.MID && q.TargetType == 3);
-                    if (N.C == null)
-                        N.C = new Contect { ZID = 10, ContectType = 0 };
-                }
-                if (FC != null)
-                {
-                    N.MS.WeeklyNo = Convert.ToInt32(FC.Get("ddl_WeeklyNo"));
-                    string[] STime = FC.Get("txb_STime").Split(':');
-                    string[] ETime = FC.Get("txb_ETime").Split(':');
-                    N.MS.S_hour = Convert.ToInt32(STime[0]);
-                    N.MS.S_minute = Convert.ToInt32(STime[1]);
-                    N.MS.E_hour = Convert.ToInt32(ETime[0]);
-                    N.MS.E_minute = Convert.ToInt32(ETime[1]);
-                    N.MS.TimeNo = N.MS.S_hour < 12 ? 1 : (N.MS.S_hour < 18 ? 2 : 3);
-                    if (N.MS.S_hour > N.MS.E_hour)
-                        Error += "聚會起始時間應小於結束時間</br>";
-                    else if (N.MS.S_minute > N.MS.E_minute)
-                        Error += "聚會起始時間應小於結束時間</br>";
-
-
-                    if (FC.Get("ddl_Zip0") == "10")
+                    var Js = DC.JoinGroupWish.Where(q => q.ACID == ID).ToList();
+                    var MOIAC = MOIACs.OrderByDescending(q => q.MID).First();
+                    if (MOIAC.OIID == 1)
                     {
-                        N.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip2"));
-                        N.L.Address = FC.Get("txb_Address0");
-                    }
-                    else if (FC.Get("ddl_Zip0") == "2")
-                    {
-                        N.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip3"));
-                        N.L.Address = FC.Get("txb_Address1_1") + "%" + FC.Get("txb_Address1_2");
+                        N.JoinGroupType = 1;
+                        foreach (var cJGW in N.cJGWs)
+                        {
+                            var JGW = Js.FirstOrDefault(q => q.JoinType == cJGW.JoinType && q.SortNo == cJGW.SortNo);
+                            cJGW.JGW = JGW;
+                            if (JGW != null)
+                            {
+                                if (!cJGW.SelectFalg)
+                                    cJGW.SelectFalg = cJGW.JGW.WeeklyNo > 0 && cJGW.JGW.TimeNo > 0;
+                                cJGW.ddl_Weekly.ddlList.ForEach(q => q.Selected = false);
+                                cJGW.ddl_Weekly.ddlList.First(q => q.Value == cJGW.JGW.WeeklyNo.ToString()).Selected = true;
+                                cJGW.ddl_Time.ddlList.ForEach(q => q.Selected = false);
+                                cJGW.ddl_Time.ddlList.First(q => q.Value == cJGW.JGW.TimeNo.ToString()).Selected = true;
+                            }
+                        }
                     }
                     else
                     {
-                        N.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip0"));
-                        N.L.Address = FC.Get("txb_Address2");
+                        N.JoinGroupType = 2;
+                        N.GroupNo = MOIAC.OrganizeInfo.OIID.ToString();
                     }
 
-
-                    N.C.ZID = Convert.ToInt32(FC.Get("ddl_PhoneZip"));
-                    N.C.ContectValue = FC.Get("txb_PhoneNo");
                 }
-
-                N.SLIs.ForEach(q => q.Selected = false);
-                N.SLIs.First(q => q.Value == N.MS.WeeklyNo.ToString()).Selected = true;
-            }
-            if (Error != "")
-                SetAlert(Error, 2);
-            else
-            {
-                if (N.MS.MID == 0)
-                    DC.M_Location_Set.InsertOnSubmit(N.MS);
-                DC.SubmitChanges();
-
-                if (N.MS.MID == 0)
+                #endregion
+                #region 介面資料填入
+                if (FC != null)
                 {
-                    N.L.TargetID = N.MS.MLID;
-                    DC.Location.InsertOnSubmit(N.L);
-
-                    N.C.TargetID = N.MS.MLID;
-                    DC.Contect.InsertOnSubmit(N.C);
-                }
-                DC.SubmitChanges();
-                SetAlert("存檔完成", 1);
-            }
-            return View(N);
-        }
-        #endregion
-        #region 小組資訊-組員名單管理-小組名單
-
-        public cTableList GetGroupData_Aldult_List(FormCollection FC)
-        {
-            cTableList cTL = new cTableList();
-            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
-            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
-            cTL.Title = "小組名單";
-            cTL.NowPage = iNowPage;
-            cTL.ItemID = "";
-            cTL.NumCut = iNumCut;
-            cTL.Rs = new List<cTableRow>();
-
-            var TopTitles = new List<cTableCell>();
-
-            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 200 });
-            TopTitles.Add(new cTableCell { Title = "職分", WidthPX = 100 });
-            TopTitles.Add(new cTableCell { Title = "姓名", WidthPX = 160 });
-            TopTitles.Add(new cTableCell { Title = "性別", WidthPX = 50 });
-            TopTitles.Add(new cTableCell { Title = "生日", WidthPX = 160 });
-            TopTitles.Add(new cTableCell { Title = "手機", WidthPX = 160 });
-            TopTitles.Add(new cTableCell { Title = "受洗狀態", WidthPX = 160 });
-            TopTitles.Add(new cTableCell { Title = "備註" });
-            cTL.Rs.Add(SetTableRowTitle(TopTitles));
-            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            ACID = GetACID();
-            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8);
-            if (OI != null)
-            {
-                var Ns = GetMOIAC(OI.OID, OI.OIID, 0).Where(q => q.JoinDate != q.CreDate && q.LeaveDate == q.CreDate && q.ActiveFlag);
-                cTL.TotalCt = Ns.Count();
-                cTL.MaxNum = GetMaxNum(cTL.TotalCt, cTL.NumCut);
-                Ns = Ns.OrderByDescending(q => q.ACID == OI.ACID).ThenByDescending(q => q.CreDate).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut);
-                foreach (var N in Ns)
-                {
-                    cTableRow cTR = new cTableRow();
-                    //操作
-                    cTableCell cTC = new cTableCell();
-                    if (N.ACID != ACID)//小組長不能移除自己
-                        cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/AccountPlace/GroupData_Aldult_Remove/" + N.MID, Target = "_self", Value = "移除" });
-                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/AccountPlace/GroupData_Aldult_Edit/" + N.MID, Target = "_self", Value = "編輯" });
-                    cTR.Cs.Add(cTC);
-                    //職分
-                    cTR.Cs.Add(new cTableCell { Value = N.ACID == OI.ACID ? OI.Organize.JobTitle : "小組員" });
-                    //姓名
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.Name });
-                    //性別
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.ManFlag ? "男" : "女" });
-                    //生日
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.Birthday == N.Account.CreDate ? "--" : N.Account.Birthday.ToString(DateFormat) });
-                    //手機
-                    var Cons = DC.Contect.Where(q => q.TargetType == 2 && q.ContectType == 1 && q.TargetID == N.ACID).OrderByDescending(q => q.CID);
-                    cTR.Cs.Add(new cTableCell { Value = (Cons.Count() > 0 ? string.Join(",", Cons.Select(q => q.ContectValue)) : "--") });
-                    //受洗狀態
-                    var B = DC.Baptized.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.BID).FirstOrDefault();
-                    if (B == null)
-                        cTR.Cs.Add(new cTableCell { Value = "--" });//受洗狀態
-                    else if (!B.ImplementFlag)
-                        cTR.Cs.Add(new cTableCell { Value = "預計於" + B.BaptismDate.ToString(DateFormat) + "受洗" });//受洗狀態
-                    else
-                        cTR.Cs.Add(new cTableCell { Value = "已於" + B.BaptismDate.ToString(DateFormat) + "受洗" });//受洗狀態
-                    //備註
-                    var cNote = N.Account.Account_Note.Where(q => q.NoteType == 0 && q.OIID == OI.OIID && !q.DeleteFlag).FirstOrDefault();
-                    if (cNote != null)
-                        cTR.Cs.Add(new cTableCell { Value = cNote.Note });
-                    else
-                        cTR.Cs.Add(new cTableCell { Value = "--" });
-                    cTL.Rs.Add(SetTableCellSortNo(cTR));
-                }
-            }
-            return cTL;
-        }
-        [HttpGet]
-        public ActionResult GroupData_Aldult_List()
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            return View(GetGroupData_Aldult_List(null));
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult GroupData_Aldult_List(FormCollection FC)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            return View(GetGroupData_Aldult_List(FC));
-        }
-        #endregion
-        #region 小組資訊-組員名單管理-小組名單-更新備註
-        [HttpGet]
-        public ActionResult GroupData_Aldult_Edit(int ID)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-            Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
-            if (M == null)
-                SetAlert("查無此小組成員資料", 2, "/Web/AccountPlace/GroupData_Aldult_List");
-            else
-            {
-                N = DC.Account_Note.FirstOrDefault(q => q.ACID == M.ACID && q.OIID == M.OIID && q.NoteType == 0);
-                if (N == null)
-                {
-                    N = new Account_Note
+                    N.AC.Name = FC.Get("txb_Name");
+                    /*if (ID == 0)
                     {
-                        Account = M.Account,
-                        NoteType = 0,
-                        OIID = M.OIID,
-                        Note = ""
-                    };
-                }
-            }
-            return View(N);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult GroupData_Aldult_Edit(int ID, FormCollection FC)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-            Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
-            if (M != null)
-            {
-                N = DC.Account_Note.FirstOrDefault(q => q.ACID == M.ACID && q.OIID == M.OIID && q.NoteType == 0);
-                if (N == null)
-                {
-                    N = new Account_Note();
-                    N.Account = M.Account;
-                    N.NoteType = 0;
-                    N.OIID = M.OIID;
-                    N.Note = "";
-                }
-                if (FC != null)
-                {
-                    N.Note = FC.Get("txb_Note");
-                }
+                        N.AC.Login = FC.Get("txb_Login");
+                        if (!CheckPasswork(FC.Get("txb_New1")))
+                            Error += "密碼必須為包含大小寫英文與數字的8碼以上字串</br>";
+                        else if (FC.Get("txb_New2") != FC.Get("txb_New1"))
+                            Error += "新密碼與重複輸入的不同</br>";
+                        else
+                            N.AC.Password = HSM.Enc_1(FC.Get("txb_New1"));
+                    }*/
 
-
-                if (N.ANID == 0)
-                {
-                    N.DeleteFlag = false;
-                    N.CreDate = N.UpdDate = DT;
-                    N.SaveACID = GetACID();
-                    DC.Account_Note.InsertOnSubmit(N);
-                    DC.SubmitChanges();
-                    SetAlert("新增備註完成", 1, "/Web/AccountPlace/GroupData_Aldult_List");
-                }
-                else
-                {
-                    N.UpdDate = DT;
-                    N.SaveACID = GetACID();
-                    DC.SubmitChanges();
-                    SetAlert("更新備註完成", 1, "/Web/AccountPlace/GroupData_Aldult_List");
-                }
-            }
-            return View(N);
-        }
-        #endregion
-        #region 小組資訊-組員名單管理-小組名單-移除
-        [HttpGet]
-        public ActionResult GroupData_Aldult_Remove(int ID)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-            Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
-            if (M == null)
-                SetAlert("查無此小組成員資料", 2, "/Web/AccountPlace/GroupData_Aldult_List");
-            else
-            {
-                N.Account = M.Account;
-                N.NoteType = 3;
-                N.OIID = M.OIID;
-                N.Note = "";
-            }
-            return View(N);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult GroupData_Aldult_Remove(int ID, FormCollection FC)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-            Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
-            if (M != null)
-            {
-                N = new Account_Note();
-                N.Account = M.Account;
-                N.NoteType = 3;
-                N.OIID = M.OIID;
-                N.DeleteFlag = false;
-                N.CreDate = N.UpdDate = DT;
-                N.SaveACID = GetACID();
-                if (FC != null)
-                    N.Note = FC.Get("txb_Note");
-                else
-                    N.Note = "";
-
-                if (N.Note == "")
-                    SetAlert("請填寫移除組員的理由", 4);
-                else
-                {
-                    DC.Account_Note.InsertOnSubmit(N);
-                    DC.SubmitChanges();
-
-                    M.ActiveFlag = false;
-                    M.LeaveDate = DT;
-                    M.SaveACID = GetACID();
-                    DC.SubmitChanges();
-
-                    SetAlert("已將組員移出此小組", 1, "/Web/AccountPlace/GroupData_Aldult_List");
-
-                }
-
-            }
-            return View(N);
-        }
-        #endregion
-
-        #region 小組資訊-組員名單管理-新人名單
-
-        public cTableList GetGroupData_New_List(FormCollection FC)
-        {
-            cTableList cTL = new cTableList();
-            
-            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
-            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
-            cTL.Title = "小組名單";
-            cTL.NowPage = iNowPage;
-            cTL.ItemID = "";
-            cTL.NumCut = iNumCut;
-            cTL.Rs = new List<cTableRow>();
-
-            var TopTitles = new List<cTableCell>();
-
-            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 200 });
-            TopTitles.Add(new cTableCell { Title = "姓名", WidthPX = 160 });
-            TopTitles.Add(new cTableCell { Title = "性別", WidthPX = 50 });
-            TopTitles.Add(new cTableCell { Title = "生日", WidthPX = 160 });
-            TopTitles.Add(new cTableCell { Title = "手機", WidthPX = 160 });
-            cTL.Rs.Add(SetTableRowTitle(TopTitles));
-            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            ACID = GetACID();
-            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8);
-            if (OI != null)
-            {
-                var Ns = GetMOIAC(OI.OID, OI.OIID, 0).Where(q => q.JoinDate == q.CreDate && q.LeaveDate == q.CreDate && q.ActiveFlag);
-                cTL.TotalCt = Ns.Count();
-                cTL.MaxNum = GetMaxNum(cTL.TotalCt, cTL.NumCut);
-                Ns = Ns.OrderByDescending(q => q.ACID == OI.ACID).ThenByDescending(q => q.CreDate).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut);
-                foreach (var N in Ns)
-                {
-                    cTableRow cTR = new cTableRow();
-                    //操作
-                    cTableCell cTC = new cTableCell();
-                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/AccountPlace/GroupData_New_Remove/" + N.MID, Target = "_self", Value = "駁回" });
-                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/AccountPlace/GroupData_New_Edit/" + N.MID, Target = "_self", Value = "落戶" });
-                    cTR.Cs.Add(cTC);
-                    //姓名
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.Name });
-                    //性別
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.ManFlag ? "男" : "女" });
-                    //生日
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.Birthday == N.Account.CreDate ? "--" : N.Account.Birthday.ToString(DateFormat) });
-                    //手機
-                    var Cons = DC.Contect.Where(q => q.TargetType == 2 && q.ContectType == 1 && q.TargetID == N.ACID).OrderByDescending(q => q.CID);
-                    cTR.Cs.Add(new cTableCell { Value = (Cons.Count() > 0 ? string.Join(",", Cons.Select(q => q.ContectValue)) : "--") });
-                    cTL.Rs.Add(SetTableCellSortNo(cTR));
-                }
-            }
-            return cTL;
-        }
-        [HttpGet]
-        public ActionResult GroupData_New_List()
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            return View(GetGroupData_New_List(null));
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult GroupData_New_List(FormCollection FC)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            return View(GetGroupData_New_List(FC));
-        }
-        #endregion
-        #region 小組資訊-組員名單管理-新人名單-落戶
-        [HttpGet]
-        public ActionResult GroupData_New_Edit(int ID)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
-            if (M == null)
-                SetAlert("查無此新人資料", 2, "/Web/AccountPlace/GroupData_New_List");
-            else
-            {
-                M.JoinDate = DT;
-                M.UpdDate = DT;
-                M.ActiveFlag = true;
-                M.SaveACID = GetACID();
-                DC.SubmitChanges();
-                SetAlert("已完成落戶", 1, "/Web/AccountPlace/GroupData_New_List");
-            }
-            return View();
-        }
-        #endregion
-        #region 小組資訊-組員名單管理-新人名單-駁回
-        [HttpGet]
-        public ActionResult GroupData_New_Remove(int ID)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-            Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
-            if (M == null)
-                SetAlert("查無此會員資料", 2, "/Web/AccountPlace/GroupData_New_List");
-            else
-            {
-                N.Account = M.Account;
-                N.NoteType = 1;
-                N.OIID = M.OIID;
-                N.Note = "";
-            }
-            return View(N);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult GroupData_New_Remove(int ID, FormCollection FC)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-            Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
-            if (M != null)
-            {
-                N = new Account_Note();
-                N.Account = M.Account;
-                N.NoteType = 1;
-                N.OIID = M.OIID;
-                N.DeleteFlag = false;
-                N.CreDate = N.UpdDate = DT;
-                N.SaveACID = GetACID();
-                if (FC != null)
-                    N.Note = FC.Get("txb_Note");
-                else
-                    N.Note = "";
-
-                if (N.Note == "")
-                    SetAlert("請填寫駁回原因", 4);
-                else
-                {
-                    DC.Account_Note.InsertOnSubmit(N);
-                    DC.SubmitChanges();
-
-                    M.ActiveFlag = false;
-                    M.UpdDate = DT;
-                    M.SaveACID = GetACID();
-                    DC.SubmitChanges();
-
-                    SetAlert("已駁回入組申請", 1, "/Web/AccountPlace/GroupData_New_List");
-
-                }
-
-            }
-            return View(N);
-        }
-        #endregion
-
-        #region 小組資訊-組員名單管理-待受洗名單
-
-        public cTableList GetGroupData_Baptized_List(FormCollection FC)
-        {
-            cTableList cTL = new cTableList();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
-            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
-            cTL.Title = "小組名單";
-            cTL.NowPage = iNowPage;
-            cTL.ItemID = "";
-            cTL.NumCut = iNumCut;
-            cTL.Rs = new List<cTableRow>();
-
-            var TopTitles = new List<cTableCell>();
-
-            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 200 });
-            TopTitles.Add(new cTableCell { Title = "姓名", WidthPX = 160 });
-            TopTitles.Add(new cTableCell { Title = "性別", WidthPX = 50 });
-            TopTitles.Add(new cTableCell { Title = "生日", WidthPX = 160 });
-            TopTitles.Add(new cTableCell { Title = "手機", WidthPX = 160 });
-            TopTitles.Add(new cTableCell { Title = "預計受洗日期" });
-            cTL.Rs.Add(SetTableRowTitle(TopTitles));
-            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            ACID = GetACID();
-            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8);
-            if (OI != null)
-            {
-                var Ns = from q in GetMOIAC(OI.OID, OI.OIID, 0).Where(q => q.JoinDate != q.CreDate && q.LeaveDate == q.CreDate && q.ActiveFlag)
-                         join p in DC.Baptized.Where(q => !q.DeleteFlag && !q.ImplementFlag)
-                         on new { q.OIID, q.ACID } equals new { p.OIID, p.ACID }
-                         select q;
-                cTL.TotalCt = Ns.Count();
-                cTL.MaxNum = GetMaxNum(cTL.TotalCt, cTL.NumCut);
-                Ns = Ns.OrderByDescending(q => q.ACID == OI.ACID).ThenByDescending(q => q.CreDate).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut);
-                foreach (var N in Ns)
-                {
-                    cTableRow cTR = new cTableRow();
-                    //操作
-                    cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/AccountPlace/GroupData_Baptized_Edit/" + N.MID, Target = "_self", Value = "設定受洗日期" });
-                    //姓名
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.Name });
-                    //性別
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.ManFlag ? "男" : "女" });
-                    //生日
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.Birthday == N.Account.CreDate ? "--" : N.Account.Birthday.ToString(DateFormat) });
-                    //手機
-                    var Cons = DC.Contect.Where(q => q.TargetType == 2 && q.ContectType == 1 && q.TargetID == N.ACID).OrderByDescending(q => q.CID);
-                    cTR.Cs.Add(new cTableCell { Value = (Cons.Count() > 0 ? string.Join(",", Cons.Select(q => q.ContectValue)) : "--") });
-                    //預計受洗日期
-                    var B = DC.Baptized.FirstOrDefault(q => q.OIID == N.OIID && q.ACID == N.ACID && !q.ImplementFlag && !q.DeleteFlag && q.BaptismDate != q.CreDate);
-                    cTR.Cs.Add(new cTableCell { Value = (B != null ? B.BaptismDate.ToString(DateFormat) : "--") });
-                    cTL.Rs.Add(SetTableCellSortNo(cTR));
-                }
-            }
-            return cTL;
-        }
-        [HttpGet]
-        public ActionResult GroupData_Baptized_List()
-        {
-            GetViewBag();
-            return View(GetGroupData_Baptized_List(null));
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult GroupData_Baptized_List(FormCollection FC)
-        {
-            GetViewBag();
-            return View(GetGroupData_Baptized_List(FC));
-        }
-        #endregion
-        #region 小組資訊-組員名單管理-待受洗名單-設定受洗日期
-        [HttpGet]
-        public ActionResult GroupData_Baptized_Edit(int ID)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-            Baptized N = new Baptized();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
-            if (M == null)
-                SetAlert("查無此小組成員資料", 2, "/Web/AccountPlace/GroupData_Baptized_List");
-            else
-            {
-                N = DC.Baptized.FirstOrDefault(q => q.ACID == M.ACID && q.OIID == M.OIID && !q.DeleteFlag && !q.ImplementFlag);
-                if (N == null)
-                {
-                    N = new Baptized
-                    {
-                        Account = M.Account,
-                        OIID = M.OIID,
-                        BaptismDate = DT,
-                        ImplementFlag = false
-                    };
-                }
-                else if (N.BaptismDate == N.CreDate)
-                    N.BaptismDate = DT;
-            }
-            return View(N);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult GroupData_Baptized_Edit(int ID, FormCollection FC)
-        {
-            GetViewBag();
-            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            ACID = GetACID();
-            Baptized N = new Baptized();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
-            if (M != null)
-            {
-                N = DC.Baptized.FirstOrDefault(q => q.ACID == M.ACID && q.OIID == M.OIID && !q.DeleteFlag && !q.ImplementFlag);
-                if (N == null)
-                {
-                    N = new Baptized
-                    {
-                        Account = M.Account,
-                        OIID = M.OIID,
-                        BaptismDate = DT,
-                        ImplementFlag = false
-                    };
-                }
-                else if (N.BaptismDate == N.CreDate)
-                    N.BaptismDate = DT;
-
-                if (FC != null)
-                {
-                    DateTime DT_ = DT;
+                    N.AC.ManFlag = GetViewCheckBox(FC.Get("cbox_Sex"));
+                    N.AC.IDNumber = FC.Get("txb_IDNumber");
+                    N.AC.IDType = CheckSSN(N.AC.IDNumber) ? 0 : 1;
+                    DateTime BD_ = DT;
                     try
                     {
-                        DT_ = Convert.ToDateTime(FC.Get("txb_BaptismDate"));
-                        if (DT_.Date <= DT.Date)
-                            Error += "預計受洗日請輸入含今天以後的日期";
-                        else
-                            N.BaptismDate = DT_;
+                        BD_ = Convert.ToDateTime(FC.Get("txb_Birthday"));
+                        N.AC.Birthday = BD_;
+                        if (BD_.Date > DT.Date)
+                            Error += "生日填寫錯誤</br>";
                     }
-                    catch { }
-                }
+                    catch { BD_ = DT; }
+                    N.AC.EducationType = Convert.ToInt32(FC.Get("ddl_EducationTypes"));
+                    N.AC.JobType = Convert.ToInt32(FC.Get("ddl_JobTypes"));
+                    N.AC.MarriageType = Convert.ToInt32(FC.Get("rbl_MarriageType"));
+                    if (N.AC.MarriageType == 2)
+                        N.AC.MarriageNote = FC.Get("txb_MarriageNote");
+                    else
+                        N.AC.MarriageNote = "";
+                    //受洗狀態
+                    if (FC.Get("rbl_BaptizedType") == "1")
+                        N.AC.BaptizedType = Convert.ToInt32(FC.Get("ddl_BaptizedType"));
+                    else
+                        N.AC.BaptizedType = 0;
+                    //主日聚會點
+                    N.MLs.ForEach(q => q.Selected = false);
+                    N.MLs.First(q => q.Value == FC.Get("ddl_ML")).Selected = true;
+                    //社群資料
+                    foreach (var CM in N.Coms)
+                    {
+                        CM.InputData = FC.Get(CM.ControlName);
+                    }
+                    //通訊地址
+                    N.L.LID = Convert.ToInt32(FC.Get("hid_LID"));
+                    //手機電話
+                    foreach (var Con in N.Cons)
+                    {
+                        Con.C.ContectValue = FC.Get(Con.ControlName2);
+                        if (Con.ControlName1 != "")
+                        {
+                            Con.C.ZID = Convert.ToInt32(FC.Get(Con.ControlName1));
+                            Con.Zips.ForEach(q => q.Selected = false);
+                            Con.Zips.First(q => q.Value == Con.C.ZID.ToString()).Selected = true;
+                        }
+                    }
 
-                if (Error != "")
-                    SetAlert(Error);
-                else if (N.BID == 0)
+                    //入組意願
+                    N.JoinGroupType = Convert.ToInt32(FC.Get("rbut_GroupFlag"));
+                    for (int i = 0; i < 2; i++)
+                    {
+                        foreach (var _cJGW in N.cJGWs.Where(q => q.JoinType == (i + 1)).OrderBy(q => q.SortNo))
+                        {
+                            _cJGW.SelectFalg = GetViewCheckBox(FC.Get("cbox_JoinGroupWish"));
+                            if (!string.IsNullOrEmpty(FC.Get(_cJGW.ddl_Weekly.ControlName)))
+                            {
+                                _cJGW.ddl_Weekly.ddlList.ForEach(q => q.Selected = false);
+                                _cJGW.ddl_Weekly.ddlList.First(q => q.Value == FC.Get(_cJGW.ddl_Weekly.ControlName)).Selected = true;
+                            }
+                            if (!string.IsNullOrEmpty(FC.Get(_cJGW.ddl_Time.ControlName)))
+                            {
+                                _cJGW.ddl_Time.ddlList.ForEach(q => q.Selected = false);
+                                _cJGW.ddl_Time.ddlList.First(q => q.Value == FC.Get(_cJGW.ddl_Time.ControlName)).Selected = true;
+                            }
+
+                        }
+                    }
+                    if (N.JoinGroupType == 2)
+                    {
+                        N.AC.GroupType = N.GroupNo = FC.Get("txb_GroupNo");
+                    }
+                    else
+                    {
+                        N.AC.GroupType = N.JoinGroupType == 0 ? "無意願" : "有意願";
+                    }
+                }
+                #endregion
+            }
+            #endregion
+            return N;
+        }
+        [HttpGet]
+        public ActionResult BasicData()
+        {
+            GetViewBag();
+            ACID = GetACID();
+            return View(GerAccountData(ACID, null));
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult BasicData(FormCollection FC)
+        {
+            GetViewBag();
+            ACID = GetACID();
+            var N = GerAccountData(ACID, FC);
+
+
+            //會員資料更新
+            N.AC.UpdDate = DT;
+            N.AC.SaveACID = GetACID();
+            DC.SubmitChanges();
+
+            //主日聚會點
+            if (N.MLs.FirstOrDefault(q => q.Selected) != null)
+            {
+                int MLID = Convert.ToInt32(N.MLs.First(q => q.Selected).Value);
+                var ML = DC.M_ML_Account.FirstOrDefault(q => q.MLID == MLID && q.ACID == ACID);
+                if (ML != null)
                 {
-                    N.DeleteFlag = false;
-                    N.CreDate = N.UpdDate = DT;
-                    N.SaveACID = GetACID();
-                    DC.Baptized.InsertOnSubmit(N);
+                    ML.MLID = MLID;
+                    ML.DeleteFlag = false;
+                    ML.UpdDate = DT;
+                    ML.SaveACID = N.AC.SaveACID;
                     DC.SubmitChanges();
-                    SetAlert("新增預計受洗日完成", 1, "/Web/AccountPlace/GroupData_Baptized_List");
                 }
                 else
                 {
-                    N.UpdDate = DT;
-                    N.SaveACID = GetACID();
+                    ML = new M_ML_Account();
+                    ML.MLID = MLID;
+                    ML.ACID = N.AC.ACID;
+                    ML.DeleteFlag = false;
+                    ML.UpdDate = ML.CreDate = DT;
+                    ML.SaveACID = N.AC.SaveACID;
+                    DC.M_ML_Account.InsertOnSubmit(ML);
                     DC.SubmitChanges();
-                    SetAlert("更新預計受洗日完成", 1, "/Web/AccountPlace/GroupData_Baptized_List");
                 }
             }
+            else
+            {
+                var MLs = from q in DC.M_ML_Account.Where(q => q.ACID == ACID && !q.DeleteFlag)
+                          join p in DC.M_Location_Set.Where(q => q.SetType == 0)
+                          on q.MLID equals p.MLID
+                          select q;
+                foreach (var ML in MLs)
+                {
+                    ML.DeleteFlag = true;
+                    ML.UpdDate = DT;
+                    ML.SaveACID = GetACID();
+                    DC.SubmitChanges();
+                }
+            }
+            //社群
+            foreach (var CM in N.Coms)
+            {
+                if (!string.IsNullOrEmpty(CM.InputData))
+                {
+                    Community Com = new Community();
+                    Com.ACID = N.AC.ACID;
+                    Com.CommunityType = CM.SortNo;
+                    Com.CommunityValue = CM.InputData;
+                    DC.Community.InsertOnSubmit(Com);
+                    DC.SubmitChanges();
+                }
+            }
+
+
+
+
             return View(N);
         }
+
+        //更換密碼
+        [HttpPut]
+        public string ChangePW(int ACID, string Login, string PW)
+        {
+            Error = "OK";
+            var AC_ = DC.Account.FirstOrDefault(q => q.ACID == ACID && q.Login == Login && !q.DeleteFlag);
+            if (AC_ == null)
+                Error = "帳號輸入錯誤";
+            else if (!CheckPasswork(PW))
+                Error = "密碼必須為包含大小寫英文與數字的8碼以上字串";
+            else
+            {
+
+            }
+            return Error;
+        }
         #endregion
+
+
     }
 }
 

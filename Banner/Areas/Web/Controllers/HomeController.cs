@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,7 +13,7 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Index()
         {
             GetViewBag();
-            Response.Redirect("/Web/AccountPlace/Index");
+
             return View();
         }
         #region 登入
@@ -268,6 +269,51 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
 
+        #endregion
+        #region 取得下一層組織選單
+        [HttpGet]
+        public string GetOISelect(int OIID)
+        {
+            var OIs = from q in DC.OrganizeInfo.Where(q => q.ParentID == OIID && q.ActiveFlag).OrderBy(q => q.Title)
+                      select new { value = q.OIID, Text = q.Title };
+
+            return JsonConvert.SerializeObject(OIs);
+        }
+        #endregion
+        #region 取得地址下層選單
+        [HttpGet]
+        public string GetZipSelect(int ZID)
+        {
+            var Zs = from q in DC.ZipCode.Where(q => q.ParentID == ZID && q.ActiveFlag).OrderBy(q => q.Code)
+                     select new { value = q.ZID, Text = q.Code + " " + q.Title, Code = q.Code };
+
+            return JsonConvert.SerializeObject(Zs);
+        }
+
+        #endregion
+        #region 取得郵遞區號 或 電話國碼
+        [HttpGet]
+        public string GetZipCode(int ZID)
+        {
+            var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == ZID && q.ActiveFlag);
+
+            return Z == null ? "" : Z.Code;
+        }
+
+        #endregion
+        #region 發認證簡訊
+        public string SendSSN()
+        {
+            string ZID = GetQueryStringInString("ZID");
+            string PhoneNo = GetQueryStringInString("PhoneNo");
+            var Z = DC.ZipCode.FirstOrDefault(q => q.ZID.ToString() == ZID);
+            string CellPhone = (ZID == "10" ? "" : (Z != null ? Z.Code.Replace(" ","") : "") + " ") + PhoneNo.Replace(" ","");
+            
+            string CheckCode = GetRand(1000000).ToString().PadLeft(6, '0');
+            //Error = SendSNS(CellPhone, "【全球旌旗資訊網】手機驗證簡訊", "親愛的旌旗家人,您的驗證碼為：" + CheckCode + "。");
+
+            return (Z != null ? Z.Code : "") + " " + PhoneNo.Substring(0,4) + new string('*', PhoneNo.Length-4) + ";" + CheckCode;
+        }
         #endregion
     }
 }

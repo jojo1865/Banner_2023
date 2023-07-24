@@ -328,6 +328,9 @@ a {
 .lab_info {
     color: var(--bs-info);
 }
+.lab_DarkBlue {
+    color: #3764ac;
+}
 .lab_gray {
     color: var(--bs-gray-500);
 }
