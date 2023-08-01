@@ -225,6 +225,8 @@
     <Content Include="Areas\Admin\Content\Img\heart-serve.png" />
     <Content Include="Areas\Admin\Content\Img\lesson.png" />
     <Content Include="Areas\Admin\Content\Img\line.png" />
+    <Content Include="Areas\Admin\Content\Img\login-bg-admin-Sheep.jpg" />
+    <Content Include="Areas\Admin\Content\Img\login-bg-admin-Sheep.svg" />
     <Content Include="Areas\Admin\Content\Img\logo.png" />
     <Content Include="Areas\Admin\Content\Img\main.png" />
     <Content Include="Areas\Admin\Content\Img\message-push.png" />
@@ -241,6 +243,7 @@
     <Content Include="Areas\Admin\Content\JS\bootstrap.js" />
     <Content Include="Areas\Admin\Content\JS\jquery-3.7.0.js" />
     <Content Include="Areas\Admin\Content\JS\WebJavaScript.js" />
+    <Content Include="Areas\Web\Content\CSS\bootstrap-4-navbar.css" />
     <Content Include="Areas\Web\Content\CSS\forestage.css" />
     <Content Include="Areas\Web\Content\CSS\form.css" />
     <Content Include="Areas\Web\Content\CSS\global.css" />
@@ -281,7 +284,10 @@
     <Content Include="Areas\Web\Content\Img\line.png" />
     <Content Include="Areas\Web\Content\Img\line.svg" />
     <Content Include="Areas\Web\Content\Img\location.svg" />
+    <Content Include="Areas\Web\Content\Img\login-bg-web-Sheep.jpg" />
+    <Content Include="Areas\Web\Content\Img\login-bg-web-Sheep.svg" />
     <Content Include="Areas\Web\Content\Img\login-bg.svg" />
+    <Content Include="Areas\Web\Content\Img\logo-r.svg" />
     <Content Include="Areas\Web\Content\Img\logo.png" />
     <Content Include="Areas\Web\Content\Img\mail.svg" />
     <Content Include="Areas\Web\Content\Img\material-symbols_mail-outline.svg" />
@@ -315,6 +321,10 @@
     <Content Include="Areas\Web\Content\Img\work-people-active.svg" />
     <Content Include="Areas\Web\Content\Img\work-people.svg" />
     <Content Include="Areas\Web\Content\Img\youtube.svg" />
+    <Content Include="Areas\Web\Content\JS\bootstrap-4-navbar.js" />
+    <Content Include="Areas\Web\Content\JS\bootstrap.bundle.js" />
+    <Content Include="Areas\Web\Content\JS\bootstrap.js" />
+    <Content Include="Areas\Web\Content\JS\jquery-3.7.0.js" />
     <Content Include="Areas\Web\Content\JS\WebJavaScript.js" />
     <Content Include="bin\Antlr3.Runtime.dll" />
     <Content Include="bin\Antlr3.Runtime.pdb" />
@@ -504,6 +514,13 @@
     <Content Include="Areas\Web\Views\Include\_SiteMap_Group.cshtml" />
     <Content Include="Areas\Web\Views\AccountPlace\BasicData.cshtml" />
     <Content Include="Areas\Web\Views\Include\_Location_User.cshtml" />
+    <Content Include="Areas\Web\Content\JS\bootstrap.bundle.js.map" />
+    <Content Include="Areas\Web\Content\JS\bootstrap.js.map" />
+    <Content Include="Areas\Web\Views\Include\_TopMenu_New1.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_TopMenu_New2.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_LeftMenu_New2.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_LeftMenu_New1.cshtml" />
+    <Content Include="Areas\Web\Views\AccountAdd\Step2.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -543,7 +560,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Files\Down\" />
     <Folder Include="Photo\" />
   </ItemGroup>

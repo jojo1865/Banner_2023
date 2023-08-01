@@ -226,7 +226,7 @@ function SendSNSCheckPhone(ddl_Zip, txb_Phone, lab_HidPhoneNo, txb_InputCheckCod
             }
             CheckCode = Return[1];
         }
-    })
+    });
     //顯示視窗
     var div = document.getElementById('div_PhoneCheck');
     if (div != null) {
@@ -267,4 +267,115 @@ function SendSNSCheckPhone(ddl_Zip, txb_Phone, lab_HidPhoneNo, txb_InputCheckCod
         });
     }
     return false;
+}
+/*檢查輸入 */
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(() => {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+/*檢查Email*/
+function checkemail(txb_email) {
+    var email = txb_email.value;
+    if (email == '') {
+        Swal.fire({
+            icon: 'error',
+            html: '請輸入電子信箱'
+        });
+        txb_email.focus();
+        return false;
+    } else {
+        var emailRegxp = /^([\w]+)(.[\w]+)*@([\w]+)(.[\w]{2,3}){1,2}$/;
+        if (emailRegxp.test(email) != true) {
+            Swal.fire({
+                icon: 'error',
+                html: '電子信箱格式錯誤'
+            });
+            txb_email.focus();
+            txb_email.select();
+            return false;
+        }
+    }
+}
+function checkLogin(txb) {
+    if (txb.value != "") {
+        /*$.ajax({
+            url: '/Web/AccountAdd/CheckLogin?input=' + txb.value,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                if (res == 'OK') {
+                    document.getElementById('cbox_Login_Success').checked = true;
+                    document.getElementById('div_Login').innerHTML = '';
+                }
+                else {
+                    document.getElementById('cbox_Login_Success').checked = false;
+                    document.getElementById('div_Login').innerHTML = '<span style="color:red">' + res + '</span>';
+                }
+            }
+        });*/
+
+        document.getElementById('cbox_Login_Success').checked = true;
+        document.getElementById('div_Login').innerHTML = '';
+    }
+    return;
+}
+//檢查密碼
+function CheckPassword() {
+    var PW1 = document.getElementById("txb_PW1");
+    var PW2 = document.getElementById("txb_PW2");
+    var div_PW1 = document.getElementById("div_PW1");
+    var div_PW2 = document.getElementById("div_PW2");
+    div_PW1.innerHTML = '';
+    div_PW2.innerHTML = '';
+    var bSuccess = true;
+    var cboxSuccess = document.getElementById('cbox_PW_Success');
+    if (PW1.value != "" && PW2.value != "") {
+        if (PW1.value != PW2.value) {
+            div_PW2.innerHTML = '<span style="color:red">兩次密碼輸入不同</span>';
+            bSuccess = false;
+        }
+        else if (PW1.value.length < 8) {
+            div_PW1.innerHTML = '<span style="color:red">密碼長度不足,請在8個字元以上</span>';
+            bSuccess = false;
+        }
+        else if (PW1.value.length > 12) {
+            div_PW1.innerHTML = '<span style="color:red">密碼長度過長,請在12個字元以內</span>';
+            bSuccess = false;
+        }
+        else {
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+            var isStrongPassword = regex.test(PW1.value);
+            if (!isStrongPassword) {
+                div_PW1.innerHTML = '<span style="color:red">密碼強度不足</span>';
+                bSuccess = false;
+            }
+        }
+
+        if (bSuccess) {
+            cboxSuccess.checked = true;
+        }
+        else {
+            cboxSuccess.checked = false;
+        }
+    }
+    else {
+        cboxSuccess.checked = false;
+    }
+    
+    return;
 }

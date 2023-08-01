@@ -248,3 +248,39 @@ function ChangeActive(TargetControl,TableName, ID) {
     })
     
 }
+//如期受洗
+function Baptized(ACID) {
+    $.ajax({
+        url: '/Admin/AccountSet/Account_Baptized_SetDate?ACID=' + ACID,
+        method: 'GET',
+        dataType: 'text'
+    })
+    Swal.fire({
+        icon: 'success',
+        html: '存檔完成'
+    });
+    location.href = '/Admin/AccountSet/Account_Baptized_List';
+    return;
+}
+
+
+/*檢查輸入 */
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(() => {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()

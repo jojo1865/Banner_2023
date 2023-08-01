@@ -20,6 +20,9 @@ namespace Banner.Areas.Admin.Controllers
         public PartialViewResult _LeftMenu()
         {
             string sURL = GetShortURL().Replace("_Edit", "_List");
+            if (!sURL.Contains("_Info_List"))
+                sURL = sURL.Replace("_Info", "_List");
+
             if (sURL.EndsWith("/"))
                 sURL = sURL.Remove(sURL.Length - 1);
             cMenu Ms = new cMenu();

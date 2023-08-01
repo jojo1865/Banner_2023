@@ -10,7 +10,7 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/Web/GroupPlace/Index">小組資訊</a></li>
                         <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
-                        <li class="breadcrumb-item"><a href="/Web/GroupPlace/Index">小組聚會資訊更新</a></li>
+                        <li class="breadcrumb-item"><a href="/Web/GroupPlace/Index/@ViewBag._OIID ">小組聚會資訊更新</a></li>
                     </ol>
                 </nav>
                 <div class="header-container">
@@ -59,11 +59,11 @@
                 @if ((((bool[])ViewBag._Power)[1] && Model.MS.MID == 0) || (((bool[])ViewBag._Power)[2] && Model.MS.MID > 0) || true)
                 {
                     <div class="btn btn-primary btn-lg btn-round">
-                        <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Admin/Content/Img/save.svg" alt="" />儲存</a>
+                        <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
                     </div>
                 }
                 <div class="btn btn-outline-primary btn-lg btn-round">
-                    <a href="/Admin/AccountSet/Account_Aldult_List/0"><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />取消</a>
+                    <a href="/Web/GroupPlace/Index/@ViewBag._OIID "><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />取消</a>
                 </div>
         </div>
     }

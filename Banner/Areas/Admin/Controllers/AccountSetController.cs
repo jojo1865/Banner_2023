@@ -146,7 +146,18 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         cTL.NowURL = "/Admin/AccountSet/Account_Baptized_List";
                         //Ns = Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.BaptizedType == 0);//小朋友不能受洗
-                        Ns = Ns.Where(q => q.BaptizedType == 0);//小朋友可以受洗
+                        //Ns = Ns.Where(q => q.BaptizedType == 0);//小朋友可以受洗
+
+                        //小朋友不在受洗名單範圍內,且不考慮未入組名單
+                        Ns = from q in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.BaptizedType == 0)
+                             join p in GetMOIAC().Where(q => q.OIID > 1).GroupBy(q=>q.ACID).Select(q=>q.Key)
+                             on q.ACID equals p
+                             select q;
+                        //排除未被指定受洗日期的會員
+                        Ns = from q in DC.Baptized.Where(q => !q.ImplementFlag && !q.DeleteFlag && q.BaptismDate != q.CreDate).GroupBy(q => q.ACID).Select(q => q.Key)
+                             join p in Ns
+                             on q equals p.ACID
+                             select p;
                     }
                     break;
             }
@@ -265,6 +276,7 @@ namespace Banner.Areas.Admin.Controllers
 
                     case 4://受洗
                         {
+                            
                             if (FC.Get("ddl_Baptized") == "1")//有日期
                             {
                                 if (FC.Get("txb_TargetDate") != "")
@@ -280,29 +292,21 @@ namespace Banner.Areas.Admin.Controllers
                                     }
                                     catch
                                     {
-                                        Ns = from q in DC.Baptized.Where(q => !q.ImplementFlag && !q.DeleteFlag && q.BaptismDate != q.CreDate).GroupBy(q => q.ACID).Select(q => q.Key)
-                                             join p in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge)
-                                             on q equals p.ACID
-                                             select p;
+                                        
                                     }
                                 }
-                                else
-                                {
-                                    Ns = from q in DC.Baptized.Where(q => !q.ImplementFlag && !q.DeleteFlag && q.BaptismDate != q.CreDate).GroupBy(q => q.ACID).Select(q => q.Key)
-                                         join p in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge)
-                                         on q equals p.ACID
-                                         select p;
-                                }
+                                
 
                             }
-                            else if (FC.Get("ddl_Baptized") == "2")//沒日期
+                            /*else if (FC.Get("ddl_Baptized") == "2")//沒日期
                             {
                                 Ns = from q in DC.Baptized.Where(q => !q.ImplementFlag && !q.DeleteFlag && q.BaptismDate == q.CreDate).GroupBy(q => q.ACID).Select(q => q.Key)
                                      join p in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge)
                                      on q equals p.ACID
                                      select p;
 
-                            }
+                            }*/
+                            
                         }
                         break;
                 }
@@ -386,7 +390,7 @@ namespace Banner.Areas.Admin.Controllers
                         {
                             cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
                             //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_black", Value = "編輯" });
-                            cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_black", Value = "檢視" });//檢視
+                            cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
                             var OI_8 = GetMOIAC(8, 0, N.ACID).FirstOrDefault();
                             if (OI_8 != null)
                             {
@@ -997,7 +1001,14 @@ namespace Banner.Areas.Admin.Controllers
 
 
                 #endregion
-
+                #region 中低收入戶
+                var AC_Note = DC.Account_Note.FirstOrDefault(q => q.ACID == ID && q.NoteType == 4);
+                if(AC_Note!=null)
+                {
+                    N.bPoorFlag = !AC_Note.DeleteFlag;
+                    N.PoorNote = AC_Note.Note;
+                }
+                #endregion
                 #region 介面資料填入
                 if (FC != null)
                 {
@@ -1184,10 +1195,10 @@ namespace Banner.Areas.Admin.Controllers
                 else
                 {
                     var MLs = from q in DC.M_ML_Account.Where(q => q.ACID == ID && !q.DeleteFlag)
-                             join p in DC.M_Location_Set.Where(q => q.SetType == 0)
-                             on q.MLID equals p.MLID
-                             select q;
-                    foreach(var ML in MLs)
+                              join p in DC.M_Location_Set.Where(q => q.SetType == 0)
+                              on q.MLID equals p.MLID
+                              select q;
+                    foreach (var ML in MLs)
                     {
                         ML.DeleteFlag = true;
                         ML.UpdDate = DT;
@@ -1213,6 +1224,69 @@ namespace Banner.Areas.Admin.Controllers
             }
 
             return View(N);
+        }
+        #endregion
+        #region 牧養成人-檢視-更新中低收入戶
+        public void SavePoot(int ID)
+        {
+            int Check = GetQueryStringInInt("Check");
+            string Note = GetQueryStringInString("Note");
+            var N = DC.Account_Note.FirstOrDefault(q => q.ACID == ID && q.NoteType == 4);
+            if (N == null)
+            {
+                if (Check == 1)//有勾選
+                {
+                    N = new Account_Note();
+                    N.ACID = ID;
+                    N.OIID = 0;
+                    N.NoteType = 4;
+                    N.Note = Note;
+                    N.DeleteFlag = false;
+                    N.CreDate = N.UpdDate = DT;
+                    N.SaveACID = GetACID();
+                    DC.Account_Note.InsertOnSubmit(N);
+                    DC.SubmitChanges();
+                }
+                else
+                {
+
+                }
+            }
+            else
+            {
+                if (Check == 1)//有勾選
+                {
+                    N.DeleteFlag = false;
+                    N.Note = Note;
+                    N.UpdDate = DT;
+                    N.SaveACID = GetACID();
+                    DC.SubmitChanges();
+                }
+                else//沒勾選
+                {
+                    N.DeleteFlag = true;
+                    N.Note = Note;
+                    N.UpdDate = DT;
+                    N.SaveACID = GetACID();
+                    DC.SubmitChanges();
+                }
+            }
+        }
+        #endregion
+        #region 牧養成人-檢視-更新帳戶資訊
+        public void SaveAcctFlag(int ID)
+        {
+            int iActiveFlag = GetQueryStringInInt("Act");
+            int iBackUserFlag = GetQueryStringInInt("Bac");
+            var N = DC.Account.FirstOrDefault(q => q.ACID == ID);
+            if (N != null)
+            {
+                N.ActiveFlag = iActiveFlag == 1;
+                N.BackUsedFlag = iBackUserFlag == 1;
+                N.UpdDate = DT;
+                N.SaveACID = GetACID();
+                DC.SubmitChanges();
+            }
         }
         #endregion
         #region 牧養名單新人-列表
@@ -1420,7 +1494,8 @@ namespace Banner.Areas.Admin.Controllers
             cAL.cTL = GetAccountTable(4, null);
             cAL.LS_Baptized.ddlList[0].Text = "全部";
             cAL.LS_Baptized.ddlList[1].Text = "已指定受洗日期";
-            cAL.LS_Baptized.ddlList[2].Text = "無指定受洗日期";
+            //cAL.LS_Baptized.ddlList[2].Text = "無指定受洗日期";
+            cAL.LS_Baptized.ddlList.RemoveAt(2);
 
             return View(cAL);
         }
@@ -1436,6 +1511,24 @@ namespace Banner.Areas.Admin.Controllers
             cAL.LS_Baptized.ddlList[2].Text = "無指定受洗日期";
 
             return View(cAL);
+        }
+        [HttpGet]
+        public void Account_Baptized_SetDate(int ACID)
+        {
+            var B = DC.Baptized.FirstOrDefault(q => q.ACID == ACID);
+            if (B != null)
+            {
+                if (!B.ImplementFlag)
+                {
+                    if (B.BaptismDate == B.CreDate)
+                        B.BaptismDate = DT;
+                    B.ImplementFlag = true;
+                    B.UpdDate = DT;
+                    B.Account.BaptizedType = 1;
+                    B.Account.UpdDate = DT;
+                    DC.SubmitChanges();
+                }
+            }
         }
         #endregion
         #region 牧養名單待受洗-新增

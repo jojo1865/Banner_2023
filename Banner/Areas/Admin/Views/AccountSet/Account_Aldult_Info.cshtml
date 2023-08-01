@@ -198,7 +198,7 @@
                                     <div class="row">
                                         <div class="col-6">
                                             <div class="form-group">
-                                                <label>@(Con.Title + Con.C.ZID)<span>@(Con.RequiredFlag ? "*" : "")</span></label>
+                                                <label>@(Con.Title)<span>@(Con.RequiredFlag ? "*" : "")</span></label>
                                                 @Html.DropDownList(Con.ControlName1, Con.Zips, new { @class = "form-select form-select-lg select-baptism-status" })
 
                                             </div>
@@ -430,7 +430,7 @@
                     </div>
                     <!--其他備註事項-->
                     <div class="form-card-group">
-                        <div id="contact" class="header-container">
+                        <div id="div_OtherNote" class="header-container">
                             <div class="header-left-border"></div>
                             <div class="header">其他備註事項</div>
                         </div>
@@ -455,12 +455,16 @@
                                     @Html.TextArea("txb_PoorNote", Model.PoorNote, new { @class = "form-control form-control-lg" })
                                 </div>
                             </div>
-
+                            <div class="row">
+                                <div class="col-12 pt-2">
+                                    <a href="javascript:;" onclick="SavePoorNote(@Model.AC.ACID);" style="color:white;" class="btn btn-primary btn-lg btn-round"><img src="/Areas/Admin/Content/Img/save.svg" alt="" />儲存</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!--帳號設定-->
                     <div class="form-card-group">
-                        <div id="contact" class="header-container">
+                        <div id="div_AccountSet" class="header-container">
                             <div class="header-left-border"></div>
                             <div class="header">帳戶設定</div>
                         </div>
@@ -488,11 +492,16 @@
                                     </div>
                                 </div>
                             }
+                            <div class="row">
+                                <div class="col-12 pt-2">
+                                    <a href="javascript:;" onclick="SaveBackSys(@Model.AC.ACID);" style="color:white;" class="btn btn-primary btn-lg btn-round"><img src="/Areas/Admin/Content/Img/save.svg" alt="" />儲存</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!--複製用 預設隱藏-->
-                    <div class="form-card-group visually-hidden">
-                        <div id="contact" class="header-container">
+                    <div class="form-card-group d-none">
+                        <div id="#" class="header-container">
                             <div class="header-left-border"></div>
                             <div class="header"><!--標題--></div>
                         </div>
@@ -541,20 +550,25 @@
             <li class="menuitem">
                 <a href="div_family">家庭狀況</a>
             </li>
+            <!--
+    <li class="menuitem">
+        <a href="">退款費用專用帳戶</a>
+    </li>
+    <li class="menuitem">
+        <a href="">多元表現</a>
+    </li>
+    <li class="menuitem">
+        <a href="">事工團紀錄</a>
+    </li>
+    <li class="menuitem">
+        <a href="">課程歷程</a>
+    </li>
+        -->
             <li class="menuitem">
-                <a href="">退款費用專用帳戶</a>
+                <a href="#div_OtherNote">其他備註事項</a>
             </li>
             <li class="menuitem">
-                <a href="">多元表現</a>
-            </li>
-            <li class="menuitem">
-                <a href="">事工團紀錄</a>
-            </li>
-            <li class="menuitem">
-                <a href="">課程歷程</a>
-            </li>
-            <li class="menuitem">
-                <a href="">其他備註事項</a>
+                <a href="#div_AccountSet">帳戶設定</a>
             </li>
         </ul>
     </div>
@@ -568,7 +582,7 @@
         {
             <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Admin/Content/Img/save.svg" alt="" />儲存</a>
         }
-        <a href="/Admin/AccountSet/Account_Aldult_List/0" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />取消</a>
+        <a href="/Admin/AccountSet/Account_Aldult_List/0" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />返回列表</a>
     }
 </div>
 <script>
@@ -577,5 +591,43 @@
     }
     function HideBaptizedTypeddl(rbut) {
         document.getElementById('ddl_BaptizedType').style.display = (!rbut.checked ? "" : "none");
+    }
+    //儲存中低收入戶資料
+    function SavePoorNote(ACID) {
+        var box = document.getElementById('cbox_PoorFlag');
+        var iCheck = box.checked ? 1 : 0;
+        var txb = document.getElementById('txb_PoorNote');
+        var sNote = txb.value;
+        $.ajax({
+            url: '/Admin/AccountSet/SavePoot/' + ACID + '?Check=' + iCheck + '&Note=' + sNote,
+            method: 'GET',
+            dataType: 'text'
+
+        });
+        Swal.fire({
+            icon: 'success',
+            html: '存檔完成'
+        });
+
+        return;
+    }
+    //儲存帳戶設定
+    function SaveBackSys(ACID) {
+        var box1 = document.getElementById('cbox_ActiveFlag');
+        var iCheck1 = box1.checked ? 1 : 0;
+        var box2 = document.getElementById('cbox_BackUsedFlag');
+        var iCheck2 = box2.checked ? 1 : 0;
+
+        $.ajax({
+            url: '/Admin/AccountSet/SaveAcctFlag/' + ACID + '?Act=' + iCheck1 + '&Bac=' + iCheck2,
+            method: 'GET',
+            dataType: 'text'
+
+        });
+        Swal.fire({
+            icon: 'success',
+            html: '存檔完成'
+        });
+        return;
     }
 </script>

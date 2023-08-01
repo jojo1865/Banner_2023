@@ -23,13 +23,19 @@
                         <div class="form-body">
                             <div class="form-card-group">
                                 <div class="form-card">
-                                    @if (Model.UpOIList != "")
+                                    @if (Model.sUPOIList != "")
                                     {
                                         <div class="form-group">
-                                            <label>上層組織<span>*</span></label>
-                                            <div class="form-control-lg">@Model.UpOIList</div>
+                                            <label>上層組織</label>
+                                            <div class="form-control-lg">@Model.sUPOIList</div>
                                         </div>
-
+                                    }
+                                    @if (Model.dUPOIList.Count > 0)
+                                    {
+                                        <div class="form-group">
+                                            <label>新上層組織<span>*</span></label>
+                                            @Html.DropDownList("ddl_UPOIList", Model.dUPOIList, new { @class = "form-select form-select-lg" })
+                                        </div>
                                     }
                                     <div class="form-group">
                                         <label>組織名稱@("(本層:" + Model.OI.Organize.Title+")")<span>*</span></label>

@@ -1,17 +1,19 @@
 ﻿@model Banner.Areas.Admin.Controllers.OrganizeSetController.cOrganize_Info_List
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
 <div class="main-container">
     <div class="header-container">
         <div class="header-left-border"></div>
         <h5 class="header font-bold">@ViewBag._Title</h5>
     </div>
     <div class="body-container">
-        @{
-            Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
-            if (Model != null)
-            {
-                @Html.Action("_OrganizeTopList", "Include", new { OID = Model.OID })
-                <form method="post" id="form1">
-                    @Html.AntiForgeryToken()
+        <form method="post" id="form1">
+            @Html.AntiForgeryToken()
+            @{
+                if (Model != null)
+                {
+                    @Html.Action("_OrganizeTopList", "Include", new { OID = Model.OID })
                     <div class="search-form">
                         <div class="search-form-section">
                             <div class="row">
@@ -30,10 +32,10 @@
                     <div class="table-container">
                         @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
                     </div>
-                </form>
-            }
 
-        }
+                }
+            }
+        </form>
     </div>
 </div>
 <script>

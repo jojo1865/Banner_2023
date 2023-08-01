@@ -45,7 +45,7 @@
 /*Form加入*/
 main {
     padding: 0;
-    height:auto;
+    /*height:auto;*/
 }
 
 .header-container {
@@ -86,6 +86,46 @@ main {
     to {
         transform: rotate(360deg);
     }
+}
+
+.left-area {
+    background-color: #dbdbdb !important;
+}
+.div_login_img {
+    background-image: url(/Areas/Web/Content/img/login-bg-web-Sheep.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 100%;
+    width: 100%;
+}
+.logo {
+    height: 80%;
+}
+/*上選單下拉*/
+.dropdown-menu {
+    background: var(--bs-secondary);
+}
+.nav-item:hover {
+    background: var(--bs-dropdown-link-active-bg) !important;
+}
+.nav-item a:hover {
+    background: var(--bs-dropdown-link-active-bg) !important;
+}
+.navbar a{
+    color:white;
+}
+.navbar a:hover {
+    color: white;
+}
+.navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
+    color: white !important;
+}
+.nav-link:hover, .nav-link:focus {
+    color: white !important;
+}
+.header-nav {
+    margin: auto;
 }
 /*======================================================手機板======================================================*/
 @media(max-width:992px) {
@@ -176,8 +216,13 @@ main {
         width: 100%;
     }
 
+        .table_RWDStyle tr:hover {
+            background-color: #FBFBFA;
+        }
+
         .table_RWDStyle tr td {
             padding: 10px 5px;
+            background-color: unset !important;
         }
 
             .table_RWDStyle tr td textarea {

@@ -1,0 +1,146 @@
+﻿@model List<Banner.Models.cMenu>
+<!--新選單-->
+
+<nav class="navbar navbar-expand-md">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        @if (Model != null)
+        {
+            <ul class="navbar-nav">
+                @foreach (var M1 in Model.OrderBy(q => q.SortNo))
+                {
+                    if (M1.Items.Count > 0)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="@M1.Url" id="@("a_"+M1.MenuID)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@M1.Title</a>
+                            <ul class="dropdown-menu" aria-labelledby="@("a_"+M1.MenuID)">
+                                @foreach (var M2 in M1.Items.OrderBy(q => q.SortNo))
+                                {
+                                    if (M2.Items.Count > 0)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item dropdown-toggle" href="@M2.Url">@M2.Title</a>
+                                            <ul class="dropdown-menu">
+                                                @foreach (var M3 in M2.Items.OrderBy(q => q.SortNo))
+                                                {
+                                                    if (M3.Items.Count > 0)
+                                                    {
+                                                        <li>
+                                                            <a class="dropdown-item dropdown-toggle" href="@M3.Url">@M3.Title</a>
+                                                            <ul class="dropdown-menu">
+                                                                @foreach (var M4 in M3.Items.OrderBy(q => q.SortNo))
+                                                                {
+                                                                    <li><a class="dropdown-item" href="@M4.Url">@M4.Title</a></li>
+                                                                }
+                                                            </ul>
+                                                        </li>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <li><a class="dropdown-item" href="@M3.Url">@M3.Title</a></li>
+                                                    }
+                                                }
+                                            </ul>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li><a class="dropdown-item" href="@M2.Url">@M2.Title</a></li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@M1.Url">@M1.Title</a>
+                        </li>
+                    }
+                }
+            </ul>
+        }
+    </div>
+</nav>
+
+
+
+<nav class="navbar navbar-expand-md d-none">
+    <ul class="menu nav navbar-nav">
+        @if (Model != null)
+        {
+            foreach (var M1 in Model.OrderBy(q => q.SortNo))
+            {
+                if (M1.Items.Count > 0)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="menu-link nav-link dropdown-toggle @(M1.SelectFlag ? "active": "")" href="#" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                            @if (M1.ImgUrl != "" && false)
+                            {
+                                <img src="@(M1.SelectFlag?M1.ImgUrl.Replace(".svg","-active.svg"):M1.ImgUrl)" class="menu-icon @(M1.SelectFlag?"menu-icon-active":"")" />
+                            }
+                            @M1.Title
+                        </a>
+                        <ul class="dropdown-menu">
+                            @foreach (var M2 in M1.Items.OrderBy(q => q.SortNo))
+                            {
+                                if (M2.Items.Count > 0)
+                                {
+                                    <li class="nav-item dropdown">
+                                        <a class="menu-link nav-link dropdown-toggle @(M1.SelectFlag ? "active": "")" href="#" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                            @if (M2.ImgUrl != "")
+                                            {
+                                                <img src="@(M2.SelectFlag?M2.ImgUrl.Replace(".svg","-active.svg"):M2.ImgUrl)" class="menu-icon @(M2.SelectFlag?"menu-icon-active":"")" />
+                                            }
+                                            @M2.Title
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            @foreach (var M3 in M2.Items.OrderBy(q => q.SortNo))
+                                            {
+                                                <li class="nav-item dropdown">
+                                                    <a class="dropdown-item" href="@M3.Url">
+                                                        @if (M3.ImgUrl != "")
+                                                        {
+                                                            <img src="@(M3.SelectFlag?M3.ImgUrl.Replace(".svg","-active.svg"):M3.ImgUrl)" class="menu-icon @(M3.SelectFlag?"menu-icon-active":"")" />
+                                                        }
+                                                        @M3.Title
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="nav-item">
+                                        <a class="dropdown-item menu-link nav-link " href="@M2.Url">
+                                            @if (M2.ImgUrl != "")
+                                            {
+                                                <img src="@(M2.SelectFlag?M2.ImgUrl.Replace(".svg","-active.svg"):M2.ImgUrl)" class="menu-icon @(M2.SelectFlag?"menu-icon-active":"")" />
+                                            }
+                                            @M2.Title
+                                        </a>
+                                    </li>
+                                }
+
+                            }
+                        </ul>
+                    </li>
+
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="menu-link nav-link @(M1.SelectFlag ? "active": "")" href="@M1.Url">@M1.Title</a>
+                    </li>
+
+                }
+
+            }
+        }
+    </ul>
+</nav>

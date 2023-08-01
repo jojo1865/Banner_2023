@@ -3,15 +3,12 @@
 
     Layout = "~/Areas/Web/Views/Include/_MasterLogin.cshtml";
 }
-
-<main class="main">
+<main class="main" style="height:auto">
     <div class="left-area">
-        <div class="logo">
-            <img src="/Areas/Web/Content/Img/logo.png" alt="" />
-        </div>
-
-        <div class="main-icon">
-            <img src="/Areas/Web/Content/Img/login-bg.svg" alt="" />
+        <div class="div_login_img">
+            <div class="logo">
+                <img src="/Areas/Web/Content/Img/top_logo.svg" alt="" />
+            </div>
         </div>
     </div>
     <div class="right-area">
@@ -53,7 +50,7 @@
 
                 <div class="input verify-with-code">
                     @Html.TextBox("txb_ValidateCode", "", new { @class = "form-control input-underline verify-form", @placeholder = "請輸入右方驗證碼" })
-                    <img src="/Admin/Home/ValidateCode" alt="" id="img_ValidateCode" />
+                    <img src="/Web/Home/ValidateCode" alt="" id="img_ValidateCode" />
                 </div>
                 <div class="login-button-container">
                     <button class="btn btn-primary btn-lg btn-round btn-login"

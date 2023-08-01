@@ -20,7 +20,7 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Login()
         {
             GetViewBag();
-            if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
+            /*if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
             {
                 if (GetACID() <= 0)
                 {
@@ -28,7 +28,7 @@ namespace Banner.Areas.Web.Controllers
                     SetBrowserData("UserName", "系統管理者");
                 }
                 Response.Redirect("/Web/Home/Index");
-            }
+            }*/
 
             return View();
         }
@@ -55,7 +55,7 @@ namespace Banner.Areas.Web.Controllers
             else
             {
                 string EncPW = HSM.Enc_1(PW);
-                var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.BackUsedFlag && q.Login == Login && q.Password == EncPW);
+                var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.Login == Login && q.Password == EncPW);
                 if (AC == null)
                 {
                     AC = DC.Account.Where(q => q.Login == Login && q.ActiveFlag && !q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
@@ -88,7 +88,7 @@ namespace Banner.Areas.Web.Controllers
                                 SetSession("LoginCt", iLoginCt.ToString());
                                 if (iLoginCt < 5)
                                 {
-                                    SetAlert("您的密碼錯誤!!</br>您還有" + (5 - iLoginCt) + "次機會...</br>建議您使用忘記密碼功能", 2, "/Admin/Home/ForgetPassWord/");
+                                    SetAlert("您的密碼錯誤!!</br>您還有" + (5 - iLoginCt) + "次機會...</br>建議您使用忘記密碼功能", 2, "/Web/Home/ForgetPassWord/");
                                 }
                                 else
                                 {
@@ -106,7 +106,8 @@ namespace Banner.Areas.Web.Controllers
                         }
 
                     }
-
+                    else
+                        SetAlert("此帳號不存在", 2);
                 }
                 else
                 {
@@ -269,6 +270,19 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
 
+        #endregion
+        #region 取得檢查碼
+        //取得/設定檢查碼
+        public void ValidateCode()
+        {
+            string Code = GetQueryStringInString("Code");
+            if (Code == "")
+            {
+                Code = GenerateCheckCode();
+                SetSession("VNum", Code);
+            }
+            CreateCheckCodeImage(Code);
+        }
         #endregion
         #region 取得下一層組織選單
         [HttpGet]

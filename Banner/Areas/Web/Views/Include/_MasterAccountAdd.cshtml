@@ -7,25 +7,27 @@
     @Html.Action("_HeadInclude", "Include")
 </head>
 
-<body class="bn-theme forestage">
-    <main class="main">
-        <div class="row">
-            <div class="col-3">
+<body class="bn-theme forestage" style=" background-color: rgb(233, 241, 255);overflow-y:auto;">
+    <main class="main" style="overflow-x: unset; background-color: rgb(233, 241, 255);">
+
+        <div class="row mt-3 ps-2 pe-2">
+            <div class="col-lg-4 col-12 text-lg-start text-center">
                 <div class="logo">
-                    <img src="/Areas/Web/Content/Img/logo.png" alt="" />
+                    <img src="/Areas/Web/Content/Img/logo-r.svg" alt="" />
                 </div>
             </div>
-            <div class="col-3"><h2 style="color: #0C3176;">註冊</h2></div>
-            <div class="col-3">
+            <div class="col-lg-4 col-12 text-center"><h2 style="color: #0C3176;">註冊</h2></div>
+            <div class="col-lg-4 col-12 text-lg-end text-center">
                 <span>如果您已有帳號，前往</span>
-                <a href="/Web/Home/Login" class="btn btn-primary btn-lg btn-round btn-login">登入</a>
+                <a href="/Web/Home/Login" class="btn btn-primary btn-round">登入</a>
             </div>
         </div>
-        <div class="container">
+        <div class="container-xxl mb-5 pb-5" style="background-color: white;">
             @RenderBody()
         </div>
     </main>
     @Html.Action("_AlertMsg", "Include")
+    <script src="/Areas/Web/Content/js/WebJavascript.js"></script>
 </body>
 </html>
 

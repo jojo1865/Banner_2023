@@ -93,7 +93,10 @@ namespace Banner.Models
     public class c_ContectEdit
     {
         public Contect C = new Contect();
+        public string ControlName1 = "ddl_PhoneZip";
+        public string ControlName2 = "txb_PhoneNo";
         public string InputNote = "";
+        public bool required = false;
         public List<SelectListItem> SLIs = new List<SelectListItem>();
     }
     /// <summary>

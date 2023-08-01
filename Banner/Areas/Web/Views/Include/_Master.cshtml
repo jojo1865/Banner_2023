@@ -10,10 +10,12 @@
 <body class="bn-theme">
     <nav class="header-nav">
         <div class="header-item">
-            <img class="logo"
-                 src="/Areas/Web/Content/img/header-logo.svg"
-                 alt="" />
-            @Html.Action("_TopMenu", "Include")
+            <a href="/Web/Home/Index">
+                <img class="logo"
+                     src="/Areas/Web/Content/img/header-logo.svg"
+                     alt="" />
+            </a>
+            @Html.Action("_TopMenu_New1", "Include")
         </div>
         <div class="header-item">
             <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="btn btn-outline-primary btn-round btn-lg" target="_blank">進入後台</a>
@@ -34,9 +36,9 @@
     </nav>
     <main class="body" style="position: relative;">
         <img class="main-bg" src="/Areas/Web/Content/img/body-bg.svg" alt="" />
-        <nav class="body-nav" style="overflow-y:auto;">
-            @Html.Action("_LeftMenu", "Include")
-        </nav>
+
+        @Html.Action("_LeftMenu_New1", "Include")
+        
         @RenderBody()
     </main>
     <!--置底-->

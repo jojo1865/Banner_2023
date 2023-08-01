@@ -213,8 +213,10 @@ main .main-bg {
   display: flex;
   padding: 32px 40px;
   width: 100%;
+  /*height:calc(100vh - 166px);*/
   flex-direction: column;
   overflow: auto;
+  margin-bottom:20px;
 }
 
 .process-block-container {

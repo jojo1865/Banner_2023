@@ -79,6 +79,7 @@ namespace Banner
         public string[] CommunityTitle = new string[] { "其他", "LineID", "InstagramID", "WeChat" };
         public string[] JoinTitle = new string[] { "無意願", "已入組未落戶", "跟進中(已分發)", "被退回(未分發)", "跟進中(未分發)" };
         public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
+        public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)"};
         public string Error = "";
         public int iChildAge = 12;
 
@@ -134,9 +135,14 @@ namespace Banner
                 sStr = cStr;
             }
             else if (cStr == "" && sStr != "")//Cookie遺失但Session還在
+            {
+                cStr = sStr;
                 SetCookie(Title, sStr);
-            else if (cStr != "-1" && sStr == "-1")//Session遺失但Cookie還在
+            }
+            else if (cStr != "" && sStr == "")//Session遺失但Cookie還在
+            {
                 SetSession(Title, cStr);
+            }
             else if (cStr == sStr)
             {
                 if (sStr != "")//Session/Cookie都還在
@@ -174,9 +180,13 @@ namespace Banner
         //檢查是否為Admin權限
         public bool CheckAdmin(int ACID)
         {
-            /*var PA = DC.M_Rool_Account.FirstOrDefault(q => q.ACID == ACID && q.Rool.RoolType == 4 && !q.DeleteFlag && q.ActiveFlag && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date));*/
-            var PA = GetMRAC(0, ACID).FirstOrDefault(q => q.Rool.RoolType == 4);
-            return PA != null;
+            if(ACID == 1)
+                return true;
+            else
+            {
+                var PA = GetMRAC(0, ACID).FirstOrDefault(q => q.Rool.RoolType == 4);
+                return PA != null;
+            }
         }
         //取得被加密的名子
         public string CutName(string sName)
@@ -2109,7 +2119,12 @@ namespace Banner
             Byte[] bin = p.GetAsByteArray();
             System.IO.File.WriteAllBytes(pathFile, bin);
             string URL = Request.Url.Scheme + "://" + Request.Url.Host + ":" + Request.Url.Port + "/" + FilePath.Replace("../", "");
-            Response.Write(string.Format("<script>window.open('{0}', '" + FileName + "','');</script>", URL + FileName));//下載
+            //Response.Write(string.Format("<script>window.open('{0}', '" + FileName + "','');</script>", URL + FileName));//下載
+
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.AppendHeader("Content-Disposition", "Attachment; FileName=" + FileName);
+            Response.TransmitFile(FilePath + FileName);
+            Response.End();
 
         }
         //匯出CSV的方法
@@ -2290,7 +2305,7 @@ namespace Banner
                 }
             }
 
-
+            //SetResponseVerify();
 
             TempData["UID"] = ACID;
             TempData["msg"] = "";
@@ -2300,7 +2315,19 @@ namespace Banner
             TempData["OID"] = "0";//組織層級ID
             TempData["OITitle"] = "";//組織搜尋用關鍵字
         }
-
+        /*private void SetResponseVerify()
+        {
+            var res = Response.Cookies["__RequestVerificationToken"];
+            var req = Request.Cookies["__RequestVerificationToken"];
+            if (res == null || string.IsNullOrEmpty(res.Value))//set Response
+            {
+                if (req != null && !string.IsNullOrEmpty(req.Value))
+                {
+                    res = new HttpCookie("__RequestVerificationToken", req.Value);
+                    Response.SetCookie(res);
+                }
+            }
+        }*/
         public void ChangeTitle(bool AddFlag)
         {
             ViewBag._Title += " " + (AddFlag ? "新增" : "編輯");

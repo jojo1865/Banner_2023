@@ -69,15 +69,15 @@ namespace Banner.Areas.Web.Controllers
             var Ms = DC.Menu.Where(q => q.ParentID == 0 && q.ActiveFlag && !q.DeleteFlag);
             int ACID = GetACID();
             var MOIs = GetMOIAC(0, 0, ACID);
+            bool bGroupLeaderFlag = false;
             if (MOIs.Count() > 0)//是否已有小組
-            {
-                if (MOIs.Count(q => q.OrganizeInfo.OID == 8) > 0)//是否為小組長
-                    Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
-                else
-                    Ms = Ms.Where(q => q.MenuType == 1);
-            }
+                bGroupLeaderFlag = MOIs.Count(q => q.OrganizeInfo.OID == 8) > 0;//是否為小組長
+
+            if (bGroupLeaderFlag)
+                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
             else
                 Ms = Ms.Where(q => q.MenuType == 1);
+
             Ms = Ms.OrderBy(q => q.SortNo);
 
             int OIID = GetOIID();
@@ -94,11 +94,13 @@ namespace Banner.Areas.Web.Controllers
                     Url = M.URL,
                     ImgUrl = M.ImgURL,
                     SortNo = M.SortNo,
-                    SelectFlag = M.URL.StartsWith(ThisController)
+                    SelectFlag = M.URL.StartsWith(ThisController),
+                    Items = new List<cMenu>()
                 };
-
                 if (M.MenuType == 2)
                 {
+
+
                     var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8).OrderBy(q => q.OIID);
                     foreach (var OI in OIs)
                     {
@@ -109,19 +111,118 @@ namespace Banner.Areas.Web.Controllers
                             Url = M.URL + "/" + OI.OIID,
                             ImgUrl = M.ImgURL,
                             SortNo = M.SortNo,
-                            SelectFlag = M.URL.StartsWith(ThisController) && OI.OIID == OIID
+                            SelectFlag = M.URL.StartsWith(ThisController) && OI.OIID == OIID,
+                            Items = new List<cMenu>()
                         };
                         cMs.Add(cM);
                     }
                 }
                 else
                     cMs.Add(cM);
+
             }
-            //if (cMs.Count > 0 && cMs.FirstOrDefault(q => q.SelectFlag) == null)
-            //   cMs[0].SelectFlag = true;
+
             if (ACID == 0)
                 SetAlert("請先登入", 3, "/Web/Home/Login");
             return PartialView(cMs);
+        }
+        public PartialViewResult _TopMenu_New1()
+        {
+            var Ms = DC.Menu.Where(q => q.ParentID == 0 && q.ActiveFlag && !q.DeleteFlag);
+            int ACID = GetACID();
+            var MOIs = GetMOIAC(0, 0, ACID);
+            bool bGroupLeaderFlag = false;
+            if (MOIs.Count() > 0)//是否已有小組
+                bGroupLeaderFlag = MOIs.Count(q => q.OrganizeInfo.OID == 8) > 0;//是否為小組長
+
+            if (bGroupLeaderFlag)
+                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
+            else
+                Ms = Ms.Where(q => q.MenuType == 1);
+
+            Ms = Ms.OrderBy(q => q.SortNo);
+
+            int OIID = GetOIID();
+
+            string ThisController = GetThisController();
+            string ThisActive = GetThisAction();
+            List<cMenu> cMs = new List<cMenu>();
+            foreach (var M in Ms)
+            {
+                cMenu cM = new cMenu
+                {
+                    MenuID = M.MID,
+                    Title = M.Title,
+                    Url = M.URL,
+                    ImgUrl = M.ImgURL,
+                    SortNo = M.SortNo,
+                    SelectFlag = M.URL.StartsWith(ThisController),
+                    Items = new List<cMenu>()
+                };
+
+                if (M.MenuType == 2 && M.Title == "小組資訊")
+                {
+                    var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8).OrderBy(q => q.OIID);
+                    foreach (var OI in OIs)
+                    {
+                        var cM1 = new cMenu
+                        {
+                            MenuID = M.MID,
+                            Title = OI.Title,
+                            Url = M.URL + "/" + OI.OIID,
+                            ImgUrl = M.ImgURL,
+                            SortNo = M.SortNo,
+                            SelectFlag = M.URL.StartsWith(ThisController) && OI.OIID == OIID,
+                            Items = GetSubItem(M.MID, bGroupLeaderFlag, OI.OIID)
+                        };
+                        cM.Items.Add(cM1);
+                    }
+                    cMs.Add(cM);
+                }
+                else
+                {
+                    cM.Items = GetSubItem(M.MID, bGroupLeaderFlag, OIID);
+                    cMs.Add(cM);
+                }
+            }
+
+            if (ACID == 0)
+                SetAlert("請先登入", 3, "/Web/Home/Login");
+            return PartialView(cMs);
+        }
+
+        private List<cMenu> GetSubItem(int MID, bool bGroupLeaderFlag, int OIID)
+        {
+            string NowShortPath = GetThisAction().Replace("_Edit", "").Replace("_List", "").Replace("_Info", "").Replace("_Remove", "");
+            string ThisController = GetThisController();
+            List<cMenu> Items = new List<cMenu>();
+            var Ms = DC.Menu.Where(q => q.ParentID == MID && q.ActiveFlag && !q.DeleteFlag);
+            if (bGroupLeaderFlag)
+                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
+            else
+                Ms = Ms.Where(q => q.MenuType == 1);
+
+            Ms = Ms.OrderBy(q => q.SortNo);
+
+            foreach (var M in Ms)
+            {
+                var CM_ = DC.Menu.FirstOrDefault(q => q.ParentID == M.MID && q.URL.StartsWith(NowShortPath));
+                cMenu cM = new cMenu
+                {
+                    MenuID = M.MID,
+                    Title = M.Title,
+                    Url = M.URL + (OIID > 0 ? "/" + OIID : ""),
+                    ImgUrl = M.ImgURL,
+                    SortNo = M.SortNo,
+                    SelectFlag = M.URL.StartsWith(ThisController) || M.URL.StartsWith(NowShortPath) || CM_ != null,
+                    Items = GetSubItem(M.MID, bGroupLeaderFlag, OIID)
+                };
+
+                Items.Add(cM);
+            }
+
+
+            return Items;
         }
         #endregion
         #region 左側選單
@@ -153,6 +254,7 @@ namespace Banner.Areas.Web.Controllers
                 //NowShortPath = NowShortPath.Replace("_Aldult", "").Replace("_Baptized", "").Replace("_New", "");
                 foreach (var M in Ms)
                 {
+
                     var CM_ = DC.Menu.FirstOrDefault(q => q.ParentID == M.MID && q.URL.StartsWith(NowShortPath));
                     cMenu cM = new cMenu
                     {
@@ -207,6 +309,10 @@ namespace Banner.Areas.Web.Controllers
 
 
             return PartialView(cMs);
+        }
+        public PartialViewResult _LeftMenu_New1()
+        {
+            return PartialView();
         }
         #endregion
 
@@ -473,7 +579,7 @@ namespace Banner.Areas.Web.Controllers
         }
         #endregion
         #region 取得/設定聯絡方式
-        public PartialViewResult _ContectEdit(Contect C)
+        public PartialViewResult _ContectEdit(Contect C, bool required = false)
         {
             c_ContectEdit cN = new c_ContectEdit();
             if (C == null)
@@ -484,12 +590,13 @@ namespace Banner.Areas.Web.Controllers
                     TargetID = 0,
                     ZID = 10,
                     ContectType = 0,
-                    ContectValue = ""
+                    ContectValue = "",
                 };
             }
             cN.C = C;
+            cN.required = required;
             cN.SLIs = new List<SelectListItem>();
-            cN.SLIs.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = C.ZID == 0 });
+            //cN.SLIs.Add(new SelectListItem { Text = "-國碼-", Value = "1", Selected = C.ZID == 0, Disabled = true });
             var Ns = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國").OrderBy(q => q.ZID).ToList();
             foreach (var N in Ns)
                 cN.SLIs.Add(new SelectListItem { Text = N.Title + "(" + N.Code + ")", Value = N.ZID.ToString(), Selected = C.ZID == N.ZID });
@@ -500,7 +607,11 @@ namespace Banner.Areas.Web.Controllers
             else if (C.ContectType == 1)
                 cN.InputNote = "請輸入手機";
             else
+            {
+                cN.ControlName2 = "txb_Email";
                 cN.InputNote = "請輸入Email";
+            }
+
             return PartialView(cN);
         }
         #endregion

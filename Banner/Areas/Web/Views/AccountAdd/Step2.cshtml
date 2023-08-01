@@ -1,0 +1,178 @@
+﻿
+@{
+    ViewBag.Title = "Step1";
+    Layout = "~/Areas/Web/Views/Include/_MasterAccountAdd.cshtml";
+}
+<style>
+    span.circle-on {
+        font-family: Courier, Arial;
+        font-size: 18px;
+        -webkit-border-radius: 40px;
+        -moz-border-radius: 40px;
+        border-radius: 40px;
+        background-color: rgb(12, 49, 118);
+        border: 3px solid rgb(12, 49, 118);
+        color: #fff;
+        display: block;
+        float: left;
+        height: 45px;
+        padding: 7px 8px 13px 8px;
+        text-align: center;
+        vertical-align: top;
+        width: 45px;
+    }
+
+    span.circle-off {
+        font-family: Courier, Arial;
+        font-size: 18px;
+        -webkit-border-radius: 40px;
+        -moz-border-radius: 40px;
+        border-radius: 40px;
+        background-color: #CCC;
+        border: 3px solid #CCC;
+        color: #fff;
+        display: block;
+        float: left;
+        height: 45px;
+        padding: 7px 8px 13px 8px;
+        text-align: center;
+        vertical-align: top;
+        width: 45px;
+    }
+
+    div.topbar-on-xl {
+        height: 3px;
+        width: 180px;
+        background-color: rgb(12, 49, 118);
+        margin-top: 20px;
+    }
+
+    div.topbar-off-xl {
+        height: 3px;
+        width: 180px;
+        background-color: #CCC;
+        margin-top: 20px;
+    }
+
+    div.topbar-on {
+        height: 3px;
+        width: 80px;
+        background-color: rgb(12, 49, 118);
+        margin-top: 20px;
+    }
+
+    div.topbar-off {
+        height: 3px;
+        width: 80px;
+        background-color: #CCC;
+        margin-top: 20px;
+    }
+
+    .form-control-lg {
+        min-height: 0 !important;
+    }
+
+    label {
+        font-size: 1.25rem;
+    }
+</style>
+<!--上方步驟-->
+<div class="row p-xxl-5 p-2 mt-4 justify-content-md-center">
+    <div class="col-sm-auto col p-0">
+        <span class="circle-on">1</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-on-xl d-xl-block d-none"></div>
+        <div class="topbar-on d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-on">2</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-off-xl d-xl-block d-none"></div>
+        <div class="topbar-off d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-off">3</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-off-xl d-xl-block d-none"></div>
+        <div class="topbar-off d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-off">4</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-off-xl d-xl-block d-none"></div>
+        <div class="topbar-off d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-off">5</span>
+    </div>
+</div>
+<div class="row justify-content-md-center">
+
+    <div class="col-lg-8 col">
+        <div class="row">
+            <div class="col-auto">
+                <div style="width: 10px; background-color: rgb(12, 49, 118); height:32px;"></div>
+            </div>
+            <div class="col-auto">
+                <label>帳號驗證</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col pt-2">
+                <div style="height: 5px; background-color: rgb(12, 49, 118); "></div>
+            </div>
+        </div>
+        <div class="row justify-content-md-center">
+            <div class="col">
+                <form id="form1" method="post" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+                    <div class="row mt-2">
+                        <div class="col mt-lg-5 mt-3 text-center">
+                            <label>手機或Email驗證</label>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col d-flex">
+                            <div class="form-group" style="flex: 1">
+                                <label>驗證方式</label>
+                                <div class="form-check form-check-inline">
+                                    @Html.RadioButton("rbut_Con", true, true, new { @id = "rbut_Con1", @class = "form-check-input", required = string.Empty })
+                                    @Html.Label("手機", new { @class = "form-check-label", @for = "rbut_Con1" })
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    @Html.RadioButton("rbut_Con", false, false, new { @id = "rbut_Con2", @class = "form-check-input", required = string.Empty })
+                                    @Html.Label("Email", new { @class = "form-check-label", @for = "rbut_Con2" })
+                                </div>
+                            </div>
+                            <div class="from-group">
+                                <label>&nbsp;</label>
+                                <div class="visibility-container">
+                                    <a class="btn btn-primary btn-lg btn-round" href="#">傳送驗證碼</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col mt-3">
+                            <label>輸入驗證碼</label>
+                            @Html.TextBox("txb_CheckCode", "", new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入驗證碼", required = string.Empty })
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col mt-3 mb-5 text-center">
+                            <a style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit" href="/Web/AccountPlace/Step1"><img src="/Areas/Web/Content/Img/save.svg" alt="" />上一步</a>
+                            
+                            <button type="submit" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/save.svg" alt="" />下一步</button>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

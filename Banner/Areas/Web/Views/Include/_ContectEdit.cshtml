@@ -2,20 +2,34 @@
 <div class="row">
     @if (Model != null)
     {
-        <div class="col-xxl-auto col-lg-6 col-12 @(Model.C.ContectType==2 ? "d-none" : "")">
-            <div class="row">
-                <div class="col-auto ms-0 me-0">
-                    <label class="form-control-lg ps-0 pe-0">國碼：</label>
-                </div>
-                <div class="col-auto ms-0 me-0">
-                    @Html.DropDownList("ddl_PhoneZip", Model.SLIs, new { @class = "form-select form-select-lg ms-0 me-0" })
-                </div>
+        if (Model.C.ContectType == 2)
+        {
+            <div class="col-12">
+                @if (Model.required)
+                {
+                    @Html.TextBox(Model.ControlName2, Model.C.ContectValue, new { @class = "form-control form-control-lg input-underline", @placeholder = Model.InputNote, @type = "email", onchange = "checkemail(this);", required = string.Empty })
+                }
+                else
+                {
+                    @Html.TextBox(Model.ControlName2, Model.C.ContectValue, new { @class = "form-control form-control-lg input-underline", @placeholder = Model.InputNote, @type = "email", onchange = "checkemail(this);" })
+                }
             </div>
-        </div>
-        <div class="col-xxl-auto col-lg-6 col-12">
-            @Html.TextBox("txb_PhoneNo", Model.C.ContectValue, new { @class = "form-control form-control-lg input-underline", @placeholder = Model.InputNote })
-        </div>
+        }
+        else
+        {
+            <div class="col-lg-6 col-12">
+                @Html.DropDownList(Model.ControlName1, Model.SLIs, new { @class = "form-select form-select-lg ms-0 me-0" })
+            </div>
+            <div class="col-lg-6 col-12">
+                @if (Model.required)
+                {
+                    @Html.TextBox(Model.ControlName2, Model.C.ContectValue, new { @class = "form-control form-control-lg input-underline", @placeholder = Model.InputNote, @type = "tel", required = string.Empty })
+                }
+                else
+                {
+                    @Html.TextBox(Model.ControlName2, Model.C.ContectValue, new { @class = "form-control form-control-lg input-underline", @placeholder = Model.InputNote, @type = "tel" })
+                }
+            </div>
+        }
     }
-
 </div>
-

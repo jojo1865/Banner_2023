@@ -47,7 +47,7 @@ namespace Banner.Areas.Web.Controllers
                     N.SLIs.Add(new SelectListItem { Text = sWeeks[i], Value = (i + 1).ToString(), Selected = i == 0 });
                 var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag && q.OIID == ID);
                 if (OI == null)
-                    SetAlert("您尚未被指定為某小組的小組長,無法進行設定", 2, "/Web/AccountPlace/Index_Default");
+                    SetAlert("您尚未被指定為某小組的小組長,無法進行設定", 2, "/Web/GroupPlace/Index");
                 else
                 {
                     N.MS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.TargetID == OI.OIID && !q.DeleteFlag);
@@ -257,7 +257,7 @@ namespace Banner.Areas.Web.Controllers
                     //受洗狀態
                     var B = DC.Baptized.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.BID).FirstOrDefault();
                     if (B == null)
-                        cTR.Cs.Add(new cTableCell { Value = "--" });//受洗狀態
+                        cTR.Cs.Add(new cTableCell { Value = BaptizedType[N.Account.BaptizedType] });//受洗狀態
                     else if (!B.ImplementFlag)
                         cTR.Cs.Add(new cTableCell { Value = "預計於" + B.BaptismDate.ToString(DateFormat) + "受洗" });//受洗狀態
                     else
@@ -463,8 +463,8 @@ namespace Banner.Areas.Web.Controllers
                     cTableRow cTR = new cTableRow();
                     //操作
                     cTableCell cTC = new cTableCell();
-                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/AccountPlace/New_Remove/" + N.MID, Target = "_self", Value = "駁回" });
-                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/AccountPlace/New_Edit/" + N.MID, Target = "_self", Value = "落戶" });
+                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/New_Remove/" + N.MID, Target = "_self", Value = "駁回" });
+                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/New_Edit/" + N.MID, Target = "_self", Value = "落戶" });
                     cTR.Cs.Add(cTC);
                     //姓名
                     cTR.Cs.Add(new cTableCell { Value = N.Account.Name });
@@ -505,7 +505,7 @@ namespace Banner.Areas.Web.Controllers
             GetID();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
             if (M == null)
-                SetAlert("查無此新人資料", 2, "/Web/AccountPlace/New_List/" + OIID);
+                SetAlert("查無此新人資料", 2, "/Web/GroupPlace/New_List/" + OIID);
             else
             {
                 M.JoinDate = DT;
@@ -513,7 +513,7 @@ namespace Banner.Areas.Web.Controllers
                 M.ActiveFlag = true;
                 M.SaveACID = ACID;
                 DC.SubmitChanges();
-                SetAlert("已完成落戶", 1, "/Web/AccountPlace/New_List/" + OIID);
+                SetAlert("已完成落戶", 1, "/Web/GroupPlace/New_List/" + OIID);
             }
             return View();
         }
@@ -609,10 +609,11 @@ namespace Banner.Areas.Web.Controllers
             var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8 && q.OIID == OIID);
             if (OI != null)
             {
-                var Ns = from q in GetMOIAC(OI.OID, OI.OIID, 0).Where(q => q.JoinDate != q.CreDate && q.LeaveDate == q.CreDate && q.ActiveFlag)
+                /*var Ns = from q in GetMOIAC(OI.OID, OI.OIID, 0).Where(q => q.JoinDate != q.CreDate && q.LeaveDate == q.CreDate && q.ActiveFlag)
                          join p in DC.Baptized.Where(q => !q.DeleteFlag && !q.ImplementFlag)
                          on new { q.OIID, q.ACID } equals new { p.OIID, p.ACID }
-                         select q;
+                         select q;*/
+                var Ns = GetMOIAC(OI.OID, OI.OIID, 0).Where(q => q.JoinDate != q.CreDate && q.LeaveDate == q.CreDate && q.ActiveFlag && q.Account.BaptizedType == 0);
                 cTL.TotalCt = Ns.Count();
                 cTL.MaxNum = GetMaxNum(cTL.TotalCt, cTL.NumCut);
                 Ns = Ns.OrderByDescending(q => q.ACID == OI.ACID).ThenByDescending(q => q.CreDate).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut);
@@ -657,6 +658,7 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Baptized_Edit(int ID)
         {
             GetViewBag();
+            DateTime DT_ = Convert.ToDateTime("2000/1/1");
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             GetID();
             Baptized N = new Baptized();
@@ -672,12 +674,11 @@ namespace Banner.Areas.Web.Controllers
                     {
                         Account = M.Account,
                         OIID = M.OIID,
-                        BaptismDate = DT,
-                        ImplementFlag = false
+                        BaptismDate = DT_,
+                        ImplementFlag = false,
+                        CreDate= DT_
                     };
                 }
-                else if (N.BaptismDate == N.CreDate)
-                    N.BaptismDate = DT;
             }
             return View(N);
         }
@@ -686,6 +687,7 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Baptized_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
+            DateTime DT_ = Convert.ToDateTime("2000/1/1");
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             GetID();
             Baptized N = new Baptized();
@@ -699,16 +701,14 @@ namespace Banner.Areas.Web.Controllers
                     {
                         Account = M.Account,
                         OIID = M.OIID,
-                        BaptismDate = DT,
+                        BaptismDate = DT_,
                         ImplementFlag = false
                     };
                 }
-                else if (N.BaptismDate == N.CreDate)
-                    N.BaptismDate = DT;
 
                 if (FC != null)
                 {
-                    DateTime DT_ = DT;
+                    DT_ = DT;
                     try
                     {
                         DT_ = Convert.ToDateTime(FC.Get("txb_BaptismDate"));

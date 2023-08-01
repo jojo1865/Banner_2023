@@ -21,7 +21,7 @@
         <div class="w-100 mt-2">
             <form method="post" id="form1">
                 @Html.AntiForgeryToken()
-                <label><span>．落戶原則：小組員需4次聚會議以上，再進行落戶。</span></label>
+                <label><span>．落戶原則：小組員需聚會4次以上，再進行落戶。</span></label>
                 @Html.Action("_TableList", "Include", new { cTL = Model })
             </form>
         </div>
