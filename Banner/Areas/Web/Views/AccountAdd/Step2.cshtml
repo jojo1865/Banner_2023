@@ -138,7 +138,7 @@
                     <div class="row mt-2">
                         <div class="col d-flex">
                             <div class="form-group" style="flex: 1">
-                                <label>驗證方式</label>
+                                <label>驗證方式</label><br />
                                 <div class="form-check form-check-inline">
                                     @Html.RadioButton("rbut_Con", true, true, new { @id = "rbut_Con1", @class = "form-check-input", required = string.Empty })
                                     @Html.Label("手機", new { @class = "form-check-label", @for = "rbut_Con1" })
@@ -165,9 +165,9 @@
 
                     <div class="row mt-2">
                         <div class="col mt-3 mb-5 text-center">
-                            <a style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit" href="/Web/AccountPlace/Step1"><img src="/Areas/Web/Content/Img/save.svg" alt="" />上一步</a>
+                            <a style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit" href="/Web/AccountAdd/Step1?ACID=16DEB26362377E03"><img src="/Areas/Web/Content/Img/Back.svg" style="width:25px;"  alt="" />上一步</a>
                             
-                            <button type="submit" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/save.svg" alt="" />下一步</button>
+                            <button type="submit" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
 
                         </div>
                     </div>

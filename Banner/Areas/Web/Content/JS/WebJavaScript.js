@@ -313,23 +313,38 @@ function checkemail(txb_email) {
 }
 function checkLogin(txb) {
     if (txb.value != "") {
-        /*$.ajax({
-            url: '/Web/AccountAdd/CheckLogin?input=' + txb.value,
-            method: 'GET',
-            dataType: 'text',
-            success: function (res) {
-                if (res == 'OK') {
+        fetch('/Web/AccountAdd/CheckLogin?input=' + txb.value)
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (myJson) {
+                console.log(myJson.res);
+                if (myJson.res == 'OK') {
                     document.getElementById('cbox_Login_Success').checked = true;
                     document.getElementById('div_Login').innerHTML = '';
                 }
                 else {
                     document.getElementById('cbox_Login_Success').checked = false;
-                    document.getElementById('div_Login').innerHTML = '<span style="color:red">' + res + '</span>';
+                    document.getElementById('div_Login').innerHTML = '<span style="color:red">' + myJson.res + '</span>';
                 }
+            });
+
+        
+        /*$.ajax({
+            url: '/Web/AccountAdd/CheckLogin?input=' + txb.value,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                
             }
         });*/
 
-        document.getElementById('cbox_Login_Success').checked = true;
+        /*document.getElementById('cbox_Login_Success').checked = true;
+        document.getElementById('div_Login').innerHTML = '';
+        */
+    }
+    else {
+        document.getElementById('cbox_Login_Success').checked = false;
         document.getElementById('div_Login').innerHTML = '';
     }
     return;

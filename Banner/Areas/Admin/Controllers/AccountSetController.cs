@@ -165,7 +165,7 @@ namespace Banner.Areas.Admin.Controllers
             if (FC != null)
             {
                 if (!string.IsNullOrEmpty(FC.Get("txb_Name")))
-                    Ns = Ns.Where(q => q.Name.Contains(FC.Get("txb_Name")));
+                    Ns = Ns.Where(q => (q.Name_First + q.Name_Last).Contains(FC.Get("txb_Name")));
 
                 if (!string.IsNullOrEmpty(FC.Get("txb_PhoneNo")))
                 {
@@ -432,7 +432,7 @@ namespace Banner.Areas.Admin.Controllers
                                 cTR.Cs.Add(new cTableCell { Value = "" });//小組
                             }
 
-                            cTR.Cs.Add(new cTableCell { Value = N.Name.ToString() });//姓名
+                            cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });//姓名
                             cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
 
                             var B = DC.Baptized.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.BID).FirstOrDefault();
@@ -485,7 +485,7 @@ namespace Banner.Areas.Admin.Controllers
                                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_New_Edit/" + N.ACID, Target = "_black", Value = "分發" });//操作
                             else
                                 cTR.Cs.Add(new cTableCell { Value = "" });//操作
-                            cTR.Cs.Add(new cTableCell { Value = N.Name });//姓名
+                            cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });//姓名
                             cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
                             cTR.Cs.Add(new cTableCell { Value = N.Birthday != N.CreDate ? N.Birthday.ToString(DateFormat) : "" });//生日
                             cTR.Cs.Add(new cTableCell { Value = CellPhone });//手機
@@ -521,7 +521,7 @@ namespace Banner.Areas.Admin.Controllers
                                     cTR.Cs.Add(new cTableCell { Value = "資料未同步" });
                             }
                             //操作
-                            cTR.Cs.Add(new cTableCell { Value = N.Name });//姓名
+                            cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });//姓名
                             cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
                             cTR.Cs.Add(new cTableCell { Value = N.Birthday != N.CreDate ? N.Birthday.ToString(DateFormat) : "" });//生日
                             cTR.Cs.Add(new cTableCell { Value = CellPhone });//手機
@@ -1012,7 +1012,8 @@ namespace Banner.Areas.Admin.Controllers
                 #region 介面資料填入
                 if (FC != null)
                 {
-                    N.AC.Name = FC.Get("txb_Name");
+                    N.AC.Name_First = FC.Get("txb_Name_First");
+                    N.AC.Name_Last = FC.Get("txb_Name_Last");
                     if (ID == 0)
                     {
                         N.AC.Login = FC.Get("txb_Login");
@@ -1329,7 +1330,7 @@ namespace Banner.Areas.Admin.Controllers
             else
             {
                 N.ACID = AC.ACID;
-                N.Name = AC.Name;
+                N.Name = (AC.Name_First + AC.Name_Last);
                 var Con = DC.Contect.Where(q => q.TargetID == AC.ACID && q.TargetType == 2 && q.ContectType == 1 && q.ContectValue != "").OrderByDescending(q => q.CID).FirstOrDefault();
                 if (Con != null)
                     N.PhonoNo = Con.ContectValue;
@@ -1552,7 +1553,7 @@ namespace Banner.Areas.Admin.Controllers
             else
             {
                 N.ACID = AC.ACID;
-                N.Name = AC.Name;
+                N.Name = (AC.Name_First + AC.Name_Last);
                 var Con = DC.Contect.Where(q => q.ContectType == 1 && q.TargetType == 2 && q.TargetID == AC.ACID).OrderByDescending(q => q.CID).FirstOrDefault();
                 if (Con != null)
                     N.PhonoNo = Con.ContectValue;

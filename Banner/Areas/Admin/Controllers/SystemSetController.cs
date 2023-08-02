@@ -29,7 +29,7 @@ namespace Banner.Areas.Admin.Controllers
             public int OID = 0;
             public string OTitle = "";
         }
-        
+
         public ActionResult BackUser_List()
         {
             GetViewBag();
@@ -75,14 +75,14 @@ namespace Banner.Areas.Admin.Controllers
             if (FC != null)
             {
                 if (!string.IsNullOrEmpty(FC.Get("txb_Name")))
-                    Ns = Ns.Where(q => q.Name.Contains(FC.Get("txb_Name")));
+                    Ns = Ns.Where(q => (q.Name_First + q.Name_Last).Contains(FC.Get("txb_Name")));
                 if (!string.IsNullOrEmpty(FC.Get("txb_Account")))
                     Ns = Ns.Where(q => q.Login.Contains(FC.Get("txb_Account")));
                 if (!string.IsNullOrEmpty(FC.Get("txb_PhoneNo")))
                 {
                     string PhoneNo = FC.Get("txb_PhoneNo");
                     int ZipID = Convert.ToInt32(FC.Get("ddl_PhoneZip"));
-                    if(ZipID>0)
+                    if (ZipID > 0)
                     {
                         Ns = from q in Ns
                              join p in DC.Contect.Where(q => q.TargetType == 2 && q.ContectType == 1 && q.ContectValue.Contains(PhoneNo) && q.ZID == ZipID).GroupBy(q => q.TargetID)
@@ -97,7 +97,7 @@ namespace Banner.Areas.Admin.Controllers
                              select q;
                     }
                 }
-                    
+
 
                 if (!string.IsNullOrEmpty(FC.Get("rbl_Sex")))
                     if (FC.Get("rbl_Sex") != "0")
@@ -106,9 +106,9 @@ namespace Banner.Areas.Admin.Controllers
 
                 int iOID = Convert.ToInt32(FC.Get("ddl_O"));
                 string OITitle = FC.Get("txb_OTitle");
-                if (iOID > 0 || OITitle!="")
+                if (iOID > 0 || OITitle != "")
                 {
-                    var OIs = DC.OrganizeInfo.Where(q =>q.ActiveFlag && !q.DeleteFlag);
+                    var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag);
                     if (OITitle != "")
                         OIs = OIs.Where(q => q.Title.Contains(OITitle));
                     if (iOID > 0)
@@ -145,7 +145,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 cTableRow cTR = new cTableRow();
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/BackUser_Edit/" + N.ACID, Target = "_black", Value = "編輯" });//
-                cTR.Cs.Add(new cTableCell { Value = N.Name.ToString() });//姓名
+                cTR.Cs.Add(new cTableCell { Value = N.Name_First + N.Name_Last });//姓名
                 cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
                 cTR.Cs.Add(new cTableCell { Value = N.Login });//帳號
                 var C = DC.Contect.Where(q => q.TargetType == 2 && q.ContectType == 1 && q.TargetID == N.ACID).OrderByDescending(q => q.CID).FirstOrDefault();
@@ -155,7 +155,7 @@ namespace Banner.Areas.Admin.Controllers
             return cTL;
         }
 
-        
+
         #endregion
         #region 帳號管理-新增/修改/刪除
         public class cBackUser_Edit
@@ -188,9 +188,9 @@ namespace Banner.Areas.Admin.Controllers
             var N_ = DC.Account.FirstOrDefault(q => q.ACID != ID && !q.DeleteFlag && q.Login == cBUE.Login);
             if (N_ != null)
                 Error += "您輸入的帳號與他人重複,請重新輸入</br>";
-            else if(cBUE.PW!="")
+            else if (cBUE.PW != "")
             {
-                if(!CheckPasswork(cBUE.PW))
+                if (!CheckPasswork(cBUE.PW))
                     Error += "密碼必須為包含大小寫英文與數字的8碼以上字串</br>";
             }
             if (Error != "")
@@ -214,9 +214,9 @@ namespace Banner.Areas.Admin.Controllers
                     foreach (var B in cBUE.RList)
                     {
                         var MA = MAs.FirstOrDefault(q => q.RID.ToString() == B.Value);
-                        if(MA == null)
+                        if (MA == null)
                         {
-                            if(B.Selected)
+                            if (B.Selected)
                             {
                                 MA = new M_Rool_Account
                                 {
@@ -237,14 +237,14 @@ namespace Banner.Areas.Admin.Controllers
                         }
                         else
                         {
-                            if(!B.Selected)
+                            if (!B.Selected)
                             {
                                 MA.ActiveFlag = false;
                                 MA.DeleteFlag = true;
                                 MA.LeaveDate = MA.UpdDate = DT;
-                                
+
                             }
-                            else if(!MA.ActiveFlag)
+                            else if (!MA.ActiveFlag)
                             {
                                 MA.ActiveFlag = true;
                                 MA.JoinDate = DT;
@@ -253,7 +253,7 @@ namespace Banner.Areas.Admin.Controllers
                                 MA.SaveACID = GetACID();
                             }
                             DC.SubmitChanges();
-                        }                   
+                        }
                     }
                 }
                 SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/SystemSet/BackUser_List");

@@ -34,7 +34,8 @@ namespace Banner.Controllers
                     {
                         Login = sLogin,
                         Password = HSM.Enc_1(sLogin),
-                        Name = O.JobTitle + i,
+                        Name_First = "-",
+                        Name_Last = O.JobTitle + i,
                         ManFlag = i % 2 == 0,
                         IDNumber = "",
                         IDType = 0,
@@ -149,7 +150,8 @@ namespace Banner.Controllers
                         {
                             Login = sLogin,
                             Password = HSM.Enc_1(sLogin),
-                            Name = "會員" + (i + (j*6)),
+                            Name_First = "-",
+                            Name_Last = "會員" + (i + (j*6)),
                             ManFlag = i % 2 == 0,
                             IDNumber = "",
                             IDType = 0,

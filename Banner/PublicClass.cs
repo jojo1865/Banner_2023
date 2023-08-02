@@ -2225,7 +2225,7 @@ namespace Banner
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             if (AC != null)
             {
-                ViewBag._UserName = AC.Name;
+                ViewBag._UserName = AC.Name_First + AC.Name_Last;
                 ViewBag._UserID = ACID;
                 ViewBag._Login = AC.Login;
                 #region 上層

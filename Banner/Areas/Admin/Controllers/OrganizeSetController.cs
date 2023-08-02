@@ -243,7 +243,7 @@ namespace Banner.Areas.Admin.Controllers
                     ALS.Add(O.CreDate == O.UpdDate ? "" : O.UpdDate.ToString(DateTimeFormat));
                     var AC = ACs.FirstOrDefault(q => q.ACID == O.SaveACID);
                     if (AC != null)
-                        ALS.Add(AC.Name);
+                        ALS.Add((AC.Name_First + AC.Name_Last));
                     else
                         ALS.Add("--");
                     AL.Add((string[])ALS.ToArray(typeof(string)));
@@ -443,7 +443,7 @@ namespace Banner.Areas.Admin.Controllers
                 if (OID < 3)
                     cTR.Cs.Add(new cTableCell { Value = "" });//職分主管
                 else
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.Name });//職分主管
+                    cTR.Cs.Add(new cTableCell { Value = (N.Account.Name_First + N.Account.Name_Last) });//職分主管
                 if (N.ActiveFlag)
                     cTR.Cs.Add(new cTableCell { Value = "啟用", CSS = "btn btn-outline-success", Type = "activebutton", URL = "ChangeActive(this,'OrganizeInfo'," + N.OIID + ")" });//狀態
                 else
@@ -570,8 +570,8 @@ namespace Banner.Areas.Admin.Controllers
                               join p in OIs__.GroupBy(q => q.ACID)
                               on q.ACID equals p.Key
                               select q;
-                    foreach (var A in ACs.OrderBy(q => q.Name))
-                        cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = A.Name, Selected = A.ACID == cIE.OI.ACID });
+                    foreach (var A in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
+                        cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = (A.Name_First + A.Name_Last), Selected = A.ACID == cIE.OI.ACID });
                     if (cIE.ACList.Count > 0)
                     {
                         if (cIE.ACList.FirstOrDefault(q => q.Selected) == null)
@@ -581,7 +581,7 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         var A = DC.Account.FirstOrDefault(q => q.ACID == 1);
                         if (A != null)
-                            cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = A.Name, Selected = true });
+                            cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = (A.Name_First + A.Name_Last), Selected = true });
                         else
                             cIE.ACList.Add(new SelectListItem { Value = "", Text = "此組織內無名單可以選擇", Selected = true });
                     }
@@ -681,8 +681,8 @@ namespace Banner.Areas.Admin.Controllers
                     if (ACs.Count() == 0)
                         ACs = DC.Account.Where(q => q.ACID == 1);
                     cIE.ACList = new List<SelectListItem>();
-                    foreach (var A in ACs.OrderBy(q => q.Name))
-                        cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = A.Name });
+                    foreach (var A in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
+                        cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = A.Name_First + A.Name_Last });
                     cIE.ACList[0].Selected = true;
 
                     #endregion
@@ -762,7 +762,7 @@ namespace Banner.Areas.Admin.Controllers
             }
             var Ns = DC.M_OI_Account.Where(q => !q.DeleteFlag && q.OIID == OIID && !q.Account.DeleteFlag);
             if (!string.IsNullOrEmpty(sKey))
-                Ns = Ns.Where(q => q.Account.Name.Contains(sKey));
+                Ns = Ns.Where(q => (q.Account.Name_First + q.Account.Name_Last).Contains(sKey));
 
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "會員資料", WidthPX = 100 });
@@ -785,7 +785,7 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_black", Value = "編輯" });//
                 cTR.Cs.Add(new cTableCell { Value = N.MID.ToString() });//成員ID
                 cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() });//會員ID
-                cTR.Cs.Add(new cTableCell { Value = N.Account.Name });//姓名
+                cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });//姓名
                 if (N.JoinDate == N.CreDate)
                 {
                     cTR.Cs.Add(new cTableCell { Value = "未落戶" });//加入日期
@@ -1247,7 +1247,7 @@ namespace Banner.Areas.Admin.Controllers
                 var ACs = (from q in DC.Account
                            join p in cMLs
                            on q.ACID equals p.SaveACID
-                           select new { q.ACID, q.Name }).ToList();
+                           select new { q.ACID, q.Name_First, q.Name_Last }).ToList();
                 var Cs = (from q in DC.Contect.Where(q => q.TargetType == 3 && q.ContectType == 0)
                           join p in cMLs
                           on q.TargetID equals p.MLID
@@ -1293,7 +1293,7 @@ namespace Banner.Areas.Admin.Controllers
                     ALS.Add(cML.CreDate == cML.UpdDate ? "" : cML.UpdDate.ToString(DateTimeFormat));
                     var AC = ACs.FirstOrDefault(q => q.ACID == cML.SaveACID);
                     if (AC != null)
-                        ALS.Add(AC.Name);
+                        ALS.Add(AC.Name_First + AC.Name_Last);
                     else
                         ALS.Add("--");
                     AL.Add((string[])ALS.ToArray(typeof(string)));

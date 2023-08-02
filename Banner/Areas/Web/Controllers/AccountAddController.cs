@@ -38,8 +38,8 @@ namespace Banner.Areas.Web.Controllers
             {
                 N.ACID = AC.ACID;
                 N.Login = AC.Login;
-                N.Name_F = AC.Name.Split('@')[0];
-                N.Name_L = AC.Name.Contains("@") ? AC.Name.Split('@')[1] : "";
+                N.Name_F = AC.Name_First;
+                N.Name_L = AC.Name_Last;
                 N.Sex = AC.ManFlag;
                 N.sBD = AC.CreDate != AC.Birthday ? AC.Birthday.ToString("yyyy-MM-dd") : "";
                 N.dBD = AC.Birthday;
@@ -67,11 +67,11 @@ namespace Banner.Areas.Web.Controllers
                 N.PW = FC.Get("txb_PW1");
 
                 N.ZID = Convert.ToInt32(FC.Get("ddl_PhoneZip"));
-                N.CellPhone =  FC.Get("txb_PhoneNo");
+                N.CellPhone = FC.Get("txb_PhoneNo");
                 N.Email = FC.Get("txb_Email");
-                N.Name_F = FC.Get("txb_Name_First") ;
+                N.Name_F = FC.Get("txb_Name_First");
                 N.Name_L = FC.Get("txb_Name_Last");
-                N.Sex= Convert.ToBoolean(FC.Get("cbox_Sex"));
+                N.Sex = Convert.ToBoolean(FC.Get("cbox_Sex"));
                 N.sBD = FC.Get("txb_Birthday");
                 N.dBD = Convert.ToDateTime(N.sBD);
             }
@@ -106,13 +106,14 @@ namespace Banner.Areas.Web.Controllers
                 SetAlert("無正確傳回,請重新填寫", 2);
             else if (bLogin && bPW)
             {
-                if(N.ACID == 0)
+                if (N.ACID == 0)
                 {
                     Account AC = new Account
                     {
                         Login = N.Login,
                         Password = HSM.Enc_1(N.PW),
-                        Name = N.Name_F+"@"+N.Name_L,
+                        Name_First = N.Name_F,
+                        Name_Last = N.Name_L,
                         ManFlag = N.Sex,
                         IDNumber = "",
                         IDType = 0,
@@ -164,13 +165,14 @@ namespace Banner.Areas.Web.Controllers
                     var AC = DC.Account.FirstOrDefault(q => q.ACID == N.ACID);
                     AC.Login = N.Login;
                     AC.Password = HSM.Enc_1(N.PW);
-                    AC.Name = N.Name_F + "@" + N.Name_L;
+                    AC.Name_First = N.Name_F;
+                    AC.Name_Last = N.Name_L;
                     AC.ManFlag = N.Sex;
                     AC.Birthday = N.dBD;
                     DC.SubmitChanges();
 
                     Contect Con = DC.Contect.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == N.ACID && q.ContectType == 1);
-                    if(Con!=null)
+                    if (Con != null)
                     {
                         Con.ContectValue = N.CellPhone;
                         DC.SubmitChanges();
@@ -210,7 +212,7 @@ namespace Banner.Areas.Web.Controllers
                     }
                 }
 
-                Response.Redirect("/Web/AccountAdd/Step2?ACID" + HSM.Enc_1(N.ACID.ToString().PadLeft(5, '0')));
+                Response.Redirect("/Web/AccountAdd/Step2?ACID=" + HSM.Enc_1(N.ACID.ToString().PadLeft(5, '0')));
             }
             return View(N);
         }
@@ -219,7 +221,7 @@ namespace Banner.Areas.Web.Controllers
         public string CheckLogin(string input)
         {
             string output = "";
-            if (string.IsNullOrEmpty(input))
+            if (!string.IsNullOrEmpty(input))
             {
                 var AC = DC.Account.FirstOrDefault(q => !q.DeleteFlag && q.Login == input);
                 if (AC != null) { output = "此帳號已被使用"; }
@@ -227,14 +229,14 @@ namespace Banner.Areas.Web.Controllers
             }
             else { output = "請輸入帳號"; }
 
-            return output;
+            return "{\"res\":\"" + output + "\"}";
         }
         #endregion
         #region 註冊會員2
-        
+
         public ActionResult Step2()
         {
-            //https://localhost:44307/Web/AccountAdd/Step2?ACID16DEB26362377E03
+            //https://localhost:44307/Web/AccountAdd/Step2?ACID=16DEB26362377E03
             GetViewBag();
             string sACID = HSM.Des_1(GetQueryStringInString("ACID"));
 

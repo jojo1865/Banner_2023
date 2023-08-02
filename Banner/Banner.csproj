@@ -253,6 +253,7 @@
     <Content Include="Areas\Web\Content\Img\account-active.svg" />
     <Content Include="Areas\Web\Content\Img\account.svg" />
     <Content Include="Areas\Web\Content\Img\avatar.svg" />
+    <Content Include="Areas\Web\Content\Img\back.svg" />
     <Content Include="Areas\Web\Content\Img\banner-icon.png" />
     <Content Include="Areas\Web\Content\Img\basic-data-active.svg" />
     <Content Include="Areas\Web\Content\Img\basic-data.svg" />
@@ -294,6 +295,7 @@
     <Content Include="Areas\Web\Content\Img\meet-check-active.svg" />
     <Content Include="Areas\Web\Content\Img\meet-check.svg" />
     <Content Include="Areas\Web\Content\Img\message-push.png" />
+    <Content Include="Areas\Web\Content\Img\Next.svg" />
     <Content Include="Areas\Web\Content\Img\password.png" />
     <Content Include="Areas\Web\Content\Img\people-edit-active.svg" />
     <Content Include="Areas\Web\Content\Img\people-edit.svg" />

@@ -246,7 +246,7 @@ namespace Banner.Areas.Web.Controllers
                     //職分
                     cTR.Cs.Add(new cTableCell { Value = N.ACID == OI.ACID ? OI.Organize.JobTitle : "小組員" });
                     //姓名
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.Name });
+                    cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });
                     //性別
                     cTR.Cs.Add(new cTableCell { Value = N.Account.ManFlag ? "男" : "女" });
                     //生日
@@ -467,7 +467,7 @@ namespace Banner.Areas.Web.Controllers
                     cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/New_Edit/" + N.MID, Target = "_self", Value = "落戶" });
                     cTR.Cs.Add(cTC);
                     //姓名
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.Name });
+                    cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });
                     //性別
                     cTR.Cs.Add(new cTableCell { Value = N.Account.ManFlag ? "男" : "女" });
                     //生日
@@ -623,7 +623,7 @@ namespace Banner.Areas.Web.Controllers
                     //操作
                     cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Baptized_Edit/" + N.MID, Target = "_self", Value = "設定受洗日期" });
                     //姓名
-                    cTR.Cs.Add(new cTableCell { Value = N.Account.Name });
+                    cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });
                     //性別
                     cTR.Cs.Add(new cTableCell { Value = N.Account.ManFlag ? "男" : "女" });
                     //生日

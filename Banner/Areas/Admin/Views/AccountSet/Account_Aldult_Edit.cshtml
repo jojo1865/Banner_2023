@@ -19,10 +19,16 @@
                         </div>
                         <div class="form-card">
                             <div class="row">
-                                <div class="col">
+                                <div class="col-6">
                                     <div class="form-group">
-                                        <label>姓名<span>*</span></label>
-                                        @Html.TextBox("txb_Name", Model.AC.Name, new { @class = "form-control form-control-lg input-underline" })
+                                        <label>姓<span>*</span></label>
+                                        @Html.TextBox("txb_Name_First", Model.AC.Name_First, new { @class = "form-control form-control-lg input-underline" })
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label>名<span>*</span></label>
+                                        @Html.TextBox("txb_Name_First", Model.AC.Name_Last, new { @class = "form-control form-control-lg input-underline" })
                                     </div>
                                 </div>
                             </div>

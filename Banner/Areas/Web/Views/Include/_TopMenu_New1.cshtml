@@ -1,14 +1,22 @@
 ﻿@model List<Banner.Models.cMenu>
 <!--新選單-->
 
-<nav class="navbar navbar-expand-md">
+<nav class="navbar navbar-expand-md navbar-mobile">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+        @* <span class="navbar-toggler-icon"></span> *@
+        <div class="btn-menu">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <div class="collapse navbar-collapse " id="navbarNavDropdown">
         @if (Model != null)
         {
             <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="nav-link" target="_blank">進入後台</a>
+                </li>
                 @foreach (var M1 in Model.OrderBy(q => q.SortNo))
                 {
                     if (M1.Items.Count > 0)
@@ -28,11 +36,11 @@
                                                     if (M3.Items.Count > 0)
                                                     {
                                                         <li>
-                                                            <a class="dropdown-item dropdown-toggle" href="@M3.Url">@M3.Title</a>
+                                                            <a class="dropdown-item dropdown-toggle" href="@M3.Url" >@M3.Title</a>
                                                             <ul class="dropdown-menu">
                                                                 @foreach (var M4 in M3.Items.OrderBy(q => q.SortNo))
                                                                 {
-                                                                    <li><a class="dropdown-item" href="@M4.Url">@M4.Title</a></li>
+                                                                    <li><a class="dropdown-item" href="@M4.Url" >@M4.Title</a></li>
                                                                 }
                                                             </ul>
                                                         </li>
@@ -40,7 +48,7 @@
                                                     }
                                                     else
                                                     {
-                                                        <li><a class="dropdown-item" href="@M3.Url">@M3.Title</a></li>
+                                                        <li><a class="dropdown-item" href="@M3.Url" >@M3.Title</a></li>
                                                     }
                                                 }
                                             </ul>

@@ -73,8 +73,8 @@ namespace Banner.Areas.Web.Controllers
                             DC.SubmitChanges();
 
                             SetBrowserData("ACID", AC.ACID.ToString());
-                            SetBrowserData("UserName", AC.Name.ToString());
-                            SetAlert(AC.Name + " 歡迎回來", 1, "/Web/Home/Index");
+                            SetBrowserData("UserName", AC.Name_First + AC.Name_Last);
+                            SetAlert(AC.Name_First + AC.Name_Last + " 歡迎回來", 1, "/Web/Home/Index");
                         }
                         else
                         {
@@ -114,8 +114,8 @@ namespace Banner.Areas.Web.Controllers
                     DelSession("LoginCt");
                     DelSession("LoginAccount");
                     LogInAC(AC.ACID);
-                    SetBrowserData("UserName", AC.Name.ToString());
-                    SetAlert(AC.Name + " 歡迎回來", 1, "/Web/Home/Index");
+                    SetBrowserData("UserName", AC.Name_First + AC.Name_Last);
+                    SetAlert(AC.Name_First + AC.Name_Last + " 歡迎回來", 1, "/Web/Home/Index");
                 }
             }
             return View();
@@ -154,7 +154,7 @@ namespace Banner.Areas.Web.Controllers
                             "請立即登入，即可修改密碼。</br></br>" +
                             "如需有任何問題，請寫信至itsupport@wwbch.org</br></br>" +
                             "旌旗教會 敬上";
-                        SendMail(Email, AC.Name, "【全球旌旗資訊網】忘記密碼通知信", string.Format(MailData, PW.ToString()));
+                        SendMail(Email, AC.Name_First + AC.Name_Last, "【全球旌旗資訊網】忘記密碼通知信", string.Format(MailData, PW.ToString()));
                         SetAlert("您的新密碼已發送,請查看您的信箱", 1, "/Web/Home/Login");
                     }
                     else
@@ -223,7 +223,7 @@ namespace Banner.Areas.Web.Controllers
                            "您的帳號為：{0}</br></br>" +
                            "如需有任何問題，請寫信至itsupport@wwbch.org</br></br>" +
                            "旌旗教會 敬上";
-                        SendMail(Email, AC.Name, "【全球旌旗資訊網】忘記帳號通知信", string.Format(MailData, AC.Login));
+                        SendMail(Email, AC.Name_First + AC.Name_Last, "【全球旌旗資訊網】忘記帳號通知信", string.Format(MailData, AC.Login));
                         SetAlert("您的帳號已發送,請查看您的信箱", 1, "/Web/Home/Login");
                     }
                     else

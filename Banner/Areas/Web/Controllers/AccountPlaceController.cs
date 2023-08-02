@@ -355,7 +355,8 @@ namespace Banner.Areas.Web.Controllers
                 #region 介面資料填入
                 if (FC != null)
                 {
-                    N.AC.Name = FC.Get("txb_Name");
+                    N.AC.Name_First = FC.Get("txb_Name_First");
+                    N.AC.Name_Last = FC.Get("txb_Name_Last");
                     /*if (ID == 0)
                     {
                         N.AC.Login = FC.Get("txb_Login");
