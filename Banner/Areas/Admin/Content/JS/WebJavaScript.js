@@ -284,3 +284,10 @@ function Baptized(ACID) {
         }, false)
     })
 })()
+/*切換顯示受洗選單 */
+function ShowBaptizedTypeddl(rbut) {
+    document.getElementById('ddl_BaptizedType').style.display = (rbut.checked ? "" : "none");
+}
+function HideBaptizedTypeddl(rbut) {
+    document.getElementById('ddl_BaptizedType').style.display = (!rbut.checked ? "" : "none");
+}

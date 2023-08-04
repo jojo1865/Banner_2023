@@ -135,7 +135,7 @@
                             <label>帳號</label>
                             @if (Model.Login != "")
                             {
-                                <span class="orm-control form-control-lg input-underline lab_gray">@Model.Login</span>
+                                @Html.TextBox("txb_Login_Old", Model.Login, new { @class = "form-control form-control-lg input-underline lab_gray", @placeholder = "請輸入帳號", required = string.Empty, @readonly = string.Empty, onchange = "checkLogin(this);" })
                                 <div class="d-none">
                                     @Html.TextBox("txb_Login", Model.Login)
                                     @Html.CheckBox("cbox_Login_Success", true)
@@ -148,7 +148,6 @@
                                     @Html.CheckBox("cbox_Login_Success")
                                 </div>
                             }
-
                         </div>
 
                         <div class="col-12 text-end" id="div_Login"></div>
@@ -195,7 +194,7 @@
                     <div class="row mt-2">
                         <div class="col mt-3">
                             <label>手機號碼</label>
-                            @Html.Action("_ContectEdit", "Include", new { C = new Contect { ContectType = 1, ContectValue = Model.CellPhone, ZID = Model.ZID }, required = true })
+                            @Html.Action("_ContectEdit", "Include", new { C = new Contect { ContectType = 1, ContectValue = Model.CellPhone, ZID = Model.ZID_Phone }, required = true })
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -228,6 +227,12 @@
                                 @Html.RadioButton("cbox_Sex", false, !Model.Sex, new { @id = "cbox_Sex2", @class = "form-check-input", required = string.Empty })
                                 @Html.Label("女", new { @class = "form-check-label", @for = "cbox_Sex2" })
                             </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col mt-3">
+                            <label>居住國家</label>
+                            @Html.DropDownList("ddl_CountryZip", Model.Zs, new { @class = "form-select form-select-lg ms-0 me-0" })
                         </div>
                     </div>
                     <div class="row mt-2">

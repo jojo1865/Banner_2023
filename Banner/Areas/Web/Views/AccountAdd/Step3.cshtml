@@ -1,0 +1,329 @@
+﻿@model Banner.Areas.Web.Controllers.AccountAddController.cStep3
+@{
+    ViewBag.Title = "Step1";
+    Layout = "~/Areas/Web/Views/Include/_MasterAccountAdd.cshtml";
+}
+<style>
+    span.circle-on {
+        font-family: Courier, Arial;
+        font-size: 18px;
+        -webkit-border-radius: 40px;
+        -moz-border-radius: 40px;
+        border-radius: 40px;
+        background-color: rgb(12, 49, 118);
+        border: 3px solid rgb(12, 49, 118);
+        color: #fff;
+        display: block;
+        float: left;
+        height: 45px;
+        padding: 7px 8px 13px 8px;
+        text-align: center;
+        vertical-align: top;
+        width: 45px;
+    }
+
+    span.circle-off {
+        font-family: Courier, Arial;
+        font-size: 18px;
+        -webkit-border-radius: 40px;
+        -moz-border-radius: 40px;
+        border-radius: 40px;
+        background-color: #CCC;
+        border: 3px solid #CCC;
+        color: #fff;
+        display: block;
+        float: left;
+        height: 45px;
+        padding: 7px 8px 13px 8px;
+        text-align: center;
+        vertical-align: top;
+        width: 45px;
+    }
+
+    div.topbar-on-xl {
+        height: 3px;
+        width: 180px;
+        background-color: rgb(12, 49, 118);
+        margin-top: 20px;
+    }
+
+    div.topbar-off-xl {
+        height: 3px;
+        width: 180px;
+        background-color: #CCC;
+        margin-top: 20px;
+    }
+
+    div.topbar-on {
+        height: 3px;
+        width: 80px;
+        background-color: rgb(12, 49, 118);
+        margin-top: 20px;
+    }
+
+    div.topbar-off {
+        height: 3px;
+        width: 80px;
+        background-color: #CCC;
+        margin-top: 20px;
+    }
+
+    .form-control-lg {
+        min-height: 0 !important;
+    }
+
+    label {
+        font-size: 1.25rem;
+    }
+    /*本頁客製*/
+    .card-header {
+        background-color: #e9f1ff;
+        color: #0c3176;
+    }
+
+    .card-body {
+        background-color: #fafcff;
+    }
+    .swal2-title {
+        background-color: #0c3176;
+        color: #FFF;
+        padding-bottom:15px;
+    }
+</style>
+<!--上方步驟-->
+<div class="row p-xxl-5 p-2 mt-4 justify-content-md-center">
+    <div class="col-sm-auto col p-0">
+        <span class="circle-on">1</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-on-xl d-xl-block d-none"></div>
+        <div class="topbar-on d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-on">2</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-on-xl d-xl-block d-none"></div>
+        <div class="topbar-on d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-on">3</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-off-xl d-xl-block d-none"></div>
+        <div class="topbar-off d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-off">4</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-off-xl d-xl-block d-none"></div>
+        <div class="topbar-off d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-off">5</span>
+    </div>
+</div>
+<div class="row justify-content-md-center">
+    @{ 
+        string StyleAdd = "";
+    }
+    <div class="col-lg-8 col-12 text-center">
+        <span style="color: #aa9159;">驗證成功!請填寫其他資料</span>
+    </div>
+    <div class="col-lg-8 col-12">
+        <div class="row">
+            <div class="col-auto">
+                <div style="width: 10px; background-color: rgb(12, 49, 118); height:32px;"></div>
+            </div>
+            <div class="col-auto">
+                <label>用戶資訊</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col pt-2">
+                <div style="height: 5px; background-color: rgb(12, 49, 118); "></div>
+            </div>
+        </div>
+        <form id="form1" method="post" class="needs-validation" novalidate>
+            @Html.AntiForgeryToken()
+            <div class="card mt-2 mb-2">
+                <div class="card-header">
+                    <div class="text-center"><label>社群資料</label></div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-10 col-12">
+                            <label>社群帳號<span>*</span></label>
+                        </div>
+                        <div class="col-lg-2 col-0"></div>
+                    </div>
+                    @foreach (var CM in Model.Coms.OrderByDescending(q => q.SortNo))
+                    {
+                        <div class="row">
+                            <div class="col-lg-2 col-0"></div>
+                            <div class="col-lg-10 col-12">
+                                <div class="form-group">
+                                    <label>@CM.Title</label>
+                                    @Html.TextBox(CM.ControlName, CM.InputData, new { @class = "form-control form-control-lg input-underline", @placeholder = (CM.SortNo == 0 ? "若沒有社群帳號請填寫：無" : "請輸入" + CM.Title) })
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-0"></div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+            <div class="card mt-2 mb-2">
+                <div class="card-header">
+                    <div class="text-center"><label>其他資訊</label></div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-10 col-12">
+                            <div class="form-group">
+                                <label>身分證字號(或居留證/護照號碼)</label>
+                                @Html.TextBox("txb_SSN", Model.AC.IDNumber, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入身分證字號或居留證/護照號碼" })
+                            </div>
+
+                        </div>
+                        <div class="col-lg-2 col-0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-10 col-12">
+                            <div class="form-group">
+                                <label>電話(市話)</label>
+                                @Html.Action("_ContectEdit", "Include", new { C = Model.C })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-0"></div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="card mt-2 mb-2">
+                <div class="card-header">
+                    <div class="text-center"><label>居住地址</label></div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-10 col-12">
+                            <div class="form-group">
+                                @Html.Action("_Location_User", "Include", new { LID = Model.LID })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-0"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mt-2 mb-2">
+                <div class="card-header">
+                    <div class="text-center"><label>信仰資料</label></div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-10 col-12">
+                            <div class="form-group">
+                                <label>信仰狀態及受洗資料</label>
+                                <div class="form-check">
+                                    @Html.RadioButton("rbl_BaptizedType", 1, Model.AC.BaptizedType > 0, new { @id = "rbl_Baptized2", @class = "form-check-input", @onchange = "ShowBaptizedTypeddl(this)" })
+                                    @Html.Label("已受洗", new { @class = "form-check-label", @for = "rbl_Baptized2" })
+                                </div>
+                                <div class="ps-3">
+                                    @{
+                                        if (Model.AC.BaptizedType == 0)
+                                        {
+                                            StyleAdd = "display:none";
+                                        }
+                                    }
+                                    @Html.DropDownList("ddl_BaptizedType", Model.BaptizedTypes, new { @class = "form-select form-select-lg select-baptism-status", @style = StyleAdd })
+                                </div>
+                                <div class="form-check">
+                                    @Html.RadioButton("rbl_BaptizedType", 0, Model.AC.BaptizedType == 0, new { @id = "rbl_Baptized1", @class = "form-check-input", @onchange = "HideBaptizedTypeddl(this)" })
+                                    @Html.Label("未受洗", new { @class = "form-check-label", @for = "rbl_Baptized1" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-10 col-12">
+                            <div class="form-group">
+                                <label>旌旗主日聚會點</label>
+                                @Html.DropDownList("ddl_ML", Model.MLs, new { @class = "form-select form-select-lg select-baptism-status" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-0"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-2 mb-2">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-10 col-12">
+                            <div class="form-check">
+
+                                <input type="checkbox" name="cbox_Allow" id="cbox_Allow" class="form-check-input" required />
+                                <label for="cbox_Allow" class="form-label">
+                                    我已詳細閱讀並同意<a href="javascript:;" onclick="return ShowNote();">線上奉獻規範與個資使用說明</a>
+                                </label>
+                                <div class="invalid-feedback">
+                                    請勾選同意"線上奉獻規範與個資使用說明"
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-0"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-md-center">
+                <div class="col">
+                    <div class="row mt-2">
+                        <div class="col mt-3 mb-5 text-center">
+                            <a style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit" href="/Web/AccountAdd/Step2?ACID=@Model.sACID"><img src="/Areas/Web/Content/Img/Back.svg" style="width:25px;" alt="" />上一步</a>
+
+                            <button type="submit" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="d-none">
+    <div id="div_Note">
+        <div style="height:60vh; overflow:auto;">
+            <p>親愛的弟兄姊妹，平安：</p>
+            <p>感謝您對教會事工的支持！為配合「個人資料保護法」規定及保障您的權益，請您務必詳細閱讀下列內容；當您使用本線上奉獻平台填寫奉獻相關資料、進行線上奉獻時，均視為已閱讀、知悉並同意台中旌旗教會/台中市基督教旌旗協會於下述範圍內，蒐集、處理及利用您的個人資料：</p>
+            <p>一、為了完成交易，所有在本站進行線上奉獻的奉獻者，都必須擔保所留存的資料與事實相符。</p>
+            <p>二、對於奉獻者所留存的資料，本站除採用安全交易模式外，並承諾負保密義務，除了為完成該筆交易或稅務申報而提供給相關配合單位以外，不會任意洩漏或提供給第三人。網站線上奉獻蒐集個人資料包括：</p>
+            <p class="ps-lg-2">1、辨識個人者：如捐款者姓名、地址、電話、電子郵件等資訊。</p>
+            <p class="ps-lg-2">2、辨識財務者：如信用卡、轉帳等資訊。</p>
+            <p class="ps-lg-2">3、政府資料辨識者：如身分證字號或護照號碼(外國人)等資訊。</p>
+            <p>三、奉獻者對於其個人資料、付款資料及會員帳號、密碼等資料，應妥善保管以避免外洩。所有使用其帳號和密碼進入本系統後之行為，均視為該帳號及密碼持有人之行為。</p>
+            <p>四、奉獻者一旦在本站進行線上奉獻，即表示出於自由意志奉獻並願遵守教會之奉獻規則。於本站進行線上奉獻者，同意以本站所紀錄之電子交易資料為準，如發現交易資料不正確，應立即通知教會財務同工。</p>
+            <p>五、於下列情形，本站有權提供奉獻者之個人資料予有權機關、或主張其權利受侵害並提出適當證明之第三人：</p>
+            <p>
+                ※依法令規定或依司法機關或其他有權機關的命令；<br />
+                ※為執行本條款或奉獻者違反本條款；<br />
+                ※為維護本站系統之正常運作及安全；<br />
+                ※為保護本站、其他奉獻者、或其他第三人的合法權益。
+            </p>
+            <p>
+                若您有其他相關問題，請電洽(04)2258-4446分機408<br />
+                或E-mail：fin@wwbch.org，我們將儘速處理與回覆。
+            </p>
+            <p>誠摯感謝您對教會的奉獻支持，並敬祝平安、喜樂 ！</p>
+            <p>台中旌旗教會/ 台中市基督教旌旗協會</p>
+        </div>
+    </div>
+</div>

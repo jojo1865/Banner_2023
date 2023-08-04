@@ -133,9 +133,11 @@ namespace Banner.Areas.Web.Controllers
             #region 物件初始化
 
             //主日聚會點初始化
-            N.MLs.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
+            //N.MLs.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
             N.MLs.AddRange((from q in DC.M_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag && q.SetType == 0)
                             select new SelectListItem { Text = q.Meeting_Location.Title, Value = q.MLID.ToString() }).ToList());
+            N.MLs[0].Selected = true;
+
             //社群帳號初始化
             N.Coms = new List<ListInput>();
             for (int i = 0; i < CommunityTitle.Length; i++)

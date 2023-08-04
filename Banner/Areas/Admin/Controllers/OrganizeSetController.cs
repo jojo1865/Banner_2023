@@ -533,6 +533,9 @@ namespace Banner.Areas.Admin.Controllers
                     cIE.C.TargetType = 1;
                     cIE.C.TargetID = cIE.OI.OIID;
                     cIE.C.ContectType = 0;
+                    cIE.C.CheckFlag = false;
+                    cIE.C.CreDate = DT;
+                    cIE.C.CheckDate = DT;
                     if (cIE.C.CID == 0)
                         DC.Contect.InsertOnSubmit(cIE.C);
                     DC.SubmitChanges();
@@ -984,6 +987,9 @@ namespace Banner.Areas.Admin.Controllers
                 cMLE.C.TargetType = 3;
                 cMLE.C.TargetID = cMLE.cML.MLID;
                 cMLE.C.ContectType = 0;
+                cMLE.C.CheckFlag = false;
+                cMLE.C.CreDate = DT;
+                cMLE.C.CheckDate = DT;
                 if (cMLE.C.CID == 0)
                     DC.Contect.InsertOnSubmit(cMLE.C);
                 DC.SubmitChanges();

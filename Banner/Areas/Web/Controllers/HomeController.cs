@@ -324,10 +324,21 @@ namespace Banner.Areas.Web.Controllers
             string CellPhone = (ZID == "10" ? "" : (Z != null ? Z.Code.Replace(" ","") : "") + " ") + PhoneNo.Replace(" ","");
             
             string CheckCode = GetRand(1000000).ToString().PadLeft(6, '0');
-            //Error = SendSNS(CellPhone, "【全球旌旗資訊網】手機驗證簡訊", "親愛的旌旗家人,您的驗證碼為：" + CheckCode + "。");
+            Error = SendSNS(CellPhone, "【全球旌旗資訊網】手機驗證簡訊", "親愛的旌旗家人,您的驗證碼為：" + CheckCode + "。");
 
             return (Z != null ? Z.Code : "") + " " + PhoneNo.Substring(0,4) + new string('*', PhoneNo.Length-4) + ";" + CheckCode;
         }
         #endregion
+        #region 發認證信
+        public string SendMailCode()
+        {
+            string Email = GetQueryStringInString("email");
+            string CheckCode = GetRand(1000000).ToString().PadLeft(6, '0');
+            Error = SendMail(Email, Email,"【全球旌旗資訊網】Email認證", "親愛的旌旗家人,您的驗證碼為：" + CheckCode + "。");
+
+            return Email.Split('@')[0].Substring(0, 4) + new string('*', 5) + Email.Split('@')[1] + ";" + CheckCode;
+        }
+        #endregion
+        
     }
 }

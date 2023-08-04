@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static Banner.Areas.Admin.Controllers.OrganizeSetController;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -194,6 +195,9 @@ namespace Banner.Areas.Web.Controllers
                     DC.Location.InsertOnSubmit(N.L);
 
                     N.C.TargetID = N.MS.MLID;
+                    N.C.CheckFlag = false;
+                    N.C.CreDate = DT;
+                    N.C.CheckDate = DT;
                     DC.Contect.InsertOnSubmit(N.C);
                 }
                 DC.SubmitChanges();

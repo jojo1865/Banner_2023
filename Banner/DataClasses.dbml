@@ -20,16 +20,6 @@
       <Association Name="Account_Community" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.Contect" Member="Contect">
-    <Type Name="Contect">
-      <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="TargetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ZID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ContectType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ContectValue" Type="System.String" DbType="VarChar(300) NOT NULL" CanBeNull="false" />
-    </Type>
-  </Table>
   <Table Name="dbo.JoinGroupWish" Member="JoinGroupWish">
     <Type Name="JoinGroupWish">
       <Column Name="JGWID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsDbGenerated="true" CanBeNull="false" />
@@ -318,6 +308,19 @@
       <Association Name="Account_Baptized" Member="Baptized" ThisKey="ACID" OtherKey="ACID" Type="Baptized" />
       <Association Name="Account_Family" Member="Family" ThisKey="ACID" OtherKey="ACID" Type="Family" />
       <Association Name="Account_M_O_Account" Member="M_O_Account" ThisKey="ACID" OtherKey="ACID" Type="M_O_Account" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Contect" Member="Contect">
+    <Type Name="Contect">
+      <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="TargetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TargetID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ZID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ContectType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ContectValue" Type="System.String" DbType="VarChar(300) NOT NULL" CanBeNull="false" />
+      <Column Name="CheckFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CheckDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

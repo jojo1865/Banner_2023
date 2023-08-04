@@ -7,14 +7,14 @@
 </div>
 @{ string ShowControl = Model.Z0List[0].Selected ? "" : "display:none"; }
 <div class="row div_Zip0" style="@ShowControl">
-    <div class="col-6">
+    <div class="col-lg-6 col-12">
         <div class="form-group">
             <label>城市</label>
             @Html.DropDownList("ddl_Zip1", Model.Z1List,
                    new { @class = "form-select form-select-lg", @onchange = "GetZipddl(this);" })
         </div>
     </div>
-    <div class="col-6">
+    <div class="col-lg-6 col-12">
         <div class="form-group">
             <label>地區</label>
             @Html.DropDownList("ddl_Zip2", Model.Z2List,
@@ -28,7 +28,7 @@
 </div>
 @{ ShowControl = Model.Z0List[1].Selected ? "" : "display:none"; }
 <div class="row div_Zip1" style="@ShowControl">
-    <div class="col-6">
+    <div class="col-lg-6 col-12">
         <div class="form-group">
             <label>居住國家</label>
             @Html.DropDownList("ddl_Zip3", Model.Z3List,

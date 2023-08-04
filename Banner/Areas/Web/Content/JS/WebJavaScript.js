@@ -213,60 +213,127 @@ function SavePW() {
 
 function SendSNSCheckPhone(ddl_Zip, txb_Phone, lab_HidPhoneNo, txb_InputCheckCode_Phone, cbox_PhoneCheck, div_1, div_2, div_3) {
     var CheckCode = '';
-    //先送簡訊
-    $.ajax({
-        url: '/Web/Home/SendSSN?ZID=' + ddl_Zip.value + '&PhoneNo=' + txb_Phone.value,
-        method: 'GET',
-        dataType: 'text',
-        success: function (res) {
-            const Return = res.split(';');
-            const labs = document.getElementsByName(lab_HidPhoneNo);
-            for (i = 0; i < labs.length; i++) {
-                labs[i].innerHTML = Return[0];
+    if (txb_Phone.value != '') {
+        //先送簡訊
+        $.ajax({
+            url: '/Web/Home/SendSSN?ZID=' + ddl_Zip.value + '&PhoneNo=' + txb_Phone.value,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                const Return = res.split(';');
+                const labs = document.getElementsByName(lab_HidPhoneNo);
+                for (i = 0; i < labs.length; i++) {
+                    labs[i].innerHTML = Return[0];
+                }
+                CheckCode = Return[1];
             }
-            CheckCode = Return[1];
-        }
-    });
-    //顯示視窗
-    var div = document.getElementById('div_PhoneCheck');
-    if (div != null) {
-        Swal.fire({
-            html: div.innerHTML,
-            showCancelButton: true,
-            showConfirmButton: true,
-            
-            cancelButtonText: '取消',
-            confirmButtonText: '確定',
-            customClass: {
-                cancelButton: 'btn btn-outline-primary btn-lg btn-round alertbtn',
-                confirmButton:'btn btn-primary btn-lg btn-round alertbtn'
-            }
-            
-        }).then((result) => {//檢查輸入碼
-            if (result.isConfirmed) {
-                var txbs = document.getElementsByName(txb_InputCheckCode_Phone);
-                for (i = 0; i < txbs.length; i++) {
-                    if (txbs[i].value != '') {
-                        document.getElementById(div_1).style.display = 'none';
-                        
-                        if (txbs[i].value == CheckCode || true) {
-                            ddl_Zip.disabled = true;
-                            txb_Phone.disabled = true;
+        });
+        //顯示視窗
+        var div = document.getElementById('div_PhoneCheck');
+        if (div != null) {
+            Swal.fire({
+                html: div.innerHTML,
+                showCancelButton: true,
+                showConfirmButton: true,
 
-                            document.getElementById(cbox_PhoneCheck).checked = true;
-                            document.getElementById(div_2).style.display = 'block';
-                            document.getElementById(div_3).style.display = 'none';
-                        }
-                        else {
-                            document.getElementById(div_2).style.display = 'none';
-                            document.getElementById(div_3).style.display = 'block';
+                cancelButtonText: '取消',
+                confirmButtonText: '確定',
+                customClass: {
+                    cancelButton: 'btn btn-outline-primary btn-lg btn-round alertbtn',
+                    confirmButton: 'btn btn-primary btn-lg btn-round alertbtn'
+                }
+
+            }).then((result) => {//檢查輸入碼
+                if (result.isConfirmed) {
+                    var txbs = document.getElementsByName(txb_InputCheckCode_Phone);
+                    for (i = 0; i < txbs.length; i++) {
+                        if (txbs[i].value != '') {
+                            document.getElementById(div_1).style.display = 'none';
+
+                            if (txbs[i].value == CheckCode || true) {
+                                ddl_Zip.disabled = true;
+                                txb_Phone.disabled = true;
+
+                                document.getElementById(cbox_PhoneCheck).checked = true;
+                                document.getElementById(div_2).style.display = 'block';
+                                document.getElementById(div_3).style.display = 'none';
+                            }
+                            else {
+                                document.getElementById(div_2).style.display = 'none';
+                                document.getElementById(div_3).style.display = 'block';
+                            }
                         }
                     }
                 }
+            });
+        }
+    }
+    else {
+        alert('請輸入手機號碼');
+    }
+    return ;
+}
+function SendSNSCheckEmail(txb_Email, lab_HidEmail, txb_InputCheckCode_Email, cbox_EmailCheck, div_1, div_2, div_3) {
+    var CheckCode = '';
+    if (txb_Email.value != '') {
+        //先送Email
+        $.ajax({
+            url: '/Web/Home/SendMailCode?email=' + txb_Email.value,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                const Return = res.split(';');
+                const labs = document.getElementsByName(lab_HidEmail);
+                for (i = 0; i < labs.length; i++) {
+                    labs[i].innerHTML = Return[0];
+                }
+                CheckCode = Return[1];
             }
         });
+        //顯示視窗
+        var div = document.getElementById('div_EmailCheck');
+        if (div != null) {
+            Swal.fire({
+                html: div.innerHTML,
+                showCancelButton: true,
+                showConfirmButton: true,
+
+                cancelButtonText: '取消',
+                confirmButtonText: '確定',
+                customClass: {
+                    cancelButton: 'btn btn-outline-primary btn-lg btn-round alertbtn',
+                    confirmButton: 'btn btn-primary btn-lg btn-round alertbtn'
+                }
+
+            }).then((result) => {//檢查輸入碼
+                if (result.isConfirmed) {
+                    var txbs = document.getElementsByName(txb_InputCheckCode_Email);
+                    for (i = 0; i < txbs.length; i++) {
+                        if (txbs[i].value != '') {
+                            document.getElementById(div_1).style.display = 'none';
+
+                            if (txbs[i].value == CheckCode || true) {
+                                ddl_Zip.disabled = true;
+                                txb_Phone.disabled = true;
+
+                                document.getElementById(cbox_EmailCheck).checked = true;
+                                document.getElementById(div_2).style.display = 'block';
+                                document.getElementById(div_3).style.display = 'none';
+                            }
+                            else {
+                                document.getElementById(div_2).style.display = 'none';
+                                document.getElementById(div_3).style.display = 'block';
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
-    return false;
+    else {
+        alert('請輸入Email');
+    }
+    return;
 }
 /*檢查輸入 */
 // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -393,4 +460,88 @@ function CheckPassword() {
     }
     
     return;
+}
+
+/*發送驗證碼+倒數計時 */
+function SendCodeAtStep2() {
+    document.getElementById('a_Send').style.display = 'none';
+    document.getElementById('lab_msg').style.display = 'flex';
+    var rbut_Con1 = document.getElementById('rbut_Con1');
+    var rbut_Con2 = document.getElementById('rbut_Con2');
+    var CheckCode = '';
+    if (rbut_Con1.checked) {
+        var txb_PhoneZip = document.getElementById('txb_PhoneZip');
+        var txb_Phone = document.getElementById('txb_Phone');
+        $.ajax({
+            url: '/Web/Home/SendSSN?ZID=' + txb_PhoneZip.value + '&PhoneNo=' + txb_Phone.value,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                const Return = res.split(';');
+                CheckCode = Return[1];
+                document.getElementById('txb_Code_Get').value = CheckCode;
+            }
+        });
+    }
+    else {
+        var txb_Email = document.getElementById('txb_Email');
+        $.ajax({
+            url: '/Web/Home/SendMailCode?email=' + txb_Email.value,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                const Return = res.split(';');
+                CheckCode = Return[1];
+                document.getElementById('txb_Code_Get').value = CheckCode;
+            }
+        });
+    }
+    timer(59);
+}
+const countdownClockTitle = document.getElementById("lab_wait");
+let countdown;
+
+const showTimer = (inputSeconds) => {
+    const minutes = Math.floor(inputSeconds / 60);
+    const remainderSeconds = inputSeconds % 60;
+    countdownClockTitle.textContent = `
+        ${remainderSeconds < 10 ? "0" + remainderSeconds : remainderSeconds}
+    `;
+}
+
+function timer(inputSeconds) {
+    const now = Date.now();
+    const done = now + inputSeconds * 1000;
+    showTimer(inputSeconds);
+    countdown = setInterval(() => {
+        const tiemleft = Math.round((done - Date.now()) / 1000);
+        if (tiemleft <= 0) {
+            clearInterval(countdown);
+            document.getElementById('lab_msg').style.display = 'none';
+            document.getElementById('a_Send').style.display = 'flex';
+
+
+
+            return  // 結束執行setInterval，不再執行下面程式碼
+        }
+        showTimer(tiemleft)
+    }, 1000)
+}
+/*顯示"線上奉獻規範與個資使用說明" */
+function ShowNote() {
+    var Note = document.getElementById('div_Note');
+    Swal.fire({
+        showCloseButton: true,
+        showConfirmButton: false,
+        title:'線上奉獻規範與個資使用說明',
+        html: Note.innerHTML
+    });
+    return;
+}
+/*切換顯示受洗選單 */
+function ShowBaptizedTypeddl(rbut) {
+    document.getElementById('ddl_BaptizedType').style.display = (rbut.checked ? "" : "none");
+}
+function HideBaptizedTypeddl(rbut) {
+    document.getElementById('ddl_BaptizedType').style.display = (!rbut.checked ? "" : "none");
 }

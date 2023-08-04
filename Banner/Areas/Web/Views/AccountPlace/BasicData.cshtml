@@ -353,9 +353,9 @@
                                     @if (Con.RequiredFlag)
                                     {
                                         <div class="col-auto" id="div_Checkbtn_Phone" style="display:block;">
-                                            <button class="btn btn-primary btn-round btn-sm btn-verify-phone" onclick="return SendSNSCheckPhone(@Con.ControlName1,@Con.ControlName2, 'lab_HidPhoneNo', 'txb_InputCheckCode_Phone','cbox_PhoneCheck', 'div_Checkbtn_Phone', 'div_Success_Phone','div_Miss_Phone')">
+                                            <a class="btn btn-primary btn-round btn-sm btn-verify-phone" href="javascript:;" onclick="return SendSNSCheckPhone(@Con.ControlName1,@Con.ControlName2, 'lab_HidPhoneNo', 'txb_InputCheckCode_Phone', 'cbox_PhoneCheck', 'div_Checkbtn_Phone', 'div_Success_Phone', 'div_Miss_Phone');">
                                                 取得手機驗證碼
-                                            </button>
+                                            </a>
                                         </div>
                                         <div class="col-auto" id="div_Success_Phone" style="display:none;">
                                             <img src="/Areas/Web/Content/Img/step-check.svg" /><span style="color: #116A2C">驗證成功</span>
@@ -370,16 +370,27 @@
                             else
                             {
                                 <div class="form-group">
+                                    <div class="col">
+                                        <div class="d-none">
+                                            @Html.CheckBox("cbox_EmailCheck")
+                                        </div>
+                                    </div>
                                     <label>@(Con.Title)<span>@(Con.RequiredFlag ? "*" : "")</span></label>
                                     @Html.TextBox(Con.ControlName2, Con.C.ContectValue, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入" + Con.Title })
                                     @if (Con.RequiredFlag)
                                     {
                                         <div class="row">
                                             <div class="col"></div>
-                                            <div class="col-auto">
-                                                <button class="btn btn-primary btn-round btn-sm btn-verify-email">
+                                            <div class="col-auto" id="div_Checkbtn_Email" style="display:block;">
+                                                <a class="btn btn-primary btn-round btn-sm btn-verify-email" href="javascript:;" onclick="return SendSNSCheckEmail(@Con.ControlName2, 'lab_HidEmail', 'txb_InputCheckCode_Email', 'cbox_EmailCheck', 'div_Checkbtn_Email', 'div_Success_Email', 'div_Miss_Email');">
                                                     電子郵件驗證
-                                                </button>
+                                                </a>
+                                            </div>
+                                            <div class="col-auto" id="div_Success_Email" style="display:none;">
+                                                <img src="/Areas/Web/Content/Img/step-check.svg" /><span style="color: #116A2C">驗證成功</span>
+                                            </div>
+                                            <div class="col-auto" id="div_Miss_Email" style="display:none;">
+                                                <img src="/Areas/Web/Content/Img/step-warning.svg" /><span style="color: red">驗證失敗</span>
                                             </div>
                                         </div>
                                     }
@@ -421,6 +432,30 @@
         <div class="row">
             <div class="col text-start">
                 <input class="form-control form-control-lg input-underline" name="txb_InputCheckCode_Phone" />
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="div_EmailCheck" class="d-none">
+    <div style="width:420px;">
+        <div class="row">
+            <div class="col text-start pb-2" style="border-bottom:2px solid darkblue;">已寄送驗證碼至</div>
+        </div>
+        <div class="row mt-2 mb-4">
+            <div class="col-6 text-start">
+                <img src="~/Areas/Web/Content/Img/ic_baseline-phone-iphone.svg" /><span name="lab_HidEmail"></span>
+            </div>
+            <div class="col-6 text-end">
+                <a>重新寄送驗證碼</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col fw-bold text-start">輸入驗證碼</div>
+        </div>
+        <div class="row">
+            <div class="col text-start">
+                <input class="form-control form-control-lg input-underline" name="txb_InputCheckCode_Email" />
             </div>
         </div>
 

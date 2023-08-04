@@ -36,9 +36,6 @@ namespace Banner
     partial void InsertCommunity(Community instance);
     partial void UpdateCommunity(Community instance);
     partial void DeleteCommunity(Community instance);
-    partial void InsertContect(Contect instance);
-    partial void UpdateContect(Contect instance);
-    partial void DeleteContect(Contect instance);
     partial void InsertLocation(Location instance);
     partial void UpdateLocation(Location instance);
     partial void DeleteLocation(Location instance);
@@ -90,6 +87,9 @@ namespace Banner
     partial void InsertAccount(Account instance);
     partial void UpdateAccount(Account instance);
     partial void DeleteAccount(Account instance);
+    partial void InsertContect(Contect instance);
+    partial void UpdateContect(Contect instance);
+    partial void DeleteContect(Contect instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -129,14 +129,6 @@ namespace Banner
 			get
 			{
 				return this.GetTable<Community>();
-			}
-		}
-		
-		public System.Data.Linq.Table<Contect> Contect
-		{
-			get
-			{
-				return this.GetTable<Contect>();
 			}
 		}
 		
@@ -281,6 +273,14 @@ namespace Banner
 			get
 			{
 				return this.GetTable<Account>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Contect> Contect
+		{
+			get
+			{
+				return this.GetTable<Contect>();
 			}
 		}
 		
@@ -676,188 +676,6 @@ namespace Banner
 						this._ACID = default(int);
 					}
 					this.SendPropertyChanged("Account");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Contect")]
-	public partial class Contect : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _CID;
-		
-		private int _TargetType;
-		
-		private int _TargetID;
-		
-		private int _ZID;
-		
-		private int _ContectType;
-		
-		private string _ContectValue;
-		
-    #region 擴充性方法定義
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnCIDChanging(int value);
-    partial void OnCIDChanged();
-    partial void OnTargetTypeChanging(int value);
-    partial void OnTargetTypeChanged();
-    partial void OnTargetIDChanging(int value);
-    partial void OnTargetIDChanged();
-    partial void OnZIDChanging(int value);
-    partial void OnZIDChanged();
-    partial void OnContectTypeChanging(int value);
-    partial void OnContectTypeChanged();
-    partial void OnContectValueChanging(string value);
-    partial void OnContectValueChanged();
-    #endregion
-		
-		public Contect()
-		{
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int CID
-		{
-			get
-			{
-				return this._CID;
-			}
-			set
-			{
-				if ((this._CID != value))
-				{
-					this.OnCIDChanging(value);
-					this.SendPropertyChanging();
-					this._CID = value;
-					this.SendPropertyChanged("CID");
-					this.OnCIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetType", DbType="Int NOT NULL")]
-		public int TargetType
-		{
-			get
-			{
-				return this._TargetType;
-			}
-			set
-			{
-				if ((this._TargetType != value))
-				{
-					this.OnTargetTypeChanging(value);
-					this.SendPropertyChanging();
-					this._TargetType = value;
-					this.SendPropertyChanged("TargetType");
-					this.OnTargetTypeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetID", DbType="Int NOT NULL")]
-		public int TargetID
-		{
-			get
-			{
-				return this._TargetID;
-			}
-			set
-			{
-				if ((this._TargetID != value))
-				{
-					this.OnTargetIDChanging(value);
-					this.SendPropertyChanging();
-					this._TargetID = value;
-					this.SendPropertyChanged("TargetID");
-					this.OnTargetIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ZID", DbType="Int NOT NULL")]
-		public int ZID
-		{
-			get
-			{
-				return this._ZID;
-			}
-			set
-			{
-				if ((this._ZID != value))
-				{
-					this.OnZIDChanging(value);
-					this.SendPropertyChanging();
-					this._ZID = value;
-					this.SendPropertyChanged("ZID");
-					this.OnZIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContectType", DbType="Int NOT NULL")]
-		public int ContectType
-		{
-			get
-			{
-				return this._ContectType;
-			}
-			set
-			{
-				if ((this._ContectType != value))
-				{
-					this.OnContectTypeChanging(value);
-					this.SendPropertyChanging();
-					this._ContectType = value;
-					this.SendPropertyChanged("ContectType");
-					this.OnContectTypeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContectValue", DbType="VarChar(300) NOT NULL", CanBeNull=false)]
-		public string ContectValue
-		{
-			get
-			{
-				return this._ContectValue;
-			}
-			set
-			{
-				if ((this._ContectValue != value))
-				{
-					this.OnContectValueChanging(value);
-					this.SendPropertyChanging();
-					this._ContectValue = value;
-					this.SendPropertyChanged("ContectValue");
-					this.OnContectValueChanged();
 				}
 			}
 		}
@@ -7061,6 +6879,260 @@ namespace Banner
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Contect")]
+	public partial class Contect : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _CID;
+		
+		private int _TargetType;
+		
+		private int _TargetID;
+		
+		private int _ZID;
+		
+		private int _ContectType;
+		
+		private string _ContectValue;
+		
+		private bool _CheckFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _CheckDate;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnCIDChanging(int value);
+    partial void OnCIDChanged();
+    partial void OnTargetTypeChanging(int value);
+    partial void OnTargetTypeChanged();
+    partial void OnTargetIDChanging(int value);
+    partial void OnTargetIDChanged();
+    partial void OnZIDChanging(int value);
+    partial void OnZIDChanged();
+    partial void OnContectTypeChanging(int value);
+    partial void OnContectTypeChanged();
+    partial void OnContectValueChanging(string value);
+    partial void OnContectValueChanged();
+    partial void OnCheckFlagChanging(bool value);
+    partial void OnCheckFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnCheckDateChanging(System.DateTime value);
+    partial void OnCheckDateChanged();
+    #endregion
+		
+		public Contect()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int CID
+		{
+			get
+			{
+				return this._CID;
+			}
+			set
+			{
+				if ((this._CID != value))
+				{
+					this.OnCIDChanging(value);
+					this.SendPropertyChanging();
+					this._CID = value;
+					this.SendPropertyChanged("CID");
+					this.OnCIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetType", DbType="Int NOT NULL")]
+		public int TargetType
+		{
+			get
+			{
+				return this._TargetType;
+			}
+			set
+			{
+				if ((this._TargetType != value))
+				{
+					this.OnTargetTypeChanging(value);
+					this.SendPropertyChanging();
+					this._TargetType = value;
+					this.SendPropertyChanged("TargetType");
+					this.OnTargetTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetID", DbType="Int NOT NULL")]
+		public int TargetID
+		{
+			get
+			{
+				return this._TargetID;
+			}
+			set
+			{
+				if ((this._TargetID != value))
+				{
+					this.OnTargetIDChanging(value);
+					this.SendPropertyChanging();
+					this._TargetID = value;
+					this.SendPropertyChanged("TargetID");
+					this.OnTargetIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ZID", DbType="Int NOT NULL")]
+		public int ZID
+		{
+			get
+			{
+				return this._ZID;
+			}
+			set
+			{
+				if ((this._ZID != value))
+				{
+					this.OnZIDChanging(value);
+					this.SendPropertyChanging();
+					this._ZID = value;
+					this.SendPropertyChanged("ZID");
+					this.OnZIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContectType", DbType="Int NOT NULL")]
+		public int ContectType
+		{
+			get
+			{
+				return this._ContectType;
+			}
+			set
+			{
+				if ((this._ContectType != value))
+				{
+					this.OnContectTypeChanging(value);
+					this.SendPropertyChanging();
+					this._ContectType = value;
+					this.SendPropertyChanged("ContectType");
+					this.OnContectTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContectValue", DbType="VarChar(300) NOT NULL", CanBeNull=false)]
+		public string ContectValue
+		{
+			get
+			{
+				return this._ContectValue;
+			}
+			set
+			{
+				if ((this._ContectValue != value))
+				{
+					this.OnContectValueChanging(value);
+					this.SendPropertyChanging();
+					this._ContectValue = value;
+					this.SendPropertyChanged("ContectValue");
+					this.OnContectValueChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CheckFlag", DbType="Bit NOT NULL")]
+		public bool CheckFlag
+		{
+			get
+			{
+				return this._CheckFlag;
+			}
+			set
+			{
+				if ((this._CheckFlag != value))
+				{
+					this.OnCheckFlagChanging(value);
+					this.SendPropertyChanging();
+					this._CheckFlag = value;
+					this.SendPropertyChanged("CheckFlag");
+					this.OnCheckFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CheckDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CheckDate
+		{
+			get
+			{
+				return this._CheckDate;
+			}
+			set
+			{
+				if ((this._CheckDate != value))
+				{
+					this.OnCheckDateChanging(value);
+					this.SendPropertyChanging();
+					this._CheckDate = value;
+					this.SendPropertyChanged("CheckDate");
+					this.OnCheckDateChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 	

@@ -523,6 +523,7 @@
     <Content Include="Areas\Web\Views\Include\_LeftMenu_New2.cshtml" />
     <Content Include="Areas\Web\Views\Include\_LeftMenu_New1.cshtml" />
     <Content Include="Areas\Web\Views\AccountAdd\Step2.cshtml" />
+    <Content Include="Areas\Web\Views\AccountAdd\Step3.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

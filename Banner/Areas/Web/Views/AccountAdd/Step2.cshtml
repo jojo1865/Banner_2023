@@ -1,4 +1,4 @@
-﻿
+﻿@model Banner.Areas.Web.Controllers.AccountAddController.cStep2
 @{
     ViewBag.Title = "Step1";
     Layout = "~/Areas/Web/Views/Include/_MasterAccountAdd.cshtml";
@@ -148,10 +148,17 @@
                                     @Html.Label("Email", new { @class = "form-check-label", @for = "rbut_Con2" })
                                 </div>
                             </div>
+                            <div class="d-none">
+                                <input id="txb_PhoneZip" value="@Model.PhoneZip" />
+                                <input id="txb_Phone" value="@Model.PhoneNo" />
+                                <input id="txb_Email" value="@Model.Email" />
+                                <input id="txb_Code_Get" name="txb_Code_Get" value="" />
+                            </div>
                             <div class="from-group">
                                 <label>&nbsp;</label>
                                 <div class="visibility-container">
-                                    <a class="btn btn-primary btn-lg btn-round" href="#">傳送驗證碼</a>
+                                    <a class="btn btn-primary btn-lg btn-round" href="javascript:;" id="a_Send" onclick="SendCodeAtStep2()" style="display: flex;">傳送驗證碼</a>
+                                    <apan class="lab_gray" id="lab_msg" style="display:none;"><span id="lab_wait"></span>秒後重新發送</apan>
                                 </div>
                             </div>
                         </div>
@@ -165,7 +172,7 @@
 
                     <div class="row mt-2">
                         <div class="col mt-3 mb-5 text-center">
-                            <a style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit" href="/Web/AccountAdd/Step1?ACID=16DEB26362377E03"><img src="/Areas/Web/Content/Img/Back.svg" style="width:25px;"  alt="" />上一步</a>
+                            <a style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit" href="/Web/AccountAdd/Step1?ACID=@Model.sACID"><img src="/Areas/Web/Content/Img/Back.svg" style="width:25px;"  alt="" />上一步</a>
                             
                             <button type="submit" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
 

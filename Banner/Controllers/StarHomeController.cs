@@ -106,7 +106,10 @@ namespace Banner.Controllers
                         TargetID = AC.ACID,
                         ZID = 10,
                         ContectType = 1,
-                        ContectValue = Phone
+                        ContectValue = Phone,
+                        CheckFlag = false,
+                        CreDate = DT,
+                        CheckDate = DT
                     };
                     DC.Contect.InsertOnSubmit(Con);
                     DC.SubmitChanges();
@@ -179,7 +182,10 @@ namespace Banner.Controllers
                             TargetID = AC.ACID,
                             ZID = 10,
                             ContectType = 1,
-                            ContectValue = Phone
+                            ContectValue = Phone,
+                            CheckFlag = false,
+                            CreDate = DT,
+                            CheckDate = DT
                         };
                         DC.Contect.InsertOnSubmit(Con);
                         DC.SubmitChanges();
