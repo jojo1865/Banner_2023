@@ -165,7 +165,7 @@ namespace Banner.Areas.Web.Controllers
                     else if (FC.Get("ddl_Zip0") == "2")
                     {
                         N.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip3"));
-                        N.L.Address = FC.Get("txb_Address1_1") + "%" + FC.Get("txb_Address1_2");
+                        N.L.Address = FC.Get("txb_Address1_1") + "\n" + FC.Get("txb_Address1_2");
                     }
                     else
                     {

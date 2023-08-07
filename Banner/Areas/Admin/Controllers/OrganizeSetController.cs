@@ -722,7 +722,7 @@ namespace Banner.Areas.Admin.Controllers
                     else if (FC.Get("ddl_Zip0") == "2")
                     {
                         cIE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip3"));
-                        cIE.L.Address = FC.Get("txb_Address1_1") + "%" + FC.Get("txb_Address1_2");
+                        cIE.L.Address = FC.Get("txb_Address1_1") + "\n" + FC.Get("txb_Address1_2");
                     }
                     else
                     {
@@ -1211,7 +1211,7 @@ namespace Banner.Areas.Admin.Controllers
                 else if (FC.Get("ddl_Zip0") == "2")
                 {
                     cMLE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip3"));
-                    cMLE.L.Address = FC.Get("txb_Address1_1") + "%" + FC.Get("txb_Address1_2");
+                    cMLE.L.Address = FC.Get("txb_Address1_1") + "\n" + FC.Get("txb_Address1_2");
                 }
                 else
                 {

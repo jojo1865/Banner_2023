@@ -1,0 +1,152 @@
+﻿
+@{
+    ViewBag.Title = "Step1";
+    Layout = "~/Areas/Web/Views/Include/_MasterAccountAdd.cshtml";
+}
+<style>
+    span.circle-on {
+        font-family: Courier, Arial;
+        font-size: 18px;
+        -webkit-border-radius: 40px;
+        -moz-border-radius: 40px;
+        border-radius: 40px;
+        background-color: rgb(12, 49, 118);
+        border: 3px solid rgb(12, 49, 118);
+        color: #fff;
+        display: block;
+        float: left;
+        height: 45px;
+        padding: 7px 8px 13px 8px;
+        text-align: center;
+        vertical-align: top;
+        width: 45px;
+    }
+
+    span.circle-off {
+        font-family: Courier, Arial;
+        font-size: 18px;
+        -webkit-border-radius: 40px;
+        -moz-border-radius: 40px;
+        border-radius: 40px;
+        background-color: #CCC;
+        border: 3px solid #CCC;
+        color: #fff;
+        display: block;
+        float: left;
+        height: 45px;
+        padding: 7px 8px 13px 8px;
+        text-align: center;
+        vertical-align: top;
+        width: 45px;
+    }
+
+    div.topbar-on-xl {
+        height: 3px;
+        width: 180px;
+        background-color: rgb(12, 49, 118);
+        margin-top: 20px;
+    }
+
+    div.topbar-off-xl {
+        height: 3px;
+        width: 180px;
+        background-color: #CCC;
+        margin-top: 20px;
+    }
+
+    div.topbar-on {
+        height: 3px;
+        width: 80px;
+        background-color: rgb(12, 49, 118);
+        margin-top: 20px;
+    }
+
+    div.topbar-off {
+        height: 3px;
+        width: 80px;
+        background-color: #CCC;
+        margin-top: 20px;
+    }
+
+    .form-control-lg {
+        min-height: 0 !important;
+    }
+
+    label {
+        font-size: 1.25rem;
+        color: rgb(12, 49, 118);
+    }
+    /*本頁客製*/
+    .card-header {
+        background-color: #e9f1ff;
+        color: #0c3176;
+    }
+
+    .card-body {
+        background-color: #fafcff;
+    }
+
+    .swal2-title {
+        background-color: #0c3176;
+        color: #FFF;
+        padding-bottom: 15px;
+    }
+</style>
+<!--上方步驟-->
+<div class="row p-xxl-5 p-2 mt-4 justify-content-md-center">
+    <div class="col-sm-auto col p-0">
+        <span class="circle-on">1</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-on-xl d-xl-block d-none"></div>
+        <div class="topbar-on d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-on">2</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-on-xl d-xl-block d-none"></div>
+        <div class="topbar-on d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-on">3</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-on-xl d-xl-block d-none"></div>
+        <div class="topbar-on d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-on">4</span>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <div class="topbar-on-xl d-xl-block d-none"></div>
+        <div class="topbar-on d-xl-none d-sm-block d-none"></div>
+    </div>
+    <div class="col-sm-auto col p-0">
+        <span class="circle-on">5</span>
+    </div>
+</div>
+<div class="row justify-content-md-center">
+
+    <div class="col-lg-8 col">
+        <div class="row">
+            <div class="col-12">
+                <div style="height:20vh"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mb-3 text-center">
+                <label>註冊成功</label>
+            </div>
+            <div class="col-12 text-center">
+                <a style="color:white;" class="btn btn-primary btn-lg btn-round" href="/Web/Home/Login">登入</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div style="height:20vh"></div>
+            </div>
+        </div>
+    </div>
+</div>
+

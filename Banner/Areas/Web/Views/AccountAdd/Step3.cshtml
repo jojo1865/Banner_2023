@@ -89,6 +89,7 @@
         color: #FFF;
         padding-bottom:15px;
     }
+
 </style>
 <!--上方步驟-->
 <div class="row p-xxl-5 p-2 mt-4 justify-content-md-center">
@@ -153,23 +154,23 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                         <div class="col-lg-10 col-12">
-                            <label>社群帳號<span>*</span></label>
+                            <label>社群帳號</label>
                         </div>
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                     </div>
                     @foreach (var CM in Model.Coms.OrderByDescending(q => q.SortNo))
                     {
                         <div class="row">
-                            <div class="col-lg-2 col-0"></div>
+                            <div class="col-lg-1 col-0"></div>
                             <div class="col-lg-10 col-12">
                                 <div class="form-group">
                                     <label>@CM.Title</label>
                                     @Html.TextBox(CM.ControlName, CM.InputData, new { @class = "form-control form-control-lg input-underline", @placeholder = (CM.SortNo == 0 ? "若沒有社群帳號請填寫：無" : "請輸入" + CM.Title) })
                                 </div>
                             </div>
-                            <div class="col-lg-2 col-0"></div>
+                            <div class="col-lg-1 col-0"></div>
                         </div>
                     }
 
@@ -181,7 +182,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                         <div class="col-lg-10 col-12">
                             <div class="form-group">
                                 <label>身分證字號(或居留證/護照號碼)</label>
@@ -189,17 +190,17 @@
                             </div>
 
                         </div>
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                         <div class="col-lg-10 col-12">
                             <div class="form-group">
                                 <label>電話(市話)</label>
                                 @Html.Action("_ContectEdit", "Include", new { C = Model.C })
                             </div>
                         </div>
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                     </div>
 
 
@@ -211,13 +212,13 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                         <div class="col-lg-10 col-12">
                             <div class="form-group">
-                                @Html.Action("_Location_User", "Include", new { LID = Model.LID })
+                                @Html.Action("_Location_User", "Include", new { LID = Model.Loc.LID })
                             </div>
                         </div>
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                     </div>
                 </div>
             </div>
@@ -227,7 +228,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                         <div class="col-lg-10 col-12">
                             <div class="form-group">
                                 <label>信仰狀態及受洗資料</label>
@@ -250,17 +251,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                         <div class="col-lg-10 col-12">
                             <div class="form-group">
                                 <label>旌旗主日聚會點</label>
                                 @Html.DropDownList("ddl_ML", Model.MLs, new { @class = "form-select form-select-lg select-baptism-status" })
                             </div>
                         </div>
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                     </div>
                 </div>
             </div>
@@ -268,7 +269,7 @@
             <div class="card mt-2 mb-2">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                         <div class="col-lg-10 col-12">
                             <div class="form-check">
 
@@ -281,7 +282,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-2 col-0"></div>
+                        <div class="col-lg-1 col-0"></div>
                     </div>
                 </div>
             </div>

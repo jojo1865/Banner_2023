@@ -524,7 +524,7 @@ namespace Banner.Areas.Web.Controllers
             }
             else if (Z != null)
             {
-                if (Z.ZID == 10)
+                if (Z.ZID == 10 || Z.GroupName == "鄉鎮市區" || Z.GroupName == "縣市")
                     cL.Z0List[0].Selected = true;
                 else
                     cL.Z0List[1].Selected = true;
@@ -536,7 +536,7 @@ namespace Banner.Areas.Web.Controllers
                     foreach (var Z1 in Z1s)
                         cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID == Z.ParentID });
 
-                    var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ZID).OrderBy(q => q.Title);
+                    var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z.ParentID).OrderBy(q => q.Title);
                     foreach (var Z2 in Z2s)
                         cL.Z2List.Add(new SelectListItem { Text = Z2.Code + " " + Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID == Z.ZID });
                 }

@@ -275,9 +275,9 @@
                                             var _cJGW = _cJGWs.First();
                                             <div class="row ps-5 mt-2">
                                                 <div class="col">
-                                                    @{ htmlAT_cbox["id"] = "cbox_JoinGroupWish" + _cJGW.JoinType;}
-                                                    @Html.CheckBox("cbox_JoinGroupWish", _cJGW.SelectFalg, htmlAT_cbox)
-                                                    @Html.Label(_cJGW.GroupTitle, new { @class = "form-check-label", @for = "cbox_JoinGroupWish" + _cJGW.JoinType })
+                                                    @{ htmlAT_cbox["id"] = "cbox_JoinGroupWish" + i;}
+                                                    @Html.CheckBox((htmlAT_cbox["id"].ToString()), _cJGW.SelectFalg, htmlAT_cbox)
+                                                    @Html.Label(_cJGW.GroupTitle, new { @class = "form-check-label", @for = (htmlAT_cbox["id"].ToString()) })
 
                                                 </div>
                                                 <div class="div_CardSet1">
@@ -495,7 +495,7 @@
                                     </div>
                                 </div>
                             }
-                            
+
                         </div>
                     </div>
                     <!--複製用 預設隱藏-->

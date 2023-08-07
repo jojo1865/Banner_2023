@@ -277,7 +277,7 @@ namespace Banner.Areas.Web.Controllers
                         if (Con_ != null)
                         {
                             Con_.C = Con;
-                            if (Con.ZID != 10 && Con.ZID != 1)
+                            if (Con.ZID != 10 && Con.ZID > 1)
                             {
                                 Con_.Zips.ForEach(q => q.Selected = false);
                                 Con_.Zips.First(q => q.Value == Con.ZID.ToString()).Selected = true;
@@ -287,13 +287,14 @@ namespace Banner.Areas.Web.Controllers
                         iSort++;
                         if (iSort >= 2) break;
                     }
+                    iSort = 2;
                     foreach (var Con in Cons.Where(q => q.ContectType == 0))
                     {
                         var Con_ = N.Cons.FirstOrDefault(q => q.SortNo == iSort);
                         if (Con_ != null)
                         {
                             Con_.C = Con;
-                            if (Con.ZID != 10 && Con.ZID != 1)
+                            if (Con.ZID != 10 && Con.ZID > 1)
                             {
                                 Con_.Zips.ForEach(q => q.Selected = false);
                                 Con_.Zips.First(q => q.Value == Con.ZID.ToString()).Selected = true;
@@ -303,13 +304,14 @@ namespace Banner.Areas.Web.Controllers
                         iSort++;
                         if (iSort >= 3) break;
                     }
+                    iSort = 3;
                     foreach (var Con in Cons.Where(q => q.ContectType == 2))
                     {
                         var Con_ = N.Cons.FirstOrDefault(q => q.SortNo == iSort);
                         if (Con_ != null)
                         {
                             Con_.C = Con;
-                            if (Con.ZID != 10 && Con.ZID != 1)
+                            if (Con.ZID != 10 && Con.ZID > 1)
                             {
                                 Con_.Zips.ForEach(q => q.Selected = false);
                                 Con_.Zips.First(q => q.Value == Con.ZID.ToString()).Selected = true;
@@ -321,7 +323,47 @@ namespace Banner.Areas.Web.Controllers
                 }
                 #endregion
                 #region 入組意願調查
-                var MOIACs = GetMOIAC(0, 0, ID);
+                N.JoinGroupType = N.AC.GroupType == "有意願" ? 1 : (N.AC.GroupType == "無意願" ? 0 : 2);
+                switch (N.AC.GroupType)
+                {
+                    case "有意願":
+                        {
+                            N.JoinGroupType = 1;
+                            var Js = DC.JoinGroupWish.Where(q => q.ACID == ID).ToList();
+                            foreach (var cJGW in N.cJGWs)
+                            {
+                                var JGW = Js.FirstOrDefault(q => q.JoinType == cJGW.JoinType && q.SortNo == cJGW.SortNo);
+                                cJGW.JGW = JGW;
+                                if (JGW != null)
+                                {
+                                    if (!cJGW.SelectFalg)
+                                        cJGW.SelectFalg = cJGW.JGW.WeeklyNo > 0 && cJGW.JGW.TimeNo > 0;
+                                    cJGW.ddl_Weekly.ddlList.ForEach(q => q.Selected = false);
+                                    cJGW.ddl_Weekly.ddlList.First(q => q.Value == cJGW.JGW.WeeklyNo.ToString()).Selected = true;
+                                    cJGW.ddl_Time.ddlList.ForEach(q => q.Selected = false);
+                                    cJGW.ddl_Time.ddlList.First(q => q.Value == cJGW.JGW.TimeNo.ToString()).Selected = true;
+                                }
+                            }
+                        }
+                        break;
+
+                    case "無意願":
+                        {
+                            N.JoinGroupType = 0;
+                        }
+                        break;
+
+                    default:
+                        {
+                            N.GroupNo = N.AC.GroupType;
+                            N.JoinGroupType = 2;
+                        }
+                        break;
+                }
+
+
+
+                /*var MOIACs = GetMOIAC(0, 0, ID);
                 if (MOIACs.Count() == 0)
                     N.JoinGroupType = 0;
                 else
@@ -352,7 +394,7 @@ namespace Banner.Areas.Web.Controllers
                         N.GroupNo = MOIAC.OrganizeInfo.OIID.ToString();
                     }
 
-                }
+                }*/
                 #endregion
                 #region 介面資料填入
                 if (FC != null)
@@ -523,10 +565,33 @@ namespace Banner.Areas.Web.Controllers
                     DC.SubmitChanges();
                 }
             }
-
-
-
-
+            //入組意願調查
+            var Js = DC.JoinGroupWish.Where(q => q.ACID == N.AC.ACID).ToList();
+            foreach (var cJGW in N.cJGWs)
+            {
+                var WNo = cJGW.ddl_Weekly.ddlList.FirstOrDefault(q => q.Selected);
+                var TNo = cJGW.ddl_Time.ddlList.FirstOrDefault(q => q.Selected);
+                var JGW = Js.FirstOrDefault(q => q.JoinType == cJGW.JoinType && q.SortNo == cJGW.SortNo);
+                if (JGW != null)
+                {
+                    JGW.WeeklyNo = Convert.ToInt32(WNo.Value);
+                    JGW.TimeNo = Convert.ToInt32(TNo.Value);
+                }
+                else
+                {
+                    JGW = new JoinGroupWish
+                    {
+                        ACID = N.AC.ACID,
+                        JoinType = cJGW.JoinType,
+                        SortNo = cJGW.SortNo,
+                        WeeklyNo = Convert.ToInt32(WNo.Value),
+                        TimeNo = Convert.ToInt32(TNo.Value)
+                    };
+                    DC.JoinGroupWish.InsertOnSubmit(JGW);
+                }
+                DC.SubmitChanges();
+            }
+            SetAlert("已完成儲存", 1);
             return View(N);
         }
 
