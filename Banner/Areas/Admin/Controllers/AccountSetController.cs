@@ -9,6 +9,7 @@ using System.Data.SqlTypes;
 using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security.AntiXss;
@@ -37,6 +38,7 @@ namespace Banner.Areas.Admin.Controllers
             public int OID = 8;
             public string OTitle = "";
             public string TargetDate = "";
+            public bool bPoorFlag = false;
             public ListSelect LS_Baptized = new ListSelect();
             public ListSelect LS_Group = new ListSelect();
 
@@ -73,6 +75,7 @@ namespace Banner.Areas.Admin.Controllers
                 cAL.CellPhone = FC.Get("txb_PhoneNo");
                 cAL.CellPhoneZipID = Convert.ToInt32(FC.Get("ddl_PhoneZip"));
                 cAL.TargetDate = FC.Get("txb_TargetDate");
+                cAL.bPoorFlag = GetViewCheckBox(FC.Get("cbox_PoorFlag"));
                 if (FC.Get("ddl_Baptized") != null)
                 {
                     cAL.LS_Baptized.ddlList.ForEach(q => q.Selected = false);
@@ -87,7 +90,6 @@ namespace Banner.Areas.Admin.Controllers
 
                 if (FC.Get("txb_OTitle") != null)
                 {
-                    //cAL.OID = Convert.ToInt32(FC.Get("ddl_O"));
                     cAL.OTitle = FC.Get("txb_OTitle");
                 }
 
@@ -113,14 +115,15 @@ namespace Banner.Areas.Admin.Controllers
                 case 1://成人
                     {
                         cTL.NowURL = "/Admin/AccountSet/Account_Aldult_List";
-                        Ns = Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge);
+                        Ns = Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.Birthday != q.CreDate);
                     }
                     break;
 
                 case 2://兒童
                     {
                         cTL.NowURL = "/Admin/AccountSet/Account_Childen_List";
-                        Ns = Ns.Where(q => DT.Year - q.Birthday.Year <= iChildAge);
+
+                        Ns = Ns.Where(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
                     }
                     break;
 
@@ -150,7 +153,7 @@ namespace Banner.Areas.Admin.Controllers
 
                         //小朋友不在受洗名單範圍內,且不考慮未入組名單
                         Ns = from q in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.BaptizedType == 0)
-                             join p in GetMOIAC().Where(q => q.OIID > 1).GroupBy(q=>q.ACID).Select(q=>q.Key)
+                             join p in GetMOIAC().Where(q => q.OIID > 1).GroupBy(q => q.ACID).Select(q => q.Key)
                              on q.ACID equals p
                              select q;
                         //排除未被指定受洗日期的會員
@@ -202,7 +205,19 @@ namespace Banner.Areas.Admin.Controllers
                          join p in MOIAGs
                          on q.ACID equals p.ACID
                          select q;
+                }
 
+                //中低收入戶篩選
+                if (GetViewCheckBox(FC.Get("cbox_PoorFlag")))
+                {
+                    var Poors = from q in DC.Account_Note.Where(q => q.NoteType == 4 && !q.DeleteFlag)
+                                group q by new { q.ACID } into g
+                                select new { g.Key.ACID };
+
+                    Ns = from q in Ns
+                         join p in Poors
+                         on q.ACID equals p.ACID
+                         select q;
                 }
                 switch (iType)
                 {
@@ -276,7 +291,7 @@ namespace Banner.Areas.Admin.Controllers
 
                     case 4://受洗
                         {
-                            
+
                             if (FC.Get("ddl_Baptized") == "1")//有日期
                             {
                                 if (FC.Get("txb_TargetDate") != "")
@@ -292,10 +307,10 @@ namespace Banner.Areas.Admin.Controllers
                                     }
                                     catch
                                     {
-                                        
+
                                     }
                                 }
-                                
+
 
                             }
                             /*else if (FC.Get("ddl_Baptized") == "2")//沒日期
@@ -306,7 +321,7 @@ namespace Banner.Areas.Admin.Controllers
                                      select p;
 
                             }*/
-                            
+
                         }
                         break;
                 }
@@ -349,6 +364,11 @@ namespace Banner.Areas.Admin.Controllers
                     break;
 
                 case 2://兒童
+                    TopTitles.Add(new cTableCell { Title = "選擇", WidthPX = 50 });
+                    TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
+                    TopTitles.Add(new cTableCell { Title = "姓名" });
+                    TopTitles.Add(new cTableCell { Title = "性別", WidthPX = 50 });
+                    TopTitles.Add(new cTableCell { Title = "受洗狀態" });
                     break;
 
                 case 3://新人
@@ -449,6 +469,19 @@ namespace Banner.Areas.Admin.Controllers
                         break;
 
                     case 2://兒童
+                        {
+                            cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
+                            cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Childen_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
+                            cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });//姓名
+                            cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
+                            var B = DC.Baptized.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.BID).FirstOrDefault();
+                            if (B == null)
+                                cTR.Cs.Add(new cTableCell { Value = "--" });//受洗狀態
+                            else if (!B.ImplementFlag)
+                                cTR.Cs.Add(new cTableCell { Value = "預計於" + B.BaptismDate.ToString(DateFormat) + "受洗" });//受洗狀態
+                            else
+                                cTR.Cs.Add(new cTableCell { Value = "已於" + B.BaptismDate.ToString(DateFormat) + "受洗" });//受洗狀態
+                        }
                         break;
 
                     case 3://新人
@@ -584,6 +617,9 @@ namespace Banner.Areas.Admin.Controllers
 
             public List<cFamily> cFs;//家庭聯繫方式
 
+            public Account_Bank AB = new Account_Bank();//退款費用專用帳戶
+            public List<SelectListItem> Banks = new List<SelectListItem>();//銀行代號下拉選單
+
             public bool bPoorFlag = false;//是否為中低收戶入
             public string PoorNote = "";//中低收入戶備註
 
@@ -639,6 +675,12 @@ namespace Banner.Areas.Admin.Controllers
             var SLI = (from q in DC.ZipCode.Where(q => q.GroupName == "國" && q.ActiveFlag && q.Title != "線上").OrderBy(q => q.ParentID).ThenBy(q => q.Code)
                        select new SelectListItem { Text = q.Title + q.Code, Value = q.ZID.ToString(), Selected = q.ZID == 10 }).ToList();
             string sSLI = JsonConvert.SerializeObject(SLI);
+
+            //銀行代號
+            N.Banks = new List<SelectListItem>();
+            foreach (var B in DC.Bank.Where(q => q.ActiveFlag).OrderBy(q => q.BankNo))
+                N.Banks.Add(new SelectListItem { Text = B.BankNo.ToString().PadLeft(3, '0') + " " + B.Title, Value = B.BID.ToString() });
+            N.Banks[0].Selected = true;
 
             //List<SelectListItem>_SLI = JsonConvert.DeserializeObject<List<SelectListItem>>(sSLI);
             N.Cons = new List<cContect>
@@ -897,7 +939,7 @@ namespace Banner.Areas.Admin.Controllers
                 #endregion
                 #region 入組意願調查
                 N.JoinGroupType = N.AC.GroupType == "有意願" ? 1 : (N.AC.GroupType == "無意願" ? 0 : 2);
-                switch(N.AC.GroupType)
+                switch (N.AC.GroupType)
                 {
                     case "有意願":
                         {
@@ -1043,9 +1085,33 @@ namespace Banner.Areas.Admin.Controllers
 
 
                 #endregion
+                #region 退款帳戶
+                var AB = N.AC.Account_Bank.Where(q => !q.DeleteFlag).FirstOrDefault();
+                if (AB != null)
+                {
+                    N.AB = AB;
+                    N.Banks.ForEach(q => q.Selected = false);
+                    N.Banks.First(q => q.Value == AB.BID.ToString()).Selected = true;
+                }
+                else
+                {
+                    N.AB = new Account_Bank
+                    {
+                        Account = N.AC,
+                        BID = 2,
+                        Title = "",
+                        BankNo = "",
+                        AccountNo = "",
+                        DeleteFlag = false,
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = N.AC.ACID
+                    };
+                }
+                #endregion
                 #region 中低收入戶
                 var AC_Note = DC.Account_Note.FirstOrDefault(q => q.ACID == ID && q.NoteType == 4);
-                if(AC_Note!=null)
+                if (AC_Note != null)
                 {
                     N.bPoorFlag = !AC_Note.DeleteFlag;
                     N.PoorNote = AC_Note.Note;
@@ -1113,13 +1179,21 @@ namespace Banner.Areas.Admin.Controllers
                         }
                     }
 
+                    //退款帳戶
+                    N.AB.Title = FC.Get("txb_Bank_Title");
+                    N.AB.BankNo = FC.Get("txb_Bank_BankNo");
+                    N.AB.AccountNo = FC.Get("txb_Bank_AccountNo");
+                    N.AB.BID = Convert.ToInt32(FC.Get("ddl_Bank_BID"));
+                    N.Banks.ForEach(q => q.Selected = false);
+                    N.Banks.First(q => q.Value == FC.Get("ddl_Bank_BID")).Selected = true;
+
                     //入組意願
                     N.JoinGroupType = Convert.ToInt32(FC.Get("rbut_GroupFlag"));
                     for (int i = 0; i < 2; i++)
                     {
                         foreach (var _cJGW in N.cJGWs.Where(q => q.JoinType == (i + 1)).OrderBy(q => q.SortNo))
                         {
-                            _cJGW.SelectFalg = GetViewCheckBox(FC.Get("cbox_JoinGroupWish"+i));
+                            _cJGW.SelectFalg = GetViewCheckBox(FC.Get("cbox_JoinGroupWish" + i));
                             if (!string.IsNullOrEmpty(FC.Get(_cJGW.ddl_Weekly.ControlName)))
                             {
                                 _cJGW.ddl_Weekly.ddlList.ForEach(q => q.Selected = false);
@@ -1183,12 +1257,6 @@ namespace Banner.Areas.Admin.Controllers
 
         [HttpGet]
         public ActionResult Account_Aldult_Edit(int ID)
-        {
-            GetViewBag();
-            return View(GerAccountData(ID, null));
-        }
-        [HttpGet]
-        public ActionResult Account_Aldult_Info(int ID)
         {
             GetViewBag();
             return View(GerAccountData(ID, null));
@@ -1262,11 +1330,26 @@ namespace Banner.Areas.Admin.Controllers
                         DC.SubmitChanges();
                     }
                 }
-
-
+                //退款
+                
+                if(N.AB.BID == 0)
+                {
+                    DC.Account_Bank.InsertOnSubmit(N.AB);
+                    DC.SubmitChanges();
+                }
+                else
+                    DC.SubmitChanges();
             }
 
             return View(N);
+        }
+        #endregion
+        #region 牧養名單成人-檢視
+        [HttpGet]
+        public ActionResult Account_Aldult_Info(int ID)
+        {
+            GetViewBag();
+            return View(GerAccountData(ID, null));
         }
         #endregion
         #region 牧養成人-檢視-更新中低收入戶
@@ -1330,6 +1413,35 @@ namespace Banner.Areas.Admin.Controllers
                 N.SaveACID = GetACID();
                 DC.SubmitChanges();
             }
+        }
+        #endregion
+        #region 牧養名單兒童-列表
+        [HttpGet]
+        public ActionResult Account_Childen_List()
+        {
+            GetViewBag();
+            cAccount_List cAL = sAccount_Aldult_List(null);
+            cAL.cTL = GetAccountTable(2, null);
+
+            return View(cAL);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Account_Childen_List(FormCollection FC)
+        {
+            GetViewBag();
+            cAccount_List cAL = sAccount_Aldult_List(FC);
+            cAL.cTL = GetAccountTable(2, FC);
+
+            return View(cAL);
+        }
+        #endregion
+        #region 牧養名單兒童-檢視
+        [HttpGet]
+        public ActionResult Account_Childen_Info(int ID)
+        {
+            GetViewBag();
+            return View(GerAccountData(ID, null));
         }
         #endregion
         #region 牧養名單新人-列表

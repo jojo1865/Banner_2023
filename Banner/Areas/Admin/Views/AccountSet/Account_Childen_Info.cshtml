@@ -170,7 +170,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-card-group">
+                <div class="form-card-group d-none">
                     <div id="social" class="header-container">
                         <div class="header-left-border"></div>
                         <div class="header">社群資料</div>
@@ -228,7 +228,7 @@
                         }
                     </div>
                 </div>
-                <div class="form-card-group">
+                <div class="form-card-group d-none">
                     <div id="contact" class="header-container">
                         <div class="header-left-border"></div>
                         <div class="header">入組意願調查</div>
@@ -324,6 +324,7 @@
                         </div>
                     </div>
                 </div>
+                <!--家庭狀況-->
                 <div class="form-card-group">
                     <div id="div_family" class="header-container">
                         <div class="header-left-border"></div>
@@ -348,7 +349,7 @@
                     </div>
                     @{
                         var cF2 = Model.cFs.FirstOrDefault(q => q.SortNo1 == 2);
-                        if (cF2 != null)
+                        if (cF2 != null && false)//兒童沒配偶
                         {
                             <div class="form-card">
                                 <div class="row">
@@ -376,8 +377,6 @@
                                 </div>
                             </div>
                         }
-
-
                     }
 
                     <div class="form-card">
@@ -413,7 +412,8 @@
                         }
 
                     </div>
-                    <div class="form-card">
+                    <div class="form-card d-none">
+                        <!---兒童沒子女-->
                         @{
                             foreach (var cF in Model.cFs.Where(q => q.SortNo1 == 4).OrderBy(q => q.SortNo2))
                             {
@@ -519,7 +519,7 @@
                                 @Html.CheckBox("cbox_ActiveFlag", Model.AC.ActiveFlag, new { @class = "form-check-input" })
                             </div>
                         </div>
-                        @if (Model.bShowBackUsedAreaFlag)
+                        @if (Model.bShowBackUsedAreaFlag && false)//兒童沒權限
                         {
                             <div class="row">
                                 <div class="col-12 pt-2">
@@ -572,7 +572,7 @@
                                 <span class="submenuitem-text">信仰</span>
                             </a>
                         </li>
-                        <li class="submenuitem">
+                        <li class="submenuitem d-none">
                             <a href="#social">
                                 <span class="material-icons"> remove </span>
                                 <span class="submenuitem-text">社群</span>
@@ -590,20 +590,19 @@
             <li class="menuitem">
                 <a href="div_family">家庭狀況</a>
             </li>
-
             <li class="menuitem">
                 <a href="div_BankData">退款費用專用帳戶</a>
-                <!--</li>
-                <li class="menuitem">
-                    <a href="">多元表現</a>
-                </li>
-                <li class="menuitem">
-                    <a href="">事工團紀錄</a>
-                </li>
-                <li class="menuitem">
-                    <a href="">課程歷程</a>
-                </li>
-                    -->
+            </li>
+            <!--<li class="menuitem">
+                <a href="">多元表現</a>
+            </li>
+            <li class="menuitem">
+                <a href="">事工團紀錄</a>
+            </li>
+                    <li class="menuitem">
+                        <a href="">課程歷程</a>
+                    </li>-->
+
             <li class="menuitem">
                 <a href="#div_OtherNote">其他備註事項</a>
             </li>

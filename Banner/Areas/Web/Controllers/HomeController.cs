@@ -29,7 +29,8 @@ namespace Banner.Areas.Web.Controllers
                 }
                 Response.Redirect("/Web/Home/Index");
             }*/
-
+            TempData["login"] = "";
+            TempData["pw"] = "";
             return View();
         }
         [HttpPost]
@@ -41,6 +42,8 @@ namespace Banner.Areas.Web.Controllers
             string Login = FC.Get("txb_Login");
             string PW = FC.Get("txb_Password");
             string ValidateCode = FC.Get("txb_ValidateCode");
+            TempData["login"] = Login;
+            TempData["pw"] = PW;
 
             if (Login.Replace(" ", "") == string.Empty)
                 Error += "請輸入帳號</br>";

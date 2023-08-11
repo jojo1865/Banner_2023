@@ -1,24 +1,21 @@
 ﻿using Banner.Models;
-using Microsoft.Ajax.Utilities;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlTypes;
-using System.Drawing;
 using System.Linq;
-using System.Net;
-using System.Net.Mime;
-using System.Security.Cryptography;
 using System.Web;
-using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
-using static Banner.Areas.Web.Controllers.AccountAddController;
 
 namespace Banner.Areas.Web.Controllers
 {
-    public class AccountAddController : PublicClass
+    public class ChildrenAddController : PublicClass
     {
+        // GET: Web/ChildrenAdd
+        public ActionResult Index()
+        {
+            return View();
+        }
         #region 註冊會員1
         public class cStep1
         {
@@ -32,6 +29,7 @@ namespace Banner.Areas.Web.Controllers
             public string Name_F = "";
             public string Name_L = "";
             public bool Sex = true;
+            public bool ParentPhone = true;
             public string sBD = "";
             public DateTime dBD = DateTime.Now;
 
@@ -80,7 +78,7 @@ namespace Banner.Areas.Web.Controllers
             {
                 N.Login = FC.Get("txb_Login");
                 N.PW = FC.Get("txb_PW1");
-
+                N.ParentPhone = Convert.ToBoolean(FC.Get("cbox_PhoneOwner"));
                 N.ZID_Phone = Convert.ToInt32(FC.Get("ddl_PhoneZip"));
                 N.CellPhone = FC.Get("txb_PhoneNo");
                 N.Email = FC.Get("txb_Email");
@@ -99,8 +97,8 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Step1()
         {
             GetViewBag();
-            if (GetACID() > 0)
-                SetAlert("您已登入帳戶", 4, "/Web/Home/Index");
+            if (GetACID() <= 0)
+                SetAlert("請先登入", 4, "/Web/Home/Index");
             cStep1 N = GetStep1(HSM.Des_1(GetQueryStringInString("ACID")), null);
 
             return View(N);
@@ -114,14 +112,14 @@ namespace Banner.Areas.Web.Controllers
 
             bool bLogin = GetViewCheckBox(FC.Get("cbox_Login_Success"));
             bool bPW = GetViewCheckBox(FC.Get("cbox_PW_Success"));
-            string sPhone = CheckCellPhoneDouble(N.CellPhone);
-            string sEmail = CheckEmailDouble(N.Email);
+            string sPhone = N.ParentPhone ? "OK" : CheckCellPhoneDouble(N.CellPhone);
+            //string sEmail = CheckEmailDouble(N.Email);
             if (FC == null)
                 SetAlert("無正確傳回,請重新填寫", 2);
             else if (sPhone != "OK")
                 SetAlert(sPhone, 2);
-            else if (sEmail != "OK")
-                SetAlert(sEmail, 2);
+            //else if (sEmail != "OK")
+            //    SetAlert(sEmail, 2);
             else if (bLogin && bPW)
             {
                 if (N.ACID == 0)
@@ -147,7 +145,7 @@ namespace Banner.Areas.Web.Controllers
                         DeleteFlag = false,
                         CreDate = DT,
                         UpdDate = DT,
-                        SaveACID = 0,
+                        SaveACID = GetACID(),
                         OldID = 0
                     };
                     DC.Account.InsertOnSubmit(AC);
@@ -155,21 +153,44 @@ namespace Banner.Areas.Web.Controllers
 
                     N.ACID = AC.ACID;
 
-                    Contect Con = new Contect
+                    var Fs = DC.Family.Where(q => q.ACID == GetACID() && q.FamilyType == 3);
+                    int iMax = (Fs.Count() > 0 ? Fs.Max(q => q.SortNo) : 0) + 1;
+
+                    Family F = new Family
                     {
-                        TargetType = 2,
-                        TargetID = AC.ACID,
-                        ZID = N.ZID_Phone,
-                        ContectType = 1,
-                        ContectValue = N.CellPhone,
-                        CheckFlag = false,
-                        CreDate = DT,
-                        CheckDate = DT
+                        ACID = GetACID(),
+                        Name = N.Name_F + N.Name_L,
+                        IDNumber = "",
+                        Login = N.Login,
+                        FamilyType = 3,
+                        FamilyTitle = "",
+                        TargetACID = N.ACID,
+                        SortNo = iMax,
+                        DeleteFlag = false
                     };
-                    DC.Contect.InsertOnSubmit(Con);
+                    DC.Family.InsertOnSubmit(F);
                     DC.SubmitChanges();
 
-                    Con = new Contect
+                    Contect Con = new Contect();
+                    if (!N.ParentPhone)//兒童手機
+                    {
+                        Con = new Contect
+                        {
+                            TargetType = 2,
+                            TargetID = AC.ACID,
+                            ZID = N.ZID_Phone,
+                            ContectType = 1,
+                            ContectValue = N.CellPhone,
+                            CheckFlag = false,
+                            CreDate = DT,
+                            CheckDate = DT
+                        };
+                        DC.Contect.InsertOnSubmit(Con);
+                        DC.SubmitChanges();
+                    }
+
+                    //Email
+                    /*Con = new Contect
                     {
                         TargetType = 2,
                         TargetID = AC.ACID,
@@ -182,6 +203,7 @@ namespace Banner.Areas.Web.Controllers
                     };
                     DC.Contect.InsertOnSubmit(Con);
                     DC.SubmitChanges();
+                    */
 
                     Location L = new Location
                     {
@@ -203,7 +225,36 @@ namespace Banner.Areas.Web.Controllers
                     AC.Name_Last = N.Name_L;
                     AC.ManFlag = N.Sex;
                     AC.Birthday = N.dBD;
+                    AC.SaveACID = GetACID();
+                    AC.UpdDate = DT;
                     DC.SubmitChanges();
+
+                    var F = DC.Family.FirstOrDefault(q => q.ACID == GetACID() && q.FamilyType == 3 && q.TargetACID == AC.ACID);
+                    if (F == null)
+                    {
+                        var Fs = DC.Family.Where(q => q.ACID == GetACID() && q.FamilyType == 3);
+                        int iMax = (Fs.Count() > 0 ? Fs.Max(q => q.SortNo) : 0) + 1;
+                        F = new Family
+                        {
+                            ACID = GetACID(),
+                            Name = N.Name_F + N.Name_L,
+                            IDNumber = "",
+                            Login = N.Login,
+                            FamilyType = 3,
+                            FamilyTitle = "",
+                            TargetACID = N.ACID,
+                            SortNo = iMax,
+                            DeleteFlag = false
+                        };
+                        DC.Family.InsertOnSubmit(F);
+                        DC.SubmitChanges();
+                    }
+                    else
+                    {
+                        F.Name = N.Name_F + N.Name_L;
+                        F.Login = N.Login;
+                        DC.SubmitChanges();
+                    }
 
                     Contect Con = DC.Contect.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == N.ACID && q.ContectType == 1);
                     if (Con != null)
@@ -228,7 +279,8 @@ namespace Banner.Areas.Web.Controllers
                         DC.SubmitChanges();
                     }
 
-                    Con = DC.Contect.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == N.ACID && q.ContectType == 2);
+                    //Email
+                    /*Con = DC.Contect.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == N.ACID && q.ContectType == 2);
                     if (Con != null)
                     {
                         Con.ContectValue = N.Email;
@@ -249,8 +301,7 @@ namespace Banner.Areas.Web.Controllers
                         };
                         DC.Contect.InsertOnSubmit(Con);
                         DC.SubmitChanges();
-                    }
-
+                    }*/
 
                     Location L = DC.Location.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == N.ACID);
                     if (L != null)
@@ -272,7 +323,7 @@ namespace Banner.Areas.Web.Controllers
                     }
                 }
 
-                Response.Redirect("/Web/AccountAdd/Step2?ACID=" + HSM.Enc_1(N.ACID.ToString().PadLeft(5, '0')));
+                Response.Redirect("/Web/ChildrenAdd/Step2?ACID=" + HSM.Enc_1(N.ACID.ToString().PadLeft(5, '0')));
             }
             return View(N);
         }
@@ -327,85 +378,6 @@ namespace Banner.Areas.Web.Controllers
         {
             public string sACID = "";
             public int iACID = 0;
-            public int PhoneZip = 10;
-            public string PhoneNo = "";
-            public string Email = "";
-            public string CheckCode_Get = "";
-            public string CheckCode_Input = "";
-        }
-        public ActionResult Step2()
-        {
-            //https://localhost:44307/Web/AccountAdd/Step2?ACID=16DEB26362377E03
-            GetViewBag();
-            cStep2 N = new cStep2();
-            N.sACID = GetQueryStringInString("ACID");
-            N.iACID = Convert.ToInt32(HSM.Des_1(N.sACID));
-            var Cons = DC.Contect.Where(q => q.TargetType == 2 && q.TargetID == N.iACID).ToList();
-            var Con = Cons.FirstOrDefault(q => q.ContectType == 1);
-            if (Con != null)
-            {
-                N.PhoneZip = Con.ZID;
-                N.PhoneNo = Con.ContectValue;
-            }
-
-            Con = Cons.FirstOrDefault(q => q.ContectType == 2);
-            if (Con != null)
-                N.Email = Con.ContectValue;
-
-            return View(N);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Step2(FormCollection FC)
-        {
-            GetViewBag();
-            cStep2 N = new cStep2();
-            N.sACID = GetQueryStringInString("ACID");
-            N.iACID = Convert.ToInt32(HSM.Des_1(N.sACID));
-
-
-            var Cons = DC.Contect.Where(q => q.TargetType == 2 && q.TargetID == N.iACID).ToList();
-            var Con1 = Cons.FirstOrDefault(q => q.ContectType == 1);
-            if (Con1 != null)
-            {
-                N.PhoneZip = Con1.ZID;
-                N.PhoneNo = Con1.ContectValue;
-
-            }
-
-            var Con2 = Cons.FirstOrDefault(q => q.ContectType == 2);
-            if (Con2 != null)
-                N.Email = Con2.ContectValue;
-
-            bool PhoneFlag = Convert.ToBoolean(FC.Get("rbut_Con"));
-            string sGetCode = FC.Get("txb_Code_Get");
-            string sSetCode = FC.Get("txb_CheckCode");
-            if (sGetCode != sSetCode)
-                SetAlert("檢查碼輸入錯誤", 2);
-            else
-            {
-                if (PhoneFlag)
-                {
-                    Con1.CheckFlag = true;
-                    Con1.CheckDate = DT;
-                    DC.SubmitChanges();
-                }
-                else
-                {
-                    Con2.CheckFlag = true;
-                    Con2.CheckDate = DT;
-                    DC.SubmitChanges();
-                }
-                SetAlert("", 1, "/Web/AccountAdd/Step3?ACID=" + N.sACID);
-            }
-            return View(N);
-        }
-        #endregion
-        #region 註冊會員3
-        public class cStep3
-        {
-            public string sACID = "";
-            public int iACID = 0;
             public Account AC = new Account();
             public List<ListInput> Coms = new List<ListInput>();//社群帳號
             public Contect C = new Contect();//市話
@@ -418,9 +390,9 @@ namespace Banner.Areas.Web.Controllers
 
             public List<SelectListItem> MLs = new List<SelectListItem>();//主日聚會點
         }
-        public cStep3 SetStep3(string ACID, FormCollection FC)
+        public cStep2 SetStep2(string ACID, FormCollection FC)
         {
-            cStep3 N = new cStep3();
+            cStep2 N = new cStep2();
             N.sACID = ACID;
             #region 初始化物件
             //社群帳號
@@ -488,7 +460,7 @@ namespace Banner.Areas.Web.Controllers
                     }
                 }
                 else
-                    SetAlert("註冊資料已遺失,請重新註冊", 2, "/Web/AccountAdd/Step1");
+                    SetAlert("註冊資料已遺失,請重新註冊", 2, "/Web/ChildrenAdd/Step1");
             }
             #endregion
 
@@ -534,19 +506,18 @@ namespace Banner.Areas.Web.Controllers
             return N;
         }
         [HttpGet]
-        public ActionResult Step3()
+        public ActionResult Step2()
         {
-            //https://localhost:44307/Web/AccountAdd/Step3?ACID=16DEB26362377E03
             GetViewBag();
-            cStep3 N = SetStep3(GetQueryStringInString("ACID"), null);
+            cStep2 N = SetStep2(GetQueryStringInString("ACID"), null);
             return View(N);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Step3(FormCollection FC)
+        public ActionResult Step2(FormCollection FC)
         {
             GetViewBag();
-            cStep3 N = SetStep3(GetQueryStringInString("ACID"), FC);
+            cStep2 N = SetStep2(GetQueryStringInString("ACID"), FC);
             if (FC != null)
             {
                 //社群帳號
@@ -635,226 +606,15 @@ namespace Banner.Areas.Web.Controllers
                     DC.M_ML_Account.InsertOnSubmit(MML);
                     DC.SubmitChanges();
                 }
-                SetAlert("", 1, "/Web/AccountAdd/Step4?ACID=" + N.sACID);
+                SetAlert("", 1, "/Web/ChildrenAdd/Step3?ACID=" + N.sACID);
             }
             else
-                SetAlert("發生錯誤,將返回第一步驟", 2, "/Web/AccountAdd/Step1?ACID=" + N.sACID);
+                SetAlert("發生錯誤,將返回第一步驟", 2, "/Web/ChildrenAdd/Step1?ACID=" + N.sACID);
             return View(N);
         }
         #endregion
-        #region 註冊會員4
-        public class cStep4
-        {
-            public string sACID = "";
-            public int iACID = 0;
-            public Account AC = null;
-            public int JoinGroupType = 0;//入組意願調查選擇
-            public List<cJoinGroupWish> cJGWs = new List<cJoinGroupWish>();//加入小組有意願選項
-            public string GroupNo = "";//想加入小組的編號
-
-            public bool b_4_1 = false;//是否在旌旗小組
-            public bool b_4_2 = true;//是否願意加入旌旗小組
-        }
-        public class cJoinGroupWish
-        {
-            public bool SelectFalg = false;
-            public int JoinType = 0;
-            public int SortNo = 0;
-            public string GroupTitle = "";
-            public JoinGroupWish JGW = new JoinGroupWish();
-            public ListSelect ddl_Weekly = new ListSelect();
-            public ListSelect ddl_Time = new ListSelect();
-        }
-        public cStep4 GetStep4(string sACID, FormCollection FC)
-        {
-            #region 物件初始化
-
-            cStep4 N = new cStep4();
-            N.sACID = sACID;
-
-            //加入小組有意願選項初始化
-            N.cJGWs = new List<cJoinGroupWish>();
-            for (int i = 0; i < 2; i++)
-            {
-                for (int j = 1; j < 4; j++)
-                {
-                    cJoinGroupWish cJ = new cJoinGroupWish();
-                    cJ.JGW = new JoinGroupWish
-                    {
-                        ACID = 0,
-                        JoinType = (i + 1),
-                        SortNo = j,
-                        WeeklyNo = 0,
-                        TimeNo = 0
-                    };
-                    cJ.GroupTitle = i == 0 ? "實體" : "線上";
-                    cJ.JoinType = (i + 1);
-                    cJ.SortNo = j;
-                    cJ.ddl_Weekly = new ListSelect
-                    {
-                        Title = "星期",
-                        SortNo = j,
-                        ControlName = "ddl_Join" + i + "_WeeklyNo_" + j,
-                        ddlList = new List<SelectListItem>()
-                    };
-                    cJ.ddl_Time = new ListSelect
-                    {
-                        Title = "時段",
-                        SortNo = j,
-                        ControlName = "ddl_Join" + i + "_TimeNo_" + j,
-                        ddlList = new List<SelectListItem>()
-                    };
-                    cJ.ddl_Weekly.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-                    cJ.ddl_Time.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-                    for (int k = 0; k < sWeeks.Length; k++)
-                        cJ.ddl_Weekly.ddlList.Add(new SelectListItem { Text = sWeeks[k], Value = (k + 1).ToString() });
-                    for (int k = 0; k < sTimeSpans.Length; k++)
-                        cJ.ddl_Time.ddlList.Add(new SelectListItem { Text = sTimeSpans[k], Value = (k + 1).ToString() });
-                    N.cJGWs.Add(cJ);
-                }
-            }
-
-            #endregion
-            #region 會員資料帶入
-
-            if (!string.IsNullOrEmpty(sACID))
-            {
-                N.iACID = Convert.ToInt32(HSM.Des_1(sACID));
-                var AC = DC.Account.FirstOrDefault(q => q.ACID == N.iACID && !q.DeleteFlag);
-                if (AC != null)
-                {
-                    N.AC = AC;
-                    var MOIACs = GetMOIAC(0, 0, AC.ACID);
-                    if (MOIACs.Count() == 0)
-                        N.JoinGroupType = 0;
-                    else
-                    {
-                        var Js = DC.JoinGroupWish.Where(q => q.ACID == AC.ACID).ToList();
-                        var MOIAC = MOIACs.OrderByDescending(q => q.MID).First();
-                        if (MOIAC.OIID == 1)
-                        {
-                            N.b_4_1 = false;
-                            N.b_4_2 = false;
-                            N.JoinGroupType = 1;
-                            foreach (var cJGW in N.cJGWs)
-                            {
-                                cJGW.JGW.ACID = AC.ACID;
-                                var JGW = Js.FirstOrDefault(q => q.JoinType == cJGW.JoinType && q.SortNo == cJGW.SortNo);
-                                cJGW.JGW = JGW;
-                                if (JGW != null)
-                                {
-                                    if (!cJGW.SelectFalg)
-                                    {
-                                        cJGW.SelectFalg = cJGW.JGW.WeeklyNo > 0 && cJGW.JGW.TimeNo > 0;
-                                        if (!N.b_4_2)
-                                            N.b_4_2 = cJGW.SelectFalg;
-                                    }
-                                    cJGW.ddl_Weekly.ddlList.ForEach(q => q.Selected = false);
-                                    cJGW.ddl_Weekly.ddlList.First(q => q.Value == cJGW.JGW.WeeklyNo.ToString()).Selected = true;
-                                    cJGW.ddl_Time.ddlList.ForEach(q => q.Selected = false);
-                                    cJGW.ddl_Time.ddlList.First(q => q.Value == cJGW.JGW.TimeNo.ToString()).Selected = true;
-                                }
-                            }
-                            N.b_4_1 = N.b_4_2;
-                        }
-                        else
-                        {
-                            N.b_4_1 = true;
-                            N.b_4_2 = false;
-                            N.JoinGroupType = 2;
-                            N.GroupNo = MOIAC.OrganizeInfo.OIID.ToString();
-                        }
-                    }
-                }
-                else
-                    SetAlert("註冊資料已遺失,請重新註冊", 2, "/Web/AccountAdd/Step1");
-            }
-
-            #endregion
-            #region 帶入回傳內容
-            if (FC != null)
-            {
-                N.b_4_1 = Convert.ToBoolean(FC.Get("rbut_1"));
-                N.b_4_2 = Convert.ToBoolean(FC.Get("rbut_2"));
-                N.JoinGroupType = N.b_4_2 ? 1 : 0;
-                for (int i = 0; i < 2; i++)
-                {
-                    foreach (var _cJGW in N.cJGWs.Where(q => q.JoinType == (i + 1)).OrderBy(q => q.SortNo))
-                    {
-                        _cJGW.SelectFalg = GetViewCheckBox(FC.Get("cbox_JoinGroupWish" + i));
-                        if (!string.IsNullOrEmpty(FC.Get(_cJGW.ddl_Weekly.ControlName)))
-                        {
-                            _cJGW.ddl_Weekly.ddlList.ForEach(q => q.Selected = false);
-                            _cJGW.ddl_Weekly.ddlList.First(q => q.Value == FC.Get(_cJGW.ddl_Weekly.ControlName)).Selected = true;
-                        }
-                        if (!string.IsNullOrEmpty(FC.Get(_cJGW.ddl_Time.ControlName)))
-                        {
-                            _cJGW.ddl_Time.ddlList.ForEach(q => q.Selected = false);
-                            _cJGW.ddl_Time.ddlList.First(q => q.Value == FC.Get(_cJGW.ddl_Time.ControlName)).Selected = true;
-                        }
-
-                    }
-                }
-                if (N.JoinGroupType == 2)
-                    N.AC.GroupType = N.GroupNo = FC.Get("txb_GroupNo");
-                else
-                    N.AC.GroupType = N.JoinGroupType == 0 ? "無意願" : "有意願";
-            }
-            #endregion
-            return N;
-        }
-
-        public ActionResult Step4()
-        {
-            GetViewBag();
-            cStep4 N = GetStep4(GetQueryStringInString("ACID"), null);
-
-            return View(N);
-
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Step4(FormCollection FC)
-        {
-            GetViewBag();
-            cStep4 N = GetStep4(GetQueryStringInString("ACID"), FC);
-            if (FC != null)
-            {
-                var Js = DC.JoinGroupWish.Where(q => q.ACID == N.AC.ACID).ToList();
-                foreach (var cJGW in N.cJGWs)
-                {
-                    var WNo = cJGW.ddl_Weekly.ddlList.FirstOrDefault(q => q.Selected);
-                    var TNo = cJGW.ddl_Time.ddlList.FirstOrDefault(q => q.Selected);
-                    var JGW = Js.FirstOrDefault(q => q.JoinType == cJGW.JoinType && q.SortNo == cJGW.SortNo);
-                    if (JGW != null)
-                    {
-                        JGW.WeeklyNo = Convert.ToInt32(WNo.Value);
-                        JGW.TimeNo = Convert.ToInt32(TNo.Value);
-                    }
-                    else
-                    {
-                        JGW = new JoinGroupWish
-                        {
-                            ACID = N.AC.ACID,
-                            JoinType = cJGW.JoinType,
-                            SortNo = cJGW.SortNo,
-                            WeeklyNo = Convert.ToInt32(WNo.Value),
-                            TimeNo = Convert.ToInt32(TNo.Value)
-                        };
-                        DC.JoinGroupWish.InsertOnSubmit(JGW);
-                    }
-                    DC.SubmitChanges();
-                }
-                SetAlert("", 1, "/Web/AccountAdd/Step5?ACID=" + N.sACID);
-            }
-            else
-                SetAlert("發生錯誤,將返回第一步驟", 2, "/Web/AccountAdd/Step1?ACID=" + N.sACID);
-            return View(N);
-
-        }
-        #endregion
-        #region 註冊會員5
-        public ActionResult Step5()
+        #region 註冊會員3
+        public ActionResult Step3()
         {
             GetViewBag();
             string sACID = GetQueryStringInString("ACID");
@@ -867,15 +627,15 @@ namespace Banner.Areas.Web.Controllers
                 {
                     AC.ActiveFlag = true;
                     AC.UpdDate = DT;
-                    AC.SaveACID = AC.ACID;
+                    AC.SaveACID = GetACID();
                     DC.SubmitChanges();
                 }
                 else
-                    SetAlert("註冊完成,但因為遺失註冊會員資料無法啟用帳戶,請通知管理員協助處理", 2);
+                    SetAlert("註冊完成,但因為遺失兒童資料無法啟用兒童帳戶,請通知管理員協助處理", 2);
             }
             catch
             {
-                SetAlert("註冊完成,但因為遺失註冊會員資料無法啟用帳戶,請通知管理員協助處理", 2);
+                SetAlert("註冊完成,但因為遺失兒童資料無法啟用兒童帳戶,請通知管理員協助處理", 2);
             }
             return View();
 

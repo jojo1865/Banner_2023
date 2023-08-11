@@ -145,6 +145,7 @@
     <Compile Include="Areas\Admin\Controllers\SystemSetController.cs" />
     <Compile Include="Areas\Web\Controllers\AccountAddController.cs" />
     <Compile Include="Areas\Web\Controllers\AccountPlaceController.cs" />
+    <Compile Include="Areas\Web\Controllers\ChildrenAddController.cs" />
     <Compile Include="Areas\Web\Controllers\GroupPlaceController.cs" />
     <Compile Include="Areas\Web\Controllers\HomeController.cs" />
     <Compile Include="Areas\Web\Controllers\IncludeController.cs" />
@@ -299,6 +300,7 @@
     <Content Include="Areas\Web\Content\Img\password.png" />
     <Content Include="Areas\Web\Content\Img\people-edit-active.svg" />
     <Content Include="Areas\Web\Content\Img\people-edit.svg" />
+    <Content Include="Areas\Web\Content\Img\Placeholder_L.png" />
     <Content Include="Areas\Web\Content\Img\question.png" />
     <Content Include="Areas\Web\Content\Img\right.svg" />
     <Content Include="Areas\Web\Content\Img\save.svg" />
@@ -409,6 +411,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\icon.svg" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Areas\Admin\Views\web.config" />
@@ -526,6 +529,12 @@
     <Content Include="Areas\Web\Views\AccountAdd\Step3.cshtml" />
     <Content Include="Areas\Web\Views\AccountAdd\Step4.cshtml" />
     <Content Include="Areas\Web\Views\AccountAdd\Step5.cshtml" />
+    <Content Include="Areas\Admin\Views\AccountSet\Account_Childen_Info.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\FamilyData.cshtml" />
+    <Content Include="Areas\Web\Views\ChildrenAdd\Step1.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_MasterChildrenAdd.cshtml" />
+    <Content Include="Areas\Web\Views\ChildrenAdd\Step2.cshtml" />
+    <Content Include="Areas\Web\Views\ChildrenAdd\Step3.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

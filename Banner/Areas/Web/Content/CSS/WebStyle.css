@@ -128,12 +128,7 @@ main {
 .navbar a:hover {
     color: white;
 }
-.navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
-    color: white !important;
-}
-.nav-link:hover, .nav-link:focus {
-    color: white !important;
-}
+
 .header-nav {
     margin: auto;
 }

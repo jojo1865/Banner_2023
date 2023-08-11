@@ -97,6 +97,7 @@ namespace Banner.Models
         public string ControlName2 = "txb_PhoneNo";
         public string InputNote = "";
         public bool required = false;
+        public bool doublecheck = false;
         public List<SelectListItem> SLIs = new List<SelectListItem>();
     }
     /// <summary>

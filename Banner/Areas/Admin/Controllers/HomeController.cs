@@ -51,7 +51,8 @@ namespace Banner.Areas.Admin.Controllers
             }
             else if(Request.Url.Host == "web-banner.viuto-aiot.com")
                 Response.Redirect("/Web/Home/Index");
-            
+            TempData["login"] = "";
+            TempData["pw"] = "";
             return View();
         }
         [HttpPost]
@@ -63,6 +64,8 @@ namespace Banner.Areas.Admin.Controllers
             string Login = FC.Get("txb_Login");
             string PW = FC.Get("txb_Password");
             string ValidateCode = FC.Get("txb_ValidateCode");
+            TempData["login"] = Login;
+            TempData["pw"] = PW;
 
             if (Login.Replace(" ", "") == string.Empty)
                 Error += "請輸入帳號</br>";

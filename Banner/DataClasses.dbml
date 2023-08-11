@@ -27,7 +27,6 @@
       <Association Name="Account_Account_Note" Member="Account_Note" ThisKey="ACID" OtherKey="ACID" Type="Account_Note" />
       <Association Name="Account_Baptized" Member="Baptized" ThisKey="ACID" OtherKey="ACID" Type="Baptized" />
       <Association Name="Account_Community" Member="Community" ThisKey="ACID" OtherKey="ACID" Type="Community" />
-      <Association Name="Account_Family" Member="Family" ThisKey="ACID" OtherKey="ACID" Type="Family" />
       <Association Name="Account_JoinGroupWish" Member="JoinGroupWish" ThisKey="ACID" OtherKey="ACID" Type="JoinGroupWish" />
       <Association Name="Account_M_ML_Account" Member="M_ML_Account" ThisKey="ACID" OtherKey="ACID" Type="M_ML_Account" />
       <Association Name="Account_M_O_Account" Member="M_O_Account" ThisKey="ACID" OtherKey="ACID" Type="M_O_Account" />
@@ -35,6 +34,7 @@
       <Association Name="Account_M_OI2_Account" Member="M_OI2_Account" ThisKey="ACID" OtherKey="ACID" Type="M_OI2_Account" />
       <Association Name="Account_M_Rool_Account" Member="M_Rool_Account" ThisKey="ACID" OtherKey="ACID" Type="M_Rool_Account" />
       <Association Name="Account_OrganizeInfo" Member="OrganizeInfo" ThisKey="ACID" OtherKey="ACID" Type="OrganizeInfo" />
+      <Association Name="Account_Family" Member="Family" ThisKey="ACID" OtherKey="ACID" Type="Family" />
     </Type>
   </Table>
   <Table Name="dbo.ZipCode" Member="ZipCode">
@@ -110,32 +110,6 @@
       <Column Name="CommunityType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="CommunityValue" Type="System.String" DbType="VarChar(300)" CanBeNull="true" />
       <Association Name="Account_Community" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Contect" Member="Contect">
-    <Type Name="Contect">
-      <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="TargetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ZID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ContectType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ContectValue" Type="System.String" DbType="VarChar(300) NOT NULL" CanBeNull="false" />
-      <Column Name="CheckFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="CheckDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Family" Member="Family">
-    <Type Name="Family">
-      <Column Name="FID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="FamilyType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="FamilyTitle" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="TargetACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="SortNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Association Name="Account_Family" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.JoinGroupWish" Member="JoinGroupWish">
@@ -350,6 +324,34 @@
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Rool_M_Rool_Account" Member="M_Rool_Account" ThisKey="RID" OtherKey="RID" Type="M_Rool_Account" />
       <Association Name="Rool_M_Rool_Menu" Member="M_Rool_Menu" ThisKey="RID" OtherKey="RID" Type="M_Rool_Menu" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Contect" Member="Contect">
+    <Type Name="Contect">
+      <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="TargetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TargetID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ZID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ContectType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ContectValue" Type="System.String" DbType="VarChar(300) NOT NULL" CanBeNull="false" />
+      <Column Name="CheckFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CheckDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Family" Member="Family">
+    <Type Name="Family">
+      <Column Name="FID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="IDNumber" Type="System.String" DbType="NVarChar(30)" CanBeNull="true" />
+      <Column Name="Login" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="FamilyType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="FamilyTitle" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="TargetACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SortNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="Account_Family" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

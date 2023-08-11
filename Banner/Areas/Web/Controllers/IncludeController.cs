@@ -579,7 +579,7 @@ namespace Banner.Areas.Web.Controllers
         }
         #endregion
         #region 取得/設定聯絡方式
-        public PartialViewResult _ContectEdit(Contect C, bool required = false)
+        public PartialViewResult _ContectEdit(Contect C, bool required = false,bool doublecheck=false)
         {
             c_ContectEdit cN = new c_ContectEdit();
             if (C == null)
@@ -595,6 +595,7 @@ namespace Banner.Areas.Web.Controllers
             }
             cN.C = C;
             cN.required = required;
+            cN.doublecheck = doublecheck;
             cN.SLIs = new List<SelectListItem>();
             //cN.SLIs.Add(new SelectListItem { Text = "-國碼-", Value = "1", Selected = C.ZID == 0, Disabled = true });
             var Ns = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國").OrderBy(q => q.ZID).ToList();

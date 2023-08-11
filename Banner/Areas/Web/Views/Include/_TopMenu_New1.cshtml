@@ -1,6 +1,14 @@
 ﻿@model List<Banner.Models.cMenu>
 <!--新選單-->
+<style>
+    .navbar-nav_top .nav-link.active, .navbar-nav .nav-link.show {
+        color: white !important;
+    }
 
+    .nav-link:hover, .nav-link:focus {
+        color: white !important;
+    }
+</style>
 <nav class="navbar navbar-expand-md navbar-mobile">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         @* <span class="navbar-toggler-icon"></span> *@
@@ -13,7 +21,7 @@
     <div class="collapse navbar-collapse " id="navbarNavDropdown">
         @if (Model != null)
         {
-            <ul class="navbar-nav">
+            <ul class="navbar-nav navbar-nav_top">
                 <li class="nav-item dropdown">
                     <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="nav-link" target="_blank">進入後台</a>
                 </li>

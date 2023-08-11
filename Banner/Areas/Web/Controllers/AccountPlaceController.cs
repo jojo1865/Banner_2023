@@ -19,6 +19,7 @@ namespace Banner.Areas.Web.Controllers
         public class cAccountPlace_Index
         {
             public List<cMeetingMsg> cMLs = new List<cMeetingMsg>();
+            public string Name = "";
             //public cTree Tree = new cTree();
         }
         public class cMeetingMsg
@@ -39,7 +40,7 @@ namespace Banner.Areas.Web.Controllers
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag);
             if (AC != null)
             {
-
+                N.Name = AC.Name_First + AC.Name_Last;
                 var MOIs = GetMOIAC(0, 0, ACID);
                 foreach (var MOI in MOIs)
                 {
@@ -80,6 +81,10 @@ namespace Banner.Areas.Web.Controllers
 
                     #endregion
                     N.cMLs.Add(cM);
+                }
+                if (MOIs.Count() == 0)
+                {
+                    N.cMLs.Add(new cMeetingMsg());
                 }
             }
 
@@ -612,7 +617,73 @@ namespace Banner.Areas.Web.Controllers
             return Error;
         }
         #endregion
+        #region 家庭狀況
+        public class cFamilyData
+        {
+            public List<Family> Fs = new List<Family>();
+            public Account AC = new Account();
+            public bool ChildFlag = false;
 
+            public Account AC_F2 =new Account();
+            public List<Contect> Cons = new List<Contect>();
+            public List<Account> AC_F3s = new List<Account>();
+        }
+        public cFamilyData GetFamilyData(FormCollection FC)
+        {
+            cFamilyData N = new cFamilyData();
+            ACID = GetACID();
+            #region 會員資料填入
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
+            if (AC != null)
+            {
+                N.AC = AC;
+                N.Fs = AC.Family.Where(q => !q.DeleteFlag).ToList();
+                N.ChildFlag = DT.Year - N.AC.Birthday.Year > iChildAge && N.AC.Birthday != N.AC.CreDate;
+
+                N.AC_F2 = (from q in N.Fs.Where(q => q.FamilyType == 2)
+                          join p in DC.Account.Where(q => !q.DeleteFlag)
+                          on q.TargetACID equals p.ACID
+                          select p).FirstOrDefault();
+                if (N.AC_F2 == null)
+                    N.AC_F2 = new Account();
+
+                N.AC_F3s = (from q in N.Fs.Where(q => q.FamilyType == 3)
+                           join p in DC.Account.Where(q => !q.DeleteFlag)
+                           on q.TargetACID equals p.ACID
+                           select p).ToList();
+
+                N.Cons = (from q in DC.Contect.Where(q => q.ContectType == 2 && q.TargetType == 4).ToList()
+                         join p in N.Fs
+                         on q.TargetID equals p.FID
+                         select q).ToList();
+            } 
+
+            #endregion
+            #region 輸入資料填入
+            if (FC != null)
+            {
+
+            }
+            #endregion
+
+
+
+            return N;
+        }
+        [HttpGet]
+        public ActionResult FamilyData()
+        {
+            GetViewBag();
+            return View(GetFamilyData(null));
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult FamilyData(FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetFamilyData(FC));
+        }
+        #endregion
 
     }
 }

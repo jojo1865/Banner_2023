@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="input">
-                    @Html.TextBox("txb_Login", "", new { @class = "form-control input-underline", @placeholder = "帳號、身分證字號" })
+                    @Html.TextBox("txb_Login", (TempData["login"].ToString()), new { @class = "form-control input-underline", @placeholder = "帳號、身分證字號" })
                 </div>
 
                 <div class="password-with-icon">
@@ -35,7 +35,7 @@
                 </div>
 
                 <div class="input input-group">
-                    @Html.Password("txb_Password", "", new { @class = "form-control input-underline", @placeholder = "請輸入密碼" })
+                    @Html.Password("txb_Password", (TempData["pw"].ToString()), new { @class = "form-control input-underline", @placeholder = "請輸入密碼" })
                     <div class="visibility-container">
                         <span class="material-icons" onclick="togglePasswordVisibility()">
                             visibility_off

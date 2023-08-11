@@ -1,0 +1,283 @@
+﻿@model Banner.Areas.Web.Controllers.AccountPlaceController.cFamilyData
+@{
+    string StyleAdd = "";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+<style>
+    main {
+        padding: 0;
+        position: relative;
+    }
+
+    .section-card {
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        gap: 16px;
+    }
+
+    .header-container {
+        margin-top: 32px;
+    }
+
+        .header-container:first-child {
+            margin-top: 0;
+        }
+
+    .btn-verify-phone,
+    .btn-verify-email {
+        margin-top: 6px;
+    }
+
+    .action-bar {
+        width: 100%;
+    }
+
+    .alertbtn {
+        line-height: 4px !important;
+    }
+</style>
+<div class="body-container" style="height: calc(100vh - 164px); padding-bottom:84px;">
+    <div class="section-container">
+
+        <form method="post" id="form1" style="width:80%;">
+            @Html.AntiForgeryToken()
+
+            <div class="row w-100">
+                <div class="col-6">
+                    <div class="form-card-group">
+                        <div class="header-container no-border">
+                            <div class="header-left-border"></div>
+                            <h5 class="header font-bold">家庭狀況</h5>
+                        </div>
+                        <div class="section-card">
+                            <div class="form-group">
+                                <label>父親</label>
+                                @{
+                                    var F0 = Model.Fs.FirstOrDefault(q => q.FamilyType == 0);
+                                    @Html.TextBox("txb_Family_Name_0", (F0 != null ? F0.Name : ""), new { @class = "form-control form-control-lg input-underline" })
+                                }
+
+                            </div>
+                            <div class="form-group">
+                                <label>母親</label>
+                                @{
+                                    var F1 = Model.Fs.FirstOrDefault(q => q.FamilyType == 1);
+                                    @Html.TextBox("txb_Family_Name_1", (F1 != null ? F1.Name : ""), new { @class = "form-control form-control-lg input-underline" })
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    @if (!Model.ChildFlag)//目前帳號非兒童
+                    {
+                        var F2 = Model.Fs.FirstOrDefault(q => q.FamilyType == 2);
+                        if (F2 != null)//有寫配偶資料
+                        {
+                            if (Model.AC_F2.ACID > 0)//配偶已配對到,不能變更
+                            {
+                                <div class="form-card-group">
+                                    <div class="section-card">
+                                        <div class="form-group">
+                                            <label>配偶姓名</label>
+                                            <label class="form-control form-control-lg input-underline">@F2.Name</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>配對狀態</label>
+                                            <label class="form-control form-control-lg input-underline">已配對完成</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else//配偶尚未確認,可以改
+                            {
+                                <div class="form-card-group">
+                                    <div class="section-card">
+                                        <div class="form-group">
+                                            <label>配偶姓名<span>*</span></label>
+                                            @Html.TextBox("txb_Family_Name_2", (Model.AC_F2.Name_First + Model.AC_F2.Name_Last), new { @class = "form-control form-control-lg input-underline" })
+                                        </div>
+                                        <div class="form-group">
+                                            <label>配偶身分證字號<span>*</span></label>
+                                            @Html.TextBox("txb_Family_IDNumber_2", Model.AC_F2.IDNumber, new { @class = "form-control form-control-lg input-underline" })
+                                        </div>
+                                        <div class="form-group">
+                                            <label>配偶會員帳號<span>*</span></label>
+                                            @Html.TextBox("txb_Family_Login_2", Model.AC_F2.Login, new { @class = "form-control form-control-lg input-underline" })
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else//沒有配偶資料
+                        {
+                            <div class="form-card-group">
+                                <div class="section-card">
+                                    <div class="form-group">
+                                        <label>配偶姓名<span>*</span></label>
+                                        @Html.TextBox("txb_Family_Name_2", (Model.AC_F2.Name_First + Model.AC_F2.Name_Last), new { @class = "form-control form-control-lg input-underline" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>配偶身分證字號<span>*</span></label>
+                                        @Html.TextBox("txb_Family_IDNumber_2", Model.AC_F2.IDNumber, new { @class = "form-control form-control-lg input-underline" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>配偶會員帳號<span>*</span></label>
+                                        @Html.TextBox("txb_Family_Login_2", Model.AC_F2.Login, new { @class = "form-control form-control-lg input-underline" })
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                    }
+
+                </div>
+                <div class="col-6">
+                    <!--緊急連絡人-->
+                    <div class="form-card-group">
+                        <div class="section-card">
+                            @for (int i = 0; i < 2; i++)
+                            {
+                                var F4 = Model.Fs.FirstOrDefault(q => q.FamilyType == 4 && q.SortNo == i);
+                                if (F4 == null)
+                                {
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-3 col-12">
+                                                <label>緊急聯絡人<span>*</span></label>
+                                                @Html.TextBox(("txb_Family_Name_4_" + i), "", new { @class = "form-control form-control-lg input-underline" })
+                                            </div>
+                                            <div class="col-lg-2 col-12">
+                                                <label>關係<span>*</span></label>
+                                                @Html.TextBox(("txb_Family_Title_4_" + i), "", new { @class = "form-control form-control-lg input-underline" })
+                                            </div>
+                                            <div class="col-lg-7 col-12">
+                                                <label>電話<span>*</span></label>
+                                                @Html.Action("_ContectEdit", "Include", new { C = new Contect { ContectType = 1 } })
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    var Con = Model.Cons.FirstOrDefault(q => q.TargetID == F4.FID);
+                                    if (Con == null)
+                                    {
+                                        Con = new Contect { ContectType = 1 };
+                                    }
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-3 col-12">
+                                                <label>緊急聯絡人<span>*</span></label>
+                                                @Html.TextBox(("txb_Family_Name_4_" + i), (F4.Name), new { @class = "form-control form-control-lg input-underline" })
+                                            </div>
+                                            <div class="col-lg-2 col-12">
+                                                <label>關係<span>*</span></label>
+                                                @Html.TextBox(("txb_Family_Title_4_" + i), (F4.FamilyTitle), new { @class = "form-control form-control-lg input-underline" })
+                                            </div>
+                                            <div class="col-lg-7 col-12">
+                                                <label>電話<span>*</span></label>
+                                                @Html.Action("_ContectEdit", "Include", new { C = Con, required = true })
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                            }
+
+
+
+                        </div>
+                    </div>
+                    <!--子女-->
+                    <div class="form-card-group">
+                        <div class="section-card">
+                            @{ 
+                                int SortNo = 1;
+                            }
+                            @foreach (var F3 in Model.AC_F3s.OrderBy(q=>q.ACID))
+                            {
+                                <div class="form-group">
+                                    <div class="row">
+                                        <label>兒童@(SortNo++)</label>
+                                        <div class="col-lg-3 col-6">
+                                            <label>姓</label>
+                                            @Html.Label(F3.Name_First, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                        </div>
+                                        <div class="col-lg-3 col-6">
+                                            <label>名</label>
+                                            @Html.Label(F3.Name_Last, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                        </div>
+                                        <div class="col-lg-6 col-12">
+                                            <label>兒童帳號</label>
+                                            @Html.Label(F3.Login, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                        </div>
+
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+
+</div>
+<div class="action-bar">
+    @if ((((bool[])ViewBag._Power)[1] && Model.AC.ACID == 0) || (((bool[])ViewBag._Power)[2] && Model.AC.ACID > 0) || true)
+    {
+        <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
+    }
+    <a href="/Web/AccountPlace/Index" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />取消</a>
+</div>
+
+<div id="div_PhoneCheck" class="d-none">
+    <div style="width:420px;">
+        <div class="row">
+            <div class="col text-start pb-2" style="border-bottom:2px solid darkblue;">已傳送驗證碼至</div>
+        </div>
+        <div class="row mt-2 mb-4">
+            <div class="col-6 text-start">
+                <img src="~/Areas/Web/Content/Img/ic_baseline-phone-iphone.svg" /><span name="lab_HidPhoneNo"></span>
+            </div>
+            <div class="col-6 text-end">
+                <a>重新傳送驗證碼</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col fw-bold text-start">輸入驗證碼</div>
+        </div>
+        <div class="row">
+            <div class="col text-start">
+                <input class="form-control form-control-lg input-underline" name="txb_InputCheckCode_Phone" />
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="div_EmailCheck" class="d-none">
+    <div style="width:420px;">
+        <div class="row">
+            <div class="col text-start pb-2" style="border-bottom:2px solid darkblue;">已寄送驗證碼至</div>
+        </div>
+        <div class="row mt-2 mb-4">
+            <div class="col-6 text-start">
+                <img src="~/Areas/Web/Content/Img/ic_baseline-phone-iphone.svg" /><span name="lab_HidEmail"></span>
+            </div>
+            <div class="col-6 text-end">
+                <a>重新寄送驗證碼</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col fw-bold text-start">輸入驗證碼</div>
+        </div>
+        <div class="row">
+            <div class="col text-start">
+                <input class="form-control form-control-lg input-underline" name="txb_InputCheckCode_Email" />
+            </div>
+        </div>
+
+    </div>
+</div>

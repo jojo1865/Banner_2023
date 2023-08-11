@@ -55,7 +55,14 @@
                                 <div class="d-flex align-items-center">
                                     <img class="avatar" src="/Areas/Web/Content/Img/avatar.svg" />
                                     <ul class="rank">
-                                        <li># @ML.JobTitle</li>
+                                        @if (ML.JobTitle != "")
+                                        {
+                                            <li># @ML.JobTitle</li>
+                                        }
+                                        else
+                                        {
+                                            <li># 無</li>
+                                        }
                                     </ul>
                                 </div>
                                 <div class="card-info-footer">

@@ -1,7 +1,7 @@
-﻿@model Banner.Areas.Web.Controllers.AccountAddController.cStep1
+﻿@model Banner.Areas.Web.Controllers.ChildrenAddController.cStep1
 @{
     ViewBag.Title = "Step1";
-    Layout = "~/Areas/Web/Views/Include/_MasterAccountAdd.cshtml";
+    Layout = "~/Areas/Web/Views/Include/_MasterChildrenAdd.cshtml";
 }
 <style>
     span.circle-on {
@@ -95,20 +95,7 @@
     <div class="col-sm-auto col p-0">
         <span class="circle-off">3</span>
     </div>
-    <div class="col-sm-auto col p-0">
-        <div class="topbar-off-xl d-xl-block d-none"></div>
-        <div class="topbar-off d-xl-none d-sm-block d-none"></div>
-    </div>
-    <div class="col-sm-auto col p-0">
-        <span class="circle-off">4</span>
-    </div>
-    <div class="col-sm-auto col p-0">
-        <div class="topbar-off-xl d-xl-block d-none"></div>
-        <div class="topbar-off d-xl-none d-sm-block d-none"></div>
-    </div>
-    <div class="col-sm-auto col p-0">
-        <span class="circle-off">5</span>
-    </div>
+    
 </div>
 <div class="row justify-content-md-center">
 
@@ -118,7 +105,7 @@
                 <div style="width: 10px; background-color: rgb(12, 49, 118); height:32px;"></div>
             </div>
             <div class="col-auto">
-                <label>個人基本資料<span>*</span></label>
+                <label>兒童基本資料<span>*</span></label>
             </div>
         </div>
         <div class="row">
@@ -191,16 +178,28 @@
                         </div>
                         <div class="col-12 text-end" id="div_PW2"></div>
                     </div>
+
+
                     <div class="row mt-2">
                         <div class="col mt-3">
-                            <label>手機號碼</label>
-                            @Html.Action("_ContectEdit", "Include", new { C = new Contect { ContectType = 1, ContectValue = Model.CellPhone, ZID = Model.ZID_Phone }, required = true })
+                            <label>手機</label><br />
+                            <div class="form-check form-check-inline">
+                                @Html.RadioButton("cbox_PhoneOwner", true, Model.ParentPhone, new { @id = "cbox_PhoneOwner1", @class = "form-check-input", required = string.Empty, onclick= "ShowChildren(1);" })
+                                @Html.Label("家長手機", new { @class = "form-check-label", @for = "cbox_PhoneOwner1" })
+                            </div>
+                            <div class="form-check form-check-inline">
+                                @Html.RadioButton("cbox_PhoneOwner", false, !Model.ParentPhone, new { @id = "cbox_PhoneOwner2", @class = "form-check-input", required = string.Empty, onclick = "ShowChildren(2);" })
+                                @Html.Label("兒童手機", new { @class = "form-check-label", @for = "cbox_PhoneOwner2" })
+                            </div>
+                            <div id="div_ChileCellPhone" class="mt-2" style="display:none">
+                                @Html.Action("_ContectEdit", "Include", new { C = new Contect { ContectType = 1, ContectValue = Model.CellPhone, ZID = Model.ZID_Phone }, required = true })
+                            </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row mt-2 d-none">
                         <div class="col mt-3">
                             <label>Email</label>
-                            @Html.Action("_ContectEdit", "Include", new { C = new Contect { ContectType = 2, ContectValue = Model.Email }, required = true })
+                            @Html.Action("_ContectEdit", "Include", new { C = new Contect { ContectType = 2, ContectValue = Model.Email } })
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -254,3 +253,14 @@
         </div>
     </div>
 </div>
+<script>
+    function ShowChildren(type) {
+        if (type == 1) {
+            document.getElementById("div_ChileCellPhone").style.display = "none";
+        }
+        else {
+            document.getElementById("div_ChileCellPhone").style.display = "block";
+        }
+        return;
+    }
+</script>

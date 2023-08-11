@@ -4,7 +4,10 @@
     <meta charset="utf-8" />
     <title>全球旌旗資訊網</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <meta name="description" content="有別於嚴肅的教會，旌旗教會是一個活潑、充滿歡樂的大家庭，我們是一群追求生命成長的伙伴，因為耶穌基督的愛與恩典，我們學習彼此相愛，相互鼓勵，同時也一起經歷上帝的引導、能力與祝福。
+在這裡，我們不分黨派、不分階級、不分貧富……，我們專注於生命品格的改變與成長、家庭價值的重視與實賤、人生意義的追尋與成全。因為我們知道上帝是如此地貼近人心，而非高高在上，祂期待你我更加認識祂，我們的問題靠祂解決，祂等候與你我建立一種真實而深厚的關係，在這樣的關係中，我們蒙受無盡的祝福！
+歡迎您的加入，我們希望可以陪伴您，與您一同走人生路程，也讓上帝的愛，透過你我更多地傳遞出去。">
+    <meta name="keywords" content="旌旗，教會，首頁，台中，旌旗教會，修哥，台中旌旗，banner church，">
     @Html.Action("_HeadInclude", "Include")
 </head>
 <body class="bn-theme">
@@ -27,6 +30,7 @@
                 <div class="profile-action">
                     <a href="javascript:ShowUserMenu();" class="material-icons" onmousemove="ShowUserMenu()"> arrow_drop_down </a>
                     <div class="div_UserMenu" id="UserMenu" onmousemove="ShowUserMenu()" onmouseout="CloseUserMenu()" style="display:none;">
+                        <div class="div_UserMenuBtn"><a href="/Web/ChildrenAdd/Step1">為12歲以下兒童註冊</a></div>
                         <div class="div_UserMenuBtn mb-2 d-none"><a href="/Web/Home/ChangePassword">修改密碼</a></div>
                         <div class="div_UserMenuBtn"><a href="javascript:LogoutCheck();">登出</a></div>
                     </div>
@@ -38,35 +42,13 @@
         <img class="main-bg" src="/Areas/Web/Content/img/body-bg.svg" alt="" />
 
         @Html.Action("_LeftMenu_New1", "Include")
-        
+
         @RenderBody()
     </main>
     <!--置底-->
-    <nav class="footer-nav">
-        <div class="footer-item">
-            <img class="footer-logo"
-                 src="/Areas/Web/Content/img/footer-logo.svg"
-                 alt="" />
-            <div class="contact-info-group">
-                <span>總體異象 新婦教會 ˙ 活出命定 世代傳承 ˙ 普世宣教</span>
-                <div class="contact-info">
-                    <span>地址：408 台中市南屯區文心南五路三段160號</span>
-                    <div class="contact-info-separate">&nbsp;</div>
-                    <span>電話：04 - 2258 - 4446</span>
-                    <div class="contact-info-separate">&nbsp;</div>
-                    <span>傳真：04 - 2258 -4660</span>
-                </div>
-            </div>
-        </div>
-        <div class="footer-item">
-            <div class="social-media">
-                <img src="/Areas/Web/Content/img/mail.svg" alt="" />
-                <img src="/Areas/Web/Content/img/facebook.svg" alt="" />
-                <img src="/Areas/Web/Content/img/instagram.svg" alt="" />
-                <img src="/Areas/Web/Content/img/youtube.svg" alt="" />
-                <img src="/Areas/Web/Content/img/cloud.svg" alt="" />
-                <img src="/Areas/Web/Content/img/line.svg" alt="" />
-            </div>
+    <nav class="footer-nav text-center">
+        <div class="contact-info-group">
+            <span>新婦教會、活出命定、世代傳承、普世宣教</span>
         </div>
     </nav>
 

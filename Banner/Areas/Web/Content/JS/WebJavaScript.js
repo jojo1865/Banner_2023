@@ -271,7 +271,7 @@ function SendSNSCheckPhone(ddl_Zip, txb_Phone, lab_HidPhoneNo, txb_InputCheckCod
     else {
         alert('請輸入手機號碼');
     }
-    return ;
+    return;
 }
 function SendSNSCheckEmail(txb_Email, lab_HidEmail, txb_InputCheckCode_Email, cbox_EmailCheck, div_1, div_2, div_3) {
     var CheckCode = '';
@@ -379,36 +379,39 @@ function checkemail(txb_email) {
     }
 }
 function checkLogin(txb) {
-    if (txb.value != "") {
-        fetch('/Web/AccountAdd/CheckLogin?input=' + txb.value)
-            .then(function (response) {
-                return response.json();
-            })
-            .then(function (myJson) {
-                console.log(myJson.res);
-                if (myJson.res == 'OK') {
+    if (txb.value != "")
+    {
+        $.ajax({
+            url: '/Web/AccountAdd/CheckLogin?input=' + txb.value,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                if (res == 'OK') {
                     document.getElementById('cbox_Login_Success').checked = true;
                     document.getElementById('div_Login').innerHTML = '';
                 }
                 else {
                     document.getElementById('cbox_Login_Success').checked = false;
-                    document.getElementById('div_Login').innerHTML = '<span style="color:red">' + myJson.res + '</span>';
+                    document.getElementById('div_Login').innerHTML = '<span style="color:red">' + res + '</span>';
                 }
-            });
-
-        
-        /*$.ajax({
-            url: '/Web/AccountAdd/CheckLogin?input=' + txb.value,
-            method: 'GET',
-            dataType: 'text',
-            success: function (res) {
-                
             }
-        });*/
 
-        /*document.getElementById('cbox_Login_Success').checked = true;
-        document.getElementById('div_Login').innerHTML = '';
-        */
+        });
+        /*fetch('/Web/AccountAdd/CheckLogin?input=' + txb.value)
+            .then(function (response) {
+                return response.text();
+            })
+            .then(function (mytext) {
+                console.log(mytext);
+                if (mytext == 'OK') {
+                    document.getElementById('cbox_Login_Success').checked = true;
+                    document.getElementById('div_Login').innerHTML = '';
+                }
+                else {
+                    document.getElementById('cbox_Login_Success').checked = false;
+                    document.getElementById('div_Login').innerHTML = '<span style="color:red">' + mytext + '</span>';
+                }
+            });*/
     }
     else {
         document.getElementById('cbox_Login_Success').checked = false;
@@ -458,7 +461,7 @@ function CheckPassword() {
     else {
         cboxSuccess.checked = false;
     }
-    
+
     return;
 }
 
@@ -480,6 +483,11 @@ function SendCodeAtStep2() {
                 const Return = res.split(';');
                 CheckCode = Return[1];
                 document.getElementById('txb_Code_Get').value = CheckCode;
+
+                Swal.fire({
+                    icon: 'success',
+                    html: '已發送驗證簡訊至您的手機'
+                });
             }
         });
     }
@@ -493,6 +501,11 @@ function SendCodeAtStep2() {
                 const Return = res.split(';');
                 CheckCode = Return[1];
                 document.getElementById('txb_Code_Get').value = CheckCode;
+
+                Swal.fire({
+                    icon: 'success',
+                    html: '已發送驗證碼至您的Email'
+                });
             }
         });
     }
@@ -533,7 +546,7 @@ function ShowNote() {
     Swal.fire({
         showCloseButton: true,
         showConfirmButton: false,
-        title:'線上奉獻規範與個資使用說明',
+        title: '線上奉獻規範與個資使用說明',
         html: Note.innerHTML
     });
     return;

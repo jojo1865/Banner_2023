@@ -40,7 +40,7 @@
 <div class="body-container" style="height: calc(100vh - 164px); padding-bottom:84px;">
     <div class="section-container">
 
-        <form method="post" id="form1">
+        <form method="post" id="form1" style="width:80%;">
             @Html.AntiForgeryToken()
 
             <div class="row w-100">
@@ -347,10 +347,10 @@
                                     </div>
                                     <div class="col">
                                         <div class="d-none">
-                                            @Html.CheckBox("cbox_PhoneCheck")
+                                            @Html.CheckBox("cbox_PhoneCheck",true)
                                         </div>
                                     </div>
-                                    @if (Con.RequiredFlag)
+                                    @if (Con.RequiredFlag && false)//2023.08.08 取消帳號內手機驗證
                                     {
                                         <div class="col-auto" id="div_Checkbtn_Phone" style="display:block;">
                                             <a class="btn btn-primary btn-round btn-sm btn-verify-phone" href="javascript:;" onclick="return SendSNSCheckPhone(@Con.ControlName1,@Con.ControlName2, 'lab_HidPhoneNo', 'txb_InputCheckCode_Phone', 'cbox_PhoneCheck', 'div_Checkbtn_Phone', 'div_Success_Phone', 'div_Miss_Phone');">
@@ -372,12 +372,12 @@
                                 <div class="form-group">
                                     <div class="col">
                                         <div class="d-none">
-                                            @Html.CheckBox("cbox_EmailCheck")
+                                            @Html.CheckBox("cbox_EmailCheck",true)
                                         </div>
                                     </div>
                                     <label>@(Con.Title)<span>@(Con.RequiredFlag ? "*" : "")</span></label>
                                     @Html.TextBox(Con.ControlName2, Con.C.ContectValue, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入" + Con.Title })
-                                    @if (Con.RequiredFlag)
+                                    @if (Con.RequiredFlag && false)//2023.08.08 取消帳號內Email驗證
                                     {
                                         <div class="row">
                                             <div class="col"></div>
