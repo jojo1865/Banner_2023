@@ -139,6 +139,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\AccountSetController.cs" />
+    <Compile Include="Areas\Admin\Controllers\CourseController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\IncludeController.cs" />
     <Compile Include="Areas\Admin\Controllers\OrganizeSetController.cs" />
@@ -253,6 +254,7 @@
     <Content Include="Areas\Web\Content\CSS\WebStyle.css" />
     <Content Include="Areas\Web\Content\Img\account-active.svg" />
     <Content Include="Areas\Web\Content\Img\account.svg" />
+    <Content Include="Areas\Web\Content\Img\add.png" />
     <Content Include="Areas\Web\Content\Img\avatar.svg" />
     <Content Include="Areas\Web\Content\Img\back.svg" />
     <Content Include="Areas\Web\Content\Img\banner-icon.png" />
@@ -261,6 +263,7 @@
     <Content Include="Areas\Web\Content\Img\body-bg.svg" />
     <Content Include="Areas\Web\Content\Img\cancel.svg" />
     <Content Include="Areas\Web\Content\Img\cloud.svg" />
+    <Content Include="Areas\Web\Content\Img\delete.png" />
     <Content Include="Areas\Web\Content\Img\eye-slash.png" />
     <Content Include="Areas\Web\Content\Img\facebook.svg" />
     <Content Include="Areas\Web\Content\Img\family-active.svg" />
@@ -412,6 +415,7 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\icon.svg" />
+    <Content Include="Error.html" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Areas\Admin\Views\web.config" />
@@ -535,6 +539,13 @@
     <Content Include="Areas\Web\Views\Include\_MasterChildrenAdd.cshtml" />
     <Content Include="Areas\Web\Views\ChildrenAdd\Step2.cshtml" />
     <Content Include="Areas\Web\Views\ChildrenAdd\Step3.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\BankData.cshtml" />
+    <Content Include="Areas\Web\Views\Home\CheckWedding.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\PerformanceData.cshtml" />
+    <Content Include="Areas\Admin\Views\Course\Category_List.cshtml" />
+    <Content Include="Areas\Admin\Views\Course\Category_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Course\Course_List.cshtml" />
+    <Content Include="Areas\Admin\Views\Course\Course_Edit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

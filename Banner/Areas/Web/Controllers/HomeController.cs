@@ -20,7 +20,7 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Login()
         {
             GetViewBag();
-            /*if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
+            if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
             {
                 if (GetACID() <= 0)
                 {
@@ -28,7 +28,7 @@ namespace Banner.Areas.Web.Controllers
                     SetBrowserData("UserName", "系統管理者");
                 }
                 Response.Redirect("/Web/Home/Index");
-            }*/
+            }/**/
             TempData["login"] = "";
             TempData["pw"] = "";
             return View();
@@ -324,12 +324,12 @@ namespace Banner.Areas.Web.Controllers
             string ZID = GetQueryStringInString("ZID");
             string PhoneNo = GetQueryStringInString("PhoneNo");
             var Z = DC.ZipCode.FirstOrDefault(q => q.ZID.ToString() == ZID);
-            string CellPhone = (ZID == "10" ? "" : (Z != null ? Z.Code.Replace(" ","") : "") + " ") + PhoneNo.Replace(" ","");
-            
+            string CellPhone = (ZID == "10" ? "" : (Z != null ? Z.Code.Replace(" ", "") : "") + " ") + PhoneNo.Replace(" ", "");
+
             string CheckCode = GetRand(1000000).ToString().PadLeft(6, '0');
             Error = SendSNS(CellPhone, "【全球旌旗資訊網】手機驗證簡訊", "親愛的旌旗家人,您的驗證碼為：" + CheckCode + "。");
 
-            return (Z != null ? Z.Code : "") + " " + PhoneNo.Substring(0,4) + new string('*', PhoneNo.Length-4) + ";" + CheckCode;
+            return (Z != null ? Z.Code : "") + " " + PhoneNo.Substring(0, 4) + new string('*', PhoneNo.Length - 4) + ";" + CheckCode;
         }
         #endregion
         #region 發認證信
@@ -337,11 +337,81 @@ namespace Banner.Areas.Web.Controllers
         {
             string Email = GetQueryStringInString("email");
             string CheckCode = GetRand(1000000).ToString().PadLeft(6, '0');
-            Error = SendMail(Email, Email,"【全球旌旗資訊網】Email認證", "親愛的旌旗家人,您的驗證碼為：" + CheckCode + "。");
+            Error = SendMail(Email, Email, "【全球旌旗資訊網】Email認證", "親愛的旌旗家人,您的驗證碼為：" + CheckCode + "。");
 
             return Email.Split('@')[0].Substring(0, 4) + new string('*', 5) + Email.Split('@')[1] + ";" + CheckCode;
         }
         #endregion
-        
+        #region 確認婚姻關係
+        [HttpGet]
+        public ActionResult CheckWedding()
+        {
+            GetViewBag();
+            string ID1 = HSM.Des_1(GetQueryStringInString("ID1"));
+            string ID2 = HSM.Des_1(GetQueryStringInString("ID2"));
+            var AC1 = DC.Account.FirstOrDefault(q => q.ACID.ToString() == ID1 && !q.DeleteFlag);//送出配對要求者
+            var AC2 = DC.Account.FirstOrDefault(q => q.ACID.ToString() == ID2 && !q.DeleteFlag);//被配對者
+            if (AC1 != null && AC2 != null)
+            {
+                //先把送出者跟被配對者組合
+                var F = DC.Family.FirstOrDefault(q => q.ACID == AC1.ACID && q.FamilyType == 2 && q.SortNo == -1 && !q.DeleteFlag && q.IDNumber == AC2.IDNumber);
+                if(F == null)
+                {
+                    F = new Family
+                    {
+                        Account = AC1,
+                        Name = AC2.Name_First + AC2.Name_Last,
+                        IDNumber = AC2.IDNumber,
+                        Login = AC2.Login,
+                        FamilyType = 2,
+                        FamilyTitle = "配偶",
+                        TargetACID = AC2.ACID,
+                        SortNo = 0,
+                        DeleteFlag = false
+                    };
+                    DC.Family.InsertOnSubmit(F);
+                    DC.SubmitChanges();
+                }
+                else
+                {
+                    F.TargetACID = AC2.ACID;
+                    F.SortNo = 0;
+                    F.DeleteFlag = false;
+                    DC.SubmitChanges();
+                }
+                //再把被配對者與送出者組合
+                F = DC.Family.FirstOrDefault(q => q.ACID == AC2.ACID && q.FamilyType == 2 && q.SortNo == -1 && !q.DeleteFlag && q.IDNumber == AC1.IDNumber);
+                if (F == null)
+                {
+                    F = new Family
+                    {
+                        Account = AC2,
+                        Name = AC1.Name_First + AC1.Name_Last,
+                        IDNumber = AC1.IDNumber,
+                        Login = AC1.Login,
+                        FamilyType = 2,
+                        FamilyTitle = "配偶",
+                        TargetACID = AC1.ACID,
+                        SortNo = 0,
+                        DeleteFlag = false
+                    };
+                    DC.Family.InsertOnSubmit(F);
+                    DC.SubmitChanges();
+                }
+                else
+                {
+                    F.TargetACID = AC1.ACID;
+                    F.SortNo = 0;
+                    F.DeleteFlag = false;
+                    DC.SubmitChanges();
+                }
+
+                SetAlert("確認完成", 1, "/Web/Home/Login");
+            }
+            else
+                SetAlert("確認失敗:其中一方帳戶不存在", 2, "/Web/Home/Login");
+            return View();
+        }
+        #endregion
     }
 }

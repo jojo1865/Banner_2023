@@ -130,12 +130,13 @@
             <div class="col">
                 <form id="form1" method="post" class="needs-validation" novalidate>
                     @Html.AntiForgeryToken()
-                    <div class="row mt-2">
+                    <!--2023.08.14 調整驗證方式只要Email 原選擇方式隱藏-->
+                    <div class="row mt-2 d-none">
                         <div class="col mt-lg-5 mt-3 text-center">
                             <label>手機或Email驗證</label>
                         </div>
                     </div>
-                    <div class="row mt-2">
+                    <div class="row mt-2 d-none">
                         <div class="col d-flex">
                             <div class="form-group" style="flex: 1">
                                 <label>驗證方式</label><br />
@@ -152,7 +153,7 @@
                                 <input id="txb_PhoneZip" value="@Model.PhoneZip" />
                                 <input id="txb_Phone" value="@Model.PhoneNo" />
                                 <input id="txb_Email" value="@Model.Email" />
-                                <input id="txb_Code_Get" name="txb_Code_Get" value="" />
+                                
                             </div>
                             <div class="from-group">
                                 <label>&nbsp;</label>
@@ -161,6 +162,20 @@
                                     <apan class="lab_gray" id="lab_msg" style="display:none;"><span id="lab_wait"></span>秒後重新發送</apan>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <!--2023.08.14 調整驗證方式只要Email-->
+                    <div class="d-none">
+                        <input id="txb_Code_Get" name="txb_Code_Get" value="@(Model.CheckCode_Get)" />
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col mt-lg-5 mt-3 text-center">
+                            <label>Email驗證</label>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col mt-lg-5 mt-3 text-center">
+                            <label>已傳送驗證碼至@(Model.HideEmail)</label>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -172,8 +187,8 @@
 
                     <div class="row mt-2">
                         <div class="col mt-3 mb-5 text-center">
-                            <a style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit" href="/Web/AccountAdd/Step1?ACID=@Model.sACID"><img src="/Areas/Web/Content/Img/Back.svg" style="width:25px;"  alt="" />上一步</a>
-                            
+                            <a style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit" href="/Web/AccountAdd/Step1?ACID=@Model.sACID"><img src="/Areas/Web/Content/Img/Back.svg" style="width:25px;" alt="" />上一步</a>
+
                             <button type="submit" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
 
                         </div>

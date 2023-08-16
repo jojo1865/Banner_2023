@@ -4,11 +4,17 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
+using System.Xml.Linq;
 using static Banner.Areas.Admin.Controllers.AccountSetController;
 using static Banner.Areas.Admin.Controllers.OrganizeSetController;
+using static Banner.Areas.Web.Controllers.AccountPlaceController;
+using static ZXing.QrCode.Internal.Mode;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -623,8 +629,7 @@ namespace Banner.Areas.Web.Controllers
             public List<Family> Fs = new List<Family>();
             public Account AC = new Account();
             public bool ChildFlag = false;
-
-            public Account AC_F2 =new Account();
+            public bool ChangeWeddingDataFlag = false;
             public List<Contect> Cons = new List<Contect>();
             public List<Account> AC_F3s = new List<Account>();
         }
@@ -640,33 +645,209 @@ namespace Banner.Areas.Web.Controllers
                 N.Fs = AC.Family.Where(q => !q.DeleteFlag).ToList();
                 N.ChildFlag = DT.Year - N.AC.Birthday.Year > iChildAge && N.AC.Birthday != N.AC.CreDate;
 
-                N.AC_F2 = (from q in N.Fs.Where(q => q.FamilyType == 2)
-                          join p in DC.Account.Where(q => !q.DeleteFlag)
-                          on q.TargetACID equals p.ACID
-                          select p).FirstOrDefault();
-                if (N.AC_F2 == null)
-                    N.AC_F2 = new Account();
+                if (N.Fs.FirstOrDefault(q => q.FamilyType == 2) == null)//沒有配偶~
+                {
+                    N.Fs.Add(new Family
+                    {
+                        ACID = N.AC.ACID,
+                        Name = "",
+                        IDNumber = "",
+                        Login = "",
+                        FamilyType = 2,
+                        FamilyTitle = "配偶",
+                        TargetACID = 0,
+                        SortNo = 0,
+                        DeleteFlag = false
+                    });
+                }
 
                 N.AC_F3s = (from q in N.Fs.Where(q => q.FamilyType == 3)
-                           join p in DC.Account.Where(q => !q.DeleteFlag)
-                           on q.TargetACID equals p.ACID
-                           select p).ToList();
+                            join p in DC.Account.Where(q => !q.DeleteFlag)
+                            on q.TargetACID equals p.ACID
+                            select p).ToList();
 
-                N.Cons = (from q in DC.Contect.Where(q => q.ContectType == 2 && q.TargetType == 4).ToList()
-                         join p in N.Fs
-                         on q.TargetID equals p.FID
-                         select q).ToList();
-            } 
+                N.Cons = (from q in DC.Contect.Where(q => q.ContectType == 1 && q.TargetType == 4).ToList()
+                          join p in N.Fs
+                          on q.TargetID equals p.FID
+                          select q).ToList();
+            }
 
             #endregion
             #region 輸入資料填入
             if (FC != null)
             {
+                string F0_Name = FC.Get("txb_Family_Name_0");//父
+                string F1_Name = FC.Get("txb_Family_Name_1");//母
+                #region 父親
+                if (!string.IsNullOrEmpty(F0_Name))
+                {
+                    var F0 = N.Fs.FirstOrDefault(q => q.FamilyType == 0);
+                    if (F0 != null)
+                    {
+                        F0.Name = F0_Name;
+                    }
+                    else
+                    {
+                        F0 = new Family
+                        {
+                            ACID = ACID,
+                            Name = F0_Name,
+                            IDNumber = "",
+                            Login = "",
+                            FamilyType = 0,
+                            FamilyTitle = "父親",
+                            TargetACID = 0,
+                            SortNo = 0,
+                            DeleteFlag = false
+                        };
+                        N.Fs.Add(F0);
+                    }
+                }
+                #endregion
+                #region 母親
+                if (!string.IsNullOrEmpty(F1_Name))
+                {
+                    var F1 = N.Fs.FirstOrDefault(q => q.FamilyType == 1);
+                    if (F1 != null)
+                    {
+                        F1.Name = F1_Name;
+                    }
+                    else
+                    {
+                        F1 = new Family
+                        {
+                            ACID = ACID,
+                            Name = F1_Name,
+                            IDNumber = "",
+                            Login = "",
+                            FamilyType = 1,
+                            FamilyTitle = "母親",
+                            TargetACID = 0,
+                            SortNo = 0,
+                            DeleteFlag = false
+                        };
+                        N.Fs.Add(F1);
+                    }
+                }
+                #endregion
+                #region 配偶
+                //有配對到配偶~就不處理了
+                //反之~若沒ACID表示目前沒配對到
+                string F2_Name = FC.Get("txb_Family_Name_2");//配偶姓名
+                if (!string.IsNullOrEmpty(F2_Name))
+                {
+                    string F2_IDNumber = FC.Get("txb_Family_IDNumber_2");//配偶身分證字號
+                    string F2_Login = FC.Get("txb_Family_Login_2");//帳號
 
+                    var F2 = N.Fs.FirstOrDefault(q => q.FamilyType == 2);
+                    if (F2 != null)
+                    {
+                        N.ChangeWeddingDataFlag = F2.Name != F2_Name || F2.IDNumber != F2_IDNumber || F2.Login != F2_Login;
+                        F2.Name = F2_Name;
+                        F2.IDNumber = F2_IDNumber;
+                        F2.Login = F2_Login;
+                    }
+                    else
+                    {
+                        N.ChangeWeddingDataFlag = true;
+                        F2 = new Family
+                        {
+                            ACID = ACID,
+                            Name = F2_Name,
+                            IDNumber = F2_IDNumber,
+                            Login = F2_Login,
+                            FamilyType = 2,
+                            FamilyTitle = "配偶",
+                            TargetACID = 0,
+                            SortNo = -1,
+                            DeleteFlag = false
+                        };
+                        N.Fs.Add(F2);
+                    }
+                }
+                #endregion
+                #region 緊急連絡人
+                for (int i = 0; i < 2; i++)
+                {
+                    string F4_Name = FC.Get("txb_Family_Name_4_" + i);
+                    string F4_Title = FC.Get("txb_Family_Title_4_" + i);
+
+                    string sPhone = FC.Get("txb_PhoneNo");
+                    string sZID = FC.Get("ddl_PhoneZip");
+                    string F4_PhoneNo = FC.Get("txb_PhoneNo").Split(',')[i];
+                    int F4_Zip = Convert.ToInt32(FC.Get("ddl_PhoneZip").Split(',')[i]);
+
+                    var F4 = N.Fs.FirstOrDefault(q => q.FamilyType == 4 && q.SortNo == i);
+                    if (F4 != null)
+                    {
+                        F4.Name = F4_Name;
+                        F4.FamilyTitle = F4_Title;
+
+                        Contect Con = N.Cons.FirstOrDefault(q => q.TargetID == F4.FID);
+                        if (Con != null)
+                        {
+                            Con.ZID = F4_Zip;
+                            Con.ContectValue = F4_PhoneNo;
+                        }
+                        else
+                        {
+                            Con = new Contect
+                            {
+                                TargetType = 4,
+                                TargetID = F4.FID,
+                                ZID = F4_Zip,
+                                ContectType = 1,
+                                ContectValue = F4_PhoneNo,
+                                CheckFlag = false,
+                                CreDate = DT,
+                                CheckDate = DT
+                            };
+                            N.Cons.Add(Con);
+                        }
+
+                    }
+                    else
+                    {
+                        F4 = new Family
+                        {
+                            ACID = ACID,
+                            Name = F4_Name,
+                            IDNumber = "",
+                            Login = F4_PhoneNo,
+                            FamilyType = 4,
+                            FamilyTitle = F4_Title,
+                            TargetACID = F4_Zip,
+                            SortNo = i,
+                            DeleteFlag = false
+                        };
+                        N.Fs.Add(F4);
+
+                        Contect Con = N.Cons.FirstOrDefault(q => q.TargetID == F4.FID && q.ContectType == i);
+                        if (Con != null)
+                        {
+                            Con.ZID = F4_Zip;
+                            Con.ContectValue = F4_PhoneNo;
+                        }
+                        else
+                        {
+                            Con = new Contect
+                            {
+                                TargetType = 4,
+                                TargetID = 0,
+                                ZID = F4_Zip,
+                                ContectType = i,
+                                ContectValue = F4_PhoneNo,
+                                CheckFlag = false,
+                                CreDate = DT,
+                                CheckDate = DT
+                            };
+                            N.Cons.Add(Con);
+                        }
+                    }
+                }
+                #endregion
             }
             #endregion
-
-
 
             return N;
         }
@@ -681,7 +862,232 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult FamilyData(FormCollection FC)
         {
             GetViewBag();
-            return View(GetFamilyData(FC));
+            var N = GetFamilyData(FC);
+            foreach (var F in N.Fs)
+            {
+                switch (F.FamilyType)
+                {
+                    case 0://父
+                    case 1://母
+                        {
+                            if (F.FID == 0)
+                                DC.Family.InsertOnSubmit(F);
+                        }
+                        break;
+
+                    case 2://配偶
+                        {
+                            if (F.FID == 0)
+                                DC.Family.InsertOnSubmit(F);
+                            if (N.ChangeWeddingDataFlag)
+                            {
+                                var AC_ = DC.Account.FirstOrDefault(q => !q.DeleteFlag &&
+                                q.ActiveFlag &&
+                                (q.Name_First + q.Name_Last) == F.Name &&
+                                q.IDNumber == F.IDNumber &&
+                                q.Login == F.Login
+                                );
+
+                                if (AC_ != null)
+                                {
+                                    string sMailData = "";
+                                    sMailData += "<p>" + AC_.Name_First + "您好：</p>";
+                                    sMailData += "<p>有位" + N.AC.Name_First + N.AC.Name_Last + (N.AC.ManFlag ? "先生" : "女士") + "想跟您確認配偶關係</p>";
+                                    sMailData += "<p>若兩位確實為配偶,請按下";
+                                    sMailData += "<a href='https://" + Request.Url.Host + "/Web/Home/CheckWedding?ID1=" + HSM.Enc_1(N.AC.ACID.ToString()) + "&ID2=" + HSM.Enc_1(AC_.ACID.ToString()) + "' target='_black'>確定</a>";
+                                    sMailData += "以確認兩位互為配偶</p>";
+
+                                    var Con = DC.Contect.FirstOrDefault(q => q.TargetID == AC_.ACID && q.TargetType == 2 && q.ContectType == 2 && q.CheckFlag);
+                                    if (Con != null)
+                                        Error = SendMail(Con.ContectValue, AC_.Name_First + AC_.Name_Last, "【全球旌旗資訊網】配偶認證", sMailData);
+                                }
+                            }
+                        }
+                        break;
+
+                    case 4://緊急連絡人
+                        {
+                            if (F.FID == 0)
+                            {
+                                DC.Family.InsertOnSubmit(F);
+                            }
+                        }
+                        break;
+                }
+            }
+            foreach (var Con in N.Cons)
+            {
+                if (Con.CID == 0)
+                    DC.Contect.InsertOnSubmit(Con);
+            }
+            DC.SubmitChanges();
+
+            foreach (var F4 in N.Fs.Where(q => q.FamilyType == 4).OrderBy(q => q.SortNo))
+            {
+                var Con = N.Cons.FirstOrDefault(q => q.TargetID == 0 && q.TargetType == 4 && q.ContectValue == F4.Login && q.ZID == F4.TargetACID && q.ContectType == F4.SortNo);
+                if (Con != null)
+                {
+                    Con.TargetID = F4.FID;
+                    Con.ContectType = 1;
+                    F4.Login = "";
+                    F4.TargetACID = 0;
+                    DC.SubmitChanges();
+                }
+            }
+            SetAlert("存檔完成", 1);
+            return View(N);
+        }
+
+        #endregion
+        #region 退款費用專用帳戶
+        public class cBankData
+        {
+            public Account_Bank AB = new Account_Bank();
+            public List<SelectListItem> SLI = new List<SelectListItem>();
+        }
+        public cBankData GetBankData(FormCollection FC)
+        {
+            cBankData N = new cBankData();
+            ACID = GetACID();
+            var Bs = DC.Bank.Where(q => q.ActiveFlag).OrderBy(q => q.BankNo);
+            #region 物件初始化
+            foreach (var B in Bs)
+                N.SLI.Add(new SelectListItem { Text = B.BankNo.ToString().PadLeft(3, '0') + " " + B.Title, Value = B.BID.ToString() });
+            N.SLI[0].Selected = true;
+            #endregion
+            #region 會員資料填入
+            N.AB = DC.Account_Bank.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
+            if (N.AB == null)
+            {
+                N.AB = new Account_Bank
+                {
+                    ACID = ACID,
+                    BID = Bs.Min(q => q.BID),
+                    Title = "",
+                    BankNo = "",
+                    AccountNo = "",
+                    DeleteFlag = false,
+                    CreDate = DT,
+                    UpdDate = DT,
+                    SaveACID = ACID
+                };
+            }
+            else
+            {
+                N.SLI.ForEach(q => q.Selected = false);
+                N.SLI.Find(q => q.Value == N.AB.BID.ToString()).Selected = true;
+            }
+            #endregion
+            #region 輸入資料填入
+            if (FC != null)
+            {
+                N.AB.Title = FC.Get("txb_Title");
+                N.AB.BankNo = FC.Get("txb_BankNo");
+                N.AB.AccountNo = FC.Get("txb_AccountNo");
+                N.AB.BID = Convert.ToInt32(FC.Get("ddl_BID"));
+                N.SLI.ForEach(q => q.Selected = false);
+                N.SLI.Find(q => q.Value == N.AB.BID.ToString()).Selected = true;
+            }
+            #endregion
+            return N;
+        }
+
+        [HttpGet]
+        public ActionResult BankData()
+        {
+            GetViewBag();
+            return View(GetBankData(null));
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult BankData(FormCollection FC)
+        {
+            GetViewBag();
+            var N = GetBankData(FC);
+            if (N.AB.ABID == 0)
+                DC.Account_Bank.InsertOnSubmit(N.AB);
+            DC.SubmitChanges();
+            SetAlert("已存檔完成", 1);
+            return View(N);
+        }
+        #endregion
+        #region 多元表現
+        public class cPerformanceData
+        {
+            public List<Account_Performance> APs = new List<Account_Performance>();
+        }
+        public cPerformanceData GetPerformanceData(FormCollection FC)
+        {
+            cPerformanceData N = new cPerformanceData();
+            ACID = GetACID();
+
+            #region 會員資料填入
+            N.APs = DC.Account_Performance.ToList();
+
+            #endregion
+            #region 輸入資料填入
+            if (FC != null)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    int iSortNo_Max = 0;
+                    foreach (var AP in N.APs.Where(q => q.PerformanceType == i).OrderBy(q => q.APID))
+                    {
+                        string sData = FC.Get("txb_Performance_DB_" + i + "_" + AP.APID);
+                        if (!string.IsNullOrEmpty(sData))
+                            AP.Performance = sData;
+                        else
+                            AP.Performance = "";
+                        iSortNo_Max = iSortNo_Max < AP.SortNo ? AP.SortNo : iSortNo_Max;
+                    }
+                    int iMax = Convert.ToInt32(FC.Get("text_max_" + i));
+                    for (int j = 0; j <= iMax; j++)
+                    {
+                        string sData = FC.Get("txb_Performance_" + i + "_" + j);
+                        if (!string.IsNullOrEmpty(sData))
+                        {
+                            N.APs.Add(new Account_Performance
+                            {
+                                APID = 0,
+                                ACID = ACID,
+                                PerformanceType = i,
+                                Performance = sData,
+                                SortNo = iSortNo_Max + 1
+                            });
+                            iSortNo_Max++;
+                        }
+                    }
+                }
+
+            }
+            #endregion
+            return N;
+        }
+
+        [HttpGet]
+        public ActionResult PerformanceData()
+        {
+            GetViewBag();
+            return View(GetPerformanceData(null));
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        //[HandleError(ExceptionType = typeof(HttpAntiForgeryException), View = "/Web/Home/CSRF")]
+        public ActionResult PerformanceData(FormCollection FC)
+        {
+            GetViewBag();
+            var N = GetPerformanceData(FC);
+            foreach (var AP in N.APs.Where(q => q.APID == 0))
+            {
+                DC.Account_Performance.InsertOnSubmit(AP);
+            }
+            foreach (var AP in N.APs.Where(q => q.Performance == "" && q.APID > 0))
+            {
+                DC.Account_Performance.DeleteOnSubmit(AP);
+            }
+            DC.SubmitChanges();
+            SetAlert("已存檔完成", 1, "/Web/AccountPlace/PerformanceData");
+            return View(N);
         }
         #endregion
 

@@ -80,6 +80,7 @@ namespace Banner
         public string[] JoinTitle = new string[] { "無意願", "已入組未落戶", "跟進中(已分發)", "被退回(未分發)", "跟進中(未分發)" };
         public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
         public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)"};
+        public string[] sCourseType = new string[] { "實體", "線上", "網路學校" };
         public string Error = "";
         public int iChildAge = 12;
 
@@ -852,7 +853,8 @@ namespace Banner
                 var message = new MailMessage(fromAddress, toAddress)
                 {
                     Subject = subject,
-                    Body = body
+                    Body = body,
+                    IsBodyHtml = true
                 };
                 smtp.Send(message);
                 return "";
@@ -2263,17 +2265,16 @@ namespace Banner
                     if (i < 4)
                         NewShortURL += ShortURLs[i] + "/";
                 }
-
+                if (NewShortURL.EndsWith("/"))
+                    NewShortURL = NewShortURL.Substring(0, NewShortURL.Length - 1);
+                
                 var M = DC.Menu.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && (q.URL == ShortURL || q.URL.StartsWith(NewShortURL)));
                 if (M != null)
                 {
                     ViewBag._Title = M.Title;
                     //取得權限
-
                     if (CheckAdmin(ACID))//此使用者擁有系統管理者權限
-                    {
                         bGroup = new bool[] { true, true, true, true, true, true };
-                    }
                     else
                     {
                         /*var MACs = from q in DC.M_Rool_Account.Where(q => q.ACID == ACID && q.ActiveFlag && (q.Rool.RoolType == 3 || q.Rool.RoolType == 4) && !q.DeleteFlag && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date))
@@ -2303,6 +2304,8 @@ namespace Banner
 
                     ViewBag._Power = bGroup;
                 }
+                else if (CheckAdmin(ACID))//此使用者擁有系統管理者權限
+                    bGroup = new bool[] { true, true, true, true, true, true };
             }
 
             //SetResponseVerify();

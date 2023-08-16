@@ -330,6 +330,7 @@ namespace Banner.Areas.Web.Controllers
             public int PhoneZip = 10;
             public string PhoneNo = "";
             public string Email = "";
+            public string HideEmail = "";
             public string CheckCode_Get = "";
             public string CheckCode_Input = "";
         }
@@ -350,10 +351,21 @@ namespace Banner.Areas.Web.Controllers
 
             Con = Cons.FirstOrDefault(q => q.ContectType == 2);
             if (Con != null)
-                N.Email = Con.ContectValue;
+            {
+                N.HideEmail = N.Email = Con.ContectValue;
+                string[] CutEmail = N.Email.Split('@');
+                if (CutEmail.Length > 1)
+                    N.HideEmail = (CutEmail[0].Length > 3 ? CutEmail[0].Substring(0, 3) + new string('*', 5) : CutEmail[0].Substring(0, 1)) + "@" + CutEmail[1];
+            }
+            //2023/8/14 新增
 
+
+            string CheckCode = GetRand(1000000).ToString().PadLeft(6, '0');
+            N.CheckCode_Get = HSM.Enc_1(CheckCode);
+            Error = SendMail(N.Email, N.Email, "【全球旌旗資訊網】Email認證", "親愛的旌旗家人,您的驗證碼為：" + CheckCode + "。");
             return View(N);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Step2(FormCollection FC)
@@ -375,9 +387,14 @@ namespace Banner.Areas.Web.Controllers
 
             var Con2 = Cons.FirstOrDefault(q => q.ContectType == 2);
             if (Con2 != null)
-                N.Email = Con2.ContectValue;
-
-            bool PhoneFlag = Convert.ToBoolean(FC.Get("rbut_Con"));
+            {
+                N.HideEmail = N.Email = Con2.ContectValue;
+                string[] CutEmail = N.Email.Split('@');
+                if (CutEmail.Length > 1)
+                    N.HideEmail = (CutEmail[0].Length > 3 ? CutEmail[0].Substring(0, 3) + new string('*', 5) : CutEmail[0].Substring(0, 1)) + "@" + CutEmail[1];
+            }
+            //2023/08/14 只要驗證Email就好
+            /*bool PhoneFlag = Convert.ToBoolean(FC.Get("rbut_Con"));
             string sGetCode = FC.Get("txb_Code_Get");
             string sSetCode = FC.Get("txb_CheckCode");
             if (sGetCode != sSetCode)
@@ -397,6 +414,20 @@ namespace Banner.Areas.Web.Controllers
                     DC.SubmitChanges();
                 }
                 SetAlert("", 1, "/Web/AccountAdd/Step3?ACID=" + N.sACID);
+            }*/
+
+
+            N.CheckCode_Get = HSM.Des_1(FC.Get("txb_Code_Get"));
+            string sSetCode = FC.Get("txb_CheckCode");
+            if (N.CheckCode_Get != sSetCode)
+                SetAlert("檢查碼輸入錯誤", 2);
+            else
+            {
+                Con2.CheckFlag = true;
+                Con2.CheckDate = DT;
+                DC.SubmitChanges();
+                SetAlert("", 1, "/Web/AccountAdd/Step3?ACID=" + N.sACID);
+
             }
             return View(N);
         }
@@ -528,9 +559,6 @@ namespace Banner.Areas.Web.Controllers
             }
             #endregion
 
-
-
-
             return N;
         }
         [HttpGet]
@@ -547,7 +575,10 @@ namespace Banner.Areas.Web.Controllers
         {
             GetViewBag();
             cStep3 N = SetStep3(GetQueryStringInString("ACID"), FC);
-            if (FC != null)
+            var AC_ = DC.Account.FirstOrDefault(q => q.ACID != N.AC.ACID && q.IDNumber == N.AC.IDNumber && !q.DeleteFlag);
+            if (AC_ != null) //檢查身分證字號是否被其他帳號使用
+                SetAlert("此身份證字號已被申請帳號,無法送出存檔", 2);
+            else if (FC != null)
             {
                 //社群帳號
                 for (int i = 0; i < CommunityTitle.Length; i++)

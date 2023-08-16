@@ -1,0 +1,153 @@
+﻿@model Banner.Areas.Web.Controllers.AccountPlaceController.cPerformanceData
+@{
+    ViewBag.Title = "PerformanceData";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<style>
+    main {
+        padding: 0;
+        position: relative;
+    }
+
+    .section-card {
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        gap: 16px;
+    }
+
+    .header-container {
+        margin-top: 32px;
+    }
+
+        .header-container:first-child {
+            margin-top: 0;
+        }
+
+    .btn-verify-phone,
+    .btn-verify-email {
+        margin-top: 6px;
+    }
+
+    .action-bar {
+        width: 100%;
+    }
+
+    .alertbtn {
+        line-height: 4px !important;
+    }
+</style>
+<div class="body-container" style="height: calc(100vh - 164px); padding-bottom:84px;">
+    <div class="section-container">
+
+        <form method="post" id="form1" style="width:80%;">
+            @Html.AntiForgeryToken()
+            <div class="row w-100">
+                <div class="col-lg-6 col-12">
+                    <div class="form-card-group">
+                        <div class="header-container no-border">
+                            <div class="header-left-border"></div>
+                            <h5 class="header font-bold">多元表現</h5>
+                        </div>
+                        <div class="section-card">
+                            @{ 
+                                var P0s = Model.APs.Where(q => q.PerformanceType == 0).ToList();
+                                int P0Ct = P0s.Count;
+                            }
+                            <div class="form-group text-end">
+                                <input id="text_max_0" name="text_max_0" value="@(P0Ct)" type="hidden" />
+                                <a class="lab_DarkBlue" href="javascript:;" onclick="AddRow0();">
+<img src="~/Areas/Web/Content/Img/add.png" class="img_Add" />新增專長</a>
+                            </div>
+                            <div id="div_Row0">
+                                @for (int i = 0; i < P0s.Count; i++)
+                                {
+                                    <div class="d-flex mb-2" id="div_Row0_@P0s[i].SortNo">
+                                        <div style="flex: 1">
+                                            <label>專長@(i+1)</label>
+                                            <input name="txb_Performance_DB_0_@P0s[i].APID" type="text" value="@P0s[i].Performance" class="form-control form-control-lg input-underline" onchange="SaveVal(this);" />
+                                        </div>
+                                        <div class="pt-5">
+                                            <a href="javascript:;" onclick="RemoveRow('div_Row0_@P0s[i].SortNo');"><img src="/Areas/Web/Content/Img/delete.png" /></a>
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-lg-6 col-12">
+                    <div class="form-card-group">
+                        <div class="header-container no-border">
+                            <div class="header-left-border" style="background-color: unset;"></div>
+                            <h5 class="header font-bold"></h5>
+                        </div>
+                        <div class="section-card">
+                            @{
+                                var P1s = Model.APs.Where(q => q.PerformanceType == 1).ToList();
+                                int P1Ct = P1s.Count;
+                            }
+                            <div class="form-group text-end">
+                                <input id="text_max_1" name="text_max_1" value="@(P1Ct)" type="hidden" />
+                                <a class="lab_DarkBlue" href="javascript:;" onclick="AddRow1();">
+                                    <img src="~/Areas/Web/Content/Img/add.png" class="img_Add" />新增外部社團/工會
+                                </a>
+                            </div>
+                            <div id="div_Row1">
+                                @for (int i = 0; i < P1s.Count; i++)
+                                {
+                                    <div class="d-flex mb-2" id="div_Row1_@P1s[i].SortNo">
+                                        <div style="flex: 1">
+                                            <label>外部社團/工會@(i+1)</label>
+                                            <input name="txb_Performance_DB_1_@P1s[i].APID" type="text" value="@P1s[i].Performance" class="form-control form-control-lg input-underline" onchange="SaveVal(this);" />
+                                        </div>
+                                        <div class="pt-5">
+                                            <a href="javascript:;" onclick="RemoveRow('div_Row1_@P1s[i].SortNo');"><img src="/Areas/Web/Content/Img/delete.png" /></a>
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+<div class="action-bar">
+    <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
+    <a href="/Web/AccountPlace/PerformanceData" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />取消</a>
+</div>
+
+
+<script>
+    function AddRow0() {
+        var sCt = document.getElementById('text_max_0');
+        var iCt = parseInt( sCt.value)+1;
+        var AddData = "<div class=\"d-flex mb-2\" id=\"div_Row0_" + iCt + "\"><div style = \"flex: 1\"><label>專長" + iCt + "</label><input name=\"txb_Performance_0_" + iCt + "\" type=\"text\" class=\"form-control form-control-lg input-underline\" onchange=\"SaveVal(this);\" /></div ><div class=\"pt-5\"><a href=\"javascript:;\" onclick=\"RemoveRow('div_Row0_" + iCt + "');\"><img src=\"/Areas/Web/Content/Img/delete.png\" /></a></div></div >";
+        document.getElementById('div_Row0').innerHTML += AddData;
+        document.getElementById('text_max_0').value = iCt;
+    }
+    function AddRow1() {
+        var sCt = document.getElementById('text_max_1');
+        var iCt = parseInt(sCt.value) + 1;
+        var AddData = "<div class=\"d-flex mb-2\" id=\"div_Row1_" + iCt + "\"><div style = \"flex: 1\"><label>外部社團/工會" + iCt + "</label><input name=\"txb_Performance_1_" + iCt + "\" type=\"text\" class=\"form-control form-control-lg input-underline\" onchange=\"SaveVal(this);\"/></div ><div class=\"pt-5\"><a href=\"javascript:;\" onclick=\"RemoveRow('div_Row1_" + iCt + "');\"><img src=\"/Areas/Web/Content/Img/delete.png\" /></a></div></div >";
+        document.getElementById('div_Row1').innerHTML += AddData;
+        document.getElementById('text_max_1').value = iCt;
+    }
+    function RemoveRow(RowID) {
+        document.getElementById(RowID).remove();
+    }
+    function SaveVal(txb) {
+        txb.setAttribute("value", txb.value);
+    }
+</script>

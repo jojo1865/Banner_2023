@@ -118,35 +118,35 @@
                         -->
                     <div class="search-form-section">
                         <div class="d-flex justify-content-end">
-                            <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-submit btn-lg btn-round btn-submit me-2">搜尋</a>
+                            <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-submit btn-lg btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
                         </div>
                     </div>
                 </div>
                 <div class="table-container">
                     <!--
-                    <div class="table-func-container">
-                        <button class="btn btn-outline-primary btn-sm btn-round">
-                            全選
-                        </button>
-                        <button class="btn btn-outline-primary btn-sm btn-round">
-                            全不選
-                        </button>
-                        <div>&nbsp;</div>
-                        <button id="btn-export-sm"
-                                class="btn btn-primary btn-sm btn-round">
-                            <span class="material-icons"> print </span> 匯出
-                        </button>
-                        <button class="btn btn-primary btn-sm btn-round">
-                            <span class="material-icons"> print </span>匯出牧養歷程
-                        </button>
-                        <button class="btn btn-primary btn-sm btn-round">
-                            <span class="material-icons"> print </span>匯出課程歷程
-                        </button>
-                        <button class="btn btn-primary btn-sm btn-round">
-                            <span class="material-icons"> print </span>匯出事工歷程
-                        </button>
-                    </div>
-                        -->
+    <div class="table-func-container">
+        <button class="btn btn-outline-primary btn-sm btn-round">
+            全選
+        </button>
+        <button class="btn btn-outline-primary btn-sm btn-round">
+            全不選
+        </button>
+        <div>&nbsp;</div>
+        <button id="btn-export-sm"
+                class="btn btn-primary btn-sm btn-round">
+            <i class="fa-solid fa-download"></i>匯出
+        </button>
+        <button class="btn btn-primary btn-sm btn-round">
+            <i class="fa-solid fa-download"></i>匯出牧養歷程
+        </button>
+        <button class="btn btn-primary btn-sm btn-round">
+            <i class="fa-solid fa-download"></i>匯出課程歷程
+        </button>
+        <button class="btn btn-primary btn-sm btn-round">
+            <i class="fa-solid fa-download"></i>匯出事工歷程
+        </button>
+    </div>
+        -->
                     <div class="table-container">
                         @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
                     </div>

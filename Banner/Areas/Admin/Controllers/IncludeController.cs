@@ -141,6 +141,8 @@ namespace Banner.Areas.Admin.Controllers
             }
 
             sURL = sURL.Replace("_Edit", "_List");
+            if (sURL.EndsWith("/"))
+                sURL = sURL.Substring(0, sURL.Length - 1);
             var N = DC.Menu.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.MenuType == 0 && q.URL.StartsWith(sURL));
             while (N != null)
             {

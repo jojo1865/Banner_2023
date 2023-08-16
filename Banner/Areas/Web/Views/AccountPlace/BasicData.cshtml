@@ -347,7 +347,7 @@
                                     </div>
                                     <div class="col">
                                         <div class="d-none">
-                                            @Html.CheckBox("cbox_PhoneCheck",true)
+                                            @Html.CheckBox("cbox_PhoneCheck", true)
                                         </div>
                                     </div>
                                     @if (Con.RequiredFlag && false)//2023.08.08 取消帳號內手機驗證
@@ -372,7 +372,7 @@
                                 <div class="form-group">
                                     <div class="col">
                                         <div class="d-none">
-                                            @Html.CheckBox("cbox_EmailCheck",true)
+                                            @Html.CheckBox("cbox_EmailCheck", true)
                                         </div>
                                     </div>
                                     <label>@(Con.Title)<span>@(Con.RequiredFlag ? "*" : "")</span></label>
@@ -406,11 +406,8 @@
     </div>
 </div>
 <div class="action-bar">
-    @if ((((bool[])ViewBag._Power)[1] && Model.AC.ACID == 0) || (((bool[])ViewBag._Power)[2] && Model.AC.ACID > 0) || true)
-    {
-        <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
-    }
-    <a href="/Web/AccountPlace/Index" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />取消</a>
+    <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
+    <a href="/Web/AccountPlace/BasicData" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />取消</a>
 </div>
 
 <div id="div_PhoneCheck" class="d-none">
