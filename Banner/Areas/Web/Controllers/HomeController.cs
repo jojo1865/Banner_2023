@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.IO;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -355,7 +356,7 @@ namespace Banner.Areas.Web.Controllers
             {
                 //先把送出者跟被配對者組合
                 var F = DC.Family.FirstOrDefault(q => q.ACID == AC1.ACID && q.FamilyType == 2 && q.SortNo == -1 && !q.DeleteFlag && q.IDNumber == AC2.IDNumber);
-                if(F == null)
+                if (F == null)
                 {
                     F = new Family
                     {
@@ -413,5 +414,6 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
         #endregion
+
     }
 }

@@ -109,7 +109,6 @@ namespace Banner.Areas.Admin.Controllers
         public Course_Category GetCategory_Edit(int ID, FormCollection FC)
         {
             #region 資料庫資料帶入
-            ACID = GetACID();
             Course_Category N = DC.Course_Category.FirstOrDefault(q => q.CCID == ID);
             if (N == null)
                 N = new Course_Category
@@ -142,6 +141,7 @@ namespace Banner.Areas.Admin.Controllers
         public ActionResult Category_Edit(int ID)
         {
             GetViewBag();
+            ChangeTitle(ID == 0);
             return View(GetCategory_Edit(ID, null));
         }
         [HttpPost]
@@ -149,6 +149,7 @@ namespace Banner.Areas.Admin.Controllers
         public ActionResult Category_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
+            ChangeTitle(ID == 0);
             var N = GetCategory_Edit(ID, FC);
             if (N.Title == "")
                 Error = "請輸入課程分類名稱";
@@ -288,7 +289,6 @@ namespace Banner.Areas.Admin.Controllers
                 N.SL[0].Selected = true;
             #endregion
             #region 資料庫資料帶入
-            ACID = GetACID();
             N.C = DC.Course.FirstOrDefault(q => q.CID == ID);
             if (N.C == null)
             {
@@ -339,6 +339,7 @@ namespace Banner.Areas.Admin.Controllers
         public ActionResult Course_Edit(int ID)
         {
             GetViewBag();
+            ChangeTitle(ID == 0);
             return View(GetCourse_Edit(ID, null));
         }
         [HttpPost]
@@ -346,6 +347,7 @@ namespace Banner.Areas.Admin.Controllers
         public ActionResult Course_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
+            ChangeTitle(ID == 0);
             var N = GetCourse_Edit(ID, FC);
             if (N.C.Title == "")
                 Error = "請輸入課程名稱";

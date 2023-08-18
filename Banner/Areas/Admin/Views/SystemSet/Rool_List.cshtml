@@ -1,0 +1,65 @@
+﻿@model Banner.Areas.Admin.Controllers.SystemSetController.cRool_List
+@{
+    ViewBag.Title = "Rool_List";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<!--權限管理-->
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        <form method="post" id="form1">
+            @Html.AntiForgeryToken()
+            @if (Model != null)
+            {
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-xxl-5 col-lg-6 col-12">
+                                <div class="form-control-lg">
+                                    <label>後台權限類別</label><br />
+                                    @foreach (var TL in Model.TypeList)
+                                    {
+                                        @Html.RadioButton("rbl_RoolType", TL.Value, TL.Selected, new { @class = "form-check-input", @id = "rbl_RoolType" + TL.Value })
+                                        @Html.Label(TL.Text, new { @for = "rbl_RoolType" + TL.Value, @class = "ms-2 me-3" })
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-xxl-4 col-lg-6 col-12">
+                                <div class="form-control-lg">
+                                    <label>啟用狀態</label><br />
+                                    @Html.RadioButton("rbl_ActiveFlag", -1, (Model.ActiveFlag == -1), new { @class = "form-check-input", @id = "rbl_ActiveFlag_All" })
+                                    @Html.Label("全部", new { @for = "rbl_ActiveFlag_All", @class = "ms-2 me-3" })
+                                    @Html.RadioButton("rbl_ActiveFlag", 1, (Model.ActiveFlag == 1), new { @class = "form-check-input", @id = "rbl_ActiveFlag_1" })
+                                    @Html.Label("已啟用", new { @for = "rbl_ActiveFlag_1", @class = "ms-2 me-3" })
+                                    @Html.RadioButton("rbl_ActiveFlag", 0, (Model.ActiveFlag == 0), new { @class = "form-check-input", @id = "rbl_ActiveFlag_0" })
+                                    @Html.Label("關閉中", new { @for = "rbl_ActiveFlag_0", @class = "ms-2 me-3" })
+                                </div>
+                            </div>
+                            <div class="col-xxl-3 col-lg-6 col-12">
+                                <div class="form-control-lg text-lg-end text-center">
+                                    <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    @if (((bool[])ViewBag._Power)[1])
+                    {
+                        <div class="table-func-container mb-4">
+                            <a class="btn btn-primary btn-lg btn-round" href="/Admin/SystemSet/Rool_Edit/0">
+                                <i class="fa-solid fa-circle-plus"></i>新增
+                            </a>
+                        </div>
+                    }
+                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                </div>
+            }
+        </form>
+    </div>
+</div>

@@ -1,0 +1,163 @@
+﻿@model Banner.Areas.Admin.Controllers.SystemSetController.cRool_Edit
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="form-container-list">
+        <div class="form-container">
+            <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
+            @if (Model != null)
+            {
+                <form method="post" id="form1">
+                    @Html.AntiForgeryToken()
+                    <div class="form-body">
+                        <div class="form-card-group">
+                            <div class="form-card">
+                                <div class="form-group">
+                                    <label>權限名稱<span>*</span></label>
+                                    @Html.TextBox("txb_Title", Model.R.Title, new { @class = "form-control form-control-lg input-underline", @required = string.Empty })
+                                </div>
+                                <div class="form-group">
+                                    <label>類別</label>
+                                    <div class="row">
+                                        @foreach (var TL in Model.TypeList)
+                                        {
+                                            <div class="col-auto">
+                                                <div class="form-check form-check-inline">
+                                                    @Html.RadioButton("rbl_RoolType", TL.Value, TL.Selected, new { @class = "form-check-input", @id = "rbl_RoolType" + TL.Value })
+                                                    @Html.Label(TL.Text, new { @for = "rbl_RoolType" + TL.Value })
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>啟用狀態</label>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("cbox_ActiveFlag", true, Model.R.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
+                                                @Html.Label("啟用", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("cbox_ActiveFlag", false, !Model.R.ActiveFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
+                                                @Html.Label("停用", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (Model.R.RID > 0 && ((bool[])ViewBag._Power)[3] && false)
+                                {
+                                    <div class="form-group">
+                                        <label>刪除</label>
+                                        <div class="row">
+                                            <div class="col-auto">
+                                                <div class="form-check form-check-inline">
+                                                    @Html.CheckBox("cbox_DeleteFlag", Model.R.DeleteFlag, new { @class = "form-check-input" })
+                                                    @Html.Label("更新後刪除", new { @class = "form-check-label" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="form-card-group">
+                            <div class="form-card">
+                                <div class="form-group">
+                                    <table class="table_Menu">
+                                        <thead>
+                                            <tr>
+                                                <td style="width:auto">選單名稱</td>
+                                                <td>全部允許</td>
+                                                <td>允許瀏覽</td>
+                                                <td>允許新增</td>
+                                                <td>允許編輯</td>
+                                                <td class="d-none">允許刪除</td>
+                                                <td>允許匯出</td>
+                                                <td class="d-none">允許上傳</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var M1 in Model.MsnuList.Where(q => q.PMID == 0).OrderBy(q => q.SortNo))
+                                            {
+                                                <tr class="tr_M1">
+                                                    <td>@M1.Title</td>
+                                                    <td>@Html.CheckBox("cbox_AllFlag" + M1.MID, M1.AllFlag, new { @class = "form-check-input" })</td>
+                                                    <td>@Html.CheckBox("cbox_ShowFlag" + M1.MID, M1.ShowFlag, new { @class = "form-check-input" })</td>
+                                                    <td>@Html.CheckBox("cbox_AddFlag" + M1.MID, M1.AddFlag, new { @class = "form-check-input" })</td>
+                                                    <td>@Html.CheckBox("cbox_EditFlag" + M1.MID, M1.EditFlag, new { @class = "form-check-input" })</td>
+                                                    <td class="d-none">@Html.CheckBox("cbox_DeleteFlag" + M1.MID, M1.DeleteFlag, new { @class = "form-check-input" })</td>
+                                                    <td>@Html.CheckBox("cbox_PrintFlag" + M1.MID, M1.PrintFlag, new { @class = "form-check-input" })</td>
+                                                    <td class="d-none">@Html.CheckBox("cbox_UploadFlag" + M1.MID, M1.UploadFlag, new { @class = "form-check-input" })</td>
+                                                </tr>
+                                                foreach (var M2 in Model.MsnuList.Where(q => q.PMID == M1.MID).OrderBy(q => q.SortNo))
+                                                {
+                                                    <tr class="tr_M2">
+                                                        <td>@M2.Title</td>
+                                                        <td>@Html.CheckBox("cbox_AllFlag" + M2.MID, M2.AllFlag, new { @class = "form-check-input" })</td>
+                                                        <td>@Html.CheckBox("cbox_ShowFlag" + M2.MID, M2.ShowFlag, new { @class = "form-check-input" })</td>
+                                                        <td>@Html.CheckBox("cbox_AddFlag" + M2.MID, M2.AddFlag, new { @class = "form-check-input" })</td>
+                                                        <td>@Html.CheckBox("cbox_EditFlag" + M2.MID, M2.EditFlag, new { @class = "form-check-input" })</td>
+                                                        <td class="d-none">@Html.CheckBox("cbox_DeleteFlag" + M2.MID, M2.DeleteFlag, new { @class = "form-check-input" })</td>
+                                                        <td>@Html.CheckBox("cbox_PrintFlag" + M2.MID, M2.PrintFlag, new { @class = "form-check-input" })</td>
+                                                        <td class="d-none">@Html.CheckBox("cbox_UploadFlag" + M2.MID, M2.UploadFlag, new { @class = "form-check-input" })</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row text-center">
+                                <div class="col m-3">
+                                    @if ((((bool[])ViewBag._Power)[1] && Model.R.RID == 0) || (((bool[])ViewBag._Power)[2] && Model.R.RID > 0))
+                                    {
+                                        <a href="javascript:;" onclick="SubmitConfirm();" class="btn_Basic btn btn-primary btn-sm btn-round"><i class="fa-solid fa-floppy-disk"></i>儲存</a>
+                                    }
+                                    <a href="/Admin/SystemSet/Rool_List" class="btn_Basic btn btn-outline-primary btn-sm btn-round"><i class="fa-solid fa-xmark"></i>返回列表</a>
+                                </div>
+                            </div>
+                        </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .table_Menu {
+        width: 100%;
+        border: 2px double var(--basic-bagrount-color);
+    }
+
+        .table_Menu td {
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+            .table_Menu td:first-child {
+                text-align: end;
+            }
+
+        .table_Menu thead tr {
+            background-color: var(--basic-bagrount-color);
+            color: white;
+        }
+
+    .tr_M1 {
+        background-color: var(--bs-gray-400);
+    }
+
+    .tr_M2 {
+        background-color: var(--bs-gray-200);
+    }
+
+        .tr_M1 td:first-child, .tr_M2 td:first-child {
+            text-align: end;
+        }
+</style>

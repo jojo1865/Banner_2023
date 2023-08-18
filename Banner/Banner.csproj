@@ -167,6 +167,24 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\Admin\Content\CSS\bootstrap.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\all.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\all.min.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\brands.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\brands.min.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\fontawesome.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\fontawesome.min.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\regular.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\regular.min.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\solid.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\solid.min.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\svg-with-js.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\svg-with-js.min.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\v4-font-face.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\v4-font-face.min.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\v4-shims.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\v4-shims.min.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\v5-font-face.css" />
+    <Content Include="Areas\Admin\Content\CSS\css\v5-font-face.min.css" />
     <Content Include="Areas\Admin\Content\CSS\form.css" />
     <Content Include="Areas\Admin\Content\CSS\global.css" />
     <Content Include="Areas\Admin\Content\CSS\list.css" />
@@ -242,6 +260,7 @@
     <Content Include="Areas\Admin\Content\Img\user.png" />
     <Content Include="Areas\Admin\Content\Img\verified-code.png" />
     <Content Include="Areas\Admin\Content\Img\verified.png" />
+    <Content Include="Areas\Admin\Content\JS\bootstrap.bundle.js" />
     <Content Include="Areas\Admin\Content\JS\bootstrap.js" />
     <Content Include="Areas\Admin\Content\JS\jquery-3.7.0.js" />
     <Content Include="Areas\Admin\Content\JS\WebJavaScript.js" />
@@ -546,6 +565,21 @@
     <Content Include="Areas\Admin\Views\Course\Category_Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Course\Course_List.cshtml" />
     <Content Include="Areas\Admin\Views\Course\Course_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\Test.cshtml" />
+    <Content Include="Areas\Admin\Views\SystemSet\Menu_List.cshtml" />
+    <Content Include="Areas\Admin\Views\SystemSet\Menu_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\SystemSet\Rool_List.cshtml" />
+    <Content Include="Areas\Admin\Content\CSS\webfonts\fa-brands-400.ttf" />
+    <Content Include="Areas\Admin\Content\CSS\webfonts\fa-brands-400.woff2" />
+    <Content Include="Areas\Admin\Content\CSS\webfonts\fa-regular-400.ttf" />
+    <Content Include="Areas\Admin\Content\CSS\webfonts\fa-regular-400.woff2" />
+    <Content Include="Areas\Admin\Content\CSS\webfonts\fa-solid-900.ttf" />
+    <Content Include="Areas\Admin\Content\CSS\webfonts\fa-solid-900.woff2" />
+    <Content Include="Areas\Admin\Content\CSS\webfonts\fa-v4compatibility.ttf" />
+    <Content Include="Areas\Admin\Content\CSS\webfonts\fa-v4compatibility.woff2" />
+    <Content Include="Areas\Admin\Content\JS\bootstrap.bundle.js.map" />
+    <Content Include="Areas\Admin\Content\JS\bootstrap.js.map" />
+    <Content Include="Areas\Admin\Views\SystemSet\Rool_Edit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -586,6 +620,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Files\Down\" />
+    <Folder Include="Files\Product\" />
     <Folder Include="Photo\" />
   </ItemGroup>
   <ItemGroup>

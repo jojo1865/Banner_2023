@@ -17,7 +17,6 @@ namespace Banner.Areas.Web.Controllers
         {
             if (GetBrowserData("OIID") != "")
                 OIID = Convert.ToInt32(GetBrowserData("OIID"));
-            ACID = GetACID();
             ViewBag._OIID = OIID;
         }
         #region 小組資訊-首頁-聚會資料

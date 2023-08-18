@@ -146,6 +146,35 @@ namespace Banner.Areas.Admin.Controllers
                     DC.SubmitChanges();
                 }
 
+                //選單角色設定
+                var R = DC.Rool.FirstOrDefault(q => q.OID == cOE.O.OID);
+                if (R == null)//新增
+                {
+                    R = new Rool
+                    {
+                        ParentID = 2,//限會友
+                        OID = cOE.O.OID,
+                        Title = cOE.O.JobTitle,
+                        RoolType = 2,//前台牧養職分功能
+                        ActiveFlag = cOE.O.ActiveFlag,
+                        DeleteFlag = false,
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = ACID
+                    };
+                    DC.Rool.InsertOnSubmit(R);
+                    DC.SubmitChanges();
+                }
+                else
+                {
+                    R.Title = cOE.O.JobTitle;
+                    R.ActiveFlag = cOE.O.ActiveFlag;
+                    R.DeleteFlag = cOE.O.DeleteFlag;
+                    R.SaveACID = ACID;
+                    R.UpdDate = DT;
+                    DC.SubmitChanges();
+                }
+
                 SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/OrganizeSet/Organize_Map_List/" + ItemID + "/");
             }
 
@@ -195,7 +224,7 @@ namespace Banner.Areas.Admin.Controllers
                     } while (true);
                 }
             }
-            cME.O.SaveACID = GetACID();
+            cME.O.SaveACID = ACID;
             if (FC != null)
             {
                 cME.O.Title = FC.Get("txb_Title");
@@ -271,7 +300,6 @@ namespace Banner.Areas.Admin.Controllers
         }
         private cOrganize_Info_List GetOrganize_Info_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
-            int ACID = GetACID();
             string sKey = "";
             if (FC != null)
             {
@@ -547,6 +575,20 @@ namespace Banner.Areas.Admin.Controllers
                     DC.SubmitChanges();
                 }
 
+                if (cIE.OI.DeleteFlag || !cIE.OI.ActiveFlag)//若組織被關閉則移除相關權限
+                {
+                    var MOI2s = GetMOI2AC(cIE.OI.OIID);
+                    foreach (var MOI2 in MOI2s)
+                    {
+                        MOI2.ActiveFlag = cIE.OI.ActiveFlag;
+                        MOI2.DeleteFlag = cIE.OI.DeleteFlag;
+                        MOI2.UpdDate = DT;
+                        MOI2.SaveACID = ACID;
+                        DC.SubmitChanges();
+                    }
+                }
+
+
 
                 PID = cIE.OI.ParentID;
                 SetAlert((OIID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + OID + "/" + PID);
@@ -695,7 +737,7 @@ namespace Banner.Areas.Admin.Controllers
                     #endregion
                 }
             }
-            cIE.OI.SaveACID = GetACID();
+            cIE.OI.SaveACID = ACID;
             if (FC != null)
             {
                 cIE.OI.Title = FC.Get("txb_Title");
@@ -1038,7 +1080,7 @@ namespace Banner.Areas.Admin.Controllers
                             DeleteFlag = false,
                             CreDate = DT,
                             UpdDate = DT,
-                            SaveACID = GetACID()
+                            SaveACID = ACID
                         };
                     }
                     #endregion
@@ -1190,7 +1232,7 @@ namespace Banner.Areas.Admin.Controllers
                     #endregion
                 }
             }
-            cMLE.cML.SaveACID = GetACID();
+            cMLE.cML.SaveACID = ACID;
             if (FC != null)
             {
                 cMLE.cML.Title = FC.Get("txb_Title");

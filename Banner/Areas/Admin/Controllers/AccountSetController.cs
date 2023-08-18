@@ -1275,7 +1275,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 //會員資料更新
                 N.AC.UpdDate = DT;
-                N.AC.SaveACID = GetACID();
+                N.AC.SaveACID = ACID;
                 DC.SubmitChanges();
 
                 //主日聚會點
@@ -1313,7 +1313,7 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         ML.DeleteFlag = true;
                         ML.UpdDate = DT;
-                        ML.SaveACID = GetACID();
+                        ML.SaveACID = ACID;
                         DC.SubmitChanges();
                     }
                 }
@@ -1369,7 +1369,7 @@ namespace Banner.Areas.Admin.Controllers
                     N.Note = Note;
                     N.DeleteFlag = false;
                     N.CreDate = N.UpdDate = DT;
-                    N.SaveACID = GetACID();
+                    N.SaveACID = ACID;
                     DC.Account_Note.InsertOnSubmit(N);
                     DC.SubmitChanges();
                 }
@@ -1385,7 +1385,7 @@ namespace Banner.Areas.Admin.Controllers
                     N.DeleteFlag = false;
                     N.Note = Note;
                     N.UpdDate = DT;
-                    N.SaveACID = GetACID();
+                    N.SaveACID = ACID;
                     DC.SubmitChanges();
                 }
                 else//沒勾選
@@ -1393,7 +1393,7 @@ namespace Banner.Areas.Admin.Controllers
                     N.DeleteFlag = true;
                     N.Note = Note;
                     N.UpdDate = DT;
-                    N.SaveACID = GetACID();
+                    N.SaveACID = ACID;
                     DC.SubmitChanges();
                 }
             }
@@ -1410,7 +1410,7 @@ namespace Banner.Areas.Admin.Controllers
                 N.ActiveFlag = iActiveFlag == 1;
                 N.BackUsedFlag = iBackUserFlag == 1;
                 N.UpdDate = DT;
-                N.SaveACID = GetACID();
+                N.SaveACID = ACID;
                 DC.SubmitChanges();
             }
         }
@@ -1578,7 +1578,7 @@ namespace Banner.Areas.Admin.Controllers
                                 DeleteFlag = false,
                                 CreDate = DT,
                                 UpdDate = DT,
-                                SaveACID = GetACID()
+                                SaveACID = ACID
                             };
                             DC.M_OI_Account.InsertOnSubmit(M);
                             DC.SubmitChanges();
@@ -1606,7 +1606,7 @@ namespace Banner.Areas.Admin.Controllers
                                     DeleteFlag = false,
                                     CreDate = DT,
                                     UpdDate = DT,
-                                    SaveACID = GetACID()
+                                    SaveACID = ACID
                                 };
                                 DC.M_OI_Account.InsertOnSubmit(M);
                                 DC.SubmitChanges();
@@ -1782,7 +1782,7 @@ namespace Banner.Areas.Admin.Controllers
                 B.DeleteFlag = false;
 
                 B.UpdDate = B.CreDate = DT;
-                B.SaveACID = GetACID();
+                B.SaveACID = ACID;
                 DC.Baptized.InsertOnSubmit(B);
                 DC.SubmitChanges();
                 SetAlert("手洗日期指定完成", 1, "/Admin/AccountSet/Account_Baptized_List/0");

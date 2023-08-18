@@ -37,22 +37,34 @@
                                     @Html.TextBox("txb_PW", Model.PW, new { @class = "form-control form-control-lg input-underline", @type = "password" })
                                 </div>
                                 <div class="form-group">
-                                    <label>角色</label>
+                                    <label>後台角色</label>
                                     <div class="row">
-
                                         @foreach (var SL in Model.RList)
                                         {
                                             <div class="col-auto">
                                                 <div class="form-check form-check-inline">
-                                                    @Html.CheckBox("cbox_rool_" + SL.Value, SL.Selected, new { @class = "form-check-input" })
-                                                    @Html.Label(SL.Text, new { @class = "form-check-label" })
+                                                    @Html.CheckBox("cbox_rool_" + SL.Value, SL.Selected, new { @class = "form-check-input",id= "cbox_rool_"+ SL.Value })
+                                                    @Html.Label(SL.Text, new { @class = "form-check-label",@for= "cbox_rool_" + SL.Value })
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>旌旗角色</label>
+                                    <div class="row">
+                                        @foreach (var SL in Model.OIList)
+                                        {
+                                            <div class="col-auto">
+                                                <div class="form-check form-check-inline">
+                                                    @Html.CheckBox("cbox_OI_" + SL.Value, SL.Selected, new { @class = "form-check-input", id = "cbox_OI_" + SL.Value })
+                                                    @Html.Label(SL.Text, new { @class = "form-check-label", @for = "cbox_OI_" + SL.Value })
                                                 </div>
                                             </div>
                                         }
 
                                     </div>
                                 </div>
-
                                 <div class="form-group">
                                     <label>啟用狀態</label>
                                     <div class="row">

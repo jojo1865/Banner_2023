@@ -145,7 +145,7 @@ namespace Banner.Areas.Web.Controllers
                         DeleteFlag = false,
                         CreDate = DT,
                         UpdDate = DT,
-                        SaveACID = GetACID(),
+                        SaveACID = ACID,
                         OldID = 0
                     };
                     DC.Account.InsertOnSubmit(AC);
@@ -158,7 +158,7 @@ namespace Banner.Areas.Web.Controllers
 
                     Family F = new Family
                     {
-                        ACID = GetACID(),
+                        ACID = ACID,
                         Name = N.Name_F + N.Name_L,
                         IDNumber = "",
                         Login = N.Login,
@@ -225,7 +225,7 @@ namespace Banner.Areas.Web.Controllers
                     AC.Name_Last = N.Name_L;
                     AC.ManFlag = N.Sex;
                     AC.Birthday = N.dBD;
-                    AC.SaveACID = GetACID();
+                    AC.SaveACID = ACID;
                     AC.UpdDate = DT;
                     DC.SubmitChanges();
 
@@ -236,7 +236,7 @@ namespace Banner.Areas.Web.Controllers
                         int iMax = (Fs.Count() > 0 ? Fs.Max(q => q.SortNo) : 0) + 1;
                         F = new Family
                         {
-                            ACID = GetACID(),
+                            ACID = ACID,
                             Name = N.Name_F + N.Name_L,
                             IDNumber = "",
                             Login = N.Login,
@@ -627,7 +627,7 @@ namespace Banner.Areas.Web.Controllers
                 {
                     AC.ActiveFlag = true;
                     AC.UpdDate = DT;
-                    AC.SaveACID = GetACID();
+                    AC.SaveACID = ACID;
                     DC.SubmitChanges();
                 }
                 else

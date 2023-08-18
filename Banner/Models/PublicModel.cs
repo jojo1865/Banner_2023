@@ -39,7 +39,7 @@ namespace Banner.Models
         public int ATID = 0;
         public string Title = "";
         public List<cTableRow> Rs = null;
-
+        public bool ShowFloor = true;
     }
     public class cTableRow
     {

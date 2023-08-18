@@ -21,6 +21,7 @@ using ZXing;
 using Banner.Models;
 using System.Net.Mail;
 using System.Net;
+
 using OfficeOpenXml;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
@@ -79,11 +80,11 @@ namespace Banner
         public string[] CommunityTitle = new string[] { "其他", "LineID", "InstagramID", "WeChat" };
         public string[] JoinTitle = new string[] { "無意願", "已入組未落戶", "跟進中(已分發)", "被退回(未分發)", "跟進中(未分發)" };
         public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
-        public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)"};
-        public string[] sCourseType = new string[] { "實體", "線上", "網路學校" };
+        public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)" };
+        public string[] sCourseType = new string[] { "實體", "線上" };
         public string Error = "";
         public int iChildAge = 12;
-
+        public int ACID = 0;
         public PublicClass()
         {
             DC = new DataClassesDataContext(System.Web.Configuration.WebConfigurationManager.ConnectionStrings["db_BannerConnectionString"].ConnectionString);
@@ -181,7 +182,7 @@ namespace Banner
         //檢查是否為Admin權限
         public bool CheckAdmin(int ACID)
         {
-            if(ACID == 1)
+            if (ACID == 1)
                 return true;
             else
             {
@@ -2223,7 +2224,7 @@ namespace Banner
             ViewBag._Login = "";
             ViewBag._GroupTitle = "小組資訊";
             string NowURL = Request.Url.AbsolutePath;
-            int ACID = GetACID();
+            ACID = GetACID();
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             if (AC != null)
             {
@@ -2267,7 +2268,7 @@ namespace Banner
                 }
                 if (NewShortURL.EndsWith("/"))
                     NewShortURL = NewShortURL.Substring(0, NewShortURL.Length - 1);
-                
+
                 var M = DC.Menu.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && (q.URL == ShortURL || q.URL.StartsWith(NewShortURL)));
                 if (M != null)
                 {
@@ -2556,16 +2557,21 @@ namespace Banner
             return MAs;
         }
 
-        /*public IQueryable<Organize> GetMO2AC(int ACID)
+        public IQueryable<M_OI2_Account> GetMOI2AC(int OIID = 0, int ACID = 0)
         {
-            var Os = DC.M_O2_Account.Where(q=>
-            q.ACID == ACID && 
-            !q.DeleteFlag && 
+            var MAs = DC.M_OI2_Account.Where(q =>
+            !q.DeleteFlag &&
             q.ActiveFlag &&
-            q.Organize.OID==
-            )
-                     
-        }*/
+            q.OrganizeInfo.ActiveFlag &&
+            !q.OrganizeInfo.DeleteFlag
+            );
+            if (OIID > 0)
+                MAs = MAs.Where(q => q.OIID == OIID);
+            if (ACID > 0)
+                MAs = MAs.Where(q => q.ACID == ACID);
+            return MAs;
+        }
+
 
         public IQueryable<M_Rool_Account> GetMRAC(int RID = 0, int ACID = 0)
         {

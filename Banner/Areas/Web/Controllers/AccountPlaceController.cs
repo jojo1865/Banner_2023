@@ -40,7 +40,6 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Index()
         {
             GetViewBag();
-            ACID = GetACID();
             cAccountPlace_Index N = new cAccountPlace_Index();
             N.cMLs = new List<cMeetingMsg>();
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag);
@@ -507,7 +506,6 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult BasicData()
         {
             GetViewBag();
-            ACID = GetACID();
             return View(GerAccountData(ACID, null));
         }
         [HttpPost]
@@ -515,13 +513,12 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult BasicData(FormCollection FC)
         {
             GetViewBag();
-            ACID = GetACID();
             var N = GerAccountData(ACID, FC);
 
 
             //會員資料更新
             N.AC.UpdDate = DT;
-            N.AC.SaveACID = GetACID();
+            N.AC.SaveACID = ACID;
             DC.SubmitChanges();
 
             //主日聚會點
@@ -559,7 +556,7 @@ namespace Banner.Areas.Web.Controllers
                 {
                     ML.DeleteFlag = true;
                     ML.UpdDate = DT;
-                    ML.SaveACID = GetACID();
+                    ML.SaveACID = ACID;
                     DC.SubmitChanges();
                 }
             }
@@ -636,7 +633,6 @@ namespace Banner.Areas.Web.Controllers
         public cFamilyData GetFamilyData(FormCollection FC)
         {
             cFamilyData N = new cFamilyData();
-            ACID = GetACID();
             #region 會員資料填入
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
             if (AC != null)
@@ -948,7 +944,6 @@ namespace Banner.Areas.Web.Controllers
         public cBankData GetBankData(FormCollection FC)
         {
             cBankData N = new cBankData();
-            ACID = GetACID();
             var Bs = DC.Bank.Where(q => q.ActiveFlag).OrderBy(q => q.BankNo);
             #region 物件初始化
             foreach (var B in Bs)
@@ -1019,7 +1014,6 @@ namespace Banner.Areas.Web.Controllers
         public cPerformanceData GetPerformanceData(FormCollection FC)
         {
             cPerformanceData N = new cPerformanceData();
-            ACID = GetACID();
 
             #region 會員資料填入
             N.APs = DC.Account_Performance.ToList();

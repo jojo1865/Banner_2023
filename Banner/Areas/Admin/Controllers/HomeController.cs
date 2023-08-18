@@ -3,6 +3,7 @@ using OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using System.Security.Cryptography;
@@ -427,6 +428,7 @@ namespace Banner.Areas.Admin.Controllers
         public string ChangeActive(string TableName,int ID)
         {
             string Msg = "NG";
+            ACID = GetACID();
             switch(TableName)
             {
                 case "OrganizeInfo":
@@ -447,7 +449,7 @@ namespace Banner.Areas.Admin.Controllers
                             {
                                 OI.ActiveFlag = !OI.ActiveFlag;
                                 OI.UpdDate = DT;
-                                OI.SaveACID = GetACID();
+                                OI.SaveACID = ACID;
                                 DC.SubmitChanges();
 
                                 Msg = "OK";
@@ -457,10 +459,73 @@ namespace Banner.Areas.Admin.Controllers
                             Msg = "查無此組織";
                     }
                     break;
+
+                case "Menu":
+                    {
+                        var M = DC.Menu.FirstOrDefault(q => q.MID == ID);
+                        if(M!=null)
+                        {
+                            M.ActiveFlag = !M.ActiveFlag;
+                            M.UpdDate = DT;
+                            M.SaveACID = ACID;
+                            DC.SubmitChanges();
+
+                            Msg = "OK";
+                        }
+                        else
+                            Msg = "查無此選單";
+                    }
+                    break;
+
+                case "Rool":
+                    {
+                        var M = DC.Rool.FirstOrDefault(q => q.RID == ID);
+                        if (M != null)
+                        {
+                            M.ActiveFlag = !M.ActiveFlag;
+                            M.UpdDate = DT;
+                            M.SaveACID = ACID;
+                            DC.SubmitChanges();
+
+                            Msg = "OK";
+                        }
+                        else
+                            Msg = "查無此權限";
+                    }
+                    break;
             }
             return Msg;
         }
         #endregion
+        #region 測試用(檔案上傳)
+        [HttpGet]
+        public ActionResult Test()
+        {
+            GetViewBag();
 
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Test(FormCollection FC,HttpPostedFileBase file_upload)
+        {
+            GetViewBag();
+
+            bool CheckFileFlag = true;
+            if (file_upload.ContentLength <= 0 || file_upload.ContentLength > 5242880)
+                CheckFileFlag = false;
+            else if(file_upload.ContentType!="image/png" || file_upload.ContentType != "image/jpeg")
+                CheckFileFlag = false;
+            if(CheckFileFlag)
+            {
+                string Ex = Path.GetExtension(file_upload.FileName);
+                string FileName = $"{DT.ToString("yyyyMMddHHmmssfff")}{Ex}";
+                string SavaPath = Path.Combine(Server.MapPath("~/Files/Product/"), FileName);
+                file_upload.SaveAs(SavaPath);
+            }
+            
+
+            return View();
+        }
+        #endregion
     }
 }
