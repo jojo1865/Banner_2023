@@ -15,7 +15,6 @@ namespace Banner.Areas.Admin.Controllers
 {
     public class SystemSetController : PublicClass
     {
-        private int ACID = 0;
         // GET: Admin/SystemSet
         public ActionResult Index()
         {
@@ -44,7 +43,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cBUL);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult BackUser_List(FormCollection FC)
         {
             GetViewBag();
@@ -77,6 +76,12 @@ namespace Banner.Areas.Admin.Controllers
             cTL.Rs = new List<cTableRow>();
 
             var Ns = DC.Account.Where(q => !q.DeleteFlag && q.BackUsedFlag);
+            if (ACID <= 0)
+                Ns = Ns.Where(q => q.ACID == 0);
+            else
+            {
+
+            }
             if (FC != null)
             {
                 if (!string.IsNullOrEmpty(FC.Get("txb_Name")))
@@ -175,20 +180,82 @@ namespace Banner.Areas.Admin.Controllers
             public List<SelectListItem> RList = new List<SelectListItem>();
             public List<SelectListItem> OIList = new List<SelectListItem>();
         }
+
+        private cBackUser_Edit GetBackUser_Edit(int ID, FormCollection FC)
+        {
+            cBackUser_Edit cBUE = new cBackUser_Edit();
+            cBUE.ACID = ID;
+            var N = DC.Account.FirstOrDefault(q => q.ACID == ID && !q.DeleteFlag);
+            if (N != null)
+            {
+                if (FC != null)
+                {
+                    cBUE.Login = FC.Get("txb_Login");
+                    if (FC.Get("txb_PW") != "")
+                        cBUE.PW = FC.Get("txb_PW");
+                    cBUE.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
+                    cBUE.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
+
+
+                }
+                else
+                {
+                    cBUE.Login = N.Login;
+                    cBUE.PW = "";
+                    cBUE.ActiveFlag = N.ActiveFlag;
+                    cBUE.DeleteFlag = N.DeleteFlag;
+                }
+            }
+            else
+                SetAlert("查無資料,請重新操作", 2, "/Admin/SystemSet/BackUser_List");
+            cBUE.RList = new List<SelectListItem>();
+            var Rs = DC.Rool.Where(q => (q.RoolType == 3 || q.RoolType == 4) && !q.DeleteFlag && q.ActiveFlag).ToList();
+            var MAs = GetMRAC(0, ID).ToList();
+            foreach (var R in Rs.Where(q => q.RoolType != 5).OrderBy(q => q.RID))
+            {
+                var MA = MAs.FirstOrDefault(q => q.RID == R.RID);
+                if (MA != null)
+                {
+                    if ((!cBUE.R4Flag && MA.Rool.RoolType == 4) || ID == 0)
+                        cBUE.R4Flag = true;
+                }
+                if (FC != null)
+                    cBUE.RList.Add(new SelectListItem { Text = R.Title, Value = R.RID.ToString(), Selected = GetViewCheckBox(FC.Get("cbox_rool_" + R.RID)) });
+                else
+                    cBUE.RList.Add(new SelectListItem { Text = R.Title, Value = R.RID.ToString(), Selected = MA != null });
+            }
+
+            //旌旗權限項目
+            var MA2s = GetMOI2AC(0, ID);
+            if (FC != null)
+                cBUE.OIList.Add(new SelectListItem { Text = "全部旌旗", Value = "1", Selected = GetViewCheckBox(FC.Get("cbox_OI_1")) });
+            else
+                cBUE.OIList.Add(new SelectListItem { Text = "全部旌旗", Value = "1", Selected = MA2s.Any(q => q.OIID == 1) });
+            foreach (var OI in DC.OrganizeInfo.Where(q => !q.DeleteFlag && q.OID == 2).OrderBy(q => q.OIID))
+            {
+                var MA = MA2s.FirstOrDefault(q => q.OIID == OI.OIID);
+                if (FC != null)
+                    cBUE.OIList.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = GetViewCheckBox(FC.Get("cbox_OI_" + OI.OIID)) });
+                else
+                    cBUE.OIList.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = MA != null });
+            }
+
+            return cBUE;
+        }
         public ActionResult BackUser_Edit(int ID)
         {
             GetViewBag();
             ChangeTitle(ID == 0);
-            cBackUser_Edit cBUE = ReSetBackUser_Edit(ID, null);
+            cBackUser_Edit cBUE = GetBackUser_Edit(ID, null);
             return View(cBUE);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult BackUser_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
             ChangeTitle(ID == 0);
-            cBackUser_Edit cBUE = ReSetBackUser_Edit(ID, FC);
+            cBackUser_Edit cBUE = GetBackUser_Edit(ID, FC);
             Error = "";
             var N_ = DC.Account.FirstOrDefault(q => q.ACID != ID && !q.DeleteFlag && q.Login == cBUE.Login);
             if (N_ != null)
@@ -259,6 +326,43 @@ namespace Banner.Areas.Admin.Controllers
                             DC.SubmitChanges();
                         }
                     }
+                    #region 旌旗角色更新
+                    var MA2s = GetMOI2AC(0, ID);
+                    foreach (var OI in cBUE.OIList)
+                    {
+                        if (OI.Selected)
+                        {
+                            if (!MA2s.Any(q => q.OIID.ToString() == OI.Value))
+                            {
+                                M_OI2_Account MA2 = new M_OI2_Account
+                                {
+                                    OIID = Convert.ToInt32(OI.Value),
+                                    ACID = N.ACID,
+                                    ActiveFlag = true,
+                                    DeleteFlag = false,
+                                    CreDate = DT,
+                                    UpdDate = DT,
+                                    SaveACID = ACID
+                                };
+                                DC.M_OI2_Account.InsertOnSubmit(MA2);
+                            }
+                        }
+                        else if (!OI.Selected)
+                        {
+                            if (MA2s.Any(q => q.OIID.ToString() == OI.Value))
+                            {
+                                var MA2 = MA2s.FirstOrDefault(q => q.OIID.ToString() == OI.Value);
+                                if (MA2 != null)
+                                {
+                                    MA2.DeleteFlag = true;
+                                    MA2.UpdDate = DT;
+                                    MA2.SaveACID = ACID;
+                                }
+                            }
+                        }
+                    }
+                    DC.SubmitChanges();
+                    #endregion
                 }
                 SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/SystemSet/BackUser_List");
             }
@@ -266,62 +370,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(cBUE);
         }
 
-        private cBackUser_Edit ReSetBackUser_Edit(int ID, FormCollection FC)
-        {
-            cBackUser_Edit cBUE = new cBackUser_Edit();
-            cBUE.ACID = ID;
-            var N = DC.Account.FirstOrDefault(q => q.ACID == ID && !q.DeleteFlag);
-            if (N != null)
-            {
-                if (FC != null)
-                {
-                    cBUE.Login = FC.Get("txb_Login");
-                    if (FC.Get("txb_PW") != "")
-                        cBUE.PW = FC.Get("txb_PW");
-                    cBUE.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
-                    cBUE.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
-                }
-                else
-                {
-                    cBUE.Login = N.Login;
-                    cBUE.PW = "";
-                    cBUE.ActiveFlag = N.ActiveFlag;
-                    cBUE.DeleteFlag = N.DeleteFlag;
-                }
-            }
-            else
-                SetAlert("查無資料,請重新操作", 2, "/Admin/SystemSet/BackUser_List");
-            cBUE.RList = new List<SelectListItem>();
-            var Rs = DC.Rool.Where(q => (q.RoolType == 3 || q.RoolType == 4) && !q.DeleteFlag && q.ActiveFlag).ToList();
-            var MAs = GetMRAC(0, ID).ToList();
-            foreach (var R in Rs.Where(q => q.RoolType != 5).OrderBy(q => q.RID))
-            {
-                var MA = MAs.FirstOrDefault(q => q.RID == R.RID);
-                if (MA != null)
-                {
-                    if ((!cBUE.R4Flag && MA.Rool.RoolType == 4) || ID == 0)
-                        cBUE.R4Flag = true;
-                }
-                if (FC != null)
-                    cBUE.RList.Add(new SelectListItem { Text = R.Title, Value = R.RID.ToString(), Selected = GetViewCheckBox(FC.Get("cbox_rool_" + R.RID)) });
-                else
-                    cBUE.RList.Add(new SelectListItem { Text = R.Title, Value = R.RID.ToString(), Selected = MA != null });
-            }
-
-            //旌旗權限項目
-
-            var MA2s = GetMOI2AC(0, ID);
-            foreach (var OI in DC.OrganizeInfo.Where(q => !q.DeleteFlag && q.OID == 2).OrderBy(q => q.OIID))
-            {
-                var MA = MA2s.FirstOrDefault(q => q.OIID == OI.OIID);
-                if (FC != null)
-                    cBUE.OIList.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = GetViewCheckBox(FC.Get("cbox_OI_" + OI.OIID)) });
-                else
-                    cBUE.OIList.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = MA != null });
-            }
-
-            return cBUE;
-        }
         #endregion
 
         #region 選單管理-列表
@@ -446,7 +494,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetMenu_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Menu_List(FormCollection FC)
         {
             GetViewBag();
@@ -503,7 +551,7 @@ namespace Banner.Areas.Admin.Controllers
                 N.M.Title = FC.Get("txb_Title");
                 N.M.URL = FC.Get("txb_URL");
                 N.M.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
-                N.M.DeleteFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
+                N.M.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
 
             }
             #endregion
@@ -518,7 +566,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetMenu_Edit(ItemID, ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Menu_Edit(string ItemID, int ID, FormCollection FC)
         {
             GetViewBag();
@@ -589,9 +637,9 @@ namespace Banner.Areas.Admin.Controllers
                 if (FC.Get("rbl_RoolType") == "-1")
                     Ns = Ns.Where(q => q.RoolType == 3 || q.RoolType == 4);
                 else
-                    Ns = Ns.Where(q => q.RoolType.ToString() == FC.Get("ddl_RoolType"));
+                    Ns = Ns.Where(q => q.RoolType.ToString() == FC.Get("rbl_RoolType"));
                 RL.TypeList.ForEach(q => q.Selected = false);
-                RL.TypeList.First(q => q.Value == FC.Get("ddl_RoolType")).Selected = true;
+                RL.TypeList.First(q => q.Value == FC.Get("rbl_RoolType")).Selected = true;
 
                 if (FC.Get("rbl_ActiveFlag") != "-1")
                 {
@@ -634,7 +682,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetRool_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Rool_List(FormCollection FC)
         {
             GetViewBag();
@@ -710,30 +758,40 @@ namespace Banner.Areas.Admin.Controllers
                         ML.ShowFlag = MRM.ShowFlag;
                         ML.AddFlag = MRM.AddFlag;
                         ML.EditFlag = MRM.EditFlag;
-                        ML.DeleteFlag = MRM.DeleteFlag;
+                        ML.DeleteFlag = MRM.DeleteFlag;//刪除現在不用
                         ML.PrintFlag = MRM.PrintFlag;
                         ML.UploadFlag = MRM.UploadFlag;//上傳現在不用
-                        MRM.AddFlag = (MRM.ShowFlag && MRM.AddFlag && MRM.EditFlag && MRM.DeleteFlag && MRM.PrintFlag);
+                        ML.AllFlag = (MRM.ShowFlag && MRM.AddFlag && MRM.EditFlag && MRM.PrintFlag);
                     }
                 }
             }
-            if(N.R.RoolType == 3 || N.R.RoolType == 4)
+            if (N.R.RoolType == 3 || N.R.RoolType == 4)
             {
                 N.TypeList.ForEach(q => q.Selected = false);
                 N.TypeList.First(q => q.Value == N.R.RoolType.ToString()).Selected = true;
             }
-            
+
             #endregion
             #region 前端資料帶入
             if (FC != null)
             {
                 N.R.Title = FC.Get("txb_Title");
-                N.R.RoolType = Convert.ToInt32(FC.Get("tbl_RoolType"));
+                N.R.RoolType = Convert.ToInt32(FC.Get("rbl_RoolType"));
                 N.TypeList.ForEach(q => q.Selected = false);
                 N.TypeList.First(q => q.Value == N.R.RoolType.ToString()).Selected = true;
                 N.R.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
-                N.R.DeleteFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
+                N.R.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
 
+                foreach (var ML in N.MsnuList)
+                {
+                    ML.ShowFlag = GetViewCheckBox(FC.Get("cbox_ShowFlag" + ML.MID));
+                    ML.AddFlag = GetViewCheckBox(FC.Get("cbox_AddFlag" + ML.MID));
+                    ML.EditFlag = GetViewCheckBox(FC.Get("cbox_EditFlag" + ML.MID));
+                    ML.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag" + ML.MID));
+                    ML.PrintFlag = GetViewCheckBox(FC.Get("cbox_PrintFlag" + ML.MID));
+                    ML.UploadFlag = GetViewCheckBox(FC.Get("cbox_UploadFlag" + ML.MID));
+                    ML.AllFlag = GetViewCheckBox(FC.Get("cbox_AllFlag" + ML.MID));
+                }
             }
             #endregion
 
@@ -747,7 +805,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetRool_Edit(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Rool_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -772,7 +830,50 @@ namespace Banner.Areas.Admin.Controllers
                     N.R.SaveACID = ACID;
                 }
                 DC.SubmitChanges();
-                
+
+                foreach (var ML in N.MsnuList)
+                {
+                    var MRM = DC.M_Rool_Menu.FirstOrDefault(q => q.RID == N.R.RID && q.MID == ML.MID);
+                    if (MRM != null)
+                    {
+                        if (ML.AllFlag)
+                        {
+                            MRM.ShowFlag = true;
+                            MRM.AddFlag = true;
+                            MRM.EditFlag = true;
+                            MRM.DeleteFlag = true;
+                            MRM.PrintFlag = true;
+                            MRM.UploadFlag = true;
+                        }
+                        else
+                        {
+                            MRM.ShowFlag = ML.ShowFlag;
+                            MRM.AddFlag = ML.AddFlag;
+                            MRM.EditFlag = ML.EditFlag;
+                            MRM.DeleteFlag = ML.DeleteFlag;
+                            MRM.PrintFlag = ML.PrintFlag;
+                            MRM.UploadFlag = ML.UploadFlag;
+                        }
+                        DC.SubmitChanges();
+                    }
+                    else
+                    {
+                        MRM = new M_Rool_Menu
+                        {
+                            RID = N.R.RID,
+                            MID = ML.MID,
+                            ShowFlag = ML.ShowFlag,
+                            AddFlag = ML.AddFlag,
+                            EditFlag = ML.EditFlag,
+                            DeleteFlag = ML.DeleteFlag,
+                            PrintFlag = ML.PrintFlag,
+                            UploadFlag = ML.UploadFlag,
+                        };
+                        DC.M_Rool_Menu.InsertOnSubmit(MRM);
+                        DC.SubmitChanges();
+                    }
+                }
+
                 SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/SystemSet/Rool_List");
             }
 

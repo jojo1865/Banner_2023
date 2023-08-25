@@ -143,6 +143,7 @@
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\IncludeController.cs" />
     <Compile Include="Areas\Admin\Controllers\OrganizeSetController.cs" />
+    <Compile Include="Areas\Admin\Controllers\StoreSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\SystemSetController.cs" />
     <Compile Include="Areas\Web\Controllers\AccountAddController.cs" />
     <Compile Include="Areas\Web\Controllers\AccountPlaceController.cs" />
@@ -265,6 +266,24 @@
     <Content Include="Areas\Admin\Content\JS\jquery-3.7.0.js" />
     <Content Include="Areas\Admin\Content\JS\WebJavaScript.js" />
     <Content Include="Areas\Web\Content\CSS\bootstrap-4-navbar.css" />
+    <Content Include="Areas\Web\Content\CSS\css\all.css" />
+    <Content Include="Areas\Web\Content\CSS\css\all.min.css" />
+    <Content Include="Areas\Web\Content\CSS\css\brands.css" />
+    <Content Include="Areas\Web\Content\CSS\css\brands.min.css" />
+    <Content Include="Areas\Web\Content\CSS\css\fontawesome.css" />
+    <Content Include="Areas\Web\Content\CSS\css\fontawesome.min.css" />
+    <Content Include="Areas\Web\Content\CSS\css\regular.css" />
+    <Content Include="Areas\Web\Content\CSS\css\regular.min.css" />
+    <Content Include="Areas\Web\Content\CSS\css\solid.css" />
+    <Content Include="Areas\Web\Content\CSS\css\solid.min.css" />
+    <Content Include="Areas\Web\Content\CSS\css\svg-with-js.css" />
+    <Content Include="Areas\Web\Content\CSS\css\svg-with-js.min.css" />
+    <Content Include="Areas\Web\Content\CSS\css\v4-font-face.css" />
+    <Content Include="Areas\Web\Content\CSS\css\v4-font-face.min.css" />
+    <Content Include="Areas\Web\Content\CSS\css\v4-shims.css" />
+    <Content Include="Areas\Web\Content\CSS\css\v4-shims.min.css" />
+    <Content Include="Areas\Web\Content\CSS\css\v5-font-face.css" />
+    <Content Include="Areas\Web\Content\CSS\css\v5-font-face.min.css" />
     <Content Include="Areas\Web\Content\CSS\forestage.css" />
     <Content Include="Areas\Web\Content\CSS\form.css" />
     <Content Include="Areas\Web\Content\CSS\global.css" />
@@ -580,6 +599,18 @@
     <Content Include="Areas\Admin\Content\JS\bootstrap.bundle.js.map" />
     <Content Include="Areas\Admin\Content\JS\bootstrap.js.map" />
     <Content Include="Areas\Admin\Views\SystemSet\Rool_Edit.cshtml" />
+    <Content Include="Areas\Web\Content\CSS\webfonts\fa-brands-400.ttf" />
+    <Content Include="Areas\Web\Content\CSS\webfonts\fa-brands-400.woff2" />
+    <Content Include="Areas\Web\Content\CSS\webfonts\fa-regular-400.ttf" />
+    <Content Include="Areas\Web\Content\CSS\webfonts\fa-regular-400.woff2" />
+    <Content Include="Areas\Web\Content\CSS\webfonts\fa-solid-900.ttf" />
+    <Content Include="Areas\Web\Content\CSS\webfonts\fa-solid-900.woff2" />
+    <Content Include="Areas\Web\Content\CSS\webfonts\fa-v4compatibility.ttf" />
+    <Content Include="Areas\Web\Content\CSS\webfonts\fa-v4compatibility.woff2" />
+    <Content Include="Areas\Admin\Views\StoreSet\Product_List.cshtml" />
+    <Content Include="Areas\Admin\Views\Course\Teacher_List.cshtml" />
+    <Content Include="Areas\Admin\Views\Course\Teacher_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\Product_Edit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

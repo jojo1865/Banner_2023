@@ -509,7 +509,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GerAccountData(ACID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult BasicData(FormCollection FC)
         {
             GetViewBag();
@@ -854,7 +854,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetFamilyData(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult FamilyData(FormCollection FC)
         {
             GetViewBag();
@@ -994,7 +994,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetBankData(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult BankData(FormCollection FC)
         {
             GetViewBag();
@@ -1065,7 +1065,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetPerformanceData(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         //[HandleError(ExceptionType = typeof(HttpAntiForgeryException), View = "/Web/Home/CSRF")]
         public ActionResult PerformanceData(FormCollection FC)
         {

@@ -71,40 +71,44 @@
                     @if (!Model.ChildFlag)//目前帳號非兒童
                     {
                         var F2 = Model.Fs.FirstOrDefault(q => q.FamilyType == 2);
-                        if (F2.TargetACID > 0)//配偶已配對到,不能變更
+                        if (F2 != null)
                         {
-                            <div class="form-card-group">
-                                <div class="section-card">
-                                    <div class="form-group">
-                                        <label>配偶姓名</label>
-                                        <label class="form-control form-control-lg input-underline lab_gray">@F2.Name</label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>配對狀態</label>
-                                        <label class="form-control form-control-lg input-underline lab_gray">已配對完成</label>
+                            if (F2.TargetACID > 0)//配偶已配對到,不能變更
+                            {
+                                <div class="form-card-group">
+                                    <div class="section-card">
+                                        <div class="form-group">
+                                            <label>配偶姓名</label>
+                                            <label class="form-control form-control-lg input-underline lab_gray">@F2.Name</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>配對狀態</label>
+                                            <label class="form-control form-control-lg input-underline lab_gray">已配對完成</label>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        }
-                        else//配偶尚未確認,可以改
-                        {
-                            <div class="form-card-group">
-                                <div class="section-card">
-                                    <div class="form-group">
-                                        <label>配偶姓名<span>*</span></label>
-                                        @Html.TextBox("txb_Family_Name_2", F2.Name, new { @class = "form-control form-control-lg input-underline" })
-                                    </div>
-                                    <div class="form-group">
-                                        <label>配偶身分證字號/居留證號碼<span>*</span></label>
-                                        @Html.TextBox("txb_Family_IDNumber_2", F2.IDNumber, new { @class = "form-control form-control-lg input-underline" })
-                                    </div>
-                                    <div class="form-group">
-                                        <label>配偶會員帳號<span>*</span></label>
-                                        @Html.TextBox("txb_Family_Login_2", F2.Login, new { @class = "form-control form-control-lg input-underline" })
+                            }
+                            else//配偶尚未確認,可以改
+                            {
+                                <div class="form-card-group">
+                                    <div class="section-card">
+                                        <div class="form-group">
+                                            <label>配偶姓名<span>*</span></label>
+                                            @Html.TextBox("txb_Family_Name_2", F2.Name, new { @class = "form-control form-control-lg input-underline" })
+                                        </div>
+                                        <div class="form-group">
+                                            <label>配偶身分證字號/居留證號碼<span>*</span></label>
+                                            @Html.TextBox("txb_Family_IDNumber_2", F2.IDNumber, new { @class = "form-control form-control-lg input-underline" })
+                                        </div>
+                                        <div class="form-group">
+                                            <label>配偶會員帳號<span>*</span></label>
+                                            @Html.TextBox("txb_Family_Login_2", F2.Login, new { @class = "form-control form-control-lg input-underline" })
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
                         }
+
                     }
 
                 </div>

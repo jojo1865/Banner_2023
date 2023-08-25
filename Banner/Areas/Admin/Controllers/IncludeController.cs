@@ -27,18 +27,24 @@ namespace Banner.Areas.Admin.Controllers
                 sURL = sURL.Remove(sURL.Length - 1);
             cMenu Ms = new cMenu();
             int ACID = GetACID();
-            if (CheckAdmin(ACID))//此使用者擁有系統管理者權限
-            {
-                Ms.Items = GetMenu(null, sURL, 0);//選單全開
-            }
+            if (ACID <= 0)
+                SetAlert("請先登入", 2, "/Admin/Home/Login"); 
             else
             {
-                var Rs = from q in DC.Rool.Where(q => q.ActiveFlag && !q.DeleteFlag && (q.RoolType == 3 || q.RoolType == 4))
-                         join p in GetMRAC(0, ACID)
-                         on q.RID equals p.RID
-                         select q;
-                Ms.Items = GetMenu(Rs.ToList(), sURL, 0);
+                if (CheckAdmin(ACID))//此使用者擁有系統管理者權限
+                {
+                    Ms.Items = GetMenu(null, sURL, 0);//選單全開
+                }
+                else
+                {
+                    var Rs = from q in DC.Rool.Where(q => q.ActiveFlag && !q.DeleteFlag && (q.RoolType == 3 || q.RoolType == 4))
+                             join p in GetMRAC(0, ACID)
+                             on q.RID equals p.RID
+                             select q;
+                    Ms.Items = GetMenu(Rs.ToList(), sURL, 0);
+                }
             }
+            
             return PartialView(Ms);
         }
         //取得選單可以查的網址
@@ -170,7 +176,7 @@ namespace Banner.Areas.Admin.Controllers
             List<SelectListItem> OList = new List<SelectListItem>();
 
             OList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = OID == 0 });
-            var Os = DC.Organize.Where(q => !q.DeleteFlag).ToList();
+            var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == "Shepherding").ToList();
             int PID = 0;
             while (true)
             {

@@ -82,7 +82,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(ReSetOrganize(ItemID, ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Organize_Map_Edit(string ItemID, int ID, FormCollection FC)
         {
             GetViewBag();
@@ -490,7 +490,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetOrganize_Info_List(ItemID, OID, OIID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Organize_Info_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
             GetViewBag();
@@ -523,7 +523,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(ReSetOrganizeInfo(ItemID, OID, PID, OIID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Organize_Info_Edit(string ItemID, int OID, int PID, int OIID, FormCollection FC)
         {
             GetViewBag();
@@ -864,7 +864,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetOrganize_Info_Account_List(ItemID, OID, OIID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Organize_Info_Account_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
             GetViewBag();
@@ -984,7 +984,7 @@ namespace Banner.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Meeting_Location_Edit(int ItemID, int ID, FormCollection FC)
         {
             GetViewBag();

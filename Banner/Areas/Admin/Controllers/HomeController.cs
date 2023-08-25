@@ -28,13 +28,13 @@ namespace Banner.Areas.Admin.Controllers
         {
             int ACID = GetQueryStringInInt("ACID");
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
-            if(AC!=null)
+            if (AC != null)
             {
                 SetBrowserData("ACID", AC.ACID.ToString());
                 SetBrowserData("UserName", AC.Name_First + AC.Name_Last);
                 Response.Redirect("/Admin/Home/Index");
             }
-            
+
         }
         #endregion
         #region 登入
@@ -50,14 +50,14 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 Response.Redirect("/Admin/Home/Index");
             }
-            else if(Request.Url.Host == "web-banner.viuto-aiot.com")
+            else if (Request.Url.Host == "web-banner.viuto-aiot.com")
                 Response.Redirect("/Web/Home/Index");
             TempData["login"] = "";
             TempData["pw"] = "";
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Login(FormCollection FC)
         {
             GetViewBag();
@@ -153,7 +153,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult ForgetPassword(FormCollection FC)
         {
             GetViewBag();
@@ -227,7 +227,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult ForgetAccount(FormCollection FC)
         {
             GetViewBag();
@@ -305,7 +305,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult ChangePassword(FormCollection FC)
         {
             GetViewBag();
@@ -390,7 +390,7 @@ namespace Banner.Areas.Admin.Controllers
         [HttpGet]
         public string GetOISelect(int OIID)
         {
-            var OIs = from q in DC.OrganizeInfo.Where(q => q.ParentID == OIID && q.ActiveFlag).OrderBy(q => q.Title)
+            var OIs = from q in DC.OrganizeInfo.Where(q => q.ParentID == OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.Title)
                       select new { value = q.OIID, Text = q.Title };
 
             return JsonConvert.SerializeObject(OIs);
@@ -425,11 +425,11 @@ namespace Banner.Areas.Admin.Controllers
 
         #endregion
         #region 更新啟用狀態
-        public string ChangeActive(string TableName,int ID)
+        public string ChangeActive(string TableName, int ID)
         {
             string Msg = "NG";
             ACID = GetACID();
-            switch(TableName)
+            switch (TableName)
             {
                 case "OrganizeInfo":
                     {
@@ -439,13 +439,13 @@ namespace Banner.Areas.Admin.Controllers
                             var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ParentID == OI.OIID);
                             if (OIs.Count() > 0)
                                 Msg = "請先移除此組織下的組織才可停用";
-                            else if(OI.OID == 8)
+                            else if (OI.OID == 8)
                             {
                                 var Ms = OI.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag);
-                                if(Ms.Count()>0)
+                                if (Ms.Count() > 0)
                                     Msg = "請先移除此小組內的成員才可停用";
                             }
-                            if(Msg == "")
+                            if (Msg == "")
                             {
                                 OI.ActiveFlag = !OI.ActiveFlag;
                                 OI.UpdDate = DT;
@@ -463,7 +463,7 @@ namespace Banner.Areas.Admin.Controllers
                 case "Menu":
                     {
                         var M = DC.Menu.FirstOrDefault(q => q.MID == ID);
-                        if(M!=null)
+                        if (M != null)
                         {
                             M.ActiveFlag = !M.ActiveFlag;
                             M.UpdDate = DT;
@@ -497,6 +497,103 @@ namespace Banner.Areas.Admin.Controllers
             return Msg;
         }
         #endregion
+        #region 取得分類下課程選單
+        [HttpGet]
+        public string GetCourseCagegorySelect(int CCID, int CID = 0)
+        {
+            var Cs = from q in DC.Course.Where(q => q.CCID == CCID && q.CID != CID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.Title)
+                     select new { value = q.CID, Text = q.Title };
+
+            return JsonConvert.SerializeObject(Cs);
+        }
+        #endregion
+        #region 取得課程內容
+        private class cCourse
+        {
+            public int CID = 0;
+            public string Title = "";
+            public int CourseType = 0;
+            public string CourseInfo = "";
+            public string TargetInfo = "";
+            public string GraduationInfo = "";
+            public List<cCR> Rools = new List<cCR>();
+        }
+        public class cCR
+        {
+            public int CRID = 0;
+            public int TargetType = 0;
+            public int TargetInt1 = 0;
+            public int TargetInt2 = 0;
+            public string CC_Title = "";
+            public string C_Title = "";
+            public string Job_Title = "";
+        }
+        [HttpGet]
+        public string GetCourse(string CID)
+        {
+            Error = "";
+            var C = DC.Course.FirstOrDefault(q => q.CID.ToString() == CID && q.ActiveFlag && !q.DeleteFlag);
+            if (C != null)
+            {
+                cCourse cC = new cCourse
+                {
+                    CID = C.CID,
+                    Title = C.Title,
+                    CourseType = C.CourseType,
+                    CourseInfo = C.CourseInfo,
+                    TargetInfo = C.TargetInfo,
+                    GraduationInfo = C.GraduationInfo,
+                    Rools = new List<cCR>()
+                };
+
+                var CRs = C.Course_Rool.OrderBy(q => q.TargetType);
+                foreach(var CR in CRs)
+                {
+                    cCR c = new cCR();
+                    c.CRID = CR.CRID;
+                    c.TargetType = CR.TargetType;
+                    c.TargetInt1=CR.TargetInt1;
+                    c.TargetInt2=CR.TargetInt2;
+                    switch (CR.TargetType)
+                    {
+                        case 0://先修課程ID[Course]
+                            {
+                                var C_ = DC.Course.FirstOrDefault(q => q.CCID == CR.TargetInt1 && q.ActiveFlag && !q.DeleteFlag);
+                                if(C_!=null)
+                                {
+                                    c.CC_Title = "【" + C_.Course_Category.Code + "】" + C_.Course_Category.Title;
+                                    c.C_Title = C_.Title;
+                                }
+                            }
+                            break;
+                        case 1://職分ID[OID]
+                            {
+                                var O = DC.Organize.FirstOrDefault(q => q.OID == CR.TargetInt1);
+                                if (O != null)
+                                    c.Job_Title = O.JobTitle;
+                            }
+                            break;
+                        
+                        case 4://事工團
+                            {
+
+                            }
+                            break;
+                        case 5://指定會員ACID
+                            {
+
+                            }
+                            break;
+                    }
+                }
+
+                Error = JsonConvert.SerializeObject(cC);
+            }
+            else
+                Error = "{\"Msg\"=\"課程不存在\"}";
+            return Error;
+        }
+        #endregion
         #region 測試用(檔案上傳)
         [HttpGet]
         public ActionResult Test()
@@ -506,23 +603,23 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult Test(FormCollection FC,HttpPostedFileBase file_upload)
+        public ActionResult Test(FormCollection FC, HttpPostedFileBase file_upload)
         {
             GetViewBag();
 
             bool CheckFileFlag = true;
             if (file_upload.ContentLength <= 0 || file_upload.ContentLength > 5242880)
                 CheckFileFlag = false;
-            else if(file_upload.ContentType!="image/png" || file_upload.ContentType != "image/jpeg")
+            else if (file_upload.ContentType != "image/png" || file_upload.ContentType != "image/jpeg")
                 CheckFileFlag = false;
-            if(CheckFileFlag)
+            if (CheckFileFlag)
             {
                 string Ex = Path.GetExtension(file_upload.FileName);
                 string FileName = $"{DT.ToString("yyyyMMddHHmmssfff")}{Ex}";
                 string SavaPath = Path.Combine(Server.MapPath("~/Files/Product/"), FileName);
                 file_upload.SaveAs(SavaPath);
             }
-            
+
 
             return View();
         }

@@ -85,7 +85,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Index(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -284,7 +284,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetAldult_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Aldult_List(FormCollection FC)
         {
             GetViewBag();
@@ -320,7 +320,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Aldult_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -386,7 +386,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Aldult_Remove(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -491,7 +491,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetNew_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult New_List(FormCollection FC)
         {
             GetViewBag();
@@ -542,7 +542,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult New_Remove(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -649,7 +649,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetBaptized_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Baptized_List(FormCollection FC)
         {
             GetViewBag();
@@ -686,7 +686,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Baptized_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

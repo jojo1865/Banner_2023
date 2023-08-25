@@ -81,7 +81,7 @@ namespace Banner
         public string[] JoinTitle = new string[] { "無意願", "已入組未落戶", "跟進中(已分發)", "被退回(未分發)", "跟進中(未分發)" };
         public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
         public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)" };
-        public string[] sCourseType = new string[] { "實體", "線上" };
+        public string[] sCourseType = new string[] {"不限制", "實體", "線上" };
         public string Error = "";
         public int iChildAge = 12;
         public int ACID = 0;
@@ -2481,7 +2481,7 @@ namespace Banner
         public List<ListSelect> GetO(int OIID = 0)
         {
             List<ListSelect> LSs = new List<ListSelect>();
-            var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
+            var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ItemID == "Shepherding").ToList();
             var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
             int[] OIIDs = new int[10];
             if (OIID > 0)
@@ -2525,7 +2525,6 @@ namespace Banner
                     }
                     else
                     {
-                        //var SubOIs = OIs.Where(q => q.OID == O.OID && q.ParentID == OIIDs[O.OID-1]).OrderBy(q => q.OIID);
                         LS.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "-1" });
                         LS.ddlList.AddRange((from q in OIs.Where(q => q.OID == O.OID && q.ParentID == OIIDs[O.OID - 1]).OrderBy(q => q.OIID)
                                              select new SelectListItem { Text = q.Title + q.Organize.Title, Value = q.OIID.ToString(), Selected = q.OIID == OIIDs[q.OID] }).ToList());

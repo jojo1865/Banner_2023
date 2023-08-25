@@ -87,25 +87,25 @@
                                             {
                                                 <tr class="tr_M1">
                                                     <td>@M1.Title</td>
-                                                    <td>@Html.CheckBox("cbox_AllFlag" + M1.MID, M1.AllFlag, new { @class = "form-check-input" })</td>
+                                                    <td>@Html.CheckBox("cbox_AllFlag" + M1.MID, M1.AllFlag, new { @class = "form-check-input d-none", @onchange = "ClearAll(this.checked, " + M1.MID + ");" })</td>
                                                     <td>@Html.CheckBox("cbox_ShowFlag" + M1.MID, M1.ShowFlag, new { @class = "form-check-input" })</td>
-                                                    <td>@Html.CheckBox("cbox_AddFlag" + M1.MID, M1.AddFlag, new { @class = "form-check-input" })</td>
-                                                    <td>@Html.CheckBox("cbox_EditFlag" + M1.MID, M1.EditFlag, new { @class = "form-check-input" })</td>
-                                                    <td class="d-none">@Html.CheckBox("cbox_DeleteFlag" + M1.MID, M1.DeleteFlag, new { @class = "form-check-input" })</td>
-                                                    <td>@Html.CheckBox("cbox_PrintFlag" + M1.MID, M1.PrintFlag, new { @class = "form-check-input" })</td>
-                                                    <td class="d-none">@Html.CheckBox("cbox_UploadFlag" + M1.MID, M1.UploadFlag, new { @class = "form-check-input" })</td>
+                                                    <td>@Html.CheckBox("cbox_AddFlag" + M1.MID, M1.AddFlag, new { @class = "form-check-input d-none", @onchange = "ChickShow(this," + M1.MID + ");" })</td>
+                                                    <td>@Html.CheckBox("cbox_EditFlag" + M1.MID, M1.EditFlag, new { @class = "form-check-input d-none", @onchange = "ChickShow(this," + M1.MID + ");" })</td>
+                                                    <td class="d-none">@Html.CheckBox("cbox_DeleteFlag" + M1.MID, M1.DeleteFlag, new { @class = "form-check-input d-none", @onchange = "ChickShow(this," + M1.MID + ");" })</td>
+                                                    <td>@Html.CheckBox("cbox_PrintFlag" + M1.MID, M1.PrintFlag, new { @class = "form-check-input d-none" })</td>
+                                                    <td class="d-none">@Html.CheckBox("cbox_UploadFlag" + M1.MID, M1.UploadFlag, new { @class = "form-check-input d-none", @onchange = "ChickShow(this," + M1.MID + ");" })</td>
                                                 </tr>
                                                 foreach (var M2 in Model.MsnuList.Where(q => q.PMID == M1.MID).OrderBy(q => q.SortNo))
                                                 {
                                                     <tr class="tr_M2">
                                                         <td>@M2.Title</td>
-                                                        <td>@Html.CheckBox("cbox_AllFlag" + M2.MID, M2.AllFlag, new { @class = "form-check-input" })</td>
-                                                        <td>@Html.CheckBox("cbox_ShowFlag" + M2.MID, M2.ShowFlag, new { @class = "form-check-input" })</td>
-                                                        <td>@Html.CheckBox("cbox_AddFlag" + M2.MID, M2.AddFlag, new { @class = "form-check-input" })</td>
-                                                        <td>@Html.CheckBox("cbox_EditFlag" + M2.MID, M2.EditFlag, new { @class = "form-check-input" })</td>
-                                                        <td class="d-none">@Html.CheckBox("cbox_DeleteFlag" + M2.MID, M2.DeleteFlag, new { @class = "form-check-input" })</td>
-                                                        <td>@Html.CheckBox("cbox_PrintFlag" + M2.MID, M2.PrintFlag, new { @class = "form-check-input" })</td>
-                                                        <td class="d-none">@Html.CheckBox("cbox_UploadFlag" + M2.MID, M2.UploadFlag, new { @class = "form-check-input" })</td>
+                                                        <td>@Html.CheckBox("cbox_AllFlag" + M2.MID, M2.AllFlag, new { @class = "form-check-input", @onchange = "ClearAll(this.checked, " + M1.MID + "," + M2.MID + ");" })</td>
+                                                        <td>@Html.CheckBox("cbox_ShowFlag" + M2.MID, M2.ShowFlag, new { @class = "form-check-input", @onchange = "CheckAll(this.checked, " + M1.MID + "," + M2.MID + ");" })</td>
+                                                        <td>@Html.CheckBox("cbox_AddFlag" + M2.MID, M2.AddFlag, new { @class = "form-check-input", @onchange = "ChickShow(this," + M1.MID + "," + M2.MID + ");" })</td>
+                                                        <td>@Html.CheckBox("cbox_EditFlag" + M2.MID, M2.EditFlag, new { @class = "form-check-input", @onchange = "ChickShow(this," + M1.MID + "," + M2.MID + ");" })</td>
+                                                        <td class="d-none">@Html.CheckBox("cbox_DeleteFlag" + M2.MID, M2.DeleteFlag, new { @class = "form-check-input", @onchange = "ChickShow(this," + M1.MID + "," + M2.MID + ");" })</td>
+                                                        <td>@Html.CheckBox("cbox_PrintFlag" + M2.MID, M2.PrintFlag, new { @class = "form-check-input", @onchange = "ChickShow(this," + M1.MID + "," + M2.MID + ");" })</td>
+                                                        <td class="d-none">@Html.CheckBox("cbox_UploadFlag" + M2.MID, M2.UploadFlag, new { @class = "form-check-input", @onchange = "ChickShow(this," + M1.MID + "," + M2.MID + ");" })</td>
                                                     </tr>
                                                 }
                                             }
@@ -123,6 +123,7 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
                 </form>
             }
         </div>
@@ -161,3 +162,55 @@
             text-align: end;
         }
 </style>
+<script>
+    function ChickShow(cbox, id1, id2) {
+        var Show = document.getElementById("cbox_ShowFlag" + id2)
+        if (cbox.checked) {
+            Show.checked = true;
+            document.getElementById("cbox_ShowFlag" + id1).checked = true;
+            CheckAll(Show.checked, id1, id2);
+        } else {
+            ClickAll(false, id1, id2);
+        }
+        return;
+    }
+    function ClickAll(ClickFlag, id1, id2) {
+        document.getElementById("cbox_AllFlag" + id2).checked = ClickFlag;
+        return;
+    }
+    function ClearAll(ClickFlag, id1, id2) {
+        document.getElementById("cbox_ShowFlag" + id2).checked = ClickFlag;
+        document.getElementById("cbox_AddFlag" + id2).checked = ClickFlag;
+        document.getElementById("cbox_EditFlag" + id2).checked = ClickFlag;
+        document.getElementById("cbox_DeleteFlag" + id2).checked = ClickFlag;
+        document.getElementById("cbox_PrintFlag" + id2).checked = ClickFlag;
+        document.getElementById("cbox_UploadFlag" + id2).checked = ClickFlag;
+
+        if (ClickFlag) {
+            document.getElementById("cbox_ShowFlag" + id1).checked = true;
+        }
+        return;
+    }
+    function CheckAll(ClickFlag, id1, id2) {
+        if (document.getElementById("cbox_ShowFlag" + id2).checked &&
+            document.getElementById("cbox_AddFlag" + id2).checked &&
+            document.getElementById("cbox_EditFlag" + id2).checked &&
+            document.getElementById("cbox_PrintFlag" + id2).checked
+        ) {
+            document.getElementById("cbox_ShowFlag" + id1).checked = true;
+
+            document.getElementById("cbox_AllFlag" + id2).checked = true;
+            //順便把隱藏的也處理一下
+            document.getElementById("cbox_DeleteFlag" + id2).checked = true;
+            document.getElementById("cbox_UploadFlag" + id2).checked = true;
+        }
+        else {
+            document.getElementById("cbox_AllFlag" + id2).checked = false;
+        }
+
+        if (ClickFlag) {
+            document.getElementById("cbox_ShowFlag" + id1).checked = true;
+        }
+        return;
+    }
+</script>

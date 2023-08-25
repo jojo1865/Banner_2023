@@ -102,7 +102,7 @@ namespace Banner.Areas.Admin.Controllers
             cTableList cTL = new cTableList();
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
-
+            ACID = GetACID();
             cTL.Title = "";
             cTL.NowPage = iNowPage;
             cTL.ItemID = "";
@@ -116,6 +116,48 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         cTL.NowURL = "/Admin/AccountSet/Account_Aldult_List";
                         Ns = Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.Birthday != q.CreDate);
+                        #region 後台全職同工可檢視旌旗資料判斷
+                        {
+                            var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                            if (MOI2 == null)//他沒有全部的權限
+                            {
+                                MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 2 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                                if (MOI2 == null)//他沒有看未入組的會員權限=需要依據他的旌旗角色篩選
+                                {
+                                    MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                                    if (MOI2 == null)//不具備旌旗的權限
+                                    {
+                                        Ns = Ns.Where(q => q.ACID == 0);
+                                    }
+                                    else
+                                    {
+                                        var v_ACIDs = from q in DC.v_GetAC_O2_OI
+                                                      join p in DC.M_OI2_Account.Where(q => q.ACID == ACID)
+                                                      on q.OIID equals p.OIID
+                                                      select q;
+
+                                        Ns = from q in v_ACIDs
+                                             join p in Ns
+                                             on q.ACID equals p.ACID
+                                             select p;
+                                    }
+                                }
+                                else
+                                {
+                                    var M_ACIDs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CreDate != q.JoinDate && q.OIID > 0)
+                                                  group q by new { q.ACID } into g
+                                                  select new { g.Key.ACID };
+                                    var ACIDs = from q in Ns
+                                                group q by new { q.ACID } into g
+                                                select new { g.Key.ACID };
+                                    Ns = from q in ACIDs.Except(M_ACIDs)
+                                         join p in Ns
+                                         on q.ACID equals p.ACID
+                                         select p;
+                                }
+                            }
+                        }
+                        #endregion
                     }
                     break;
 
@@ -411,7 +453,7 @@ namespace Banner.Areas.Admin.Controllers
                             cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
                             //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_black", Value = "編輯" });
                             cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
-                            var OI_8 = GetMOIAC(8, 0, N.ACID).FirstOrDefault();
+                            var OI_8 = GetMOIAC(8, 0, N.ACID).FirstOrDefault(q => q.JoinDate != q.CreDate);//確定有入組再列
                             if (OI_8 != null)
                             {
                                 var OI_7 = DC.OrganizeInfo.FirstOrDefault(q => !q.DeleteFlag && q.OID == 7 && q.OIID == OI_8.OrganizeInfo.ParentID);
@@ -585,7 +627,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Account_Aldult_List(FormCollection FC)
         {
             GetViewBag();
@@ -1262,7 +1304,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GerAccountData(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Account_Aldult_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1331,8 +1373,8 @@ namespace Banner.Areas.Admin.Controllers
                     }
                 }
                 //退款
-                
-                if(N.AB.BID == 0)
+
+                if (N.AB.BID == 0)
                 {
                     DC.Account_Bank.InsertOnSubmit(N.AB);
                     DC.SubmitChanges();
@@ -1426,7 +1468,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Account_Childen_List(FormCollection FC)
         {
             GetViewBag();
@@ -1455,7 +1497,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Account_New_List(FormCollection FC)
         {
             GetViewBag();
@@ -1633,7 +1675,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetAccount_New_Edit(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Account_New_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1655,7 +1697,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Account_Baptized_List(FormCollection FC)
         {
             GetViewBag();
@@ -1767,7 +1809,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetAccount_Baptized_Edit(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Account_Baptized_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

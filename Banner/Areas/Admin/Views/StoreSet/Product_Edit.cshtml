@@ -1,4 +1,4 @@
-﻿@model Banner.Areas.Admin.Controllers.CourseController.cCourse_Edit
+﻿@model Banner.Areas.Admin.Controllers.StoreSetController.cProduct_Edit
 @{
     ViewBag.Title = "Category_Edit";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
@@ -16,71 +16,87 @@
                         <div class="form-card-group">
                             <div id="personal-info" class="header-container">
                                 <div class="header-left-border"></div>
-                                <div class="header">課程資訊</div>
+                                <div class="header">課程上架管理</div>
                             </div>
                             <div class="form-card">
-
                                 <div class="form-group">
-                                    <label>課程分類<span>*</span></label>
-                                    @Html.DropDownList("ddl_CC", Model.CCSL, new { @class = "form-select form-control-lg" })
-                                </div>
-                                <div class="form-group">
-                                    <label>課程名稱<span>*</span></label>
-                                    @Html.TextBox("txb_Title", Model.C.Title, new { @class = "form-control form-control-lg input-underline" })
-                                </div>
-                                <div class="form-group">
-                                    <label>課程類型</label><br />
-                                    @for (int i = 0; i < Model.sCourseType.Length; i++)
+                                    <label>課程所屬旌旗</label><br />
+                                    @foreach (var OI2 in Model.OI2SL)
                                     {
                                         <div class="form-check form-check-inline">
-                                            @Html.RadioButton("rbl_CourseType", i, Model.C.CourseType == i, new { @id = ("rbl_CourseType" + i), @class = "form-check-input" })
-                                            @Html.Label(Model.sCourseType[i], new { @class = "form-check-label", @for = ("rbl_CourseType" + i) })
+                                            @Html.RadioButton("rbl_OI", OI2.Value, OI2.Selected, new { @id = ("rbl_OI_" + OI2.Value), @class = "form-check-input" })
+                                            @Html.Label(OI2.Text, new { @class = "form-check-label", @for = ("rbl_OI_" + OI2.Value) })
                                         </div>
                                     }
                                 </div>
                                 <div class="form-group">
-                                    <label>課程內容</label>
-                                    @Html.TextArea("txb_CourseInfo", Model.C.CourseInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
-                                </div>
-                                <div class="form-group">
-                                    <label>對象資格說明</label>
-                                    @Html.TextArea("txb_TargetInfo", Model.C.TargetInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
-                                </div>
-                                <div class="form-group">
-                                    <label>結業資格說明</label>
-                                    @Html.TextArea("txb_GraduationInfo", Model.C.GraduationInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
-                                </div>
-                                <div class="form-group">
-                                    <label>啟用狀態</label>
+                                    <label>課程選擇<span>*</span></label>
                                     <div class="row">
-                                        <div class="col-auto">
-                                            <div class="form-check form-check-inline">
-                                                @Html.RadioButton("cbox_ActiveFlag", true, Model.C.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
-                                                @Html.Label("啟用", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
-                                            </div>
+                                        <div class="col-6">
+                                            @Html.DropDownList("ddl_CCBasic", Model.CCSL, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this);" })
                                         </div>
-                                        <div class="col-auto">
-                                            <div class="form-check form-check-inline">
-                                                @Html.RadioButton("cbox_ActiveFlag", false, !Model.C.ActiveFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
-                                                @Html.Label("停用", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
-                                            </div>
+                                        <div class="col-6">
+                                            @Html.DropDownList("ddl_CBasic", Model.CSL, new { @class = "form-select form-control-lg", onchange = "GetCourse(this.value);" })
                                         </div>
                                     </div>
-                                </div>
-                                @if (Model.C.CID > 0 && ((bool[])ViewBag._Power)[3])
-                                {
                                     <div class="form-group">
-                                        <label>刪除</label>
+                                        <label>課程副標題<span>*</span></label>
+                                        @Html.TextBox("txb_SubTitle", Model.P.SubTitle, new { @class = "form-control form-control-lg input-underline" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>課程類型</label><br />
+                                        @for (int i = 0; i < Model.sCourseType.Length; i++)
+                                        {
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("rbl_CourseType", i, Model.P.ProductType == i, new { @id = ("rbl_CourseType" + i), @class = "form-check-input" })
+                                                @Html.Label(Model.sCourseType[i], new { @class = "form-check-label", @for = ("rbl_CourseType" + i) })
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="form-group">
+                                        <label>課程內容</label>
+                                        @Html.TextArea("txb_ProductInfo", Model.P.ProductInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>對象資格說明</label>
+                                        @Html.TextArea("txb_TargetInfo", Model.P.TargetInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>結業資格說明</label>
+                                        @Html.TextArea("txb_GraduationInfo", Model.P.GraduationInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>啟用狀態</label>
                                         <div class="row">
                                             <div class="col-auto">
                                                 <div class="form-check form-check-inline">
-                                                    @Html.CheckBox("cbox_DeleteFlag", Model.C.DeleteFlag, new { @class = "form-check-input" })
-                                                    @Html.Label("更新後刪除", new { @class = "form-check-label" })
+                                                    @Html.RadioButton("cbox_ActiveFlag", true, Model.P.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
+                                                    @Html.Label("啟用", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="form-check form-check-inline">
+                                                    @Html.RadioButton("cbox_ActiveFlag", false, !Model.P.ActiveFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
+                                                    @Html.Label("停用", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                }
+                                    @if (Model.P.CID > 0 && ((bool[])ViewBag._Power)[3])
+                                    {
+                                        <div class="form-group">
+                                            <label>刪除</label>
+                                            <div class="row">
+                                                <div class="col-auto">
+                                                    <div class="form-check form-check-inline">
+                                                        @Html.CheckBox("cbox_DeleteFlag", Model.P.DeleteFlag, new { @class = "form-check-input" })
+                                                        @Html.Label("更新後刪除", new { @class = "form-check-label" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -189,7 +205,7 @@
     <div id="div_AddCourse_*" class="mt-3">
         <div class="row">
             <div class="col-lg-4 col-12">
-                @Html.DropDownList("ddl_CC_*", Model.CBs[0].CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this," + Model.C.CID + ");" })
+                @Html.DropDownList("ddl_CC_*", Model.CBs[0].CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this," + Model.P.CID + ");" })
             </div>
             <div class="col-lg-6 col-12">
                 @Html.DropDownList("ddl_C_*", Model.CBs[0].CSL_Before, new { @class = "form-select form-control-lg", @id = "ddl_C_*" })
@@ -200,10 +216,25 @@
         </div>
     </div>
 </div>
+<div id="div_BeforeCourse_Bata" class="d-none">
+    <div id="div_SetCourse_*" class="mt-3">
+        <div class="row">
+            <div class="col-lg-4 col-12">
+                @Html.DropDownList("ddl_CC_*", Model.CBs[0].CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this," + Model.P.CID + ");" })
+            </div>
+            <div class="col-lg-6 col-12">
+                @Html.DropDownList("ddl_C_*", Model.CBs[0].CSL_Before, new { @class = "form-select form-control-lg", @id = "ddl_C_*" })
+            </div>
+            <div class="col-lg-2 col-12 text-lg-end text-start">
+                <a class="d-none" href="javascript:;" onclick="RemoveRow('div_AddCourse_*');"><i class="fa-solid fa-trash lab_DarkBlue"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="action-bar">
     @if (Model != null)
     {
-        if ((((bool[])ViewBag._Power)[1] && Model.C.CID == 0) || (((bool[])ViewBag._Power)[2] && Model.C.CID > 0))
+        if ((((bool[])ViewBag._Power)[1] && Model.P.PID == 0) || (((bool[])ViewBag._Power)[2] && Model.P.PID > 0))
         {
             <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-submit btn-lg btn-round btn-submit">
                 <i class="fa-solid fa-floppy-disk"></i>儲存
@@ -228,7 +259,10 @@
     /*取得課程選單*/
     function GetCourseddl(ddl, CID) {
         var sControlTitle = '';
-        if (ddl.name.includes('DB')) {
+        if (ddl.name.includes('Basic')) {
+            sControlTitle = 'ddl_CBasic';
+        }
+        else if (ddl.name.includes('DB')) {
             var iSort = parseInt(ddl.name.replace('ddl_CCDB_', ''), 10);
             sControlTitle = 'ddl_CDB_' + iSort;
         }
@@ -246,13 +280,37 @@
             success: function (res) {
                 $.each(res, function (index) {
                     Nextddl.innerHTML += ('<option value="' + res[index].value + '">' + res[index].Text + '</option>');
+                    if (index == 0) {
+                        GetCourse(res[index].value);
+                    }
                 });
             },
             error: function (err) { console.log(err) },
         })
-        
     }
-
+    //選擇課程後更新上架資料
+    function GetCourse(CID) {
+        $.ajax({
+            url: '/Admin/Home/GetCourse?CID=' + CID,
+            method: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                var Types = document.getElementsByName("rbl_CourseType");
+                $.each(Types, function (index) {
+                    if (Types[index].value == res.CourseType.toString()) {
+                        Types[index].checked = true;
+                    }
+                })
+                document.getElementById("txb_ProductInfo").value = res.CourseInfo;
+                document.getElementById("txb_TargetInfo").value = res.TargetInfo;
+                document.getElementById("txb_GraduationInfo").value = res.GraduationInfo;
+                //擋修
+                document.getElementById("div_BeforeCourse").innerHTML = "";
+                //$.each(res, function (index)
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
     function RemoveRow(RowID) {
         document.getElementById(RowID).remove();
     }

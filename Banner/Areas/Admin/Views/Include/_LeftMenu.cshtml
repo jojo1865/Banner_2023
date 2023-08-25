@@ -21,9 +21,16 @@
                             <a href="@(M1.Url)" onclick="ShowMenu('div_Menu_@M1.SortNo');return false;" class="@(M1.SelectFlag ? "Selected" : "")">
                                 @if (M1.ImgUrl != "")
                                 {
-                                    <img class="menu-icon"
-                                         src="~/Areas/Admin/Content/img/@M1.ImgUrl"
-                                         alt="" />
+                                    if (M1.ImgUrl.Contains("fa-solid"))
+                                    {
+                                        <i class="@M1.ImgUrl"></i>
+                                    }
+                                    else
+                                    {
+                                        <img class="menu-icon"
+                                             src="~/Areas/Admin/Content/img/@M1.ImgUrl"
+                                             alt="" />
+                                    }
                                 }
                                 <span class="menu-text">@(M1.Title)</span>
                             </a>
@@ -121,6 +128,6 @@
         document.getElementById("a_SideMenu_button1").setAttribute("aria-expanded", "true");
         document.getElementById("collapse-nav").classList.add("show");
         document.getElementById(ID).style.display = "block";
-        
+
     }
 </script>
