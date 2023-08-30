@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Web;
 using System.Web.Mvc;
@@ -144,13 +145,14 @@ namespace Banner.Areas.Admin.Controllers
             public List<SelectListItem> CSL = new List<SelectListItem>();
             public List<SelectListItem> OI2SL = new List<SelectListItem>();
             //擋修限制
-            public List<cCourse_Before> CBs = new List<cCourse_Before>();
-            public List<Course_Rool> CRs = new List<Course_Rool>();
+            public List<cProduct_Before> PBs = new List<cProduct_Before>();
+            public List<Product_Rool> PRs = new List<Product_Rool>();
             public List<SelectListItem> OSL = new List<SelectListItem>();
             public string[] sCourseType = new string[0];
         }
-        public class cCourse_Before
+        public class cProduct_Before
         {
+            public int PRID = 0;
             public int CRID = 0;
             public List<SelectListItem> CCSL_Before = new List<SelectListItem>();
             public List<SelectListItem> CSL_Before = new List<SelectListItem>();
@@ -172,16 +174,14 @@ namespace Banner.Areas.Admin.Controllers
                 var Cs = DC.Course.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CCID.ToString() == N.CCSL[0].Value).OrderBy(q => q.CCID);
                 foreach (var C in Cs)
                 {
-                    if (C.CID == Cs.Min(q => q.CID))
+                    if (CID == 0)
                     {
-                        N.CSL.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString(), Selected = true });
                         CID = C.CID;
+                        N.CSL.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString(), Selected = true });
                     }
                     else
                         N.CSL.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString() });
                 }
-                if(CID == 0)
-                    SetAlert("請先新增課程", 3, "/Admin/StoreSet/Product_List");
             }
             //所屬旌旗
             var OI2s = DC.M_OI2_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.OIID == 1);
@@ -204,15 +204,17 @@ namespace Banner.Areas.Admin.Controllers
                 }
             }
             //擋修用選單
-            N.CBs = new List<cCourse_Before>();
-            cCourse_Before CB = new cCourse_Before();
-            CB.CRID = 0;
+            N.PBs = new List<cProduct_Before>();
+            cProduct_Before PB = new cProduct_Before();
+            PB.PRID = 0;
+            PB.CRID = 0;
             CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag && p.CID != ID) > 0).OrderByDescending(q => q.CCID).ToList();
-            CB.CCSL_Before.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
+            PB.CCSL_Before.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
             foreach (var CC in CCs)
-                CB.CCSL_Before.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString() });
-            CB.CSL_Before = new List<SelectListItem>();
-            N.CBs.Add(CB);
+                PB.CCSL_Before.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString() });
+            PB.CSL_Before = new List<SelectListItem>();
+            N.PBs.Add(PB);
+
             //組織
             var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ItemID == "Shepherding").ToList();
             var O = Os.FirstOrDefault(q => q.ParentID == 0);
@@ -227,122 +229,116 @@ namespace Banner.Areas.Admin.Controllers
             N.P = DC.Product.FirstOrDefault(q => q.PID == ID);
             if (N.P == null)
             {
-                var C = DC.Course.FirstOrDefault(q => q.CID== CID);
-                if(C!=null)
+                N.P = new Product
                 {
-                    N.P = new Product
-                    {
-                        CID = CID,
-                        OIID = 0,
-                        Title = C.Title,
-                        SubTitle = "",
-                        ProductType = C.CourseType,
-                        ProductInfo = C.CourseInfo,
-                        TargetInfo = C.TargetInfo,
-                        GraduationInfo = C.GraduationInfo,
-                        YearNo = DT.Year,
-                        SeasonNo = (DT.Month / 4) + 1,
-                        EchelonNo = 1,
-                        ImgURL = "",
-                        Price_Basic = 0,
-                        Price_Early = 0,
-                        SDate = DT,
-                        EDate = DT,
-                        SDate_Signup_OnSite = DT,
-                        EDate_Signup_OnSite = DT,
-                        SDate_Signup_OnLine = DT,
-                        EDate_Signup_OnLine = DT,
-                        SDate_Early = DT,
-                        EDate_Early = DT,
-                        ActiveFlag = true,
-                        DeleteFlag = false,
-                        CreDate = DT,
-                        UpdDate = DT,
-                        SaveACID = ACID
-                    };
-                }
-                else
+                    CID = 0,
+                    OIID = 0,
+                    Title = "",
+                    SubTitle = "",
+                    ProductType = 0,
+                    ProductInfo = "",
+                    TargetInfo = "",
+                    GraduationInfo = "",
+                    YearNo = DT.Year,
+                    SeasonNo = (DT.Month / 4) + 1,
+                    EchelonNo = 1,
+                    ImgURL = "",
+                    Price_Basic = 0,
+                    Price_Early = 0,
+                    SDate = DT,
+                    EDate = DT,
+                    SDate_Signup_OnSite = DT,
+                    EDate_Signup_OnSite = DT,
+                    SDate_Signup_OnLine = DT,
+                    EDate_Signup_OnLine = DT,
+                    SDate_Early = DT,
+                    EDate_Early = DT,
+                    ActiveFlag = true,
+                    DeleteFlag = false,
+                    CreDate = DT,
+                    UpdDate = DT,
+                    SaveACID = ACID
+                };
+
+                if (CID > 0)
                 {
-                    N.P = new Product
+                    var CRs = DC.Course_Rool.Where(q => q.TargetType == 0 && q.CID == CID).OrderBy(q => q.CID);
+                    
+                    foreach (var CR in CRs)
                     {
-                        CID = 0,
-                        OIID = 0,
-                        Title = "",
-                        SubTitle = "",
-                        ProductType = 0,
-                        ProductInfo = "",
-                        TargetInfo = "",
-                        GraduationInfo = "",
-                        YearNo = DT.Year,
-                        SeasonNo = (DT.Month / 4) + 1,
-                        EchelonNo = 1,
-                        ImgURL = "",
-                        Price_Basic = 0,
-                        Price_Early = 0,
-                        SDate = DT,
-                        EDate = DT,
-                        SDate_Signup_OnSite = DT,
-                        EDate_Signup_OnSite = DT,
-                        SDate_Signup_OnLine = DT,
-                        EDate_Signup_OnLine = DT,
-                        SDate_Early = DT,
-                        EDate_Early = DT,
-                        ActiveFlag = true,
-                        DeleteFlag = false,
-                        CreDate = DT,
-                        UpdDate = DT,
-                        SaveACID = ACID
-                    };
+                        if(CR.TargetType == 0)
+                        {
+                            PB = new cProduct_Before();
+                            PB.PRID = 0;
+                            PB.CRID = CR.CRID;
+                            CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag && p.CID != ID) > 0).OrderByDescending(q => q.CCID).ToList();
+                            foreach (var CC in CCs) PB.CCSL_Before.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CC.CCID == CR.Course.CCID });
+                            var Cs = DC.Course.Where(q => q.CCID == CR.Course.CCID).OrderByDescending(q => q.CID);
+                            foreach (var C in Cs) PB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CCID.ToString(), Selected = CR.CID == CID });
+
+                            N.PBs.Add(PB);
+                        }
+                        else
+                        {
+                            N.PRs.Add(new Product_Rool
+                            {
+                                PID = 0,
+                                TargetType = CR.TargetType,
+                                TargetInt1 = CR.TargetInt1,
+                                TargetInt2 = CR.TargetInt2,
+                                CreDate = DT,
+                                SaveACID = ACID
+                            });
+                        }
+                    }
                 }
             }
             else
             {
-                
                 if (N.CCSL.FirstOrDefault(q => q.Value == N.P.Course.CCID.ToString()) != null)
                 {
                     N.CCSL.ForEach(q => q.Selected = false);
                     N.CCSL.FirstOrDefault(q => q.Value == N.P.Course.CCID.ToString()).Selected = true;
 
                     var Cs = DC.Course.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CCID == N.P.Course.CCID).OrderBy(q => q.CCID);
-                    foreach(var C in Cs)
+                    foreach (var C in Cs)
                     {
-                        if (C.CCID == N.P.CID)
-                        {
+                        if (C.CID == N.P.CID)
                             N.CSL.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString(), Selected = true });
-                            CID = C.CCID;
-                        }
                         else
                             N.CSL.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString() });
                     }
                 }
 
-                N.CRs = N.P.Course.Course_Rool.ToList();
-                //擋修
-                foreach (var CR in N.CRs.Where(q => q.TargetType == 0).OrderBy(q => q.CRID))
-                {
-                    var C_ = DC.Course.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.CID == CR.TargetInt1);
-                    if (C_ != null)
-                    {
-                        CB = new cCourse_Before();
-                        CB.CRID = CR.CRID;
-                        CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag && p.CID != ID) > 0).OrderByDescending(q => q.CCID).ToList();
-                        foreach (var CC in CCs) CB.CCSL_Before.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CC.CCID == C_.CCID });
-                        var Cs = DC.Course.Where(q => q.CCID == C_.CCID).OrderByDescending(q => q.CID);
-                        foreach (var C in Cs) CB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CCID.ToString(), Selected = C.CID == C_.CID });
+                N.PRs = N.P.Product_Rool.ToList();
 
-                        N.CBs.Add(CB);
-                    }
-                    else//這堂課已經不見了~就直接移除
+                //擋修
+                    foreach (var PR in N.PRs.Where(q => q.TargetType == 0).OrderBy(q => q.PRID))
                     {
-                        CR.TargetInt1 = 0;
+                        var C_ = DC.Course.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.CID == PR.TargetInt1);
+                        if (C_ != null)
+                        {
+                            PB = new cProduct_Before();
+                            PB.PRID = PR.PRID;
+                            PB.CRID = 0;
+                            CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag && p.CID != ID) > 0).OrderByDescending(q => q.CCID).ToList();
+                            foreach (var CC in CCs) PB.CCSL_Before.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CC.CCID == C_.CCID });
+                            var Cs = DC.Course.Where(q => q.CCID == C_.CCID).OrderByDescending(q => q.CID);
+                            foreach (var C in Cs) PB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CCID.ToString() });
+
+                            N.PBs.Add(PB);
+                        }
+                        else//這堂課已經不見了~就直接移除
+                        {
+                            PR.TargetInt1 = 0;
+                        }
                     }
-                }
 
                 //職分
-                foreach (var CR1 in N.CRs.Where(q => q.TargetType == 1))
+                foreach (var PR1 in N.PRs.Where(q => q.TargetType == 1))
                 {
-                    if (N.OSL.Any(q => q.Value == CR1.TargetInt1.ToString()))
-                        N.OSL.Find(q => q.Value == CR1.TargetInt1.ToString()).Selected = true;
+                    if (N.OSL.Any(q => q.Value == PR1.TargetInt1.ToString()))
+                        N.OSL.Find(q => q.Value == PR1.TargetInt1.ToString()).Selected = true;
                 }
             }
 
@@ -350,97 +346,60 @@ namespace Banner.Areas.Admin.Controllers
             #region 前端資料帶入
             if (FC != null)
             {
-                /*N.C.Title = FC.Get("txb_Title");
-                N.C.CourseInfo = FC.Get("txb_CourseInfo");
-                N.C.TargetInfo = FC.Get("txb_TargetInfo");
-                N.C.GraduationInfo = FC.Get("txb_GraduationInfo");
-                N.C.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
-                N.C.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
-                N.C.CourseType = Convert.ToInt32(FC.Get("rbl_CourseType"));
-                N.C.UpdDate = DT;
-                N.C.SaveACID = ACID;
+                N.P.Title = FC.Get("txb_Title");
+                N.P.ProductInfo = FC.Get("txb_ProductIInfo");
+                N.P.TargetInfo = FC.Get("txb_TargetInfo");
+                N.P.GraduationInfo = FC.Get("txb_GraduationInfo");
+                N.P.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
+                N.P.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
+                N.P.ProductType = Convert.ToInt32(FC.Get("rbl_ProductType"));
+                N.P.UpdDate = DT;
+                N.P.SaveACID = ACID;
                 N.CCSL.ForEach(q => q.Selected = false);
                 N.CCSL.FirstOrDefault(q => q.Value == FC.Get("ddl_CC")).Selected = true;
-                N.C.CCID = Convert.ToInt32(FC.Get("ddl_CC"));
+                N.P.CID = Convert.ToInt32(FC.Get("ddl_C"));
+                N.CSL = new List<SelectListItem>();
+                var Cs = DC.Course.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CCID.ToString() == FC.Get("ddl_CC")).OrderBy(q => q.CCID);
+                foreach (var C in Cs)
+                {
+                    if (C.CID == N.P.CID)
+                        N.CSL.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString(), Selected = true });
+                    else
+                        N.CSL.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString() });
+                }
+
                 //擋修與對象
-                //先把原本有的更新
-                foreach (var CR in N.CRs)
-                {
-                    switch (CR.TargetType)
-                    {
-                        case 0://0:先修課程ID[Course]
-                            {
-                                if (!string.IsNullOrEmpty(FC.Get("ddl_CDB_" + CR.CRID)))//項目還在
-                                    CR.TargetInt1 = Convert.ToInt32(FC.Get("ddl_CDB_" + CR.CRID));
-                                else
-                                    CR.TargetInt1 = 0;
-                            }
-                            break;
-                        case 1://1:職分ID[OID]
-                            {
-                                //後面處理
-                            }
-                            break;
-                        case 2://2:性別
-                            {
-                                CR.TargetInt1 = Convert.ToInt32(FC.Get("rbl_Sex"));
-                            }
-                            break;
-                        case 3://3:年齡
-                            {
-                                try
-                                {
-                                    CR.TargetInt1 = Convert.ToInt32(FC.Get("txb_Age_Min"));
-                                }
-                                catch
-                                {
-                                    CR.TargetInt1 = 0;
-                                }
-                                try
-                                {
-                                    CR.TargetInt2 = Convert.ToInt32(FC.Get("txb_Age_Max"));
-                                }
-                                catch
-                                {
-                                    CR.TargetInt2 = 0;
-                                }
-                            }
-                            break;
-                        case 4://4:事工團
-                            {
-
-                            }
-                            break;
-                    }
-                }
-
-                //再新增UI新增的部分
+                //新增UI新增的部分
                 #region 先修課程
-                int iCt = Convert.ToInt32(FC.Get("txb_AddCourseCt"));
-                for (int i = 0; i <= iCt; i++)
+                if (N.PRs.Count(q => q.TargetType == 0) == 0)
                 {
-                    if (!string.IsNullOrEmpty(FC.Get("ddl_C_" + i)))
+                    int iCt = Convert.ToInt32(FC.Get("txb_AddCourseCt"));
+                    for (int i = 0; i <= iCt; i++)
                     {
-                        N.CRs.Add(new Course_Rool
+                        if (!string.IsNullOrEmpty(FC.Get("ddl_C_" + i)))
                         {
-                            CID = N.C.CID,
-                            TargetType = 0,
-                            TargetInt1 = Convert.ToInt32(FC.Get("ddl_CC_" + i)),
-                            TargetInt2 = 0,
-                            CreDate = DT,
-                            SaveACID = ACID
-                        });
+                            N.PRs.Add(new Product_Rool
+                            {
+                                PID = N.P.PID,
+                                TargetType = 0,
+                                TargetInt1 = Convert.ToInt32(FC.Get("ddl_C_" + i)),
+                                TargetInt2 = 0,
+                                CreDate = DT,
+                                SaveACID = ACID
+                            });
+                        }
                     }
                 }
+
                 #endregion
                 #region 性別
-                if (N.CRs.FirstOrDefault(q => q.TargetType == 2) == null && FC.Get("rbl_Sex") != null)
+                if (N.PRs.FirstOrDefault(q => q.TargetType == 2) == null && FC.Get("rbl_Sex") != null)
                 {
                     if (FC.Get("rbl_Sex") != "-1")
                     {
-                        N.CRs.Add(new Course_Rool
+                        N.PRs.Add(new Product_Rool
                         {
-                            CID = N.C.CID,
+                            PID = N.P.PID,
                             TargetType = 2,
                             TargetInt1 = Convert.ToInt32(FC.Get("rbl_Sex")),
                             TargetInt2 = 0,
@@ -456,11 +415,11 @@ namespace Banner.Areas.Admin.Controllers
                 catch { iMin = 0; }
                 try { iMax = int.Parse(FC.Get("txb_Age_Max")); }
                 catch { iMax = 0; }
-                if (N.CRs.FirstOrDefault(q => q.TargetType == 3) == null && (iMin > 0 || iMax > 0))
+                if (N.PRs.FirstOrDefault(q => q.TargetType == 3) == null && (iMin > 0 || iMax > 0))
                 {
-                    N.CRs.Add(new Course_Rool
+                    N.PRs.Add(new Product_Rool
                     {
-                        CID = N.C.CID,
+                        PID = N.P.PID,
                         TargetType = 3,
                         TargetInt1 = iMin,
                         TargetInt2 = iMax,
@@ -473,12 +432,12 @@ namespace Banner.Areas.Admin.Controllers
                 foreach (var _O in N.OSL)
                 {
                     _O.Selected = GetViewCheckBox(FC.Get("cbox_O" + _O.Value));
-                    var CR = N.CRs.FirstOrDefault(q => q.TargetInt1.ToString() == _O.Value && q.TargetType == 1);
+                    var CR = N.PRs.FirstOrDefault(q => q.TargetInt1.ToString() == _O.Value && q.TargetType == 1);
                     if (_O.Selected && CR == null)
                     {
-                        N.CRs.Add(new Course_Rool
+                        N.PRs.Add(new Product_Rool
                         {
-                            CID = N.C.CID,
+                            PID = N.P.PID,
                             TargetType = 1,
                             TargetInt1 = Convert.ToInt32(_O.Value),
                             TargetInt2 = 0,
@@ -489,7 +448,7 @@ namespace Banner.Areas.Admin.Controllers
                     else if (!_O.Selected && CR != null)
                         CR.TargetInt1 = 0;
                 }
-                #endregion*/
+                #endregion
             }
 
             #endregion

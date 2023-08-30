@@ -143,6 +143,7 @@ namespace Banner.Areas.Web.Controllers
                         BaptizedType = 0,
                         GroupType = "無意願",
                         BackUsedFlag = false,
+                        TeacherFlag = false,
                         ActiveFlag = false,
                         DeleteFlag = false,
                         CreDate = DT,

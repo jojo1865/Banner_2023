@@ -111,26 +111,48 @@
 
                                 <div class="form-group">
                                     <label>先修課程</label>
-                                    <a class="ms-2" href="javascript:;" onclick="AddRow1();"><i class="fa-solid fa-circle-plus lab_DarkBlue me-2"></i></a>
+                                    @if (Model.PBs.Count(q => q.CRID > 0) > 0)
+                                    {
+                                        <a class="ms-2 d-none" id="a_add_Course" href="javascript:;" onclick="AddRow1();"><i class="fa-solid fa-circle-plus lab_DarkBlue me-2"></i></a>
+                                    }
+                                    else
+                                    {
+                                        <a class="ms-2" id="a_add_Course" href="javascript:;" onclick="AddRow1();"><i class="fa-solid fa-circle-plus lab_DarkBlue me-2"></i></a>
+                                    }
                                     <input type="hidden" id="txb_AddCourseCt" name="txb_AddCourseCt" value="0" />
                                     <div id="div_BeforeCourse">
-                                        @foreach (var CB in Model.CBs.Where(q => q.CRID > 0).OrderBy(q => q.CRID))
+                                        @foreach (var PB in Model.PBs.Where(q => q.PRID > 0).OrderBy(q => q.PRID))
                                         {
-                                            <div id="div_AddCourse_@CB.CRID" class="mt-3">
+                                            <div id="div_AddCourse_@PB.PRID" class="mt-3">
                                                 <div class="row">
                                                     <div class="col-lg-4 col-12">
-                                                        @Html.DropDownList("ddl_CCDB_" + CB.CRID, CB.CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this);" })
+                                                        @Html.DropDownList("ddl_CCDB_" + PB.PRID, PB.CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this);" })
                                                     </div>
                                                     <div class="col-lg-6 col-12">
-                                                        @Html.DropDownList("ddl_CDB_" + CB.CRID, CB.CSL_Before, new { @class = "form-select form-control-lg" })
+                                                        @Html.DropDownList("ddl_CCDB_" + PB.PRID, PB.CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this);" })
                                                     </div>
                                                     <div class="col-lg-2 col-12 text-lg-end text-start">
-                                                        <a href="javascript:;" onclick="RemoveRow('div_AddCourse_@CB.CRID');"><i class="fa-solid fa-trash lab_DarkBlue"></i></a>
+                                                        <a href="javascript:;" onclick="RemoveRow('div_AddCourse_@PB.PRID');"><i class="fa-solid fa-trash lab_DarkBlue"></i></a>
                                                     </div>
                                                 </div>
                                             </div>
                                         }
-
+                                        @foreach (var PB in Model.PBs.Where(q => q.CRID > 0).OrderBy(q => q.PRID))
+                                        {
+                                            <div id="div_AddCourse_@PB.PRID" class="mt-3">
+                                                <div class="row">
+                                                    <div class="col-lg-4 col-12">
+                                                        @Html.Label(PB.CCSL_Before.FirstOrDefault(q=>q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
+                                                        
+                                                    </div>
+                                                    <div class="col-lg-6 col-12">
+                                                        @Html.Label(PB.CSL_Before.FirstOrDefault(q => q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
+                                                    </div>
+                                                    <div class="col-lg-2 col-12 text-lg-end text-start">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
                                     </div>
 
                                 </div>
@@ -138,45 +160,100 @@
                                     <label>限制性別</label><br />
                                     @{
                                         int iSex = -1;
-                                        var CR2 = Model.CRs.FirstOrDefault(q => q.TargetType == 2);
-                                        if (CR2 != null)
+                                        var PR2 = Model.PRs.FirstOrDefault(q => q.TargetType == 2);
+                                        if (PR2 != null)
                                         {
-                                            iSex = CR2.TargetInt1;
+                                            iSex = PR2.TargetInt1;
                                         }
                                     }
-                                    <div class="form-check form-check-inline">
-                                        @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex1", @class = "form-check-input" })
-                                        @Html.Label("不限制", new { @class = "form-check-label", @for = "cbox_Sex1" })
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input" })
-                                        @Html.Label("男", new { @class = "form-check-label", @for = "cbox_Sex1" })
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input" })
-                                        @Html.Label("女", new { @class = "form-check-label", @for = "cbox_Sex2" })
-                                    </div>
+                                <div class="form-check form-check-inline">
+                                    @if (PR2 == null)
+                                    {
+                                        @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input" });
+                                    }
+                                    else if (PR2.PRID == 0)
+                                    {
+                                        @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input", @disabled = "true" });
+                                    }
+                                    else
+                                    {
+                                        @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input" });
+                                    }
+                                    @Html.Label("不限制", new { @class = "form-check-label", @for = "cbox_Sex0" })
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    @if (PR2 == null)
+                                    {
+                                        @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input" });
+                                    }
+                                    else if (PR2.PRID == 0)
+                                    {
+                                        @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input", @disabled = "true" });
+                                    }
+                                    else
+                                    {
+                                        @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input" });
+                                    }
+                                    @Html.Label("男", new { @class = "form-check-label", @for = "cbox_Sex1" })
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    @if (PR2 == null)
+                                    {
+                                        @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input" });
+                                    }
+                                    else if (PR2.PRID == 0)
+                                    {
+                                        @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input", @disabled = "true" });
+                                    }
+                                    else
+                                    {
+                                        @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input" });
+                                    }
+                                    @Html.Label("女", new { @class = "form-check-label", @for = "cbox_Sex2" })
+                                </div>
                                 </div>
                                 <div class="form-group">
                                     <label>限制年齡</label><br />
                                     @{
                                         int iAge_Min = 0, iAge_Max = 0;
-                                        var CR3 = Model.CRs.FirstOrDefault(q => q.TargetType == 3);
-                                        if (CR3 != null)
+                                        var PR3 = Model.PRs.FirstOrDefault(q => q.TargetType == 3);
+                                        if (PR3 != null)
                                         {
-                                            iAge_Min = CR3.TargetInt1;
-                                            iAge_Max = CR3.TargetInt2;
+                                            iAge_Min = PR3.TargetInt1;
+                                            iAge_Max = PR3.TargetInt2;
                                         }
                                     }
                                     <div class="row">
                                         <div class="col-4">
-                                            @Html.TextBox("txb_Age_Min", iAge_Min, new { @class = "form-control form-control-lg input-underline", @type = "number" })
+                                            @if (PR3 == null)
+                                            {
+                                                @Html.TextBox("txb_Age_Min", iAge_Min, new { @class = "form-control form-control-lg input-underline", @type = "number" })
+                                            }
+                                            else if (PR3.PRID == 0)
+                                            {
+                                                @Html.Label(iAge_Min.ToString(), new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBox("txb_Age_Min", iAge_Min, new { @class = "form-control form-control-lg input-underline", @type = "number" })
+                                            }
                                         </div>
                                         <div class="col-auto pt-3">
                                             以上 至
                                         </div>
                                         <div class="col-4">
-                                            @Html.TextBox("txb_Age_Max", iAge_Max, new { @class = "form-control form-control-lg input-underline", @type = "number" })
+                                            @if (PR3 == null)
+                                            {
+                                                @Html.TextBox("txb_Age_Max", iAge_Max, new { @class = "form-control form-control-lg input-underline", @type = "number" })
+                                            }
+                                            else if (PR3.PRID == 0)
+                                            {
+                                                @Html.Label(iAge_Max.ToString(), new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBox("txb_Age_Max", iAge_Max, new { @class = "form-control form-control-lg input-underline", @type = "number" })
+                                            }
                                         </div>
                                         <div class="col-auto pt-3">
                                             以下
@@ -205,10 +282,10 @@
     <div id="div_AddCourse_*" class="mt-3">
         <div class="row">
             <div class="col-lg-4 col-12">
-                @Html.DropDownList("ddl_CC_*", Model.CBs[0].CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this," + Model.P.CID + ");" })
+                @Html.DropDownList("ddl_CC_*", Model.PBs[0].CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this," + Model.P.CID + ");" })
             </div>
             <div class="col-lg-6 col-12">
-                @Html.DropDownList("ddl_C_*", Model.CBs[0].CSL_Before, new { @class = "form-select form-control-lg", @id = "ddl_C_*" })
+                @Html.DropDownList("ddl_C_*", Model.PBs[0].CSL_Before, new { @class = "form-select form-control-lg", @id = "ddl_C_*" })
             </div>
             <div class="col-lg-2 col-12 text-lg-end text-start">
                 <a href="javascript:;" onclick="RemoveRow('div_AddCourse_*');"><i class="fa-solid fa-trash lab_DarkBlue"></i></a>
@@ -216,18 +293,16 @@
         </div>
     </div>
 </div>
-<div id="div_BeforeCourse_Bata" class="d-none">
+<div id="div_BeforeCourse_Set" class="d-none">
     <div id="div_SetCourse_*" class="mt-3">
         <div class="row">
             <div class="col-lg-4 col-12">
-                @Html.DropDownList("ddl_CC_*", Model.CBs[0].CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this," + Model.P.CID + ");" })
+                <input enable="false" name="ddl_CCDB_*" value="#1" class="form-select form-control-lg lab_gray" />
             </div>
             <div class="col-lg-6 col-12">
-                @Html.DropDownList("ddl_C_*", Model.CBs[0].CSL_Before, new { @class = "form-select form-control-lg", @id = "ddl_C_*" })
+                <input enable="false" name="ddl_CDB_*" value="#2" class="form-select form-control-lg lab_gray" />
             </div>
-            <div class="col-lg-2 col-12 text-lg-end text-start">
-                <a class="d-none" href="javascript:;" onclick="RemoveRow('div_AddCourse_*');"><i class="fa-solid fa-trash lab_DarkBlue"></i></a>
-            </div>
+            <div class="col-lg-2 col-12 text-lg-end text-start"></div>
         </div>
     </div>
 </div>
@@ -305,8 +380,69 @@
                 document.getElementById("txb_TargetInfo").value = res.TargetInfo;
                 document.getElementById("txb_GraduationInfo").value = res.GraduationInfo;
                 //擋修
+                //初始化
                 document.getElementById("div_BeforeCourse").innerHTML = "";
-                //$.each(res, function (index)
+                var a_add_Course = document.getElementById("a_add_Course");
+                a_add_Course.classList.remove('d-none');
+                //性別
+                var Sexs = document.getElementsByName("rbl_Sex");
+                $.each(Sexs, function (j) {
+                    Sexs[j].disabled = false;
+                    //Sexs[j].removeAttribute('disabled');
+                    if (j == 0) {
+                        Sexs[j].checked = true;
+                    }
+                    else {
+                        Sexs[j].checked = false;
+                    }
+                });
+                //年齡
+                var Min = document.getElementById("txb_Age_Min");
+                var Max = document.getElementById("txb_Age_Max");
+                Min.value = 0;
+                Max.value = 0;
+                Min.disabled = false;
+                Max.disabled = false;
+                Min.classList.remove("lab_gray");
+                Max.classList.remove("lab_gray");
+
+                var s = document.getElementById("div_BeforeCourse_Set").innerHTML;
+                $.each(res.Rools, function (index) {
+                    if (res.Rools[index].TargetType == 0) {
+                        var str = s;
+                        for (i = 0; i < 10; i++) {
+                            str = str.replace('*', res.Rools[index].CRID);
+                        }
+                        str = str.replace('#1', res.Rools[index].CC_Title);
+                        str = str.replace('#2', res.Rools[index].C_Title);
+                        document.getElementById("div_BeforeCourse").innerHTML += str;
+                        a_add_Course.classList.add('d-none');
+                    }
+                    else if (res.Rools[index].TargetType == 1) {//職分
+
+
+                    }
+                    else if (res.Rools[index].TargetType == 2) {//性別
+                        $.each(Sexs, function (j) {
+                            Sexs[j].disabled = true;
+                            if (res.Rools[index].TargetInt1.toString() == Sexs[j].value) {
+                                Sexs[j].checked = true;
+                            }
+                            else {
+                                Sexs[j].checked = false;
+                            }
+                        });
+                    }
+                    else if (res.Rools[index].TargetType == 3) {//年齡
+
+                        Min.value = res.Rools[index].TargetInt1;
+                        Max.value = res.Rools[index].TargetInt2;
+                        Min.disabled = true;
+                        Max.disabled = true;
+                        Min.classList.add("lab_gray");
+                        Max.classList.add("lab_gray");
+                    }
+                });
             },
             error: function (err) { console.log(err) },
         })

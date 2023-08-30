@@ -462,6 +462,7 @@ namespace Banner.Areas.Admin.Controllers
                             TargetInt1 = Convert.ToInt32(FC.Get("ddl_CC_" + i)),
                             TargetInt2 = 0,
                             CreDate = DT,
+                            UpdDate = DT,
                             SaveACID = ACID
                         });
                     }
@@ -479,6 +480,7 @@ namespace Banner.Areas.Admin.Controllers
                             TargetInt1 = Convert.ToInt32(FC.Get("rbl_Sex")),
                             TargetInt2 = 0,
                             CreDate = DT,
+                            UpdDate = DT,
                             SaveACID = ACID
                         });
                     }
@@ -499,6 +501,7 @@ namespace Banner.Areas.Admin.Controllers
                         TargetInt1 = iMin,
                         TargetInt2 = iMax,
                         CreDate = DT,
+                        UpdDate = DT,
                         SaveACID = ACID
                     });
                 }
@@ -517,6 +520,7 @@ namespace Banner.Areas.Admin.Controllers
                             TargetInt1 = Convert.ToInt32(_O.Value),
                             TargetInt2 = 0,
                             CreDate = DT,
+                            UpdDate = DT,
                             SaveACID = ACID
                         });
                     }

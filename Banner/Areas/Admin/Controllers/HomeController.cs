@@ -585,6 +585,7 @@ namespace Banner.Areas.Admin.Controllers
                             }
                             break;
                     }
+                    cC.Rools.Add(c);
                 }
 
                 Error = JsonConvert.SerializeObject(cC);

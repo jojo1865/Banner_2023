@@ -1446,14 +1446,50 @@ namespace Banner.Areas.Admin.Controllers
         {
             int iActiveFlag = GetQueryStringInInt("Act");
             int iBackUserFlag = GetQueryStringInInt("Bac");
+            int iTeacherFlag = GetQueryStringInInt("Tea");
             var N = DC.Account.FirstOrDefault(q => q.ACID == ID);
             if (N != null)
             {
                 N.ActiveFlag = iActiveFlag == 1;
                 N.BackUsedFlag = iBackUserFlag == 1;
+                N.TeacherFlag = iTeacherFlag == 1;
                 N.UpdDate = DT;
                 N.SaveACID = ACID;
                 DC.SubmitChanges();
+
+                var T = DC.Teacher.FirstOrDefault(q => q.ACID == N.ACID);
+                if(T!=null)
+                {
+                    if(N.TeacherFlag)
+                    {
+                        T.ActiveFlag = true;
+                        T.DeleteFlag = false;
+                    }
+                    else
+                    {
+                        T.ActiveFlag = false;
+                        T.DeleteFlag = true;
+                    }
+                    T.UpdDate = DT;
+                    T.SaveACID = ACID;
+                    DC.SubmitChanges();
+                }
+                else if(N.TeacherFlag)
+                {
+                    T = new Teacher
+                    {
+                        ACID = N.ACID,
+                        Title = N.Name_First + N.Name_Last,
+                        Note = "",
+                        ActiveFlag = true,
+                        DeleteFlag = false,
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = ACID
+                    };
+                    DC.Teacher.InsertOnSubmit(T);
+                    DC.SubmitChanges();
+                }
             }
         }
         #endregion

@@ -534,6 +534,16 @@
                         }
                         <div class="row">
                             <div class="col-12 pt-2">
+                                <label>講師權限</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 pt-2">
+                                @Html.CheckBox("cbox_TeacherFlag", Model.AC.TeacherFlag, new { @class = "form-check-input" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 pt-2">
                                 <a href="javascript:;" onclick="SaveBackSys(@Model.AC.ACID);" style="color:white;" class="btn btn-primary btn-lg btn-round"><img src="/Areas/Admin/Content/Img/save.svg" alt="" />儲存</a>
                             </div>
                         </div>
@@ -657,9 +667,10 @@
         var iCheck1 = box1.checked ? 1 : 0;
         var box2 = document.getElementById('cbox_BackUsedFlag');
         var iCheck2 = box2.checked ? 1 : 0;
-
+        var box3 = document.getElementById('cbox_TeacherFlag');
+        var iCheck3 = box2.checked ? 1 : 0;
         $.ajax({
-            url: '/Admin/AccountSet/SaveAcctFlag/' + ACID + '?Act=' + iCheck1 + '&Bac=' + iCheck2,
+            url: '/Admin/AccountSet/SaveAcctFlag/' + ACID + '?Act=' + iCheck1 + '&Bac=' + iCheck2 + '&Tea=' + iCheck3,
             method: 'GET',
             dataType: 'text'
 
