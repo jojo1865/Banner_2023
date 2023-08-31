@@ -28,7 +28,7 @@ namespace Banner.Areas.Admin.Controllers
             cMenu Ms = new cMenu();
             int ACID = GetACID();
             if (ACID <= 0)
-                SetAlert("請先登入", 2, "/Admin/Home/Login"); 
+                SetAlert("請先登入", 2, "/Admin/Home/Login");
             else
             {
                 if (CheckAdmin(ACID))//此使用者擁有系統管理者權限
@@ -44,7 +44,7 @@ namespace Banner.Areas.Admin.Controllers
                     Ms.Items = GetMenu(Rs.ToList(), sURL, 0);
                 }
             }
-            
+
             return PartialView(Ms);
         }
         //取得選單可以查的網址
@@ -337,12 +337,7 @@ namespace Banner.Areas.Admin.Controllers
 
             return cL;
         }
-        public PartialViewResult _Location_Meeting(int LID)
-        {
-            return PartialView(SetLocation_Meeting(LID, null));
-        }
-        [HttpPost]
-        public PartialViewResult _Location_Meeting(int LID, FormCollection FC)
+        public PartialViewResult _Location_Meeting(int LID, FormCollection FC = null)
         {
             return PartialView(SetLocation_Meeting(LID, FC));
         }
@@ -440,12 +435,7 @@ namespace Banner.Areas.Admin.Controllers
 
             return cL;
         }
-        public PartialViewResult _Location_User(int LID)
-        {
-            return PartialView(SetLocation_User(LID, null));
-        }
-        [HttpPost]
-        public PartialViewResult _Location_User(int LID, FormCollection FC)
+        public PartialViewResult _Location_User(int LID, FormCollection FC = null)
         {
             return PartialView(SetLocation_User(LID, FC));
         }

@@ -147,7 +147,7 @@ namespace Banner.Areas.Admin.Controllers
             //擋修限制
             public List<cProduct_Before> PBs = new List<cProduct_Before>();
             public List<Product_Rool> PRs = new List<Product_Rool>();
-            public List<SelectListItem> OSL = new List<SelectListItem>();
+            public ListSelect OSL = new ListSelect();
             public string[] sCourseType = new string[0];
         }
         public class cProduct_Before
@@ -216,12 +216,14 @@ namespace Banner.Areas.Admin.Controllers
             N.PBs.Add(PB);
 
             //組織
+            N.OSL.Title = "";
+            N.OSL.SortNo = 0;
             var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ItemID == "Shepherding").ToList();
             var O = Os.FirstOrDefault(q => q.ParentID == 0);
             while (O != null)
             {
                 if (O.JobTitle != "")
-                    N.OSL.Add(new SelectListItem { Text = O.JobTitle, Value = O.OID.ToString() });
+                    N.OSL.ddlList.Add(new SelectListItem { Text = O.JobTitle, Value = O.OID.ToString() });
                 O = Os.FirstOrDefault(q => q.ParentID == O.OID);
             };
             #endregion
@@ -262,11 +264,10 @@ namespace Banner.Areas.Admin.Controllers
 
                 if (CID > 0)
                 {
-                    var CRs = DC.Course_Rool.Where(q => q.TargetType == 0 && q.CID == CID).OrderBy(q => q.CID);
-                    
+                    var CRs = DC.Course_Rool.Where(q => q.CID == CID).OrderBy(q => q.CID);
                     foreach (var CR in CRs)
                     {
-                        if(CR.TargetType == 0)
+                        if (CR.TargetType == 0)//擋修
                         {
                             PB = new cProduct_Before();
                             PB.PRID = 0;
@@ -277,6 +278,12 @@ namespace Banner.Areas.Admin.Controllers
                             foreach (var C in Cs) PB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CCID.ToString(), Selected = CR.CID == CID });
 
                             N.PBs.Add(PB);
+                        }
+                        else if (CR.TargetType == 1)//職分
+                        {
+                            N.OSL.SortNo = CR.CRID;
+                            if (N.OSL.ddlList.Any(q => q.Value == CR.TargetInt1.ToString()))
+                                N.OSL.ddlList.First(q => q.Value == CR.TargetInt1.ToString()).Selected = true;
                         }
                         else
                         {
@@ -313,32 +320,32 @@ namespace Banner.Areas.Admin.Controllers
                 N.PRs = N.P.Product_Rool.ToList();
 
                 //擋修
-                    foreach (var PR in N.PRs.Where(q => q.TargetType == 0).OrderBy(q => q.PRID))
+                foreach (var PR in N.PRs.Where(q => q.TargetType == 0).OrderBy(q => q.PRID))
+                {
+                    var C_ = DC.Course.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.CID == PR.TargetInt1);
+                    if (C_ != null)
                     {
-                        var C_ = DC.Course.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.CID == PR.TargetInt1);
-                        if (C_ != null)
-                        {
-                            PB = new cProduct_Before();
-                            PB.PRID = PR.PRID;
-                            PB.CRID = 0;
-                            CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag && p.CID != ID) > 0).OrderByDescending(q => q.CCID).ToList();
-                            foreach (var CC in CCs) PB.CCSL_Before.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CC.CCID == C_.CCID });
-                            var Cs = DC.Course.Where(q => q.CCID == C_.CCID).OrderByDescending(q => q.CID);
-                            foreach (var C in Cs) PB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CCID.ToString() });
+                        PB = new cProduct_Before();
+                        PB.PRID = PR.PRID;
+                        PB.CRID = 0;
+                        CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag && p.CID != ID) > 0).OrderByDescending(q => q.CCID).ToList();
+                        foreach (var CC in CCs) PB.CCSL_Before.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CC.CCID == C_.CCID });
+                        var Cs = DC.Course.Where(q => q.CCID == C_.CCID).OrderByDescending(q => q.CID);
+                        foreach (var C in Cs) PB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CCID.ToString() });
 
-                            N.PBs.Add(PB);
-                        }
-                        else//這堂課已經不見了~就直接移除
-                        {
-                            PR.TargetInt1 = 0;
-                        }
+                        N.PBs.Add(PB);
                     }
+                    else//這堂課已經不見了~就直接移除
+                    {
+                        PR.TargetInt1 = 0;
+                    }
+                }
 
                 //職分
                 foreach (var PR1 in N.PRs.Where(q => q.TargetType == 1))
                 {
-                    if (N.OSL.Any(q => q.Value == PR1.TargetInt1.ToString()))
-                        N.OSL.Find(q => q.Value == PR1.TargetInt1.ToString()).Selected = true;
+                    if (N.OSL.ddlList.Any(q => q.Value == PR1.TargetInt1.ToString()))
+                        N.OSL.ddlList.Find(q => q.Value == PR1.TargetInt1.ToString()).Selected = true;
                 }
             }
 
@@ -429,7 +436,7 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 #endregion
                 #region 職分
-                foreach (var _O in N.OSL)
+                foreach (var _O in N.OSL.ddlList)
                 {
                     _O.Selected = GetViewCheckBox(FC.Get("cbox_O" + _O.Value));
                     var CR = N.PRs.FirstOrDefault(q => q.TargetInt1.ToString() == _O.Value && q.TargetType == 1);

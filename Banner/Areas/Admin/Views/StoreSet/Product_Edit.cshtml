@@ -142,8 +142,8 @@
                                             <div id="div_AddCourse_@PB.PRID" class="mt-3">
                                                 <div class="row">
                                                     <div class="col-lg-4 col-12">
-                                                        @Html.Label(PB.CCSL_Before.FirstOrDefault(q=>q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
-                                                        
+                                                        @Html.Label(PB.CCSL_Before.FirstOrDefault(q => q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
+
                                                     </div>
                                                     <div class="col-lg-6 col-12">
                                                         @Html.Label(PB.CSL_Before.FirstOrDefault(q => q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
@@ -166,51 +166,51 @@
                                             iSex = PR2.TargetInt1;
                                         }
                                     }
-                                <div class="form-check form-check-inline">
-                                    @if (PR2 == null)
-                                    {
-                                        @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input" });
-                                    }
-                                    else if (PR2.PRID == 0)
-                                    {
-                                        @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input", @disabled = "true" });
-                                    }
-                                    else
-                                    {
-                                        @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input" });
-                                    }
-                                    @Html.Label("不限制", new { @class = "form-check-label", @for = "cbox_Sex0" })
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    @if (PR2 == null)
-                                    {
-                                        @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input" });
-                                    }
-                                    else if (PR2.PRID == 0)
-                                    {
-                                        @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input", @disabled = "true" });
-                                    }
-                                    else
-                                    {
-                                        @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input" });
-                                    }
-                                    @Html.Label("男", new { @class = "form-check-label", @for = "cbox_Sex1" })
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    @if (PR2 == null)
-                                    {
-                                        @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input" });
-                                    }
-                                    else if (PR2.PRID == 0)
-                                    {
-                                        @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input", @disabled = "true" });
-                                    }
-                                    else
-                                    {
-                                        @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input" });
-                                    }
-                                    @Html.Label("女", new { @class = "form-check-label", @for = "cbox_Sex2" })
-                                </div>
+                                    <div class="form-check form-check-inline">
+                                        @if (PR2 == null)
+                                        {
+                                            @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input" });
+                                        }
+                                        else if (PR2.PRID == 0)
+                                        {
+                                            @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input", @disabled = "true" });
+                                        }
+                                        else
+                                        {
+                                            @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input" });
+                                        }
+                                        @Html.Label("不限制", new { @class = "form-check-label", @for = "cbox_Sex0" })
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        @if (PR2 == null)
+                                        {
+                                            @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input" });
+                                        }
+                                        else if (PR2.PRID == 0)
+                                        {
+                                            @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input", @disabled = "true" });
+                                        }
+                                        else
+                                        {
+                                            @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input" });
+                                        }
+                                        @Html.Label("男", new { @class = "form-check-label", @for = "cbox_Sex1" })
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        @if (PR2 == null)
+                                        {
+                                            @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input" });
+                                        }
+                                        else if (PR2.PRID == 0)
+                                        {
+                                            @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input", @disabled = "true" });
+                                        }
+                                        else
+                                        {
+                                            @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input" });
+                                        }
+                                        @Html.Label("女", new { @class = "form-check-label", @for = "cbox_Sex2" })
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <label>限制年齡</label><br />
@@ -231,7 +231,7 @@
                                             }
                                             else if (PR3.PRID == 0)
                                             {
-                                                @Html.Label(iAge_Min.ToString(), new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                                @Html.TextBox("txb_Age_Min", iAge_Min, new { @class = "form-control form-control-lg input-underline lab_gray",@disabled=true })
                                             }
                                             else
                                             {
@@ -248,7 +248,7 @@
                                             }
                                             else if (PR3.PRID == 0)
                                             {
-                                                @Html.Label(iAge_Max.ToString(), new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                                @Html.TextBox("txb_Age_Max", iAge_Max, new { @class = "form-control form-control-lg input-underline lab_gray", @disabled = true })
                                             }
                                             else
                                             {
@@ -262,12 +262,23 @@
                                 </div>
                                 <div class="form-group">
                                     <label>牧養職分</label><br />
-                                    @foreach (var CR1 in Model.OSL)
+                                    @foreach (var CR1 in Model.OSL.ddlList)
                                     {
-                                        <div class="form-check form-check-inline">
-                                            @Html.CheckBox("cbox_O" + CR1.Value, CR1.Selected, new { @id = "cbox_O" + CR1.Value, @class = "form-check-input" })
-                                            @Html.Label(CR1.Text, new { @class = "form-check-label", @for = "cbox_O" + CR1.Value })
-                                        </div>
+                                        if (Model.OSL.SortNo > 0)
+                                        {
+                                            <div class="form-check form-check-inline">
+                                                @Html.CheckBox("cbox_O" + CR1.Value, CR1.Selected, new { @id = "cbox_O" + CR1.Value, @class = "form-check-input cbox_Os",@disabled=true })
+                                                @Html.Label(CR1.Text, new { @class = "form-check-label", @for = "cbox_O" + CR1.Value })
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="form-check form-check-inline">
+                                                @Html.CheckBox("cbox_O" + CR1.Value, CR1.Selected, new { @id = "cbox_O" + CR1.Value, @class = "form-check-input cbox_Os" })
+                                                @Html.Label(CR1.Text, new { @class = "form-check-label", @for = "cbox_O" + CR1.Value })
+                                            </div>
+                                        }
+
                                     }
                                 </div>
                             </div>
@@ -388,7 +399,6 @@
                 var Sexs = document.getElementsByName("rbl_Sex");
                 $.each(Sexs, function (j) {
                     Sexs[j].disabled = false;
-                    //Sexs[j].removeAttribute('disabled');
                     if (j == 0) {
                         Sexs[j].checked = true;
                     }
@@ -405,6 +415,13 @@
                 Max.disabled = false;
                 Min.classList.remove("lab_gray");
                 Max.classList.remove("lab_gray");
+                //職分
+                var Os = document.getElementsByClassName("cbox_Os");
+                $.each(Os, function (j) {
+                    Os[j].disabled = false;
+                    Os[j].checked = false;
+                });
+
 
                 var s = document.getElementById("div_BeforeCourse_Set").innerHTML;
                 $.each(res.Rools, function (index) {
@@ -419,8 +436,12 @@
                         a_add_Course.classList.add('d-none');
                     }
                     else if (res.Rools[index].TargetType == 1) {//職分
-
-
+                        $.each(Os, function (j) {
+                            Os[j].disabled = true;
+                            if (res.Rools[index].TargetInt1.toString() == Os[j].id.replace('cbox_O','')) {
+                                Os[j].checked = true;
+                            }
+                        });
                     }
                     else if (res.Rools[index].TargetType == 2) {//性別
                         $.each(Sexs, function (j) {
