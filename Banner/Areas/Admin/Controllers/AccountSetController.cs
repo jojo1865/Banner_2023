@@ -627,7 +627,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Account_Aldult_List(FormCollection FC)
         {
             GetViewBag();
@@ -765,9 +765,8 @@ namespace Banner.Areas.Admin.Controllers
                         ControlName = "ddl_Join" + i + "_TimeNo_" + j,
                         ddlList = new List<SelectListItem>()
                     };
-                    cJ.ddl_Weekly.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
                     cJ.ddl_Time.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-                    for (int k = 0; k < sWeeks.Length; k++)
+                    for (int k = 1; k < sWeeks.Length; k++)
                         cJ.ddl_Weekly.ddlList.Add(new SelectListItem { Text = sWeeks[k], Value = (k + 1).ToString() });
                     for (int k = 0; k < sTimeSpans.Length; k++)
                         cJ.ddl_Time.ddlList.Add(new SelectListItem { Text = sTimeSpans[k], Value = (k + 1).ToString() });
@@ -1304,7 +1303,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GerAccountData(ID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Account_Aldult_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1504,7 +1503,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Account_Childen_List(FormCollection FC)
         {
             GetViewBag();
@@ -1533,7 +1532,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Account_New_List(FormCollection FC)
         {
             GetViewBag();
@@ -1711,7 +1710,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetAccount_New_Edit(ID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Account_New_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1733,7 +1732,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Account_Baptized_List(FormCollection FC)
         {
             GetViewBag();
@@ -1845,7 +1844,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetAccount_Baptized_Edit(ID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Account_Baptized_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

@@ -10,7 +10,6 @@ namespace Banner.Areas.Web.Controllers
 {
     public class GroupPlaceController : PublicClass
     {
-        private int ACID = 0;
         // GET: Web/GroupPlace
         private int OIID = 0;
         private void GetID()
@@ -43,7 +42,7 @@ namespace Banner.Areas.Web.Controllers
             N.AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             if (N.AC != null)
             {
-                for (int i = 0; i < sWeeks.Length; i++)
+                for (int i = 1; i < sWeeks.Length; i++)
                     N.SLIs.Add(new SelectListItem { Text = sWeeks[i], Value = (i + 1).ToString(), Selected = i == 0 });
                 var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag && q.OIID == ID);
                 if (OI == null)
@@ -85,7 +84,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Index(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -93,7 +92,7 @@ namespace Banner.Areas.Web.Controllers
             GetID();
             cIndex N = new cIndex();
             N.AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
-            for (int i = 0; i < sWeeks.Length; i++)
+            for (int i = 1; i < sWeeks.Length; i++)
                 N.SLIs.Add(new SelectListItem { Text = sWeeks[i], Value = (i + 1).ToString(), Selected = i == 0 });
 
             var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag && q.OIID == ID);
@@ -284,7 +283,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetAldult_List(null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Aldult_List(FormCollection FC)
         {
             GetViewBag();
@@ -320,7 +319,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Aldult_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -386,7 +385,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Aldult_Remove(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -491,7 +490,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetNew_List(null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult New_List(FormCollection FC)
         {
             GetViewBag();
@@ -542,7 +541,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult New_Remove(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -649,7 +648,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetBaptized_List(null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Baptized_List(FormCollection FC)
         {
             GetViewBag();
@@ -686,7 +685,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Baptized_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

@@ -19,7 +19,7 @@ namespace Banner.Areas.Admin.Controllers
         // GET: Admin/Shared
         public PartialViewResult _LeftMenu()
         {
-            string sURL = GetShortURL().Replace("_Edit", "_List");
+            string sURL = GetShortURL().Replace("_Edit", "_List").Replace("ProductClass_", "Product_").Replace("ProductAccount_", "Product_").Split('?')[0];
             if (!sURL.Contains("_Info_List"))
                 sURL = sURL.Replace("_Info", "_List");
 
@@ -266,7 +266,12 @@ namespace Banner.Areas.Admin.Controllers
             var Z3s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國" && q.ZID != 10).OrderBy(q => q.ParentID).ThenBy(q => q.ZID).ToList();
             var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == ZID);
             if (FC != null)
+                if (FC.Keys.Count == 0)
+                    FC = null;
+
+            if (FC != null)
             {
+                
                 cL.Z0List.First(q => q.Value == FC.Get("ddl_Zip0")).Selected = true;
                 cL.Address0 = FC.Get("txb_Address0");
                 cL.Address1_1 = FC.Get("txb_Address1_1");
@@ -364,6 +369,10 @@ namespace Banner.Areas.Admin.Controllers
             var Z1s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "縣市").OrderBy(q => q.Title).ToList();
             var Z3s = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國" && q.ZID != 10).OrderBy(q => q.ParentID).ThenBy(q => q.ZID).ToList();
             var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == ZID);
+            if (FC != null)
+                if (FC.Keys.Count == 0)
+                    FC = null;
+
             if (FC != null)
             {
                 try

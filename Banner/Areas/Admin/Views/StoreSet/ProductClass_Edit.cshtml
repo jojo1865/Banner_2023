@@ -1,0 +1,76 @@
+﻿@model Banner.Areas.Admin.Controllers.StoreSetController.cProductClass_Edit
+@{
+    ViewBag.Title = "ProductClass_Edit";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="form-container-list">
+        <div class="form-container">
+            <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
+            @if (Model != null)
+            {
+                string TimeFormat = "HH:mm";
+                <form method="post" id="form1" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-body mt-4">
+                        <div class="form-card-group">
+                            <div id="personal-info" class="header-container">
+                                <div class="header-left-border"></div>
+                                <div class="header">班級設定設定</div>
+                            </div>
+                            <div class="form-group">
+                                <label>班級名稱</label>
+                                @Html.TextBox("txb_Title", Model.PC.Title, new { @class = "form-control form-control-lg input-underline" })
+                            </div>
+                            <div class="form-group">
+                                <label>週期選擇<span>*</span></label>
+                                @Html.DropDownList("ddl_Week", Model.LS_Week.ddlList, new { @class = "form-select form-control-lg" })
+                            </div>
+                            <div class="form-group">
+                                <label>上課時間<span>*</span></label>
+                                <div class="row">
+                                    <div class="col-auto">
+                                        @Html.TextBox("txb_STime", Model.PC.STime.ToString(TimeFormat), new { @class = "form-control form-control-lg input-underline", @type = "time" })
+                                    </div>
+                                    <div class="col-auto">~</div>
+                                    <div class="col-auto">
+                                        @Html.TextBox("txb_ETime", Model.PC.ETime.ToString(TimeFormat), new { @class = "form-control form-control-lg input-underline", @type = "time" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>人數限制<span>(0表示不限制)</span></label>
+                                @Html.TextBox("txb_PeopleCt", Model.PC.PeopleCt, new { @class = "form-control form-control-lg input-underline", @type = "number", @min = "0" })
+                            </div>
+                            <div class="form-group">
+                                <label>電話</label>
+                                @Html.TextBox("txb_PhoneNo", Model.PC.PhoneNo, new { @class = "form-control form-control-lg input-underline"})
+                            </div>
+                            <div class="form-group">
+                                <label>地址/網址</label>
+                                @Html.TextBox("txb_Address", Model.PC.Address, new { @class = "form-control form-control-lg input-underline" })
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            }
+        </div>
+    </div>
+</div>
+<div class="action-bar">
+    @if (Model != null)
+    {
+        if ((((bool[])ViewBag._Power)[1] && Model.PC.PCID == 0) || (((bool[])ViewBag._Power)[2] && Model.PC.PCID > 0))
+        {
+            <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-submit btn-lg btn-round btn-submit">
+                <i class="fa-solid fa-floppy-disk"></i>儲存
+            </a>
+        }
+        <a href="/Admin/StoreSet/ProductClass_List?PID=@Model.PC.PID" class="btn btn-outline-primary btn-lg btn-round">
+            <i class="fa-solid fa-xmark"></i>取消
+        </a>
+    }
+</div>

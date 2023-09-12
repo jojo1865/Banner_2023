@@ -82,7 +82,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(ReSetOrganize(ItemID, ID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Organize_Map_Edit(string ItemID, int ID, FormCollection FC)
         {
             GetViewBag();
@@ -490,7 +490,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetOrganize_Info_List(ItemID, OID, OIID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Organize_Info_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
             GetViewBag();
@@ -523,7 +523,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(ReSetOrganizeInfo(ItemID, OID, PID, OIID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Organize_Info_Edit(string ItemID, int OID, int PID, int OIID, FormCollection FC)
         {
             GetViewBag();
@@ -864,12 +864,127 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetOrganize_Info_Account_List(ItemID, OID, OIID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Organize_Info_Account_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
             GetViewBag();
             return View(GetOrganize_Info_Account_List(ItemID, OID, OIID, FC));
         }
+        #endregion
+        #region 牧養組織與職分-匯出全部
+        public ActionResult Organize_Info_Print()
+        {
+            GetViewBag();
+            var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == "Shepherding");
+            var Os_All = Os.ToList();
+            var OIs_All = (from q in DC.OrganizeInfo.Where(q => !q.DeleteFlag)
+                           join p in Os
+                           on q.OID equals p.OID
+                           select q).ToList();
+
+            int XCt = 0;
+            ArrayList AL = new ArrayList();
+            ArrayList ALS = new ArrayList();
+            var O = Os_All.FirstOrDefault(q => q.ParentID == 0);
+            while (O != null)
+            {
+                XCt++;
+                ALS.Add(O.Title);
+                if (!string.IsNullOrEmpty(O.JobTitle))
+                    ALS.Add(O.JobTitle);
+                O = Os_All.FirstOrDefault(q => q.ParentID == O.OID);
+            };
+            AL.Add((string[])ALS.ToArray(typeof(string)));
+
+            var OIs = OIs_All.Where(q => q.OID == 8);
+            int YCt = OIs.Count();
+            OITable[,] T = new OITable[XCt, YCt];
+            int Y = 0, X = XCt - 1;
+
+
+
+
+            foreach (var OI in OIs.OrderBy(q => q.ParentID))
+            {
+                T[X, Y] = new OITable
+                {
+                    OID = OI.OID,
+                    OIID = OI.OIID,
+                    POID = OI.Organize.ParentID,
+                    POIID = OI.ParentID,
+                    Title = OI.Title + OI.Organize.Title,
+                    ACName = string.IsNullOrEmpty(OI.Organize.JobTitle) ? "" : OI.Account.Name_First + OI.Account.Name_Last,
+                    ActiceFlag = OI.ActiveFlag
+                };
+                Y++;
+            }
+            var O8 = Os_All.First(q => q.OID == 8);
+
+            Y = 0;
+            X--;
+
+            for (int j = X; j >= 0; j--)
+            {
+                for (int i = 0; i < YCt; i++)
+                {
+                    if (T[j + 1, i] != null)
+                    {
+                        var OI = OIs_All.FirstOrDefault(q => q.OIID == T[j + 1, i].POIID && q.OID == T[j + 1, i].POID);
+                        if (OI != null)
+                        {
+                            T[j, i] = new OITable
+                            {
+                                OID = OI.OID,
+                                OIID = OI.OIID,
+                                POID = OI.Organize.ParentID,
+                                POIID = OI.ParentID,
+                                Title = OI.Title + OI.Organize.Title,
+                                ACName = string.IsNullOrEmpty(OI.Organize.JobTitle) ? "" : OI.Account.Name_First + OI.Account.Name_Last,
+                                ActiceFlag = OI.ActiveFlag
+                            };
+                        }
+                    }
+                }
+
+            }
+
+            
+            for(int j=0;j< YCt;j++)
+            {
+                ALS = new ArrayList();
+                for (int i = 0; i < XCt; i++)
+                {
+                    if(T[i, j]!=null)
+                    {
+                        ALS.Add(T[i, j].Title);
+                        if (!string.IsNullOrEmpty(T[i, j].ACName))
+                            ALS.Add(T[i, j].ACName);
+                    }
+                    else
+                    {
+                        ALS.Add("--");
+                        ALS.Add("--");
+                    }
+                }
+                AL.Add((string[])ALS.ToArray(typeof(string)));
+            }
+
+            WriteExcelFromString("組織與職分管理列表", AL);
+            SetAlert("已完成匯出", 1);
+            return View();
+        }
+        private class OITable
+        {
+            public int OID = 0;
+            public int OIID = 0;
+            public int POID = 0;
+            public int POIID = 0;
+            public string Title = "";
+            public string ACName = "";
+            public bool ActiceFlag = false;
+        }
+
+
         #endregion
 
         #region 主日聚會點-列表
@@ -984,7 +1099,7 @@ namespace Banner.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Meeting_Location_Edit(int ItemID, int ID, FormCollection FC)
         {
             GetViewBag();

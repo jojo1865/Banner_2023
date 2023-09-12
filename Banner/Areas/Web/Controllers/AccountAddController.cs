@@ -106,7 +106,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Step1(FormCollection FC)
         {
             GetViewBag();
@@ -368,7 +368,7 @@ namespace Banner.Areas.Web.Controllers
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Step2(FormCollection FC)
         {
             GetViewBag();
@@ -571,7 +571,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Step3(FormCollection FC)
         {
             GetViewBag();
@@ -736,9 +736,8 @@ namespace Banner.Areas.Web.Controllers
                         ControlName = "ddl_Join" + i + "_TimeNo_" + j,
                         ddlList = new List<SelectListItem>()
                     };
-                    cJ.ddl_Weekly.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
                     cJ.ddl_Time.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-                    for (int k = 0; k < sWeeks.Length; k++)
+                    for (int k = 1; k < sWeeks.Length; k++)
                         cJ.ddl_Weekly.ddlList.Add(new SelectListItem { Text = sWeeks[k], Value = (k + 1).ToString() });
                     for (int k = 0; k < sTimeSpans.Length; k++)
                         cJ.ddl_Time.ddlList.Add(new SelectListItem { Text = sTimeSpans[k], Value = (k + 1).ToString() });
@@ -845,7 +844,7 @@ namespace Banner.Areas.Web.Controllers
 
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Step4(FormCollection FC)
         {
             GetViewBag();

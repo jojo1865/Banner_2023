@@ -57,7 +57,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Login(FormCollection FC)
         {
             GetViewBag();
@@ -153,7 +153,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult ForgetPassword(FormCollection FC)
         {
             GetViewBag();
@@ -227,7 +227,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult ForgetAccount(FormCollection FC)
         {
             GetViewBag();
@@ -305,7 +305,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult ChangePassword(FormCollection FC)
         {
             GetViewBag();
@@ -611,7 +611,7 @@ namespace Banner.Areas.Admin.Controllers
             bool CheckFileFlag = true;
             if (file_upload.ContentLength <= 0 || file_upload.ContentLength > 5242880)
                 CheckFileFlag = false;
-            else if (file_upload.ContentType != "image/png" || file_upload.ContentType != "image/jpeg")
+            else if (file_upload.ContentType != "image/png" && file_upload.ContentType != "image/jpeg")
                 CheckFileFlag = false;
             if (CheckFileFlag)
             {

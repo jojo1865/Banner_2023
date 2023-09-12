@@ -611,6 +611,8 @@
     <Content Include="Areas\Admin\Views\Course\Teacher_List.cshtml" />
     <Content Include="Areas\Admin\Views\Course\Teacher_Edit.cshtml" />
     <Content Include="Areas\Admin\Views\StoreSet\Product_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\ProductClass_List.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\ProductClass_Edit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -652,7 +654,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Files\Down\" />
     <Folder Include="Files\Product\" />
-    <Folder Include="Photo\" />
+    <Folder Include="Photo\Product\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -98,7 +98,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCourseCategory(null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Category_List(FormCollection FC)
         {
             GetViewBag();
@@ -151,7 +151,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCategory_Edit(ID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Category_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -266,7 +266,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCourse_List(ID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Course_List(int ID = 0, FormCollection FC = null)
         {
             GetViewBag();
@@ -542,7 +542,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCourse_Edit(ID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Course_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -650,7 +650,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetTeacher_List(null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Teacher_List(FormCollection FC)
         {
             GetViewBag();
@@ -700,7 +700,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetTeacher_Edit(ID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Teacher_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

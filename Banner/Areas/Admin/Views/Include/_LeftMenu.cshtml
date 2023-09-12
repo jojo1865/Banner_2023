@@ -64,9 +64,9 @@
                                 <ul>
                                     @foreach (var M2 in M1.Items.OrderBy(q => q.SortNo))
                                     {
-                                        <li class="menuitem @(M2.Items.Count>0 ? "more" :"")">
+                                        <li class="menuitem @(M2.Items.Count>0 && false ? "more" :"")">
                                             @{
-                                                if (M2.Items.Count > 0)
+                                                /*if (M2.Items.Count > 0)
                                                 {
                                                     <a data-bs-toggle="collapse" href="#collapse-submenu-@(M2.MenuID)" class="@(M2.SelectFlag ? "active" :"")">
                                                         <div class="point"></div>
@@ -74,7 +74,7 @@
                                                         <span class="material-icons"> chevron_right </span>
                                                     </a>
                                                 }
-                                                else
+                                                else*/
                                                 {
                                                     <a href="@M2.Url" class="@(M2.SelectFlag ? "active" :"")">
                                                         <div class="point"></div>
@@ -84,7 +84,7 @@
                                                 }
                                             }
 
-                                            @if (M2.Items.Count > 0)
+                                            @if (M2.Items.Count > 0 && false)
                                             {
                                                 <div id="collapse-submenu-@(M2.MenuID)" class="submenu-container collapse">
                                                     <ul>

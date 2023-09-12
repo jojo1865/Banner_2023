@@ -3,14 +3,19 @@
     ViewBag.Title = "Category_Edit";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
 }
-
+<style>
+    .pt-40{
+        padding-top:40px;
+    }
+</style>
 <div class="main-container">
     <div class="form-container-list">
         <div class="form-container">
             <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
             @if (Model != null)
             {
-                <form method="post" id="form1">
+                string DateFormat = "yyyy-MM-dd";
+                <form method="post" id="form1" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <div class="form-body">
                         <div class="form-card-group">
@@ -66,6 +71,23 @@
                                         @Html.TextArea("txb_GraduationInfo", Model.P.GraduationInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
                                     </div>
                                     <div class="form-group">
+                                        <label>前台顯示</label>
+                                        <div class="row">
+                                            <div class="col-auto">
+                                                <div class="form-check form-check-inline">
+                                                    @Html.RadioButton("cbox_ShowFlag", true, Model.P.ShowFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
+                                                    @Html.Label("已顯示", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="form-check form-check-inline">
+                                                    @Html.RadioButton("cbox_ShowFlag", false, !Model.P.ShowFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
+                                                    @Html.Label("已隱藏", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label>啟用狀態</label>
                                         <div class="row">
                                             <div class="col-auto">
@@ -100,7 +122,93 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-body mt-4">
+                        <div class="form-card-group">
+                            <div id="personal-info" class="header-container">
+                                <div class="header-left-border"></div>
+                                <div class="header">課程細節設定</div>
+                            </div>
+                            <div class="form-group">
+                                <label>課程年度</label>
+                                @Html.DropDownList("ddl_Year", Model.Years.ddlList, new { @class = "form-select form-control-lg" })
+                            </div>
+                            <div class="form-group">
+                                <label>梯次</label>
+                                @Html.DropDownList("ddl_EchelonNo", Model.Echelons.ddlList, new { @class = "form-select form-control-lg" })
+                            </div>
+                            <div class="form-group">
+                                <label>圖片</label><br />
+                                <input type="file" name="file_upload" />
+                                @if (Model.P.ImgURL != "")
+                                {
+                                    <br /><img style="height:100px;" src="@Model.P.ImgURL" />
+                                }
+                            </div>
+                            <div class="form-group">
 
+                                <div class="row">
+                                    <div class="col-lg-6 col-12">
+                                        <label>原價<span>*</span></label>
+                                        @Html.TextBox("txb_Price_Basic", Model.P.Price_Basic, new { @class = "form-control form-control-lg input-underline", @type = "number", @min = "0" })
+                                    </div>
+                                    <div class="col-lg-6 col-12">
+                                        <label>早鳥價</label>
+                                        @Html.TextBox("txb_Price_Early", Model.P.Price_Early, new { @class = "form-control form-control-lg input-underline", @type = "number", @min = "0" })
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-6 col-12">
+                                        <label>開課起始日<span>*</span></label>
+                                        @Html.TextBox("txb_SDate",(Model.P.SDate.Date >= Model.P.CreDate.Date ? Model.P.SDate.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                    </div>
+                                    <div class="col-lg-6 col-12">
+                                        <label>開課結束日<span>*</span></label>
+                                        @Html.TextBox("txb_EDate", (Model.P.EDate.Date >= Model.P.CreDate.Date ? Model.P.EDate.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-6 col-12">
+                                        <label>早鳥起始日</label>
+                                        @Html.TextBox("txb_SDate_Early", (Model.P.SDate_Early.Date >= Model.P.CreDate.Date ? Model.P.SDate_Early.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                    </div>
+                                    <div class="col-lg-6 col-12">
+                                        <label>早鳥結束日</label>
+                                        @Html.TextBox("txb_EDate_Early", (Model.P.EDate_Early.Date >= Model.P.CreDate.Date ? Model.P.EDate_Early.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-6 col-12">
+                                        <label>臨櫃報名起始日</label>
+                                        @Html.TextBox("txb_SDate_Signup_OnSite", (Model.P.SDate_Signup_OnSite.Date >= Model.P.CreDate.Date ? Model.P.SDate_Signup_OnSite.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                    </div>
+                                    <div class="col-lg-6 col-12">
+                                        <label>臨櫃報名結束日</label>
+                                        @Html.TextBox("txb_EDate_Signup_OnSite", (Model.P.EDate_Signup_OnSite.Date >= Model.P.CreDate.Date ? Model.P.EDate_Signup_OnSite.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-6 col-12">
+                                        <label>線上報名起始日</label>
+                                        @Html.TextBox("txb_SDate_Signup_OnLine", (Model.P.SDate_Signup_OnLine.Date >= Model.P.CreDate.Date ? Model.P.SDate_Signup_OnLine.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                    </div>
+                                    <div class="col-lg-6 col-12">
+                                        <label>線上報名結束日</label>
+                                        @Html.TextBox("txb_EDate_Signup_OnLine", (Model.P.EDate_Signup_OnLine.Date >= Model.P.CreDate.Date ? Model.P.EDate_Signup_OnLine.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-body mt-4">
                         <div class="form-card-group">
                             <div id="personal-info" class="header-container">
@@ -121,12 +229,12 @@
                                     }
                                     <input type="hidden" id="txb_AddCourseCt" name="txb_AddCourseCt" value="0" />
                                     <div id="div_BeforeCourse">
-                                        @foreach (var PB in Model.PBs.Where(q => q.PRID > 0).OrderBy(q => q.PRID))
+                                        @foreach (var PB in Model.PBs.Where(q => q.PRID > 0 && q.CRID==0).OrderBy(q => q.PRID))
                                         {
                                             <div id="div_AddCourse_@PB.PRID" class="mt-3">
                                                 <div class="row">
                                                     <div class="col-lg-4 col-12">
-                                                        @Html.DropDownList("ddl_CCDB_" + PB.PRID, PB.CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this);" })
+                                                       @Html.DropDownList("ddl_CCDB_" + PB.PRID, PB.CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this);" })
                                                     </div>
                                                     <div class="col-lg-6 col-12">
                                                         @Html.DropDownList("ddl_CCDB_" + PB.PRID, PB.CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this);" })
@@ -142,11 +250,10 @@
                                             <div id="div_AddCourse_@PB.PRID" class="mt-3">
                                                 <div class="row">
                                                     <div class="col-lg-4 col-12">
-                                                        @Html.Label(PB.CCSL_Before.FirstOrDefault(q => q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
-
+                                                       @Html.Label(PB.CCSL_Before.FirstOrDefault(q => q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
                                                     </div>
                                                     <div class="col-lg-6 col-12">
-                                                        @Html.Label(PB.CSL_Before.FirstOrDefault(q => q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
+                                                        @Html.Label(PB.CSL_Before.First().Text, new { @class = "form-select form-control-lg lab_gray" })
                                                     </div>
                                                     <div class="col-lg-2 col-12 text-lg-end text-start">
                                                     </div>
@@ -171,7 +278,7 @@
                                         {
                                             @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input" });
                                         }
-                                        else if (PR2.PRID == 0)
+                                        else if (PR2.PRID == 0 || PR2.CRID>0)
                                         {
                                             @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input", @disabled = "true" });
                                         }
@@ -186,7 +293,7 @@
                                         {
                                             @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input" });
                                         }
-                                        else if (PR2.PRID == 0)
+                                        else if (PR2.PRID == 0 || PR2.CRID > 0)
                                         {
                                             @Html.RadioButton("rbl_Sex", 1, iSex == 1, new { @id = "cbox_Sex1", @class = "form-check-input", @disabled = "true" });
                                         }
@@ -201,7 +308,7 @@
                                         {
                                             @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input" });
                                         }
-                                        else if (PR2.PRID == 0)
+                                        else if (PR2.PRID == 0 || PR2.CRID > 0)
                                         {
                                             @Html.RadioButton("rbl_Sex", 0, iSex == 0, new { @id = "cbox_Sex2", @class = "form-check-input", @disabled = "true" });
                                         }
@@ -229,9 +336,9 @@
                                             {
                                                 @Html.TextBox("txb_Age_Min", iAge_Min, new { @class = "form-control form-control-lg input-underline", @type = "number" })
                                             }
-                                            else if (PR3.PRID == 0)
+                                            else if (PR3.PRID == 0 || PR3.CRID > 0)
                                             {
-                                                @Html.TextBox("txb_Age_Min", iAge_Min, new { @class = "form-control form-control-lg input-underline lab_gray",@disabled=true })
+                                                @Html.TextBox("txb_Age_Min", iAge_Min, new { @class = "form-control form-control-lg input-underline lab_gray", @disabled = true })
                                             }
                                             else
                                             {
@@ -246,7 +353,7 @@
                                             {
                                                 @Html.TextBox("txb_Age_Max", iAge_Max, new { @class = "form-control form-control-lg input-underline", @type = "number" })
                                             }
-                                            else if (PR3.PRID == 0)
+                                            else if (PR3.PRID == 0 || PR3.CRID > 0)
                                             {
                                                 @Html.TextBox("txb_Age_Max", iAge_Max, new { @class = "form-control form-control-lg input-underline lab_gray", @disabled = true })
                                             }
@@ -267,14 +374,14 @@
                                         if (Model.OSL.SortNo > 0)
                                         {
                                             <div class="form-check form-check-inline">
-                                                @Html.CheckBox("cbox_O" + CR1.Value, CR1.Selected, new { @id = "cbox_O" + CR1.Value, @class = "form-check-input cbox_Os",@disabled=true })
+                                                @Html.CheckBox("cbox_O_" + CR1.Value, CR1.Selected, new { @id = "cbox_O" + CR1.Value, @class = "form-check-input cbox_Os", @disabled = true })
                                                 @Html.Label(CR1.Text, new { @class = "form-check-label", @for = "cbox_O" + CR1.Value })
                                             </div>
                                         }
                                         else
                                         {
                                             <div class="form-check form-check-inline">
-                                                @Html.CheckBox("cbox_O" + CR1.Value, CR1.Selected, new { @id = "cbox_O" + CR1.Value, @class = "form-check-input cbox_Os" })
+                                                @Html.CheckBox("cbox_O_" + CR1.Value, CR1.Selected, new { @id = "cbox_O" + CR1.Value, @class = "form-check-input cbox_Os" })
                                                 @Html.Label(CR1.Text, new { @class = "form-check-label", @for = "cbox_O" + CR1.Value })
                                             </div>
                                         }
@@ -284,6 +391,8 @@
                             </div>
                         </div>
                     </div>
+
+
                 </form>
             }
         </div>
@@ -317,6 +426,8 @@
         </div>
     </div>
 </div>
+
+
 <div class="action-bar">
     @if (Model != null)
     {
@@ -326,12 +437,13 @@
                 <i class="fa-solid fa-floppy-disk"></i>儲存
             </a>
         }
-        <a href="/Admin/Course/Course_List/0" class="btn btn-outline-primary btn-lg btn-round">
+        <a href="/Admin/StoreSet/Product_List/" class="btn btn-outline-primary btn-lg btn-round">
             <i class="fa-solid fa-xmark"></i>取消
         </a>
     }
 </div>
 <script>
+    //新增一行課程
     function AddRow1() {
         var sCt = document.getElementById('txb_AddCourseCt');
         var iCt = parseInt(sCt.value) + 1;
@@ -342,6 +454,7 @@
         document.getElementById('div_BeforeCourse').innerHTML += str;
         sCt.value = iCt;
     }
+    
     /*取得課程選單*/
     function GetCourseddl(ddl, CID) {
         var sControlTitle = '';
@@ -470,6 +583,12 @@
     }
     function RemoveRow(RowID) {
         document.getElementById(RowID).remove();
+    }
+    //選擇教師
+    function ShowTeacher() {
+        Swal.fire({
+            html: ''
+        });
     }
 </script>
 

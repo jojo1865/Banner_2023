@@ -198,9 +198,8 @@ namespace Banner.Areas.Web.Controllers
                         ControlName = "ddl_Join" + i + "_TimeNo_" + j,
                         ddlList = new List<SelectListItem>()
                     };
-                    cJ.ddl_Weekly.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
                     cJ.ddl_Time.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-                    for (int k = 0; k < sWeeks.Length; k++)
+                    for (int k = 1; k < sWeeks.Length; k++)
                         cJ.ddl_Weekly.ddlList.Add(new SelectListItem { Text = sWeeks[k], Value = (k + 1).ToString() });
                     for (int k = 0; k < sTimeSpans.Length; k++)
                         cJ.ddl_Time.ddlList.Add(new SelectListItem { Text = sTimeSpans[k], Value = (k + 1).ToString() });
@@ -509,7 +508,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GerAccountData(ACID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult BasicData(FormCollection FC)
         {
             GetViewBag();
@@ -854,7 +853,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetFamilyData(null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult FamilyData(FormCollection FC)
         {
             GetViewBag();
@@ -994,7 +993,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetBankData(null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult BankData(FormCollection FC)
         {
             GetViewBag();
@@ -1065,7 +1064,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetPerformanceData(null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         //[HandleError(ExceptionType = typeof(HttpAntiForgeryException), View = "/Web/Home/CSRF")]
         public ActionResult PerformanceData(FormCollection FC)
         {

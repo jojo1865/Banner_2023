@@ -43,7 +43,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cBUL);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult BackUser_List(FormCollection FC)
         {
             GetViewBag();
@@ -250,7 +250,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(cBUE);
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult BackUser_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -494,7 +494,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetMenu_List(null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Menu_List(FormCollection FC)
         {
             GetViewBag();
@@ -566,7 +566,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetMenu_Edit(ItemID, ID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Menu_Edit(string ItemID, int ID, FormCollection FC)
         {
             GetViewBag();
@@ -682,7 +682,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetRool_List(null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Rool_List(FormCollection FC)
         {
             GetViewBag();
@@ -805,7 +805,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetRool_Edit(ID, null));
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Rool_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

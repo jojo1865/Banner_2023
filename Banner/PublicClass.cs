@@ -26,6 +26,7 @@ using OfficeOpenXml;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Data.SqlTypes;
+using System.Web.Helpers;
 
 namespace Banner
 {
@@ -33,7 +34,7 @@ namespace Banner
     {
         public DataClassesDataContext DC { get; set; }
         public DateTime DT = DateTime.Now;
-        public string[] sWeeks = new string[] { "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" };
+        public string[] sWeeks = new string[] { "請選擇", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" };
         public string[] sTimeSpans = new string[] { "上午", "下午", "晚上" };
         public string sPhotoFileName = "Photo";//圖片存檔資料夾名稱
         public string sNoPhoto = "/Photo/NoPhoto.jpg";
@@ -2111,7 +2112,8 @@ namespace Banner
                     var cell = sheet.Cells[i + 1, j + 1, i + 1, j + 1];
                     if (ECs[j].bColor)
                     {
-                        //cell.Style.Fill.BackgroundColor.SetColor(Color.Red);//ECs[j].cBagColor
+                        cell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                        cell.Style.Fill.BackgroundColor.SetColor(ECs[j].cBagColor);
                         cell.Style.Font.Color.SetColor(ECs[j].cFontColor);
                     }
                     cell.Value = ECs[j].sValue;
@@ -2255,7 +2257,7 @@ namespace Banner
 
             ViewBag._CSS1 = "";
             ViewBag._URL = NowURL;
-            string ShortURL = Request.RawUrl;
+            string ShortURL = Request.RawUrl.Split('?')[0];
             if (ShortURL.ToLower().Contains("/admin/"))
             {
                 ViewBag._CSS1 = "/Areas/Admin/Content/CSS/" + (ShortURL.Contains("_List") ? "list.css" : "form.css");
@@ -2318,6 +2320,8 @@ namespace Banner
             TempData["_url"] = NowURL;
             TempData["OID"] = "0";//組織層級ID
             TempData["OITitle"] = "";//組織搜尋用關鍵字
+
+            CheckVCookie();
         }
         /*private void SetResponseVerify()
         {
@@ -2332,6 +2336,49 @@ namespace Banner
                 }
             }
         }*/
+        /// <summary>
+        /// 修正 需要的反仿冒 Cookie "__RequestVerificationToken" 不存在。 錯誤
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public string CheckVCookie()
+        {
+            try
+            {
+                const string __RequestVerificationToken = "__RequestVerificationToken";
+                HttpCookie cookie = Request.Cookies[__RequestVerificationToken];
+
+                // check for null
+                if (cookie == null)
+                {
+                    // no cookie found, create it... or respond with an error
+                    throw new NotImplementedException();
+                }
+
+                // grab the cookie
+                AntiForgery.GetTokens(
+                    Request.Form[__RequestVerificationToken],
+                    out string cookieToken,
+                    out string formToken);
+
+                if (!String.IsNullOrEmpty(cookieToken))
+                {
+                    // update the cookie value(s)
+                    cookie.Values[__RequestVerificationToken] = cookieToken;
+                    //...
+                }
+
+                // update the expiration timestamp
+                cookie.Expires = DateTime.UtcNow.AddDays(30);
+
+                // overwrite the cookie
+                Response.Cookies.Add(cookie);
+
+                // return the NEW token!
+                return cookieToken;
+            }
+            catch { return ""; }
+        }
         public void ChangeTitle(bool AddFlag)
         {
             ViewBag._Title += " " + (AddFlag ? "新增" : "編輯");
