@@ -146,6 +146,7 @@
       <Column Name="CourseInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="TargetInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="GraduationInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="ClassicalFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
@@ -509,12 +510,16 @@
       <Column Name="PCID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="LoopFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TargetDate" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
       <Column Name="WeeklyNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="STime" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
       <Column Name="ETime" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
       <Column Name="PeopleCt" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="PhoneNo" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="LocationName" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
       <Column Name="Address" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
+      <Column Name="MeetURL" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
@@ -535,6 +540,20 @@
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Product_Product_File" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Product_Rool" Member="Product_Rool">
+    <Type Name="Product_Rool">
+      <Column Name="PRID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CRID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TargetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TargetInt1" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TargetInt2" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Product_Product_Rool" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Rool" Member="Rool">
@@ -610,20 +629,6 @@
       <Column Name="OITitle_1" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
       <Column Name="OIID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="OID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Product_Rool" Member="Product_Rool">
-    <Type Name="Product_Rool">
-      <Column Name="PRID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="CRID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetInt1" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetInt2" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Product_Product_Rool" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

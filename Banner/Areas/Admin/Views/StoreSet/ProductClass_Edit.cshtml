@@ -10,7 +10,8 @@
             <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
             @if (Model != null)
             {
-                string TimeFormat = "HH:mm";
+                //string TimeFormat = "HH:mm";
+                string DateFormat = "yyyy-MM-dd";
                 <form method="post" id="form1" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
 
@@ -21,22 +22,55 @@
                                 <div class="header">班級設定設定</div>
                             </div>
                             <div class="form-group">
-                                <label>班級名稱</label>
+                                <label>班級名稱<span>*</span></label>
                                 @Html.TextBox("txb_Title", Model.PC.Title, new { @class = "form-control form-control-lg input-underline" })
                             </div>
                             <div class="form-group">
+                                <label>上課週期<span>*</span></label>
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("cbox_LoopFlag", true, Model.PC.LoopFlag, new { @id = "cbox_LoopFlag1", @class = "form-check-input", @onchange = "ShowLoop(1);" })
+                                            @Html.Label("每周", new { @class = "form-check-label", @for = "cbox_LoopFlag1" })
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("cbox_LoopFlag", false, !Model.PC.LoopFlag, new { @id = "cbox_LoopFlag2", @class = "form-check-input", @onchange = "ShowLoop(0);" })
+                                            @Html.Label("只有一天", new { @class = "form-check-label", @for = "cbox_LoopFlag2" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @{ 
+                                string d_Loop0 = "none";
+                                string d_Loop1 = "none";
+                                if(Model.PC.LoopFlag)
+                                {
+                                    d_Loop1 = "block";
+                                }
+                                else
+                                {
+                                    d_Loop0 = "block";
+                                }
+                            }
+                            <div class="form-group" style="display:@(d_Loop0)" id="div_Loop_0">
+                                <label>上課日期<span>*</span></label>
+                                @Html.TextBox("txb_TargetDate", Model.PC.TargetDate.ToString(DateFormat), new { @class = "form-control form-control-lg input-underline", type = "date" })
+                            </div>
+                            <div class="form-group" style="display:@(d_Loop1)" id="div_Loop_1_1">
                                 <label>週期選擇<span>*</span></label>
                                 @Html.DropDownList("ddl_Week", Model.LS_Week.ddlList, new { @class = "form-select form-control-lg" })
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="display:@(d_Loop1)" id="div_Loop_1_2">
                                 <label>上課時間<span>*</span></label>
                                 <div class="row">
                                     <div class="col-auto">
-                                        @Html.TextBox("txb_STime", Model.PC.STime.ToString(TimeFormat), new { @class = "form-control form-control-lg input-underline", @type = "time" })
+                                        @Html.TextBox("txb_STime", Model.PC.STime, new { @class = "form-control form-control-lg input-underline", @type = "time" })
                                     </div>
                                     <div class="col-auto">~</div>
                                     <div class="col-auto">
-                                        @Html.TextBox("txb_ETime", Model.PC.ETime.ToString(TimeFormat), new { @class = "form-control form-control-lg input-underline", @type = "time" })
+                                        @Html.TextBox("txb_ETime", Model.PC.ETime, new { @class = "form-control form-control-lg input-underline", @type = "time" })
                                     </div>
                                 </div>
                             </div>
@@ -45,12 +79,37 @@
                                 @Html.TextBox("txb_PeopleCt", Model.PC.PeopleCt, new { @class = "form-control form-control-lg input-underline", @type = "number", @min = "0" })
                             </div>
                             <div class="form-group">
-                                <label>電話</label>
-                                @Html.TextBox("txb_PhoneNo", Model.PC.PhoneNo, new { @class = "form-control form-control-lg input-underline"})
+                                <label>地點名稱</label>
+                                @Html.TextBox("txb_LocationName", Model.PC.LocationName, new { @class = "form-control form-control-lg input-underline" })
                             </div>
                             <div class="form-group">
-                                <label>地址/網址</label>
+                                <label>電話</label>
+                                @Html.TextBox("txb_PhoneNo", Model.PC.PhoneNo, new { @class = "form-control form-control-lg input-underline" })
+                            </div>
+                            @{ 
+                                string s_Address = "none";
+                                string s_Meet = "none";
+                                switch(Model.ProductType)
+                                {
+                                    default:
+                                        s_Address = "block";
+                                        s_Meet = "block";
+                                        break;
+                                    case 1:
+                                        s_Address = "block";
+                                        break;
+                                    case 2:
+                                        s_Meet = "block";
+                                        break;
+                                }
+                                            }
+                            <div class="form-group" style="display:@(s_Address)">
+                                <label>班級地址</label>
                                 @Html.TextBox("txb_Address", Model.PC.Address, new { @class = "form-control form-control-lg input-underline" })
+                            </div>
+                            <div class="form-group" style="display:@(s_Meet)">
+                                <label>線上網址</label>
+                                @Html.TextBox("txb_MeetURL", Model.PC.MeetURL, new { @class = "form-control form-control-lg input-underline" })
                             </div>
                         </div>
                     </div>
@@ -63,8 +122,8 @@
 <div class="action-bar">
     @if (Model != null)
     {
-        if ((((bool[])ViewBag._Power)[1] && Model.PC.PCID == 0) || (((bool[])ViewBag._Power)[2] && Model.PC.PCID > 0))
-        {
+                                    if ((((bool[])ViewBag._Power)[1] && Model.PC.PCID == 0) || (((bool[])ViewBag._Power)[2] && Model.PC.PCID > 0))
+                                    {
             <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-submit btn-lg btn-round btn-submit">
                 <i class="fa-solid fa-floppy-disk"></i>儲存
             </a>
@@ -74,3 +133,20 @@
         </a>
     }
 </div>
+<script>
+    function ShowLoop(i) {
+                                    var d0 = document.getElementById('div_Loop_0');
+                                    var d11 = document.getElementById('div_Loop_1_1');
+                                    var d12 = document.getElementById('div_Loop_1_2');
+                                    if (i == 0) {
+                                        d0.style.display = 'block';
+                                        d11.style.display = 'none';
+                                        d12.style.display = 'none';
+                                    }
+                                    else if (i == 1) {
+                                        d0.style.display = 'none';
+                                        d11.style.display = 'block';
+                                        d12.style.display = 'block';
+                                    }
+                                }
+</script>

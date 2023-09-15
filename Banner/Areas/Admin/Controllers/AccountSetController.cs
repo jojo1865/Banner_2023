@@ -627,7 +627,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Account_Aldult_List(FormCollection FC)
         {
             GetViewBag();
@@ -1503,7 +1502,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Account_Childen_List(FormCollection FC)
         {
             GetViewBag();
@@ -1532,7 +1530,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Account_New_List(FormCollection FC)
         {
             GetViewBag();
@@ -1732,7 +1729,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(cAL);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Account_Baptized_List(FormCollection FC)
         {
             GetViewBag();

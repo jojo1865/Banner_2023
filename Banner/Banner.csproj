@@ -148,6 +148,7 @@
     <Compile Include="Areas\Web\Controllers\AccountAddController.cs" />
     <Compile Include="Areas\Web\Controllers\AccountPlaceController.cs" />
     <Compile Include="Areas\Web\Controllers\ChildrenAddController.cs" />
+    <Compile Include="Areas\Web\Controllers\ClassStoreController.cs" />
     <Compile Include="Areas\Web\Controllers\GroupPlaceController.cs" />
     <Compile Include="Areas\Web\Controllers\HomeController.cs" />
     <Compile Include="Areas\Web\Controllers\IncludeController.cs" />
@@ -300,6 +301,7 @@
     <Content Include="Areas\Web\Content\Img\basic-data.svg" />
     <Content Include="Areas\Web\Content\Img\body-bg.svg" />
     <Content Include="Areas\Web\Content\Img\cancel.svg" />
+    <Content Include="Areas\Web\Content\Img\class_index.svg" />
     <Content Include="Areas\Web\Content\Img\cloud.svg" />
     <Content Include="Areas\Web\Content\Img\delete.png" />
     <Content Include="Areas\Web\Content\Img\eye-slash.png" />
@@ -613,6 +615,9 @@
     <Content Include="Areas\Admin\Views\StoreSet\Product_Edit.cshtml" />
     <Content Include="Areas\Admin\Views\StoreSet\ProductClass_List.cshtml" />
     <Content Include="Areas\Admin\Views\StoreSet\ProductClass_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\ProductClassTeacher_List.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\ProductAllowAccount_List.cshtml" />
+    <Content Include="Areas\Web\Views\ClassStore\Index.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

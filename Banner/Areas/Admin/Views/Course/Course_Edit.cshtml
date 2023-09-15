@@ -51,6 +51,23 @@
                                     @Html.TextArea("txb_GraduationInfo", Model.C.GraduationInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
                                 </div>
                                 <div class="form-group">
+                                    <label>經典課程</label>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("cbox_ClassicalFlag", true, Model.C.ClassicalFlag, new { @id = "cbox_ClassicalFlag1", @class = "form-check-input" })
+                                                @Html.Label("是", new { @class = "form-check-label", @for = "cbox_ClassicalFlag1" })
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("cbox_ClassicalFlag", false, !Model.C.ClassicalFlag, new { @id = "cbox_ClassicalFlag2", @class = "form-check-input" })
+                                                @Html.Label("否", new { @class = "form-check-label", @for = "cbox_ClassicalFlag2" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label>啟用狀態</label>
                                     <div class="row">
                                         <div class="col-auto">

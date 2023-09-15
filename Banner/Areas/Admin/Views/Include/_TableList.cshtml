@@ -211,7 +211,7 @@
                                 <div class="aux-empty">&nbsp;</div>
                                 <div class="pagination-button-group">
                                     @{
-                                        int iMin = (Model.NowPage / Model.NumCut - (Model.NowPage % Model.NumCut == 0 ? 1 : 0)) * Model.NumCut + 1;
+                                        int iMin = (Model.NowPage / (Model.NumCut - (Model.NowPage % Model.NumCut == 0 ? 1 : 0))) * Model.NumCut + 1;
                                         if (iMin <= 0) { iMin = 1; }
                                         if (Model.NowPage > 1)
                                         {

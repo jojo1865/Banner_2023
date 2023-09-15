@@ -490,7 +490,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetOrganize_Info_List(ItemID, OID, OIID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Organize_Info_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
             GetViewBag();
@@ -864,7 +863,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetOrganize_Info_Account_List(ItemID, OID, OIID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Organize_Info_Account_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
             GetViewBag();

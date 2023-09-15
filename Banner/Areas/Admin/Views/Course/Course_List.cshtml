@@ -11,9 +11,9 @@
     </div>
     <div class="body-container">
         <form method="post" id="form1">
-            @Html.AntiForgeryToken()
             @if (Model != null)
             {
+
                 <div class="search-form">
                     <div class="search-form-section">
                         <div class="row">
@@ -44,6 +44,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="table-container">
                     @if (((bool[])ViewBag._Power)[1])
                     {
@@ -55,9 +56,9 @@
                     }
 
                     @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+
                 </div>
             }
-
         </form>
     </div>
 </div>

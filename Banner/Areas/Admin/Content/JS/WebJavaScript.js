@@ -248,6 +248,33 @@ function ChangeActive(TargetControl,TableName, ID) {
     })
     
 }
+//變更講師
+function ChangeTeacher(TargetControl, TID, PCID) {
+    $.ajax({
+        url: '/Admin/Home/ChangeTeacher?TID=' + TID + '&PCID=' + PCID,
+        method: 'GET',
+        dataType: 'text',
+        success: function (res) {
+            if (TargetControl.classList.contains('btn-outline-success')) {
+                TargetControl.classList.replace('btn-outline-success', 'btn-outline-danger');
+                TargetControl.innerHTML = '未指定';
+            }
+            else {
+                TargetControl.classList.replace('btn-outline-danger', 'btn-outline-success');
+                TargetControl.innerHTML = '已指定';
+            }
+
+            Swal.fire({
+                icon: 'success',
+                html: '存檔完成'
+            }).then((result) => {
+                location.reload();
+            });
+            
+        },
+        error: function (err) { console.log(err) },
+    })
+}
 //如期受洗
 function Baptized(ACID) {
     $.ajax({

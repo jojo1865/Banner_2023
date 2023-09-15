@@ -19,7 +19,11 @@ namespace Banner.Areas.Admin.Controllers
         // GET: Admin/Shared
         public PartialViewResult _LeftMenu()
         {
-            string sURL = GetShortURL().Replace("_Edit", "_List").Replace("ProductClass_", "Product_").Replace("ProductAccount_", "Product_").Split('?')[0];
+            string sURL = GetShortURL()
+                .Replace("_Edit", "_List")
+                .Replace("ProductClass_", "Product_")
+                .Replace("ProductClassTeacher_", "Product_")
+                .Replace("ProductAllowAccount_", "Product_").Split('?')[0];
             if (!sURL.Contains("_Info_List"))
                 sURL = sURL.Replace("_Info", "_List");
 

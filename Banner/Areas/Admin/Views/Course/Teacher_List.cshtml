@@ -1,4 +1,4 @@
-﻿@model Banner.Areas.Admin.Controllers.CourseController.cTeacher_List
+﻿@model Banner.Models.cTeacher_List
 @{
     ViewBag.Title = "Category_List";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
@@ -11,7 +11,6 @@
     </div>
     <div class="body-container">
         <form method="post" id="form1">
-            @Html.AntiForgeryToken()
             @if (Model != null)
             {
                 <div class="search-form">

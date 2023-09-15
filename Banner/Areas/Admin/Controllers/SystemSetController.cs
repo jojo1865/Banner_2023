@@ -43,7 +43,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(cBUL);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult BackUser_List(FormCollection FC)
         {
             GetViewBag();
@@ -494,7 +493,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetMenu_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Menu_List(FormCollection FC)
         {
             GetViewBag();
@@ -682,7 +680,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetRool_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Rool_List(FormCollection FC)
         {
             GetViewBag();

@@ -2321,7 +2321,7 @@ namespace Banner
             TempData["OID"] = "0";//組織層級ID
             TempData["OITitle"] = "";//組織搜尋用關鍵字
 
-            CheckVCookie();
+            //CheckVCookie();
         }
         /*private void SetResponseVerify()
         {

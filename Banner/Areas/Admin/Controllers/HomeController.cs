@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Ajax.Utilities;
+using Newtonsoft.Json;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 using System;
 using System.Collections.Generic;
@@ -497,6 +498,55 @@ namespace Banner.Areas.Admin.Controllers
             return Msg;
         }
         #endregion
+        #region 更新講師
+        public string ChangeTeacher(int TID, int PCID)
+        {
+            ACID = GetACID();
+            string Msg = "NG";
+
+            //目前設定是只能有一位講師
+            var MP = DC.M_Product_Teacher.FirstOrDefault(q => q.PCID == PCID);
+            if (MP == null)
+            {
+                var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == PCID);
+                if (PC != null)
+                {
+                    MP = new M_Product_Teacher
+                    {
+                        PID = PC.PID,
+                        PCID = PC.PCID,
+                        TID = TID,
+                        Title = "",
+                        Note = "",
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = ACID
+                    };
+                    DC.M_Product_Teacher.InsertOnSubmit(MP);
+                    DC.SubmitChanges();
+                }
+                else
+                    Msg = "查無此班級";
+            }
+            else
+            {
+                if (MP.TID != TID)//替換講師
+                {
+                    MP.TID = TID;
+                    MP.UpdDate = DT;
+                    MP.SaveACID = ACID;
+                    DC.SubmitChanges();
+                }
+                else//刪除講師但尚未指定新講師
+                {
+                    DC.M_Product_Teacher.DeleteOnSubmit(MP);
+                    DC.SubmitChanges();
+                }
+            }
+
+            return Msg;
+        }
+        #endregion
         #region 取得分類下課程選單
         [HttpGet]
         public string GetCourseCagegorySelect(int CCID, int CID = 0)
@@ -547,19 +597,19 @@ namespace Banner.Areas.Admin.Controllers
                 };
 
                 var CRs = C.Course_Rool.OrderBy(q => q.TargetType);
-                foreach(var CR in CRs)
+                foreach (var CR in CRs)
                 {
                     cCR c = new cCR();
                     c.CRID = CR.CRID;
                     c.TargetType = CR.TargetType;
-                    c.TargetInt1=CR.TargetInt1;
-                    c.TargetInt2=CR.TargetInt2;
+                    c.TargetInt1 = CR.TargetInt1;
+                    c.TargetInt2 = CR.TargetInt2;
                     switch (CR.TargetType)
                     {
                         case 0://先修課程ID[Course]
                             {
                                 var C_ = DC.Course.FirstOrDefault(q => q.CCID == CR.TargetInt1 && q.ActiveFlag && !q.DeleteFlag);
-                                if(C_!=null)
+                                if (C_ != null)
                                 {
                                     c.CC_Title = "【" + C_.Course_Category.Code + "】" + C_.Course_Category.Title;
                                     c.C_Title = C_.Title;
@@ -573,7 +623,7 @@ namespace Banner.Areas.Admin.Controllers
                                     c.Job_Title = O.JobTitle;
                             }
                             break;
-                        
+
                         case 4://事工團
                             {
 

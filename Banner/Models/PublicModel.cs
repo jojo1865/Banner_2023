@@ -113,4 +113,13 @@ namespace Banner.Models
         public int LV = 0;
         public List<cTree> children = new List<cTree>();
     }
+    //講師
+    public class cTeacher_List
+    {
+        public int PID = 0;
+        public int ActiveType = -1;
+        public string sKey = "";
+        public string sGroupKey = "";
+        public cTableList cTL = new cTableList();
+    }
 }

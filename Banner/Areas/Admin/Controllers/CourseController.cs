@@ -98,7 +98,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCourseCategory(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Category_List(FormCollection FC)
         {
             GetViewBag();
@@ -266,7 +265,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCourse_List(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Course_List(int ID = 0, FormCollection FC = null)
         {
             GetViewBag();
@@ -335,6 +333,7 @@ namespace Banner.Areas.Admin.Controllers
                     CourseInfo = "",
                     TargetInfo = "",
                     GraduationInfo = "",
+                    ClassicalFlag=false,
                     ActiveFlag = true,
                     DeleteFlag = false,
                     CreDate = DT,
@@ -388,6 +387,7 @@ namespace Banner.Areas.Admin.Controllers
                 N.C.CourseInfo = FC.Get("txb_CourseInfo");
                 N.C.TargetInfo = FC.Get("txb_TargetInfo");
                 N.C.GraduationInfo = FC.Get("txb_GraduationInfo");
+                N.C.ClassicalFlag = GetViewCheckBox(FC.Get("cbox_ClassicalFlag")); 
                 N.C.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
                 N.C.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
                 N.C.CourseType = Convert.ToInt32(FC.Get("rbl_CourseType"));
@@ -584,12 +584,7 @@ namespace Banner.Areas.Admin.Controllers
         #endregion
 
         #region 講師-列表
-        public class cTeacher_List
-        {
-            public int ActiveType = -1;
-            public string sKey = "";
-            public cTableList cTL = new cTableList();
-        }
+
         public cTeacher_List GetTeacher_List(FormCollection FC)
         {
             cTeacher_List N = new cTeacher_List();
@@ -650,7 +645,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetTeacher_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Teacher_List(FormCollection FC)
         {
             GetViewBag();

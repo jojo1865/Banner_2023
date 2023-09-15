@@ -99,7 +99,7 @@ namespace Banner.Areas.Admin.Controllers
             TopTitles.Add(new cTableCell { Title = "開課日期" });
             TopTitles.Add(new cTableCell { Title = "原價" });
             TopTitles.Add(new cTableCell { Title = "開班" });
-            TopTitles.Add(new cTableCell { Title = "會友限定" });
+            //TopTitles.Add(new cTableCell { Title = "會友限定" });
             TopTitles.Add(new cTableCell { Title = "顯示狀態" });
             TopTitles.Add(new cTableCell { Title = "交易狀態" });
 
@@ -119,7 +119,7 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Value = (N_.SDate.ToString(DateFormat) + (N_.SDate == N_.EDate ? "" : "<br/>↕<br/>" + N_.EDate.ToString(DateFormat))) });//開課日期
                 cTR.Cs.Add(new cTableCell { Value = N_.Price_Basic.ToString() });//原價
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_List?PID=" + N_.PID, Target = "_self", Value = "開班管理" });//班別
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductAllowAccount_List/" + N_.PID, Target = "_self", Value = "會友限定管理" });//限定會員
+                //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductAllowAccount_List/" + N_.PID, Target = "_self", Value = "指定名單" });//限定會員
                 cTR.Cs.Add(new cTableCell { Value = N_.ShowFlag ? "顯示" : "隱藏" });//顯示狀態
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "可交易" : "不可交易" });//交易狀態
                 N.cTL.Rs.Add(SetTableCellSortNo(cTR));
@@ -136,7 +136,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetProduct_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Product_List(FormCollection FC = null)
         {
             GetViewBag();
@@ -616,12 +615,14 @@ namespace Banner.Areas.Admin.Controllers
         #region 上架課程-班別列表
         public class cProductClass_List
         {
+            public int PID = 0;
             public string sKey = "";
             public cTableList cTL = new cTableList();
         }
         public cProductClass_List GetProductClass_List(int PID, FormCollection FC)
         {
             cProductClass_List N = new cProductClass_List();
+            N.PID = PID;
             N.sKey = FC != null ? FC.Get("txb_Key") : "";
             N.cTL.Rs = new List<cTableRow>();
             var Ns = DC.Product_Class.Where(q => q.PID > 0);
@@ -649,28 +650,27 @@ namespace Banner.Areas.Admin.Controllers
             foreach (var N_ in Ns)
             {
                 cTableRow cTR = new cTableRow();
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_Edit/" + N_.PCID, Target = "_self", Value = "編輯" });//編輯
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_Edit/" + N_.PCID + "?PID=" + N_.PID, Target = "_self", Value = "編輯" });//編輯
                 cTR.Cs.Add(new cTableCell { Value = N_.Product.Title });//課程名稱
                 cTR.Cs.Add(new cTableCell { Value = N_.Title });//班級名稱
                 cTR.Cs.Add(new cTableCell { Value = sWeeks[N_.WeeklyNo] });//星期
-                cTR.Cs.Add(new cTableCell { Value = N_.STime.ToString("HH:mm") + "~" + N_.ETime.ToString("HH:mm") });//時段
+                cTR.Cs.Add(new cTableCell { Value = N_.STime.ToString() + "~" + N_.ETime.ToString() });//時段
                 cTR.Cs.Add(new cTableCell { Value = N_.PeopleCt.ToString() });//人數
-                cTR.Cs.Add(new cTableCell { Value = N_.Address });//地點
-                if (N_.M_Product_Teacher.Any())
-                {
-                    var Ts = from q in DC.Teacher.Where(q => !q.DeleteFlag)
-                             join p in DC.M_Product_Teacher.Where(q => q.PCID == N_.PCID && q.TID > 0)
-                             on q.TID equals p.TID
-                             select q;
-                    if (Ts.Any())
-                        cTR.Cs.Add(new cTableCell { Value = Ts.First().Title });//講師
-                    else if (N_.M_Product_Teacher.Any(q => q.TID == 0))
-                        cTR.Cs.Add(new cTableCell { Value = N_.M_Product_Teacher.First(q => q.TID == 0).Title });//講師
-                    else
-                        cTR.Cs.Add(new cTableCell { Value = "" });
-                }
-                else
-                    cTR.Cs.Add(new cTableCell { Value = "" });
+
+                string sLocation = string.IsNullOrEmpty(N_.LocationName) ? "" : N_.LocationName;
+                if (N_.Product.ProductType == 0)
+                    sLocation += (sLocation == "" ? "" : "<br/>") + N_.Address + "<br/>" + N_.MeetURL;
+                else if (N_.Product.ProductType == 1)
+                    sLocation += (sLocation == "" ? "" : "<br/>") + N_.Address;
+                else if (N_.Product.ProductType == 2)
+                    sLocation += (sLocation == "" ? "" : "<br/>") + N_.MeetURL;
+
+                cTR.Cs.Add(new cTableCell { Value = sLocation });//地點
+                var MPT = (from q in DC.M_Product_Teacher.Where(q => q.PID == N_.PID && q.PCID == N_.PCID)
+                           join p in DC.Teacher.Where(q => !q.DeleteFlag)
+                           on q.TID equals p.TID
+                           select p).FirstOrDefault();
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClassTeacher_List/" + N_.PCID + "?PID=" + N_.PID, Target = "_self", Value = (MPT != null ? MPT.Title : "設定講師") });//編輯
                 N.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
 
@@ -684,7 +684,6 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetProductClass_List(PID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult ProductClass_List(FormCollection FC)
         {
             GetViewBag();
@@ -697,7 +696,7 @@ namespace Banner.Areas.Admin.Controllers
         {
             public Product_Class PC = new Product_Class();
             public ListSelect LS_Week = new ListSelect();
-
+            public int ProductType = 0;
         }
         public cProductClass_Edit GetProductClass_Edit(int PID, int ID, FormCollection FC)
         {
@@ -715,12 +714,16 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     PID = PID,
                     Title = "",
+                    LoopFlag = true,
+                    TargetDate = DT,
                     WeeklyNo = 0,
                     STime = new TimeSpan(9, 0, 0),
                     ETime = new TimeSpan(12, 0, 0),
                     PeopleCt = 0,
                     PhoneNo = "",
+                    LocationName = "",
                     Address = "",
+                    MeetURL = "",
                     CreDate = DT,
                     UpdDate = DT,
                     SaveACID = 1
@@ -732,19 +735,38 @@ namespace Banner.Areas.Admin.Controllers
                 N.LS_Week.ddlList.ForEach(q => q.Selected = false);
                 N.LS_Week.ddlList.First(q => q.Value == PC.WeeklyNo.ToString()).Selected = true;
             }
+            var P = DC.Product.FirstOrDefault(q => q.PID == PID);
+            if (P == null)
+                SetAlert("參數遺失,請重試一次", 2, "/Admin/StoreSet/Product_List");
+            else
+                N.ProductType = P.ProductType;
+
             #endregion
             #region 前端載入
-            if (FC.Keys.Count == 0)
-                FC = null;
+            if (FC != null)
+                if (FC.Keys.Count == 0)
+                    FC = null;
             if (FC != null)
             {
                 N.PC.Title = FC.Get("txb_Title");
+                N.PC.LoopFlag = GetViewCheckBox(FC.Get("cbox_LoopFlag"));
+                N.PC.TargetDate = Convert.ToDateTime(FC.Get("txb_TargetDate"));
                 N.PC.WeeklyNo = Convert.ToInt32(FC.Get("ddl_Week"));
                 N.PC.STime = TimeSpan.Parse(FC.Get("txb_STime"));
                 N.PC.ETime = TimeSpan.Parse(FC.Get("txb_ETime"));
                 N.PC.PeopleCt = Convert.ToInt32(FC.Get("txb_PeopleCt"));
                 N.PC.PhoneNo = FC.Get("txb_PhoneNo");
-                N.PC.Address = FC.Get("txb_Address");
+                N.PC.LocationName = FC.Get("txb_LocationName");
+
+                if (N.ProductType == 0 || N.ProductType == 1)
+                    N.PC.Address = FC.Get("txb_Address");
+                else
+                    N.PC.Address = "";
+
+                if (N.ProductType == 0 || N.ProductType == 2)
+                    N.PC.MeetURL = FC.Get("txb_MeetURL");
+                else
+                    N.PC.MeetURL = "";
             }
             #endregion
 
@@ -777,5 +799,100 @@ namespace Banner.Areas.Admin.Controllers
             return View(N);
         }
         #endregion
+
+        #region 上課課程-班別講師設定
+        public cTeacher_List ProductClassTeacher_List(int ID, int PID, FormCollection FC)
+        {
+            cTeacher_List N = new cTeacher_List();
+            #region 物件初始化
+            #region 前端資料帶入
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            //N.ActiveType = Convert.ToInt32(FC != null ? FC.Get("rbl_ActiveType") : "-1");
+            N.sKey = FC != null ? FC.Get("txb_Key") : "";
+            N.sGroupKey = FC != null ? FC.Get("txb_GroupKey") : "";
+            N.PID = PID;
+            #endregion
+
+
+            N.cTL = new cTableList();
+            N.cTL.Title = "";
+            N.cTL.NowPage = iNowPage;
+            N.cTL.ItemID = "";
+            N.cTL.NumCut = iNumCut;
+            N.cTL.Rs = new List<cTableRow>();
+
+            #endregion
+            #region 資料庫資料帶入
+            var Ns = DC.Teacher.Where(q => !q.DeleteFlag);
+            if (N.sKey != "")
+                Ns = Ns.Where(q => q.Title.Contains(N.sKey));
+            //if (N.ActiveType >= 0)
+            //    Ns = Ns.Where(q => q.ActiveFlag == (N.ActiveType == 1));
+            if (N.sGroupKey != "")
+            {
+                Ns = from q in DC.M_OI_Account.Where(q => !q.DeleteFlag &&
+                     q.ActiveFlag &&
+                     q.OrganizeInfo.OID == 8 &&
+                     q.OrganizeInfo.Title.Contains(N.sGroupKey))
+                     join p in Ns.Where(q => q.ACID > 0)
+                     on q.ACID equals p.ACID
+                     select p;
+            }
+            int TargetID = 0;
+            if (ID != 0)
+            {
+                var PCT = DC.M_Product_Teacher.FirstOrDefault(q => q.PID == PID && q.PCID == ID);
+                if (PCT != null)
+                    TargetID = PCT.TID;
+            }
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "指定狀態", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "講師名稱" });
+            TopTitles.Add(new cTableCell { Title = "小組" });
+            TopTitles.Add(new cTableCell { Title = "狀態" });
+            TopTitles.Add(new cTableCell { Title = "備註" });
+
+            N.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            N.cTL.TotalCt = Ns.Count();
+            N.cTL.MaxNum = GetMaxNum(N.cTL.TotalCt, N.cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.TID == TargetID).ThenByDescending(q => q.TID).Skip((iNowPage - 1) * N.cTL.NumCut).Take(N.cTL.NumCut);
+
+            foreach (var N_ in Ns)
+            {
+                cTableRow cTR = new cTableRow();
+                if (N_.TID == TargetID)
+                    cTR.Cs.Add(new cTableCell { Value = "已指定", CSS = "btn btn-outline-success", Type = "activebutton", URL = "ChangeTeacher(this," + N_.TID + "," + ID + ")" });//狀態
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "未指定", CSS = "btn btn-outline-danger", Type = "activebutton", URL = "ChangeTeacher(this," + N_.TID + "," + ID + ")" });//狀態
+                cTR.Cs.Add(new cTableCell { Value = N_.Title });//講師名稱
+                //小組
+                var M = DC.M_OI_Account.FirstOrDefault(q => q.ACID == N_.ACID && q.ActiveFlag && !q.DeleteFlag);
+                cTR.Cs.Add(new cTableCell { Value = M != null ? M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title : "停用" });//小組
+                cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "啟用" : "停用" });//狀態
+                cTR.Cs.Add(new cTableCell { Value = N_.Note });//備註
+
+                N.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+            #endregion
+
+            return N;
+        }
+        [HttpGet]
+        public ActionResult ProductClassTeacher_List(int ID)
+        {
+            GetViewBag();
+            int PID = GetQueryStringInInt("PID");
+            return View(ProductClassTeacher_List(ID, PID, null));
+        }
+        [HttpPost]
+        public ActionResult ProductClassTeacher_List(int ID, FormCollection FC)
+        {
+            GetViewBag();
+            int PID = GetQueryStringInInt("PID");
+            return View(ProductClassTeacher_List(ID, PID, FC));
+        }
+        #endregion
+
     }
 }
