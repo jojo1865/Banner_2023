@@ -668,7 +668,7 @@
         var box2 = document.getElementById('cbox_BackUsedFlag');
         var iCheck2 = box2.checked ? 1 : 0;
         var box3 = document.getElementById('cbox_TeacherFlag');
-        var iCheck3 = box2.checked ? 1 : 0;
+        var iCheck3 = box3.checked ? 1 : 0;
         $.ajax({
             url: '/Admin/AccountSet/SaveAcctFlag/' + ACID + '?Act=' + iCheck1 + '&Bac=' + iCheck2 + '&Tea=' + iCheck3,
             method: 'GET',

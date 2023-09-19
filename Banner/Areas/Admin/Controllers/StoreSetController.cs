@@ -653,7 +653,10 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_Edit/" + N_.PCID + "?PID=" + N_.PID, Target = "_self", Value = "編輯" });//編輯
                 cTR.Cs.Add(new cTableCell { Value = N_.Product.Title });//課程名稱
                 cTR.Cs.Add(new cTableCell { Value = N_.Title });//班級名稱
-                cTR.Cs.Add(new cTableCell { Value = sWeeks[N_.WeeklyNo] });//星期
+                if(N_.LoopFlag)
+                    cTR.Cs.Add(new cTableCell { Value = sWeeks[N_.WeeklyNo] });//星期
+                else
+                    cTR.Cs.Add(new cTableCell { Value = N_.TargetDate.ToString(DateFormat) });//單日
                 cTR.Cs.Add(new cTableCell { Value = N_.STime.ToString() + "~" + N_.ETime.ToString() });//時段
                 cTR.Cs.Add(new cTableCell { Value = N_.PeopleCt.ToString() });//人數
 

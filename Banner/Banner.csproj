@@ -362,6 +362,7 @@
     <Content Include="Areas\Web\Content\Img\step-warning.svg" />
     <Content Include="Areas\Web\Content\Img\system-manage.png" />
     <Content Include="Areas\Web\Content\Img\team.png" />
+    <Content Include="Areas\Web\Content\Img\Temp_Product.jpg" />
     <Content Include="Areas\Web\Content\Img\top_logo.svg" />
     <Content Include="Areas\Web\Content\Img\user.png" />
     <Content Include="Areas\Web\Content\Img\verified.png" />
@@ -618,6 +619,7 @@
     <Content Include="Areas\Admin\Views\StoreSet\ProductClassTeacher_List.cshtml" />
     <Content Include="Areas\Admin\Views\StoreSet\ProductAllowAccount_List.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Index.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_StoreSetProductCell.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

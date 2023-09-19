@@ -1,0 +1,46 @@
+﻿@model Banner.Product
+
+<div class="card">
+    <div class="img_Product">
+        <a href="/ClassStore/Info/@Model.PID">
+            <img src="@Model.ImgURL" class="card-img-top img_Product" />
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col fw-bolder" style="font-size:20px">@(Model.Course.Title + Model.SubTitle)<span class="lab_Category">@(Model.ProductType == 0 ? "實體+線上" : (Model.ProductType==1 ? "實體課程" : "線上課程"))</span></div>
+        </div>
+        <div class="row">
+            <div class="col-12 mt-1">
+                <i class="fa-solid fa-dollar-sign me-1"></i>
+                @if (Model.Price_Early > 0)
+                {
+                    <span style="color: #3764AC">早鳥價 NT$@(Model.Price_Early)</span>
+                    <span style="text-decoration: line-through;">原價 NT@(Model.Price_Basic)</span>
+                }
+                else if (Model.Price_Basic > 0)
+                {
+                    <span style="color: #3764AC">定價 NT$@(Model.Price_Basic)</span>
+                }
+                else
+                {
+                    <span style="color: #3764AC">免費</span>
+                }
+            </div>
+            <div class="col-12 mt-1">
+                <i class="fa-regular fa-calendar me-1"></i>開課日期：@(Model.SDate.ToString("yyyy/MM/dd")) - @(Model.EDate.ToString("yyyy/MM/dd"))
+            </div>
+            <div class="col-12 mt-1">
+                <i class="fa-solid fa-users me-1"></i>@Model.TargetInfo
+            </div>
+            <div class="col-12 mt-1">
+                <a class="btn btn-close">
+                    <i class="fa-solid fa-heart"></i>
+                </a>
+                <a>
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

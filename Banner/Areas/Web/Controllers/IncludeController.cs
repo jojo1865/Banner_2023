@@ -616,5 +616,11 @@ namespace Banner.Areas.Web.Controllers
             return PartialView(cN);
         }
         #endregion
+        #region 商品卡
+        public PartialViewResult _StoreSetProductCell(Product P)
+        {
+            return PartialView(P);
+        }
+        #endregion
     }
 }
