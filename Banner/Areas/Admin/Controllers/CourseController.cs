@@ -15,6 +15,8 @@ namespace Banner.Areas.Admin.Controllers
         // GET: Admin/Course
         public ActionResult Index()
         {
+            GetViewBag();
+            GetACID();
             return View();
         }
         #region 課程-分類-列表
@@ -78,7 +80,7 @@ namespace Banner.Areas.Admin.Controllers
                 //課程數量
                 int iCt = N_.Course.Count(q => !q.DeleteFlag);
                 if (iCt == 0)
-                    cTR.Cs.Add(new cTableCell { Type = "link", URL = "/Admin/Course/Course_Edit/0", Target = "_self", Value = "新增" });//課程數量
+                    cTR.Cs.Add(new cTableCell { Type = "link", URL = "/Admin/Course/Course_Edit/0?CCID=" + N_.CCID, Target = "_self", Value = "新增" });//課程數量
                 else
                     cTR.Cs.Add(new cTableCell { Type = "link", URL = "/Admin/Course/Course_List/" + N_.CCID, Target = "_self", Value = iCt.ToString() });
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "啟用" : "停用" });//狀態
@@ -293,12 +295,18 @@ namespace Banner.Areas.Admin.Controllers
             ACID = GetACID();
             #region 物件初始化
             N.sCourseType = sCourseType;
-            var CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.ActiveFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag) > 0).OrderByDescending(q => q.CCID).ToList();
+            int CCID = GetQueryStringInInt("CCID");
+            var CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.ActiveFlag).OrderByDescending(q => q.CCID).ToList();
             foreach (var CC in CCs)
-                N.CCSL.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString() });
+            {
+                if (CCID > 0)
+                    N.CCSL.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CCID == CC.CCID });
+                else
+                    N.CCSL.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString() });
+            }
             if (CCs.Count == 0)
                 SetAlert("請先新增課程分類", 3, "/Admin/Course/Category_Edit/0");
-            else
+            else if (CCID == 0)
                 N.CCSL[0].Selected = true;
 
             //擋修用選單
@@ -333,7 +341,7 @@ namespace Banner.Areas.Admin.Controllers
                     CourseInfo = "",
                     TargetInfo = "",
                     GraduationInfo = "",
-                    ClassicalFlag=false,
+                    ClassicalFlag = false,
                     ActiveFlag = true,
                     DeleteFlag = false,
                     CreDate = DT,
@@ -387,7 +395,7 @@ namespace Banner.Areas.Admin.Controllers
                 N.C.CourseInfo = FC.Get("txb_CourseInfo");
                 N.C.TargetInfo = FC.Get("txb_TargetInfo");
                 N.C.GraduationInfo = FC.Get("txb_GraduationInfo");
-                N.C.ClassicalFlag = GetViewCheckBox(FC.Get("cbox_ClassicalFlag")); 
+                N.C.ClassicalFlag = GetViewCheckBox(FC.Get("cbox_ClassicalFlag"));
                 N.C.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
                 N.C.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
                 N.C.CourseType = Convert.ToInt32(FC.Get("rbl_CourseType"));
