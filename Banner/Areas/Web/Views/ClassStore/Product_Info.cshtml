@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewBag.Title = "Product_Info";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<main>
+    
+    <div class="container">
+        <div class="row  w-100 mb-3 bt-3">
+            <div class="col-lg-6 col-12 pt-3 text-lg-start text-center">
+                <a href="/Web/ClassStore/Index" class="lab_DarkBlue me-3">課程選購首頁</a>><a href="#" class="lab_DarkBlue ms-3"><b>課程內容</b></a>
+            </div>
+            <div class="col-lg-6 col-12 pt-3 text-lg-end text-center">
+                @Html.Action("_SotreSetTopCart", "Include")
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+
+        </div>
+    </div>
+</main>
+

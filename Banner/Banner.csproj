@@ -620,6 +620,8 @@
     <Content Include="Areas\Admin\Views\StoreSet\ProductAllowAccount_List.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Index.cshtml" />
     <Content Include="Areas\Web\Views\Include\_StoreSetProductCell.cshtml" />
+    <Content Include="Areas\Web\Views\ClassStore\Product_Info.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_SotreSetTopCart.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

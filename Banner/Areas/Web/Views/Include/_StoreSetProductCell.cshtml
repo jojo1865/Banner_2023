@@ -2,7 +2,7 @@
 
 <div class="card">
     <div class="img_Product">
-        <a href="/ClassStore/Info/@Model.PID">
+        <a href="/Web/ClassStore/Product_Info/@Model.PID">
             <img src="@Model.ImgURL" class="card-img-top img_Product" />
         </a>
     </div>
@@ -34,11 +34,8 @@
                 <i class="fa-solid fa-users me-1"></i>@Model.TargetInfo
             </div>
             <div class="col-12 mt-1">
-                <a class="btn btn-close">
-                    <i class="fa-solid fa-heart"></i>
-                </a>
-                <a>
-                    <i class="fa-solid fa-cart-shopping"></i>
+                <a class="btn btn-success" href="javascript:;" onclick="AddCart(@(TempData["UID"].ToString()),@(Model.PID));">
+                    <i class="fa-solid fa-cart-shopping"></i> 加入購物車
                 </a>
             </div>
         </div>

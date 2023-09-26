@@ -80,5 +80,15 @@ namespace Banner.Areas.Web.Controllers
         }
         #endregion
 
+        #region 課程內頁
+
+        [HttpGet]
+        public ActionResult Product_Info(int ID)
+        {
+            GetViewBag();
+            return View();
+        }
+
+        #endregion
     }
 }

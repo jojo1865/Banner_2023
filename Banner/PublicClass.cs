@@ -2225,6 +2225,8 @@ namespace Banner
             ViewBag._Power = bGroup;
             ViewBag._Login = "";
             ViewBag._GroupTitle = "小組資訊";
+
+
             string NowURL = Request.Url.AbsolutePath;
             ACID = GetACID();
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
@@ -2233,6 +2235,7 @@ namespace Banner
                 ViewBag._UserName = AC.Name_First + AC.Name_Last;
                 ViewBag._UserID = ACID;
                 ViewBag._Login = AC.Login;
+                
                 #region 上層
                 string GroupMapTitle = "";
                 var OIs = DC.OrganizeInfo.Where(q => q.ACID == AC.ACID && q.OID == 8 && q.ActiveFlag && !q.DeleteFlag);

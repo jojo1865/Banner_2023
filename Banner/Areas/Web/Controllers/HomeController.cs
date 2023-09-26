@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -73,10 +74,10 @@ namespace Banner.Areas.Web.Controllers
             else
             {
                 string EncPW = HSM.Enc_1(PW);
-                var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && q.DeleteFlag && q.Login == Login && q.Password == EncPW);
+                var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.Login == Login && q.Password == EncPW);
                 if (AC == null)
                 {
-                    AC = DC.Account.Where(q => q.Login == Login && q.ActiveFlag && q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
+                    AC = DC.Account.Where(q => q.Login == Login && q.ActiveFlag && !q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
                     if (AC == null)
                         SetAlert("此帳號不存在", 2);
                     /*else if (AC.DeleteFlag)
@@ -428,6 +429,237 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
         #endregion
+        #region 加入購物車
+        private class cPID
+        {
+            public int PID = 0;
+        }
+        public string SendCart()
+        {
+            int ACID = GetQueryStringInInt("ACID");
+            int PID = GetQueryStringInInt("PID");
 
+
+
+            Error = "";
+            if (ACID <= 0)
+                Error = "無登入會員資料";
+            else if (PID <= 0)
+                Error = "無課程資料";
+            else
+            {
+                var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
+                var P = DC.Product.FirstOrDefault(q => q.PID == PID);
+                #region 基本檢查
+                if (AC != null)
+                {
+                    if (AC.DeleteFlag)
+                        Error = "無會員資料";
+                    else if (!AC.ActiveFlag)
+                        Error = "會員資料未啟用";
+                }
+                else
+                    Error = "無會員資料";
+                if (Error == "")
+                {
+                    if (P != null)
+                    {
+                        if (P.DeleteFlag)
+                            Error = "無課程資料";
+                        else if (!P.ActiveFlag)
+                            Error = "課程並未允許交易";
+                    }
+                    else
+                        Error = "無課程資料";
+                }
+                #endregion
+                #region 購買資格檢查
+                int Price = 0, PriceType = 0;
+                if (Error == "")
+                {
+                    //有線上報名日期
+                    if (P.SDate_Signup_OnLine.Date >= P.CreDate.Date && P.SDate_Signup_OnLine.Date < DT.Date)
+                        Error = "本課程尚未開始線上報名";
+                    else if (P.EDate_Signup_OnLine.Date >= P.CreDate.Date && P.EDate_Signup_OnLine.Date > DT.Date)
+                        Error = "本課程已結束線上報名";
+                    else
+                    {
+                        if (P.SDate_Early.Date >= P.CreDate.Date && P.SDate_Early.Date >= DT.Date)//有早鳥起始日,且今天在起始日之後
+                        {
+                            if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
+                            {
+                                Price = P.Price_Early;
+                                PriceType = 1;
+                            }
+                            else if (P.EDate_Early.Date < P.CreDate.Date)//沒有早鳥結束日
+                            {
+                                Price = P.Price_Early;
+                                PriceType = 1;
+                            }
+                            else//不符早鳥設定=基本價
+                            {
+                                Price = P.Price_Basic;
+                                PriceType = 0;
+                            }
+                        }
+                        else if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
+                        {
+                            Price = P.Price_Early;
+                            PriceType = 1;
+                        }
+                        else//沒早鳥設定=基本價
+                        {
+                            Price = P.Price_Basic;
+                            PriceType = 0;
+                        }
+
+                        bool bCheck0 = false;//先修課程檢查過沒?
+                        bool bCheck1 = false;//職分檢查過沒?
+                        //有購買限制規則
+                        foreach (var R in P.Product_Rool.OrderBy(q => q.TargetType))
+                        {
+                            switch (R.TargetType)
+                            {
+                                case 0://先修課程ID[Course]
+                                    {
+                                        if (!bCheck0)
+                                        {
+                                            var Os = from q in DC.Order_Product.Where(q => q.Order_Header.ACID == AC.ACID && q.Order_Header.Order_Type == 2 && !q.Order_Header.DeleteFlag)
+                                                     join p in DC.Product_Rool.Where(q => q.PID == P.PID && q.TargetType == 0 && q.TargetInt1 > 0)
+                                                     on q.PID equals p.TargetInt1
+                                                     select p;
+                                            if (Os.Count() == 0)
+                                                Error = "本課程有限制需先參加先修課程,您不具備此資格";
+                                            bCheck0 = true;
+                                        }
+                                    }
+                                    break;
+
+                                case 1://職分ID[OID]
+                                    {
+                                        if (!bCheck1)
+                                        {
+                                            var Os = from q in DC.M_O_Account.Where(q => q.ACID == AC.ACID && !q.DeleteFlag && q.ActiveFlag)
+                                                     join p in DC.Product_Rool.Where(q => q.PID == P.PID && q.TargetType == 1 && q.TargetInt1 > 0)
+                                                     on q.OID equals p.TargetInt1
+                                                     select p;
+                                            if (Os.Count() == 0)
+                                                Error = "本課程有限制指定職分參加,您不具備職分資格";
+                                            bCheck1 = true;
+                                        }
+                                    }
+                                    break;
+
+                                case 2://性別
+                                    {
+                                        if (R.TargetInt1 >= 0)//有限制
+                                        {
+                                            if (AC.ManFlag && R.TargetInt1 == 0)
+                                                Error = "本課程限制女性參加";
+                                            if (!AC.ManFlag && R.TargetInt1 == 1)
+                                                Error = "本課程限制男性參加";
+                                        }
+                                    }
+                                    break;
+
+                                case 3://年齡
+                                    {
+                                        if (AC.Birthday.Date != AC.CreDate.Date)//會友有生日資料
+                                        {
+                                            if (R.TargetInt1 > 0)//有最小年齡限制
+                                            {
+                                                if ((DT.Year - AC.Birthday.Year) < R.TargetInt1)//今年-生日年<最小年齡限制
+                                                    Error = "您的年紀不符最小年齡限制";
+                                            }
+                                            else if (R.TargetInt2 > 0)//有最大年齡限制
+                                            {
+                                                if ((DT.Year - AC.Birthday.Year) > R.TargetInt1)//今年-生日年>最大年齡限制
+                                                    Error = "您的年紀不符最大年齡限制";
+                                            }
+                                        }
+
+                                    }
+                                    break;
+
+                                case 4://事工團
+                                    break;
+
+                                case 5://指定會員ACID
+                                    if (AC.ACID != R.TargetInt1)
+                                        Error = "您非本課程指定會員";
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                #endregion
+                if (Error == "")
+                {
+                    var OH = DC.Order_Header.FirstOrDefault(q => q.Order_Type == 0 && q.ACID == ACID);
+                    if (OH != null)
+                    {
+                        if (!OH.Order_Product.Any(q => q.PID == PID))//這商品目前尚未加入購物車中
+                        {
+                            Order_Product OP = new Order_Product
+                            {
+                                OHID = OH.OHID,
+                                PID = PID,
+                                Ct = 1,
+                                Price = Price,
+                                Price_Type = PriceType,
+                                CreDate = DT,
+                                UpdDate = DT,
+                                SaveACID = ACID
+                            };
+                            DC.Order_Product.InsertOnSubmit(OP);
+                            DC.SubmitChanges();
+
+                            OH.TotalPrice = OH.Order_Product.Sum(q => q.Ct * q.Price);
+                            OH.DeleteFlag = false;
+                            DC.SubmitChanges();
+                        }
+                    }
+                    else
+                    {
+                        OH = new Order_Header
+                        {
+                            OIID = 0,
+                            ACID = ACID,
+                            Order_Type = 0,
+                            TotalPrice = Price,
+                            DeleteFlag = false,
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = ACID
+                        };
+                        DC.Order_Header.InsertOnSubmit(OH);
+                        DC.SubmitChanges();
+
+                        Order_Product OP = new Order_Product
+                        {
+                            OHID = OH.OHID,
+                            PID = PID,
+                            Ct = 1,
+                            Price = Price,
+                            Price_Type = PriceType,
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = ACID
+                        };
+                        DC.Order_Product.InsertOnSubmit(OP);
+                        DC.SubmitChanges();
+                    }
+
+                }
+            }
+
+            if (Error != "")
+                Error = "Error;" + Error;
+            else
+                Error = "OK;";
+            return Error;
+        }
+        #endregion
     }
 }

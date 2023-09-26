@@ -379,8 +379,7 @@ function checkemail(txb_email) {
     }
 }
 function checkLogin(txb) {
-    if (txb.value != "")
-    {
+    if (txb.value != "") {
         $.ajax({
             url: '/Web/AccountAdd/CheckLogin?input=' + txb.value,
             method: 'GET',
@@ -532,9 +531,6 @@ function timer(inputSeconds) {
             clearInterval(countdown);
             document.getElementById('lab_msg').style.display = 'none';
             document.getElementById('a_Send').style.display = 'flex';
-
-
-
             return  // 結束執行setInterval，不再執行下面程式碼
         }
         showTimer(tiemleft)
@@ -558,3 +554,28 @@ function ShowBaptizedTypeddl(rbut) {
 function HideBaptizedTypeddl(rbut) {
     document.getElementById('ddl_BaptizedType').style.display = (!rbut.checked ? "" : "none");
 }
+/*加入購物車*/
+function AddCart(ACID, PID) {
+    $.ajax({
+        url: '/Web/Home/SendCart?ACID=' + ACID + '&PID=' + PID,
+        method: 'GET',
+        dataType: 'text',
+        success: function (res) {
+            const Return = res.split(';');
+            if (Return[0] == 'OK') {
+                Swal.fire({
+                    icon: 'success',
+                    html: '已加入購物車'
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    html: Return[1]
+                });
+            }
+        }
+    });
+    return;
+}
+//關鍵字搜尋

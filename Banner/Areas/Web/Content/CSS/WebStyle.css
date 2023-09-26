@@ -11,6 +11,10 @@
     margin-top: 32px;
 }
 
+a {
+    text-decoration: none;
+}
+
 .bn-theme .table button.disabled {
     color: #282828;
     opacity: 1;

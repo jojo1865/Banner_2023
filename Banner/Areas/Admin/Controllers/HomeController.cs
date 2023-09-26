@@ -82,10 +82,10 @@ namespace Banner.Areas.Admin.Controllers
             else
             {
                 string EncPW = HSM.Enc_1(PW);
-                var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && q.DeleteFlag && q.BackUsedFlag && q.Login == Login && q.Password == EncPW);
+                var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.BackUsedFlag && q.Login == Login && q.Password == EncPW);
                 if (AC == null)
                 {
-                    AC = DC.Account.Where(q => q.Login == Login && q.ActiveFlag && q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
+                    AC = DC.Account.Where(q => q.Login == Login && q.ActiveFlag && !q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
                     if (AC == null)
                         SetAlert("此帳號不存在", 2);
                     /*else if (AC.DeleteFlag)

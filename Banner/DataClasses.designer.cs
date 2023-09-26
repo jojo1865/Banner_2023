@@ -138,6 +138,12 @@ namespace Banner
     partial void InsertProduct(Product instance);
     partial void UpdateProduct(Product instance);
     partial void DeleteProduct(Product instance);
+    partial void InsertOrder_Product(Order_Product instance);
+    partial void UpdateOrder_Product(Order_Product instance);
+    partial void DeleteOrder_Product(Order_Product instance);
+    partial void InsertOrder_Header(Order_Header instance);
+    partial void UpdateOrder_Header(Order_Header instance);
+    partial void DeleteOrder_Header(Order_Header instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -468,6 +474,22 @@ namespace Banner
 			}
 		}
 		
+		public System.Data.Linq.Table<Order_Product> Order_Product
+		{
+			get
+			{
+				return this.GetTable<Order_Product>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Order_Header> Order_Header
+		{
+			get
+			{
+				return this.GetTable<Order_Header>();
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.sp_GetOI2List")]
 		public ISingleResult<sp_GetOI2ListResult> sp_GetOI2List([global::System.Data.Linq.Mapping.ParameterAttribute(Name="ACID", DbType="Int")] System.Nullable<int> aCID)
 		{
@@ -561,6 +583,8 @@ namespace Banner
 		
 		private EntitySet<OrganizeInfo> _OrganizeInfo;
 		
+		private EntitySet<Order_Header> _Order_Header;
+		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -628,6 +652,7 @@ namespace Banner
 			this._M_OI2_Account = new EntitySet<M_OI2_Account>(new Action<M_OI2_Account>(this.attach_M_OI2_Account), new Action<M_OI2_Account>(this.detach_M_OI2_Account));
 			this._M_Rool_Account = new EntitySet<M_Rool_Account>(new Action<M_Rool_Account>(this.attach_M_Rool_Account), new Action<M_Rool_Account>(this.detach_M_Rool_Account));
 			this._OrganizeInfo = new EntitySet<OrganizeInfo>(new Action<OrganizeInfo>(this.attach_OrganizeInfo), new Action<OrganizeInfo>(this.detach_OrganizeInfo));
+			this._Order_Header = new EntitySet<Order_Header>(new Action<Order_Header>(this.attach_Order_Header), new Action<Order_Header>(this.detach_Order_Header));
 			OnCreated();
 		}
 		
@@ -1260,6 +1285,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Order_Header", Storage="_Order_Header", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<Order_Header> Order_Header
+		{
+			get
+			{
+				return this._Order_Header;
+			}
+			set
+			{
+				this._Order_Header.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -1431,6 +1469,18 @@ namespace Banner
 		}
 		
 		private void detach_OrganizeInfo(OrganizeInfo entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_Order_Header(Order_Header entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_Order_Header(Order_Header entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -13062,6 +13112,8 @@ namespace Banner
 		
 		private EntitySet<Product_Rool> _Product_Rool;
 		
+		private EntitySet<Order_Product> _Order_Product;
+		
 		private EntityRef<Course> _Course;
 		
 		private EntityRef<OrganizeInfo> _OrganizeInfo;
@@ -13134,6 +13186,7 @@ namespace Banner
 			this._Product_Class = new EntitySet<Product_Class>(new Action<Product_Class>(this.attach_Product_Class), new Action<Product_Class>(this.detach_Product_Class));
 			this._Product_File = new EntitySet<Product_File>(new Action<Product_File>(this.attach_Product_File), new Action<Product_File>(this.detach_Product_File));
 			this._Product_Rool = new EntitySet<Product_Rool>(new Action<Product_Rool>(this.attach_Product_Rool), new Action<Product_Rool>(this.detach_Product_Rool));
+			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
 			this._Course = default(EntityRef<Course>);
 			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
 			OnCreated();
@@ -13759,6 +13812,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Order_Product", Storage="_Order_Product", ThisKey="PID", OtherKey="PID")]
+		public EntitySet<Order_Product> Order_Product
+		{
+			get
+			{
+				return this._Order_Product;
+			}
+			set
+			{
+				this._Order_Product.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Product", Storage="_Course", ThisKey="CID", OtherKey="CID", IsForeignKey=true)]
 		public Course Course
 		{
@@ -13893,6 +13959,677 @@ namespace Banner
 		{
 			this.SendPropertyChanging();
 			entity.Product = null;
+		}
+		
+		private void attach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = this;
+		}
+		
+		private void detach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Order_Product")]
+	public partial class Order_Product : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _OPID;
+		
+		private int _OHID;
+		
+		private int _PID;
+		
+		private int _Ct;
+		
+		private int _Price;
+		
+		private int _Price_Type;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Product> _Product;
+		
+		private EntityRef<Order_Header> _Order_Header;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnOPIDChanging(int value);
+    partial void OnOPIDChanged();
+    partial void OnOHIDChanging(int value);
+    partial void OnOHIDChanged();
+    partial void OnPIDChanging(int value);
+    partial void OnPIDChanged();
+    partial void OnCtChanging(int value);
+    partial void OnCtChanged();
+    partial void OnPriceChanging(int value);
+    partial void OnPriceChanged();
+    partial void OnPrice_TypeChanging(int value);
+    partial void OnPrice_TypeChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Order_Product()
+		{
+			this._Product = default(EntityRef<Product>);
+			this._Order_Header = default(EntityRef<Order_Header>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int OPID
+		{
+			get
+			{
+				return this._OPID;
+			}
+			set
+			{
+				if ((this._OPID != value))
+				{
+					this.OnOPIDChanging(value);
+					this.SendPropertyChanging();
+					this._OPID = value;
+					this.SendPropertyChanged("OPID");
+					this.OnOPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OHID", DbType="Int NOT NULL")]
+		public int OHID
+		{
+			get
+			{
+				return this._OHID;
+			}
+			set
+			{
+				if ((this._OHID != value))
+				{
+					if (this._Order_Header.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOHIDChanging(value);
+					this.SendPropertyChanging();
+					this._OHID = value;
+					this.SendPropertyChanged("OHID");
+					this.OnOHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PID", DbType="Int NOT NULL")]
+		public int PID
+		{
+			get
+			{
+				return this._PID;
+			}
+			set
+			{
+				if ((this._PID != value))
+				{
+					if (this._Product.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnPIDChanging(value);
+					this.SendPropertyChanging();
+					this._PID = value;
+					this.SendPropertyChanged("PID");
+					this.OnPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Ct", DbType="Int NOT NULL")]
+		public int Ct
+		{
+			get
+			{
+				return this._Ct;
+			}
+			set
+			{
+				if ((this._Ct != value))
+				{
+					this.OnCtChanging(value);
+					this.SendPropertyChanging();
+					this._Ct = value;
+					this.SendPropertyChanged("Ct");
+					this.OnCtChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Int NOT NULL")]
+		public int Price
+		{
+			get
+			{
+				return this._Price;
+			}
+			set
+			{
+				if ((this._Price != value))
+				{
+					this.OnPriceChanging(value);
+					this.SendPropertyChanging();
+					this._Price = value;
+					this.SendPropertyChanged("Price");
+					this.OnPriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Type", DbType="Int NOT NULL")]
+		public int Price_Type
+		{
+			get
+			{
+				return this._Price_Type;
+			}
+			set
+			{
+				if ((this._Price_Type != value))
+				{
+					this.OnPrice_TypeChanging(value);
+					this.SendPropertyChanging();
+					this._Price_Type = value;
+					this.SendPropertyChanged("Price_Type");
+					this.OnPrice_TypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Order_Product", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
+		public Product Product
+		{
+			get
+			{
+				return this._Product.Entity;
+			}
+			set
+			{
+				Product previousValue = this._Product.Entity;
+				if (((previousValue != value) 
+							|| (this._Product.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Product.Entity = null;
+						previousValue.Order_Product.Remove(this);
+					}
+					this._Product.Entity = value;
+					if ((value != null))
+					{
+						value.Order_Product.Add(this);
+						this._PID = value.PID;
+					}
+					else
+					{
+						this._PID = default(int);
+					}
+					this.SendPropertyChanged("Product");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Header_Order_Product", Storage="_Order_Header", ThisKey="OHID", OtherKey="OHID", IsForeignKey=true)]
+		public Order_Header Order_Header
+		{
+			get
+			{
+				return this._Order_Header.Entity;
+			}
+			set
+			{
+				Order_Header previousValue = this._Order_Header.Entity;
+				if (((previousValue != value) 
+							|| (this._Order_Header.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Order_Header.Entity = null;
+						previousValue.Order_Product.Remove(this);
+					}
+					this._Order_Header.Entity = value;
+					if ((value != null))
+					{
+						value.Order_Product.Add(this);
+						this._OHID = value.OHID;
+					}
+					else
+					{
+						this._OHID = default(int);
+					}
+					this.SendPropertyChanged("Order_Header");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Order_Header")]
+	public partial class Order_Header : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _OHID;
+		
+		private int _OIID;
+		
+		private int _ACID;
+		
+		private int _Order_Type;
+		
+		private int _TotalPrice;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntitySet<Order_Product> _Order_Product;
+		
+		private EntityRef<Account> _Account;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnOHIDChanging(int value);
+    partial void OnOHIDChanged();
+    partial void OnOIIDChanging(int value);
+    partial void OnOIIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnOrder_TypeChanging(int value);
+    partial void OnOrder_TypeChanged();
+    partial void OnTotalPriceChanging(int value);
+    partial void OnTotalPriceChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Order_Header()
+		{
+			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
+			this._Account = default(EntityRef<Account>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OHID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int OHID
+		{
+			get
+			{
+				return this._OHID;
+			}
+			set
+			{
+				if ((this._OHID != value))
+				{
+					this.OnOHIDChanging(value);
+					this.SendPropertyChanging();
+					this._OHID = value;
+					this.SendPropertyChanged("OHID");
+					this.OnOHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int NOT NULL")]
+		public int OIID
+		{
+			get
+			{
+				return this._OIID;
+			}
+			set
+			{
+				if ((this._OIID != value))
+				{
+					this.OnOIIDChanging(value);
+					this.SendPropertyChanging();
+					this._OIID = value;
+					this.SendPropertyChanged("OIID");
+					this.OnOIIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Order_Type", DbType="Int NOT NULL")]
+		public int Order_Type
+		{
+			get
+			{
+				return this._Order_Type;
+			}
+			set
+			{
+				if ((this._Order_Type != value))
+				{
+					this.OnOrder_TypeChanging(value);
+					this.SendPropertyChanging();
+					this._Order_Type = value;
+					this.SendPropertyChanged("Order_Type");
+					this.OnOrder_TypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TotalPrice", DbType="Int NOT NULL")]
+		public int TotalPrice
+		{
+			get
+			{
+				return this._TotalPrice;
+			}
+			set
+			{
+				if ((this._TotalPrice != value))
+				{
+					this.OnTotalPriceChanging(value);
+					this.SendPropertyChanging();
+					this._TotalPrice = value;
+					this.SendPropertyChanged("TotalPrice");
+					this.OnTotalPriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Header_Order_Product", Storage="_Order_Product", ThisKey="OHID", OtherKey="OHID")]
+		public EntitySet<Order_Product> Order_Product
+		{
+			get
+			{
+				return this._Order_Product;
+			}
+			set
+			{
+				this._Order_Product.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Order_Header", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.Order_Header.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.Order_Header.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Order_Header = this;
+		}
+		
+		private void detach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Order_Header = null;
 		}
 	}
 	

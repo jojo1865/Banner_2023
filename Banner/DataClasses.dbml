@@ -37,6 +37,7 @@
       <Association Name="Account_M_OI2_Account" Member="M_OI2_Account" ThisKey="ACID" OtherKey="ACID" Type="M_OI2_Account" />
       <Association Name="Account_M_Rool_Account" Member="M_Rool_Account" ThisKey="ACID" OtherKey="ACID" Type="M_Rool_Account" />
       <Association Name="Account_OrganizeInfo" Member="OrganizeInfo" ThisKey="ACID" OtherKey="ACID" Type="OrganizeInfo" />
+      <Association Name="Account_Order_Header" Member="Order_Header" ThisKey="ACID" OtherKey="ACID" Type="Order_Header" />
     </Type>
   </Table>
   <Table Name="dbo.ZipCode" Member="ZipCode">
@@ -627,8 +628,39 @@
       <Association Name="Product_Product_Class" Member="Product_Class" ThisKey="PID" OtherKey="PID" Type="Product_Class" />
       <Association Name="Product_Product_File" Member="Product_File" ThisKey="PID" OtherKey="PID" Type="Product_File" />
       <Association Name="Product_Product_Rool" Member="Product_Rool" ThisKey="PID" OtherKey="PID" Type="Product_Rool" />
+      <Association Name="Product_Order_Product" Member="Order_Product" ThisKey="PID" OtherKey="PID" Type="Order_Product" />
       <Association Name="Course_Product" Member="Course" ThisKey="CID" OtherKey="CID" Type="Course" IsForeignKey="true" />
       <Association Name="OrganizeInfo_Product" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Order_Product" Member="Order_Product">
+    <Type Name="Order_Product">
+      <Column Name="OPID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="OHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Ct" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Price" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Price_Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Product_Order_Product" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
+      <Association Name="Order_Header_Order_Product" Member="Order_Header" ThisKey="OHID" OtherKey="OHID" Type="Order_Header" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Order_Header" Member="Order_Header">
+    <Type Name="Order_Header">
+      <Column Name="OHID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Order_Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TotalPrice" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Order_Header_Order_Product" Member="Order_Product" ThisKey="OHID" OtherKey="OHID" Type="Order_Product" />
+      <Association Name="Account_Order_Header" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

@@ -622,5 +622,12 @@ namespace Banner.Areas.Web.Controllers
             return PartialView(P);
         }
         #endregion
+        #region 商品上方加入購物車列
+        public PartialViewResult _SotreSetTopCart()
+        {
+            return PartialView();
+        }
+        
+        #endregion
     }
 }
