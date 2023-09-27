@@ -36,7 +36,7 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Login()
         {
             GetViewBag();
-            if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
+            /*if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
             {
                 if (GetACID() <= 0)
                 {
@@ -44,13 +44,13 @@ namespace Banner.Areas.Web.Controllers
                     SetBrowserData("UserName", "系統管理者");
                 }
                 Response.Redirect("/Web/Home/Index");
-            }/**/
+            }*/
             TempData["login"] = "";
             TempData["pw"] = "";
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Login(FormCollection FC)
         {
             GetViewBag();
