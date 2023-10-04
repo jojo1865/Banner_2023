@@ -49,14 +49,14 @@ namespace Banner.Areas.Web.Controllers
                     SetAlert("您尚未被指定為某小組的小組長,無法進行設定", 2, "/Web/GroupPlace/Index");
                 else
                 {
-                    N.MS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.TargetID == OI.OIID && !q.DeleteFlag);
+                    N.MS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == OI.OIID && !q.DeleteFlag);
                     if (N.MS == null)
                     {
                         N.MS = new M_Location_Set
                         {
                             Meeting_Location = new Meeting_Location { Code = OI.OIID.ToString().PadLeft(6, '0'), Title = OI.Title + OI.Organize.Title + "聚會點" },
                             SetType = 1,
-                            TargetID = OI.OIID,
+                            OIID = OI.OIID,
                             WeeklyNo = 7,
                             TimeNo = 0,
                             S_hour = 9,
@@ -98,7 +98,7 @@ namespace Banner.Areas.Web.Controllers
             var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag && q.OIID == ID);
             if (OI != null)
             {
-                N.MS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.TargetID == OI.OIID && !q.DeleteFlag);
+                N.MS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == OI.OIID && !q.DeleteFlag);
                 if (N.MS == null)
                 {
                     N.MS = new M_Location_Set
@@ -114,7 +114,7 @@ namespace Banner.Areas.Web.Controllers
                             SaveACID = ACID
                         },
                         SetType = 1,
-                        TargetID = OI.OIID,
+                        OIID = OI.OIID,
                         WeeklyNo = 7,
                         TimeNo = 0,
                         S_hour = 9,

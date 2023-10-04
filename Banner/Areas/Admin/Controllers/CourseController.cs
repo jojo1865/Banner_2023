@@ -623,7 +623,8 @@ namespace Banner.Areas.Admin.Controllers
 
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
-            TopTitles.Add(new cTableCell { Title = "講師名稱" });
+            TopTitles.Add(new cTableCell { Title = "講師姓名" });
+            TopTitles.Add(new cTableCell { Title = "所屬小組" });
             TopTitles.Add(new cTableCell { Title = "狀態" });
             TopTitles.Add(new cTableCell { Title = "備註" });
 
@@ -637,6 +638,14 @@ namespace Banner.Areas.Admin.Controllers
                 cTableRow cTR = new cTableRow();
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/Course/Teacher_Edit/" + N_.TID, Target = "_self", Value = "編輯" });//編輯
                 cTR.Cs.Add(new cTableCell { Value = N_.Title });//講師名稱
+                if (N_.ACID > 0)
+                {
+                    var OIs = GetMOIAC(8, 0, N_.ACID);
+                    cTR.Cs.Add(new cTableCell { Value = string.Join(";", OIs.Select(q => q.OrganizeInfo.Title + "小組")) });//所屬小組
+                }
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "--" });//所屬小組
+
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "啟用" : "停用" });//狀態
                 cTR.Cs.Add(new cTableCell { Value = N_.Note });//備註
 

@@ -1,11 +1,11 @@
-﻿
+﻿@model Banner.Areas.Web.Controllers.ClassStoreController.cProduct_Info
 @{
     ViewBag.Title = "Product_Info";
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
 }
 
 <main>
-    
+
     <div class="container">
         <div class="row  w-100 mb-3 bt-3">
             <div class="col-lg-6 col-12 pt-3 text-lg-start text-center">
@@ -15,17 +15,179 @@
                 @Html.Action("_SotreSetTopCart", "Include")
             </div>
         </div>
-        <div class="card">
+        @if (Model != null)
+        {
+            if (Model.P != null)
+            {
+                <div class="card">
+                    <div class="card-body">
+
+                        <div class="row">
+                            <!--課程主要區域-->
+                            <div class="col-12">
+                                <h3 class="mb-3">@(Model.P.Title +"-"+ Model.P.SubTitle)</h3>
+                                <!---->
+                                <h4 class="mt-2 mb-3 lab_DarkBlue"><i class="fa-solid fa-address-card me-1"></i>課程簡介</h4>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <b>課程類型</b>
+                                        <p class="mb-2">@Html.Raw(Model.P.ProductType == 0 ? "實體與線上" : (Model.P.ProductType == 1 ? "實體" : "線上"))</p>
+                                        <b>年度梯次</b>
+                                        <p class="mb-0">年度：@Html.Raw(Model.P.YearNo)</p>
+                                        <p class="mb-2">梯次：@Html.Raw(Model.P.EchelonNo)</p>
+                                        <b>課程內容</b>
+                                        <p class="mb-2">@Html.Raw(Model.P.ProductInfo)</p>
+                                        <b>適用資格</b>
+                                        <p class="mb-2">@Html.Raw(Model.P.TargetInfo)</p>
+                                        <b>結業資格</b>
+                                        <p class="mb-2">@Html.Raw(Model.P.GraduationInfo)</p>
+                                        <b>課程講師</b>
+                                        <p class="mb-2">@Html.Raw(Model.TeacherName)</p>
+                                        <b>課程日期與地點</b>
+                                        <table class="table table_RWDStyle">
+                                            <tr class="Bgn">
+                                                @for (int i = 0; i < Model.cTL.Rs[0].Cs.Count; i++)
+                                                {
+                                                    <td>@(Model.cTL.Rs[0].Cs[i].Title)</td>
+                                                }
+                                            </tr>
+                                            @for (int j = 1; j < Model.cTL.Rs.Count; j++)
+                                            {
+                                                <tr>
+                                                    @for (int i = 0; i < Model.cTL.Rs[j].Cs.Count; i++)
+                                                    {
+                                                        <td><span class="lab_MobelTitle">@(Model.cTL.Rs[0].Cs[i].Title)</span>@(Model.cTL.Rs[j].Cs[i].Value)</td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!--報名資訊-->
+                                <h4 class="mt-2 mb-3 lab_DarkBlue"><i class="fa-solid fa-user-plus me-1"></i>報名資訊</h4>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <b>報名日期</b>
+                                        @if (Model.P.SDate_Early >= Model.P.CreDate.Date || Model.P.EDate_Early >= Model.P.CreDate.Date)
+                                        {
+                                            string sDate = "";
+                                            if (Model.P.SDate_Early >= Model.P.CreDate.Date)
+                                            {
+                                                sDate = Model.P.SDate_Early.ToString("yyyy/MM/dd");
+                                            }
+                                            else
+                                            {
+                                                sDate = "即日起";
+                                            }
+                                            if (Model.P.EDate_Early >= Model.P.CreDate.Date)
+                                            {
+                                                sDate += " ~ " + Model.P.EDate_Early.ToString("yyyy/MM/dd");
+                                            }
+                                            else
+                                            {
+                                                sDate += " ~ ";
+                                            }
+                                            <p class="mb-2">早鳥：@sDate</p>
+                                        }
+                                        @if (Model.P.SDate_Signup_OnSite >= Model.P.CreDate.Date || Model.P.EDate_Signup_OnSite >= Model.P.CreDate.Date)
+                                        {
+                                            string sDate = "";
+                                            if (Model.P.SDate_Signup_OnSite >= Model.P.CreDate.Date)
+                                            {
+                                                sDate = Model.P.SDate_Signup_OnSite.ToString("yyyy/MM/dd");
+                                            }
+                                            else
+                                            {
+                                                sDate = "即日起";
+                                            }
+                                            if (Model.P.EDate_Signup_OnSite >= Model.P.CreDate.Date)
+                                            {
+                                                sDate += " ~ " + Model.P.EDate_Signup_OnSite.ToString("yyyy/MM/dd");
+                                            }
+                                            else
+                                            {
+                                                sDate += " ~ ";
+                                            }
+                                            <p class="mb-2">臨櫃：@sDate</p>
+                                        }
+                                        @if (Model.P.SDate_Signup_OnLine >= Model.P.CreDate.Date || Model.P.EDate_Signup_OnLine >= Model.P.CreDate.Date)
+                                        {
+                                            string sDate = "";
+                                            if (Model.P.SDate_Signup_OnLine >= Model.P.CreDate.Date)
+                                            {
+                                                sDate = Model.P.SDate_Signup_OnLine.ToString("yyyy/MM/dd");
+                                            }
+                                            else
+                                            {
+                                                sDate = "即日起";
+                                            }
+                                            if (Model.P.EDate_Signup_OnLine >= Model.P.CreDate.Date)
+                                            {
+                                                sDate += " ~ " + Model.P.EDate_Signup_OnLine.ToString("yyyy/MM/dd");
+                                            }
+                                            else
+                                            {
+                                                sDate += " ~ ";
+                                            }
+                                            <p class="mb-2">線上：@sDate</p>
+                                        }
+                                        <b>報名資格</b>
+                                        @for (int i = 0; i < Model.sRool.Length; i++)
+                                        {
+                                            <p>@(Model.sRool[i]) </p>
+                                        }
+                                        <b class="mt-2">報名費用</b>
+                                        @if (Model.P.Price_Early > 0)
+                                        {
+                                            <p>早鳥價：NT <span style="text-decoration:line-through">@(Model.P.Price_Early)</span> @(Model.P.Price_Early)</p>
+                                        }
+                                        else
+                                        {
+                                            <p>單一價：NT @(Model.P.Price_Basic) </p>
+                                        }
+
+                                    </div>
+                                </div>
+
+                                <!--其他應注意事項
+        <h4 class="mt-2 mb-3 lab_DarkBlue"><i class="fa-solid fa-circle-exclamation me-1"></i>其他應注意事項</h4>
+        <div class="card mb-3">
             <div class="card-body">
-
-
             </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
+        </div>-->
+                                <!--檔案下載
+        <h4 class="mt-2 mb-3 lab_DarkBlue"><i class="fa-solid fa-cloud-arrow-down me-1"></i>檔案下載</h4>
+        <div class="card mb-3">
+            <div class="card-body">
+            </div>
+        </div>-->
+                            </div>
+                            <!--桌機右側選單-->
+                            <div class="col d-lg-block d-none">
+                                <div class="card position-fixed" style="top:200px; right:100px; float:right">
+                                    <div class="card-header text-center">對此課程</div>
+                                    <div class="card-body text-center">
+                                        <a class="btn brn_banner_dark" href="javascript:;" onclick="AddCart(@(TempData["UID"].ToString()),@(Model.P.PID));"><i class="fa-solid fa-cart-shopping"></i> 放入購物車</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 d-lg-none d-block">
+                                <div class="card">
+                                    <div class="card-header text-center">對此課程</div>
+                                    <div class="card-body text-center">
+                                        <a class="btn brn_banner_dark" href="javascript:;" onclick="AddCart(@(TempData["UID"].ToString()),@(Model.P.PID));"><i class="fa-solid fa-cart-shopping"></i> 放入購物車</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
 
-        </div>
+        }
+
     </div>
+    
 </main>
 

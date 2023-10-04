@@ -71,7 +71,7 @@ namespace Banner.Areas.Web.Controllers
                     #endregion
                     #region 小組聚會點
 
-                    var MLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.TargetID == MOI.OIID && q.ActiveFlag && !q.DeleteFlag);
+                    var MLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == MOI.OIID && q.ActiveFlag && !q.DeleteFlag);
                     if (MLS != null)
                     {
                         cM.Week = sWeeks[MLS.WeeklyNo];

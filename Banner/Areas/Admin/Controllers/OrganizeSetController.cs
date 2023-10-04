@@ -658,7 +658,7 @@ namespace Banner.Areas.Admin.Controllers
 
                     #endregion
                     #region 查聚會點
-                    var MLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.TargetID == cIE.OI.OIID && q.ActiveFlag && !q.DeleteFlag);
+                    var MLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == cIE.OI.OIID && q.ActiveFlag && !q.DeleteFlag);
                     if (MLS != null)
                     {
                         #region 地址
@@ -1033,7 +1033,7 @@ namespace Banner.Areas.Admin.Controllers
                 var OIs = DC.OrganizeInfo.Where(q => q.OID == 2 && !q.DeleteFlag && q.ParentID == POI.OIID).OrderBy(q => q.OIID);
                 foreach (var OI in OIs)
                 {
-                    var MLSs = DC.M_Location_Set.Where(q => q.SetType == 0 && q.TargetID == OI.OIID && !q.DeleteFlag && !q.Meeting_Location.DeleteFlag).Select(q => q.Meeting_Location).OrderBy(q => q.MLID);
+                    var MLSs = DC.M_Location_Set.Where(q => q.SetType == 0 && q.OIID == OI.OIID && !q.DeleteFlag && !q.Meeting_Location.DeleteFlag).Select(q => q.Meeting_Location).OrderBy(q => q.MLID);
                     cTree T2 = new cTree();
                     T2.name = OI.Title + OI.Organize.Title + " (" + MLSs.Count() + ")";
                     T2.title = "新增";
@@ -1109,7 +1109,7 @@ namespace Banner.Areas.Admin.Controllers
                 Error = "聚會點名稱請輸入18字內</br>";
             else if (cMLE.cML.DeleteFlag)//刪除
             {
-                var MLS = DC.M_Location_Set.FirstOrDefault(q => !q.DeleteFlag && q.SetType == 0 && q.TargetID == cMLE.OIID);
+                var MLS = DC.M_Location_Set.FirstOrDefault(q => !q.DeleteFlag && q.SetType == 0 && q.OIID == cMLE.OIID);
                 if (MLS != null)
                     Error = "請先移除使用此聚會點的組織資料後再行刪除</br>";
             }
@@ -1130,7 +1130,7 @@ namespace Banner.Areas.Admin.Controllers
                 cMLE.cMLS.UpdDate = DT;
                 if (ID == 0)
                 {
-                    cMLE.cMLS.TargetID = ItemID;
+                    cMLE.cMLS.OIID = ItemID;
                     cMLE.cMLS.MLID = cMLE.cML.MLID;
                     cMLE.cMLS.DeleteFlag = false;
                     cMLE.cMLS.CreDate = cMLE.cML.UpdDate;
@@ -1177,14 +1177,14 @@ namespace Banner.Areas.Admin.Controllers
                 else
                 {
                     #region 聚會點使用對象
-                    cMLE.cMLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 0 && q.TargetID == cMLE.cML.MLID);
+                    cMLE.cMLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 0 && q.OIID == cMLE.cML.MLID);
                     if (cMLE.cMLS == null)
                     {
                         cMLE.cMLS = new M_Location_Set
                         {
                             MLID = cMLE.cML.MLID,
                             SetType = 0,
-                            TargetID = OIID,
+                            OIID = OIID,
                             S_hour = 9,
                             S_minute = 0,
                             E_hour = 12,
@@ -1351,7 +1351,7 @@ namespace Banner.Areas.Admin.Controllers
                 cMLE.cML.Title = FC.Get("txb_Title");
                 cMLE.cML.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
                 cMLE.cML.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
-                cMLE.cMLS.TargetID = cMLE.cML.MLID;//Convert.ToInt32(FC.Get("ddl_OIID_10"));
+                cMLE.cMLS.OIID = cMLE.cML.MLID;//Convert.ToInt32(FC.Get("ddl_OIID_10"));
                 cMLE.cMLS.S_hour = Convert.ToInt32(FC.Get(cMLE.SH_ControlName));
                 cMLE.cMLS.S_minute = Convert.ToInt32(FC.Get(cMLE.SM_ControlName));
                 cMLE.cMLS.E_hour = Convert.ToInt32(FC.Get(cMLE.EH_ControlName));
@@ -1403,7 +1403,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 var cMLs = from q in DC.OrganizeInfo.Where(q => q.ParentID == POI.OIID && q.OID == 2 && !q.DeleteFlag)
                            join p in DC.M_Location_Set.Where(q => !q.DeleteFlag && q.SetType == 0)
-                           on q.OIID equals p.TargetID
+                           on q.OIID equals p.OIID
                            select new { q.OIID, OITitle = q.Title, p.MLID, MLTitle = p.Meeting_Location.Title, p.ActiveFlag, p.CreDate, p.UpdDate, p.SaveACID, OTitle = q.Organize.Title };
                 var ACs = (from q in DC.Account
                            join p in cMLs

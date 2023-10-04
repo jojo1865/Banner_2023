@@ -140,6 +140,7 @@
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\AccountSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\CourseController.cs" />
+    <Compile Include="Areas\Admin\Controllers\EventSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\IncludeController.cs" />
     <Compile Include="Areas\Admin\Controllers\OrganizeSetController.cs" />
@@ -622,6 +623,8 @@
     <Content Include="Areas\Web\Views\Include\_StoreSetProductCell.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Product_Info.cshtml" />
     <Content Include="Areas\Web\Views\Include\_SotreSetTopCart.cshtml" />
+    <Content Include="Areas\Admin\Views\EventSet\Event_List.cshtml" />
+    <Content Include="Areas\Admin\Views\EventSet\Event_Edit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

@@ -54,7 +54,6 @@ a {
     border-radius: 10px;
     padding: 10px 20px;
     margin: 10px 0;
-
 }
 /*Form加入*/
 main {
@@ -74,15 +73,19 @@ main {
 .btn-verify-email {
     margin-top: 6px;
 }
+
 .action-bar {
     width: 100%;
 }
-.body-container{
-    padding:0 48px;
+
+.body-container {
+    padding: 0 48px;
 }
+
 .lab_info {
     color: var(--bs-info);
 }
+
 .lab_gray {
     color: var(--bs-gray-500);
 }
@@ -90,6 +93,7 @@ main {
 .lab_DarkBlue {
     color: var(--bs-secondary);
 }
+
 .div_NoDataMsg {
     color: #3764ac;
     font-size: 20px;
@@ -105,6 +109,7 @@ main {
 .left-area {
     background-color: #dbdbdb !important;
 }
+
 .div_login_img {
     background-image: url(/Areas/Web/Content/img/login-bg-web-Sheep.svg);
     background-position: center;
@@ -113,38 +118,61 @@ main {
     height: 100%;
     width: 100%;
 }
+
 .logo {
     height: 80%;
 }
+
+.brn_banner_dark, .brn_banner_light:hover {
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    background-color: var(--bs-secondary);
+    color: white;
+    border: 2px solid var(--bs-secondary);
+}
+
+    .brn_banner_light, .brn_banner_dark:hover {
+        -webkit-border-radius: 20px;
+        -moz-border-radius: 20px;
+        border-radius: 20px;
+        background-color: white;
+        color: var(--bs-secondary);
+        border: 2px solid var(--bs-secondary);
+    }
 /*上選單下拉*/
 .dropdown-menu {
     background: var(--bs-secondary);
 }
+
 .nav-item:hover {
     background: var(--bs-dropdown-link-active-bg) !important;
 }
+
 .nav-item a:hover {
     background: var(--bs-dropdown-link-active-bg) !important;
 }
-.navbar a{
-    color:white;
-}
-.navbar a:hover {
+
+.navbar a {
     color: white;
 }
+
+    .navbar a:hover {
+        color: white;
+    }
 
 .header-nav {
     margin: auto;
 }
+
 .img_Add {
     height: 20px;
     width: 20px;
 }
 
-.img_Product
-{
-    max-height:245px;
-    overflow:hidden;
+.img_Product {
+    max-height: 245px;
+    overflow: hidden;
 }
 /*======================================================手機板======================================================*/
 @media(max-width:992px) {
@@ -235,6 +263,10 @@ main {
         width: 100%;
     }
 
+        .table_RWDStyle tr.Bgn, .table_RWDStyle tr.Bgn:hover {
+            background-color: var(--bs-gray-500);
+        }
+
         .table_RWDStyle tr:hover {
             background-color: #FBFBFA;
         }
@@ -253,8 +285,6 @@ main {
         text-align: right;
         font-weight: 600;
     }
-
-    
 }
 /*課程選購首頁-左右調整設定*/
 @media(min-width:1840px) {

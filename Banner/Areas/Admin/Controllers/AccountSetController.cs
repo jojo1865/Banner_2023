@@ -1582,7 +1582,7 @@ namespace Banner.Areas.Admin.Controllers
                     //實體
                     var MLSs_1 = from q in MLs_1
                                  join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8)
-                                 on q.TargetID equals p.OIID
+                                 on q.OIID equals p.OIID
                                  select new { q.MID, q.Meeting_Location.Title, q.WeeklyNo, q.TimeNo, OITitle = p.Title, p.OIID };
                     var OIs = from q in JGWs_1
                               join p in MLSs_1
@@ -1605,7 +1605,7 @@ namespace Banner.Areas.Admin.Controllers
                     //線上
                     var MLSs_2 = from q in MLs_2
                                  join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8)
-                                 on q.TargetID equals p.OIID
+                                 on q.OIID equals p.OIID
                                  select new { q.MID, q.Meeting_Location.Title, q.WeeklyNo, q.TimeNo, OITitle = p.Title, p.OIID };
 
                     var OIs = from q in JGWs_2

@@ -36,7 +36,7 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Login()
         {
             GetViewBag();
-            /*if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
+            if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
             {
                 if (GetACID() <= 0)
                 {
@@ -44,7 +44,7 @@ namespace Banner.Areas.Web.Controllers
                     SetBrowserData("UserName", "系統管理者");
                 }
                 Response.Redirect("/Web/Home/Index");
-            }*/
+            }
             TempData["login"] = "";
             TempData["pw"] = "";
             return View();
@@ -592,7 +592,15 @@ namespace Banner.Areas.Web.Controllers
                         }
                     }
                 }
-
+                if(Error=="")
+                {
+                    if (ACID != 1)//非管理者
+                    {
+                        var OICheck = DC.v_GetAC_O2_OI.Where(q => q.ACID == ACID && q.OIID == P.OIID);
+                        if (OICheck == null)//本課程限制的旌旗與報名者不符
+                            Error = "本課程只允許特定旌旗教會下的會友報名";
+                    }
+                }
                 #endregion
                 if (Error == "")
                 {

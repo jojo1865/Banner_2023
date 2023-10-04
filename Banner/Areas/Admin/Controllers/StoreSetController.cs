@@ -29,6 +29,7 @@ namespace Banner.Areas.Admin.Controllers
             cProduct_List N = new cProduct_List();
             #region 物件初始化
             N.SL = new List<SelectListItem>();
+            N.SL.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
             var CCs = DC.Course_Category.Where(q => !q.DeleteFlag).OrderByDescending(q => q.CCID);
             foreach (var CC in CCs)
                 N.SL.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString() });
@@ -38,20 +39,9 @@ namespace Banner.Areas.Admin.Controllers
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             N.ActiveType = Convert.ToInt32(FC != null ? FC.Get("rbl_ActiveType") : "-1");
             N.sKey = FC != null ? FC.Get("txb_Key") : "";
-            int CID = Convert.ToInt32(FC != null ? FC.Get("ddl_C") : "0");
-            if (CID == 0)
-            {
-                N.SL.ForEach(q => q.Selected = false);
-                N.SL[0].Selected = true;
-            }
-            else
-            {
-                N.SL.ForEach(q => q.Selected = false);
-                if (N.SL.FirstOrDefault(q => q.Value == CID.ToString()) != null)
-                    N.SL.First(q => q.Value == CID.ToString()).Selected = true;
-                else
-                    N.SL[0].Selected = true;
-            }
+            int CCID = Convert.ToInt32(FC != null ? FC.Get("ddl_CC") : "0");
+            N.SL.ForEach(q => q.Selected = false);
+            N.SL.First(q => q.Value == CCID.ToString()).Selected = true;
             #endregion
 
 
@@ -67,8 +57,8 @@ namespace Banner.Areas.Admin.Controllers
             var Ns = DC.Product.Where(q => !q.DeleteFlag);
             if (N.sKey != "")
                 Ns = Ns.Where(q => q.Title.Contains(N.sKey));
-            if (CID > 0)
-                Ns = Ns.Where(q => q.CID == CID);
+            if (CCID > 0)
+                Ns = Ns.Where(q => q.Course.CCID == CCID);
             if (N.ActiveType >= 0)
                 Ns = Ns.Where(q => q.ActiveFlag == (N.ActiveType == 1));
 
@@ -85,6 +75,7 @@ namespace Banner.Areas.Admin.Controllers
                          select q;
                 }
             }
+            else if (ACID == 1) { }
             else//沒有旌旗權限~暫時就乾脆都先不給看好了
             {
                 Ns = Ns.Where(q => q.OIID == 1);
@@ -386,7 +377,8 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (!string.IsNullOrEmpty(FC.Get("rbl_OI")))
                     N.P.OIID = Convert.ToInt32(FC.Get("rbl_OI"));
-                N.P.Title = FC.Get("txb_Title");
+                //N.P.Title = FC.Get("txb_Title");
+
                 N.P.SubTitle = FC.Get("txb_SubTitle");
                 N.P.ProductInfo = FC.Get("txb_ProductInfo");
                 N.P.TargetInfo = FC.Get("txb_TargetInfo");
@@ -427,7 +419,10 @@ namespace Banner.Areas.Admin.Controllers
                 foreach (var C in Cs)
                 {
                     if (C.CID == N.P.CID)
+                    {
                         N.CSL.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString(), Selected = true });
+                        N.P.Title = C.Title;
+                    }
                     else
                         N.CSL.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString() });
                 }
@@ -653,7 +648,7 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_Edit/" + N_.PCID + "?PID=" + N_.PID, Target = "_self", Value = "編輯" });//編輯
                 cTR.Cs.Add(new cTableCell { Value = N_.Product.Title });//課程名稱
                 cTR.Cs.Add(new cTableCell { Value = N_.Title });//班級名稱
-                if(N_.LoopFlag)
+                if (N_.LoopFlag)
                     cTR.Cs.Add(new cTableCell { Value = sWeeks[N_.WeeklyNo] });//星期
                 else
                     cTR.Cs.Add(new cTableCell { Value = N_.TargetDate.ToString(DateFormat) });//單日
