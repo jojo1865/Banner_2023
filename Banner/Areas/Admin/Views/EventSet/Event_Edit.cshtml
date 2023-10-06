@@ -1,4 +1,4 @@
-﻿
+﻿@model Banner.Areas.Admin.Controllers.EventSetController.cEvent_Edit
 @{
     ViewBag.Title = "Event_Edit";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
@@ -17,7 +17,11 @@
                         <div class="form-card-group">
                             <div class="form-card">
                                 <div class="form-group">
-                                    <label>講師名稱<span>*</span></label>
+                                    <label>活動類別<span>*</span></label>
+                                    @Html.TextBox("txb_Title", Model.Title, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                                <div class="form-group">
+                                    <label>活動主題<span>*</span></label>
                                     @Html.TextBox("txb_Title", Model.Title, new { @class = "form-control form-control-lg input-underline" })
                                 </div>
                                 <div class="form-group">
@@ -73,7 +77,7 @@
                 <i class="fa-solid fa-floppy-disk"></i>儲存
             </a>
         }
-        <a href="/Admin/Course/Teacher_List" class="btn btn-outline-primary btn-lg btn-round">
+        <a href="/Admin/EventSet/Event_List?CID=@Model.CID" class="btn btn-outline-primary btn-lg btn-round">
             <i class="fa-solid fa-xmark"></i>取消
         </a>
     }

@@ -150,16 +150,30 @@ namespace Banner.Areas.Admin.Controllers
         public class cEvent_Edit
         {
             public Event N = new Event();
-
+            public int CID = 0;
+            public string CTitle = "";
         }
 
         public cEvent_Edit GetEvent_Edit(FormCollection FC)
         {
             cEvent_Edit c = new cEvent_Edit();
             int EID = GetQueryStringInInt("EID");
-            int CID = GetQueryStringInInt("CID");
 
+            #region 物件初始化
+            c.CID = GetQueryStringInInt("CID");
+            var EC = DC.Event_Category.FirstOrDefault(q => q.ECID == c.CID && q.ActiveFlag && !q.DeleteFlag);
+            if (EC == null)
+                SetAlert("缺少類別資料...", 3, "/Admin/EventSet/Event_List?CID=1");
+            else
+                c.CTitle = EC.Title;
 
+            #endregion
+            #region 資料庫載入
+
+            #endregion
+            #region 前端資料載入
+
+            #endregion
             return c;
         }
         [HttpGet]
