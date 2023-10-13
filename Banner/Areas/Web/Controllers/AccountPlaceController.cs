@@ -71,7 +71,7 @@ namespace Banner.Areas.Web.Controllers
                     #endregion
                     #region 小組聚會點
 
-                    var MLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == MOI.OIID && q.ActiveFlag && !q.DeleteFlag);
+                    var MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == MOI.OIID && q.ActiveFlag && !q.DeleteFlag);
                     if (MLS != null)
                     {
                         cM.Week = sWeeks[MLS.WeeklyNo];
@@ -80,7 +80,7 @@ namespace Banner.Areas.Web.Controllers
                             MLS.E_hour.ToString().PadLeft(2, '0') + ":" +
                             MLS.E_minute.ToString().PadLeft(2, '0');
 
-                        var L = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MID);
+                        var L = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MLSID);
                         cM.Location = GetLocationString(L);
                     }
 
@@ -144,7 +144,7 @@ namespace Banner.Areas.Web.Controllers
 
             //主日聚會點初始化
             //N.MLs.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-            N.MLs.AddRange((from q in DC.M_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag && q.SetType == 0)
+            N.MLs.AddRange((from q in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag && q.SetType == 0)
                             select new SelectListItem { Text = q.Meeting_Location.Title, Value = q.MLID.ToString() }).ToList());
             N.MLs[0].Selected = true;
 
@@ -244,7 +244,7 @@ namespace Banner.Areas.Web.Controllers
                 if (FC == null)
                 {
                     var ML = (from q in DC.M_ML_Account.Where(q => !q.DeleteFlag && q.ACID == N.AC.ACID)
-                              join p in DC.M_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SetType == 0)
+                              join p in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SetType == 0)
                               on q.MLID equals p.MLID
                               select q).FirstOrDefault();
                     if (ML != null)
@@ -548,7 +548,7 @@ namespace Banner.Areas.Web.Controllers
             else
             {
                 var MLs = from q in DC.M_ML_Account.Where(q => q.ACID == ACID && !q.DeleteFlag)
-                          join p in DC.M_Location_Set.Where(q => q.SetType == 0)
+                          join p in DC.Meeting_Location_Set.Where(q => q.SetType == 0)
                           on q.MLID equals p.MLID
                           select q;
                 foreach (var ML in MLs)

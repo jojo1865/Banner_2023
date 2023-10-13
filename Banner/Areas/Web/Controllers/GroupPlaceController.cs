@@ -21,7 +21,7 @@ namespace Banner.Areas.Web.Controllers
         #region 小組資訊-首頁-聚會資料
         public class cIndex
         {
-            public M_Location_Set MS = new M_Location_Set();
+            public Meeting_Location_Set MLS = new Meeting_Location_Set();
             public List<SelectListItem> SLIs = new List<SelectListItem>();
             public Location L = new Location();
             public Account AC = new Account();
@@ -49,10 +49,10 @@ namespace Banner.Areas.Web.Controllers
                     SetAlert("您尚未被指定為某小組的小組長,無法進行設定", 2, "/Web/GroupPlace/Index");
                 else
                 {
-                    N.MS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == OI.OIID && !q.DeleteFlag);
-                    if (N.MS == null)
+                    N.MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == OI.OIID && !q.DeleteFlag);
+                    if (N.MLS == null)
                     {
-                        N.MS = new M_Location_Set
+                        N.MLS = new Meeting_Location_Set
                         {
                             Meeting_Location = new Meeting_Location { Code = OI.OIID.ToString().PadLeft(6, '0'), Title = OI.Title + OI.Organize.Title + "聚會點" },
                             SetType = 1,
@@ -69,16 +69,16 @@ namespace Banner.Areas.Web.Controllers
                     }
                     else
                     {
-                        N.L = DC.Location.FirstOrDefault(q => q.TargetID == N.MS.MID && q.TargetType == 3);
+                        N.L = DC.Location.FirstOrDefault(q => q.TargetID == N.MLS.MLSID && q.TargetType == 3);
                         if (N.L == null)
                             N.L = new Location { ZID = 10, Address = "", LID = 0 };
-                        N.C = DC.Contect.FirstOrDefault(q => q.TargetID == N.MS.MID && q.TargetType == 3);
+                        N.C = DC.Contect.FirstOrDefault(q => q.TargetID == N.MLS.MLSID && q.TargetType == 3);
                         if (N.C == null)
                             N.C = new Contect { ZID = 10, ContectType = 0 };
                     }
 
                     N.SLIs.ForEach(q => q.Selected = false);
-                    N.SLIs.First(q => q.Value == N.MS.WeeklyNo.ToString()).Selected = true;
+                    N.SLIs.First(q => q.Value == N.MLS.WeeklyNo.ToString()).Selected = true;
                 }
             }
             return View(N);
@@ -98,10 +98,10 @@ namespace Banner.Areas.Web.Controllers
             var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag && q.OIID == ID);
             if (OI != null)
             {
-                N.MS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == OI.OIID && !q.DeleteFlag);
-                if (N.MS == null)
+                N.MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == OI.OIID && !q.DeleteFlag);
+                if (N.MLS == null)
                 {
-                    N.MS = new M_Location_Set
+                    N.MLS = new Meeting_Location_Set
                     {
                         Meeting_Location = new Meeting_Location
                         {
@@ -132,26 +132,26 @@ namespace Banner.Areas.Web.Controllers
                 }
                 else
                 {
-                    N.L = DC.Location.FirstOrDefault(q => q.TargetID == N.MS.MID && q.TargetType == 3);
+                    N.L = DC.Location.FirstOrDefault(q => q.TargetID == N.MLS.MLSID && q.TargetType == 3);
                     if (N.L == null)
                         N.L = new Location { ZID = 10, Address = "", LID = 0 };
-                    N.C = DC.Contect.FirstOrDefault(q => q.TargetID == N.MS.MID && q.TargetType == 3);
+                    N.C = DC.Contect.FirstOrDefault(q => q.TargetID == N.MLS.MLSID && q.TargetType == 3);
                     if (N.C == null)
                         N.C = new Contect { ZID = 10, ContectType = 0 };
                 }
                 if (FC != null)
                 {
-                    N.MS.WeeklyNo = Convert.ToInt32(FC.Get("ddl_WeeklyNo"));
+                    N.MLS.WeeklyNo = Convert.ToInt32(FC.Get("ddl_WeeklyNo"));
                     string[] STime = FC.Get("txb_STime").Split(':');
                     string[] ETime = FC.Get("txb_ETime").Split(':');
-                    N.MS.S_hour = Convert.ToInt32(STime[0]);
-                    N.MS.S_minute = Convert.ToInt32(STime[1]);
-                    N.MS.E_hour = Convert.ToInt32(ETime[0]);
-                    N.MS.E_minute = Convert.ToInt32(ETime[1]);
-                    N.MS.TimeNo = N.MS.S_hour < 12 ? 1 : (N.MS.S_hour < 18 ? 2 : 3);
-                    if (N.MS.S_hour > N.MS.E_hour)
+                    N.MLS.S_hour = Convert.ToInt32(STime[0]);
+                    N.MLS.S_minute = Convert.ToInt32(STime[1]);
+                    N.MLS.E_hour = Convert.ToInt32(ETime[0]);
+                    N.MLS.E_minute = Convert.ToInt32(ETime[1]);
+                    N.MLS.TimeNo = N.MLS.S_hour < 12 ? 1 : (N.MLS.S_hour < 18 ? 2 : 3);
+                    if (N.MLS.S_hour > N.MLS.E_hour)
                         Error += "聚會起始時間應小於結束時間</br>";
-                    else if (N.MS.S_minute > N.MS.E_minute)
+                    else if (N.MLS.S_minute > N.MLS.E_minute)
                         Error += "聚會起始時間應小於結束時間</br>";
 
 
@@ -177,22 +177,22 @@ namespace Banner.Areas.Web.Controllers
                 }
 
                 N.SLIs.ForEach(q => q.Selected = false);
-                N.SLIs.First(q => q.Value == N.MS.WeeklyNo.ToString()).Selected = true;
+                N.SLIs.First(q => q.Value == N.MLS.WeeklyNo.ToString()).Selected = true;
             }
             if (Error != "")
                 SetAlert(Error, 2);
             else
             {
-                if (N.MS.MID == 0)
-                    DC.M_Location_Set.InsertOnSubmit(N.MS);
+                if (N.MLS.MLSID == 0)
+                    DC.Meeting_Location_Set.InsertOnSubmit(N.MLS);
                 DC.SubmitChanges();
 
-                if (N.MS.MID == 0)
+                if (N.MLS.MLSID == 0)
                 {
-                    N.L.TargetID = N.MS.MLID;
+                    N.L.TargetID = N.MLS.MLID;
                     DC.Location.InsertOnSubmit(N.L);
 
-                    N.C.TargetID = N.MS.MLID;
+                    N.C.TargetID = N.MLS.MLID;
                     N.C.CheckFlag = false;
                     N.C.CreDate = DT;
                     N.C.CheckDate = DT;

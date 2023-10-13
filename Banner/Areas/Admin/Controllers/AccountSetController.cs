@@ -706,7 +706,7 @@ namespace Banner.Areas.Admin.Controllers
 
             //主日聚會點初始化
             N.MLs.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-            N.MLs.AddRange((from q in DC.M_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag && q.SetType == 0)
+            N.MLs.AddRange((from q in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag && q.SetType == 0)
                             select new SelectListItem { Text = q.Meeting_Location.Title, Value = q.MLID.ToString() }).ToList());
             //社群帳號初始化
             N.Coms = new List<ListInput>();
@@ -890,7 +890,7 @@ namespace Banner.Areas.Admin.Controllers
                 if (FC == null)
                 {
                     var ML = (from q in DC.M_ML_Account.Where(q => !q.DeleteFlag && q.ACID == N.AC.ACID)
-                              join p in DC.M_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SetType == 0)
+                              join p in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SetType == 0)
                               on q.MLID equals p.MLID
                               select q).FirstOrDefault();
                     if (ML != null)
@@ -1346,7 +1346,7 @@ namespace Banner.Areas.Admin.Controllers
                 else
                 {
                     var MLs = from q in DC.M_ML_Account.Where(q => q.ACID == ID && !q.DeleteFlag)
-                              join p in DC.M_Location_Set.Where(q => q.SetType == 0)
+                              join p in DC.Meeting_Location_Set.Where(q => q.SetType == 0)
                               on q.MLID equals p.MLID
                               select q;
                     foreach (var ML in MLs)
@@ -1574,7 +1574,7 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     //小組聚會點
                     //實體
-                    var MLs_1 = from q in DC.M_Location_Set.Where(q => q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag)
+                    var MLs_1 = from q in DC.Meeting_Location_Set.Where(q => q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag)
                                 join p in DC.Location.Where(q => q.TargetType == 3 && q.ZipCode.GroupName != "網路")
                                 on q.MLID equals p.TargetID
                                 select q;
@@ -1583,7 +1583,7 @@ namespace Banner.Areas.Admin.Controllers
                     var MLSs_1 = from q in MLs_1
                                  join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8)
                                  on q.OIID equals p.OIID
-                                 select new { q.MID, q.Meeting_Location.Title, q.WeeklyNo, q.TimeNo, OITitle = p.Title, p.OIID };
+                                 select new { q.MLSID, q.Meeting_Location.Title, q.WeeklyNo, q.TimeNo, OITitle = p.Title, p.OIID };
                     var OIs = from q in JGWs_1
                               join p in MLSs_1
                               on new { q.WeeklyNo, q.TimeNo } equals new { p.WeeklyNo, p.TimeNo }
@@ -1596,7 +1596,7 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     //小組聚會點
                     //線上
-                    var MLs_2 = from q in DC.M_Location_Set.Where(q => q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag)
+                    var MLs_2 = from q in DC.Meeting_Location_Set.Where(q => q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag)
                                 join p in DC.Location.Where(q => q.TargetType == 3 && q.ZipCode.GroupName == "網路")
                                 on q.MLID equals p.TargetID
                                 select q;
@@ -1606,7 +1606,7 @@ namespace Banner.Areas.Admin.Controllers
                     var MLSs_2 = from q in MLs_2
                                  join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8)
                                  on q.OIID equals p.OIID
-                                 select new { q.MID, q.Meeting_Location.Title, q.WeeklyNo, q.TimeNo, OITitle = p.Title, p.OIID };
+                                 select new { q.MLSID, q.Meeting_Location.Title, q.WeeklyNo, q.TimeNo, OITitle = p.Title, p.OIID };
 
                     var OIs = from q in JGWs_2
                               join p in MLSs_2

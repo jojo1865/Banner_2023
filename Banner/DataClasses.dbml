@@ -185,6 +185,76 @@
       <Association Name="Course_Course_Rool" Member="Course" ThisKey="CID" OtherKey="CID" Type="Course" IsForeignKey="true" />
     </Type>
   </Table>
+  <Table Name="dbo.Event" Member="Event">
+    <Type Name="Event">
+      <Column Name="EID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ECID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="EventType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="EventInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="CircleFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="EventDate" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
+      <Column Name="WeeklyNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="STime" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
+      <Column Name="ETime" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
+      <Column Name="SDate_AllowJoin" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
+      <Column Name="EDate_AllowJoin" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
+      <Column Name="STime_AllowJoin" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
+      <Column Name="ETime_AllowJoin" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
+      <Column Name="PhoneNo" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="Location_MID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Location_URL" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
+      <Column Name="Location_Note" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
+      <Column Name="Note" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Event_Event_Join_Header" Member="Event_Join_Header" ThisKey="EID" OtherKey="EID" Type="Event_Join_Header" />
+      <Association Name="Event_Category_Event" Member="Event_Category" ThisKey="ECID" OtherKey="ECID" Type="Event_Category" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Event_Category" Member="Event_Category">
+    <Type Name="Event_Category">
+      <Column Name="ECID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Event_Category_Event" Member="Event" ThisKey="ECID" OtherKey="ECID" Type="Event" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Event_Join_Detail" Member="Event_Join_Detail">
+    <Type Name="Event_Join_Detail">
+      <Column Name="EJDID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="EJHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="PhoneNo" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="JoinDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="Event_Join_Header_Event_Join_Detail" Member="Event_Join_Header" ThisKey="EJHID" OtherKey="EJHID" Type="Event_Join_Header" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Event_Join_Header" Member="Event_Join_Header">
+    <Type Name="Event_Join_Header">
+      <Column Name="EJHID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="EventDate" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
+      <Column Name="Note" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Event_Join_Header_Event_Join_Detail" Member="Event_Join_Detail" ThisKey="EJHID" OtherKey="EJHID" Type="Event_Join_Detail" />
+      <Association Name="Event_Event_Join_Header" Member="Event" ThisKey="EID" OtherKey="EID" Type="Event" IsForeignKey="true" />
+    </Type>
+  </Table>
   <Table Name="dbo.Family" Member="Family">
     <Type Name="Family">
       <Column Name="FID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -336,7 +406,46 @@
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Meeting_Location_M_ML_Account" Member="M_ML_Account" ThisKey="MLID" OtherKey="MLID" Type="M_ML_Account" />
-      <Association Name="Meeting_Location_M_Location_Set" Member="M_Location_Set" ThisKey="MLID" OtherKey="MLID" Type="M_Location_Set" />
+      <Association Name="Meeting_Location_Meeting_Location_Set" Member="Meeting_Location_Set" ThisKey="MLID" OtherKey="MLID" Type="Meeting_Location_Set" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Meeting_Location_Set" Member="Meeting_Location_Set">
+    <Type Name="Meeting_Location_Set">
+      <Column Name="MLSID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="MLID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="WeeklyNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TimeNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="S_hour" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="S_minute" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="E_hour" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="E_minute" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Meeting_Location_Set_Meeting_Location_Used" Member="Meeting_Location_Used" ThisKey="MLSID" OtherKey="MLSID" Type="Meeting_Location_Used" />
+      <Association Name="Meeting_Location_Meeting_Location_Set" Member="Meeting_Location" ThisKey="MLID" OtherKey="MLID" Type="Meeting_Location" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Meeting_Location_Used" Member="Meeting_Location_Used">
+    <Type Name="Meeting_Location_Used">
+      <Column Name="MLUID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="MLSID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="S_DateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="E_DateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="JoinCt_Child" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="JoinCt_Juiner" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="JoinCt_Aldult" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Meeting_Location_Set_Meeting_Location_Used" Member="Meeting_Location_Set" ThisKey="MLSID" OtherKey="MLSID" Type="Meeting_Location_Set" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Menu" Member="Menu">
@@ -587,99 +696,6 @@
       <Column Name="OITitle_1" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
       <Column Name="OIID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="OID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.M_Location_Set" Member="M_Location_Set">
-    <Type Name="M_Location_Set">
-      <Column Name="MID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="MLID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="SetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="WeeklyNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TimeNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="S_hour" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="S_minute" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="E_hour" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="E_minute" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Meeting_Location_M_Location_Set" Member="Meeting_Location" ThisKey="MLID" OtherKey="MLID" Type="Meeting_Location" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Event" Member="Event">
-    <Type Name="Event">
-      <Column Name="EID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="ECID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="EventType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="EventInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="CircleFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="EventDate" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
-      <Column Name="WeeklyNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="STime" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
-      <Column Name="ETime" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
-      <Column Name="SDate_AllowJoin" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
-      <Column Name="EDate_AllowJoin" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
-      <Column Name="STime_AllowJoin" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
-      <Column Name="ETime_AllowJoin" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
-      <Column Name="PhoneNo" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="TargetLocationType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetLocationID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="LocationNote" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
-      <Column Name="Note" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Event_Event_Join_Header" Member="Event_Join_Header" ThisKey="EID" OtherKey="EID" Type="Event_Join_Header" />
-      <Association Name="Event_Category_Event" Member="Event_Category" ThisKey="ECID" OtherKey="ECID" Type="Event_Category" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Event_Join_Header" Member="Event_Join_Header">
-    <Type Name="Event_Join_Header">
-      <Column Name="EJHID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="EID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="EventDate" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
-      <Column Name="Join_Ct_1" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Join_Ct_2" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Join_Ct_3" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Note" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Event_Join_Header_Event_Join_Detail" Member="Event_Join_Detail" ThisKey="EJHID" OtherKey="EJHID" Type="Event_Join_Detail" />
-      <Association Name="Event_Event_Join_Header" Member="Event" ThisKey="EID" OtherKey="EID" Type="Event" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Event_Category" Member="Event_Category">
-    <Type Name="Event_Category">
-      <Column Name="ECID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Code" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
-      <Column Name="Note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Event_Category_Event" Member="Event" ThisKey="ECID" OtherKey="ECID" Type="Event" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Event_Join_Detail" Member="Event_Join_Detail">
-    <Type Name="Event_Join_Detail">
-      <Column Name="EJDID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="EJHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="PhoneNo" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="JoinDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Association Name="Event_Join_Header_Event_Join_Detail" Member="Event_Join_Header" ThisKey="EJHID" OtherKey="EJHID" Type="Event_Join_Header" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

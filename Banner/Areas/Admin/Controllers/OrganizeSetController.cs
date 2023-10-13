@@ -658,11 +658,11 @@ namespace Banner.Areas.Admin.Controllers
 
                     #endregion
                     #region 查聚會點
-                    var MLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == cIE.OI.OIID && q.ActiveFlag && !q.DeleteFlag);
+                    var MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == cIE.OI.OIID && q.ActiveFlag && !q.DeleteFlag);
                     if (MLS != null)
                     {
                         #region 地址
-                        var L = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MID);
+                        var L = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MLSID);
                         if (L != null)
                         {
                             cIE.L = L;
@@ -673,7 +673,7 @@ namespace Banner.Areas.Admin.Controllers
 
                         #endregion
                         #region 電話
-                        var C = DC.Contect.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MID);
+                        var C = DC.Contect.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MLSID);
                         if (C != null)
                         {
                             cIE.C = C;
@@ -1033,7 +1033,7 @@ namespace Banner.Areas.Admin.Controllers
                 var OIs = DC.OrganizeInfo.Where(q => q.OID == 2 && !q.DeleteFlag && q.ParentID == POI.OIID).OrderBy(q => q.OIID);
                 foreach (var OI in OIs)
                 {
-                    var MLSs = DC.M_Location_Set.Where(q => q.SetType == 0 && q.OIID == OI.OIID && !q.DeleteFlag && !q.Meeting_Location.DeleteFlag).Select(q => q.Meeting_Location).OrderBy(q => q.MLID);
+                    var MLSs = DC.Meeting_Location_Set.Where(q => q.SetType == 0 && q.OIID == OI.OIID && !q.DeleteFlag && !q.Meeting_Location.DeleteFlag).Select(q => q.Meeting_Location).OrderBy(q => q.MLID);
                     cTree T2 = new cTree();
                     T2.name = OI.Title + OI.Organize.Title + " (" + MLSs.Count() + ")";
                     T2.title = "新增";
@@ -1076,7 +1076,7 @@ namespace Banner.Areas.Admin.Controllers
         public class cMeeting_Location_Edit
         {
             public Meeting_Location cML = new Meeting_Location();
-            public M_Location_Set cMLS = new M_Location_Set();
+            public Meeting_Location_Set cMLS = new Meeting_Location_Set();
             public List<OIListSelect> OIParent = new List<OIListSelect>();
             public Contect C = new Contect();
             public Location L = new Location();
@@ -1109,7 +1109,7 @@ namespace Banner.Areas.Admin.Controllers
                 Error = "聚會點名稱請輸入18字內</br>";
             else if (cMLE.cML.DeleteFlag)//刪除
             {
-                var MLS = DC.M_Location_Set.FirstOrDefault(q => !q.DeleteFlag && q.SetType == 0 && q.OIID == cMLE.OIID);
+                var MLS = DC.Meeting_Location_Set.FirstOrDefault(q => !q.DeleteFlag && q.SetType == 0 && q.OIID == cMLE.OIID);
                 if (MLS != null)
                     Error = "請先移除使用此聚會點的組織資料後再行刪除</br>";
             }
@@ -1134,7 +1134,7 @@ namespace Banner.Areas.Admin.Controllers
                     cMLE.cMLS.MLID = cMLE.cML.MLID;
                     cMLE.cMLS.DeleteFlag = false;
                     cMLE.cMLS.CreDate = cMLE.cML.UpdDate;
-                    DC.M_Location_Set.InsertOnSubmit(cMLE.cMLS);
+                    DC.Meeting_Location_Set.InsertOnSubmit(cMLE.cMLS);
                 }
                 DC.SubmitChanges();
 
@@ -1177,10 +1177,10 @@ namespace Banner.Areas.Admin.Controllers
                 else
                 {
                     #region 聚會點使用對象
-                    cMLE.cMLS = DC.M_Location_Set.FirstOrDefault(q => q.SetType == 0 && q.OIID == cMLE.cML.MLID);
+                    cMLE.cMLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 0 && q.OIID == cMLE.cML.MLID);
                     if (cMLE.cMLS == null)
                     {
-                        cMLE.cMLS = new M_Location_Set
+                        cMLE.cMLS = new Meeting_Location_Set
                         {
                             MLID = cMLE.cML.MLID,
                             SetType = 0,
@@ -1402,7 +1402,7 @@ namespace Banner.Areas.Admin.Controllers
             foreach (var POI in POIs)
             {
                 var cMLs = from q in DC.OrganizeInfo.Where(q => q.ParentID == POI.OIID && q.OID == 2 && !q.DeleteFlag)
-                           join p in DC.M_Location_Set.Where(q => !q.DeleteFlag && q.SetType == 0)
+                           join p in DC.Meeting_Location_Set.Where(q => !q.DeleteFlag && q.SetType == 0)
                            on q.OIID equals p.OIID
                            select new { q.OIID, OITitle = q.Title, p.MLID, MLTitle = p.Meeting_Location.Title, p.ActiveFlag, p.CreDate, p.UpdDate, p.SaveACID, OTitle = q.Organize.Title };
                 var ACs = (from q in DC.Account

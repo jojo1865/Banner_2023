@@ -143,6 +143,7 @@
     <Compile Include="Areas\Admin\Controllers\EventSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\IncludeController.cs" />
+    <Compile Include="Areas\Admin\Controllers\MeetingLocationController.cs" />
     <Compile Include="Areas\Admin\Controllers\OrganizeSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\StoreSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\SystemSetController.cs" />
@@ -625,6 +626,10 @@
     <Content Include="Areas\Web\Views\Include\_SotreSetTopCart.cshtml" />
     <Content Include="Areas\Admin\Views\EventSet\Event_List.cshtml" />
     <Content Include="Areas\Admin\Views\EventSet\Event_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Include\_Location_OnLine.cshtml" />
+    <Content Include="Areas\Admin\Views\MeetingLocation\JoinCt_List.cshtml" />
+    <Content Include="Areas\Admin\Views\MeetingLocation\JoinCt_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\MeetingLocation\JoinCt_Print.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

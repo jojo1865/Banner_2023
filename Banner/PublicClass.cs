@@ -2264,7 +2264,11 @@ namespace Banner
             if (ShortURL.ToLower().Contains("/admin/"))
             {
                 ViewBag._CSS1 = "/Areas/Admin/Content/CSS/" + (ShortURL.Contains("_List") ? "list.css" : "form.css");
-                string[] ShortURLs = ShortURL.Replace("_Edit", "_List").Split('/');
+                string[] ShortURLs = ShortURL
+                    .Replace("_Edit_1", "_List?CID=1")
+                    .Replace("_Edit_2", "_List?CID=2")
+                    .Replace("_Edit_3", "_List?CID=3")
+                    .Replace("_Edit", "_List").Split('/');
                 string NewShortURL = "";
                 for (int i = 0; i < ShortURLs.Length; i++)
                 {
@@ -2669,6 +2673,14 @@ namespace Banner
             }
 
             return str;
+        }
+
+        public string GetStringValue(string sReturn, FormCollection FC, string sKey)
+        {
+            if (FC.AllKeys.FirstOrDefault(q => q == sKey) != null)
+                sReturn = FC.Get(sKey);
+
+            return sReturn;
         }
         #endregion
     }

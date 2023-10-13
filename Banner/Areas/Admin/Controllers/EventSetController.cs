@@ -1,8 +1,11 @@
 ﻿using Banner.Models;
 using OfficeOpenXml.ConditionalFormatting;
+using OfficeOpenXml.Drawing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 
@@ -35,12 +38,11 @@ namespace Banner.Areas.Admin.Controllers
             //聚會點初始化
             int MID = 0;
             c.EC_SL.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-            var Ms = from q in DC.M_Location_Set.Where(q => q.SetType == 0 && q.ActiveFlag && !q.DeleteFlag)
+            var Ms = from q in DC.Meeting_Location_Set.Where(q => q.SetType == 0 && q.ActiveFlag && !q.DeleteFlag)
                      join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag)
                      on q.OIID equals p.OIID
-                     select new { p.OIID, OITitle = p.Title, OTitle = p.Organize.Title, q.MID, ML_Title = q.Meeting_Location.Title };
+                     select new { p.OIID, OITitle = p.Title, OTitle = p.Organize.Title, q.MLSID, ML_Title = q.Meeting_Location.Title };
             ACID = GetACID();
-            ACID = 4;
             if (ACID != 1)//非管理者
             {
                 Ms = from q in Ms
@@ -50,7 +52,7 @@ namespace Banner.Areas.Admin.Controllers
             }
 
             foreach (var M in Ms)
-                c.EC_SL.Add(new SelectListItem { Text = M.OITitle + M.OTitle + "-" + M.ML_Title, Value = M.MID.ToString() });
+                c.EC_SL.Add(new SelectListItem { Text = M.OITitle + M.OTitle + "-" + M.ML_Title, Value = M.MLSID.ToString() });
 
             #region 前端資料帶入
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
@@ -83,10 +85,10 @@ namespace Banner.Areas.Admin.Controllers
             if (CatID == 1)//主日聚會
             {
                 if (MID > 0)
-                    Ns = Ns.Where(q => q.TargetLocationType == 0 && q.TargetLocationID == MID);
+                    Ns = Ns.Where(q => q.Location_MID == MID);
                 else if (ACID != 1)//非管理者
                 {
-                    var MLs = from q in DC.M_Location_Set.Where(q => q.SetType == 0 && !q.DeleteFlag && q.ActiveFlag && q.OIID > 0)
+                    var MLs = from q in DC.Meeting_Location_Set.Where(q => q.SetType == 0 && !q.DeleteFlag && q.ActiveFlag && q.OIID > 0)
                               join p in DC.Meeting_Location.Where(q => !q.DeleteFlag && q.ActiveFlag)
                               on q.MLID equals p.MLID
                               select new { q.OIID };
@@ -103,7 +105,7 @@ namespace Banner.Areas.Admin.Controllers
             TopTitles.Add(new cTableCell { Title = "活動名稱" });
             TopTitles.Add(new cTableCell { Title = "舉辦日期" });
             TopTitles.Add(new cTableCell { Title = "舉辦時間" });
-            TopTitles.Add(new cTableCell { Title = "報名管理" });
+            //TopTitles.Add(new cTableCell { Title = "報名管理" });
             TopTitles.Add(new cTableCell { Title = "狀態" });
             TopTitles.Add(new cTableCell { Title = "備註" });
 
@@ -115,14 +117,14 @@ namespace Banner.Areas.Admin.Controllers
             foreach (var N_ in Ns)
             {
                 cTableRow cTR = new cTableRow();
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/EventSet/Event_Edit/" + N_.EID + "?CID=" + CatID, Target = "_self", Value = "編輯" });//編輯
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/EventSet/Event_Edit/" + N_.EID, Target = "_self", Value = "編輯" });//編輯
                 cTR.Cs.Add(new cTableCell { Value = N_.Title });//活動名稱
                 if (N_.CircleFlag)//為循環活動
                     cTR.Cs.Add(new cTableCell { Value = sWeeks[N_.WeeklyNo] });//舉辦日期
                 else
                     cTR.Cs.Add(new cTableCell { Value = N_.EventDate.ToString(DateFormat) });//舉辦日期
                 cTR.Cs.Add(new cTableCell { Value = N_.STime.Hours + ":" + N_.STime.Minutes + " ~ " + N_.ETime.Hours + ":" + N_.ETime.Minutes });//舉辦時間
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/EventSet/Event_Join_List/0?CID=" + CatID + "&EID=" + N_.EID, Target = "_self", Value = "管理" });//報名管理
+                //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/EventSet/Event_Join_List_" + N_.ECID + "/?EID=" + N_.EID, Target = "_self", Value = "管理" });//報名管理
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "啟用" : "停用" });//狀態
                 cTR.Cs.Add(new cTableCell { Value = N_.Note });//備註
 
@@ -146,36 +148,168 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetEvent_List(FC));
         }
         #endregion
-        #region 活動編輯
+        #region 活動編輯-通用物件
         public class cEvent_Edit
         {
-            public Event N = new Event();
-            public int CID = 0;
+            public Event E = new Event();
+            public int ECID = 0;
             public string CTitle = "";
+            public List<SelectListItem> WeeklyNoList = new List<SelectListItem>();
+            public List<SelectListItem> ML0List = new List<SelectListItem>();
         }
 
         public cEvent_Edit GetEvent_Edit(FormCollection FC)
         {
             cEvent_Edit c = new cEvent_Edit();
             int EID = GetQueryStringInInt("EID");
-
+            int ECID = GetQueryStringInInt("ECID");
             #region 物件初始化
-            c.CID = GetQueryStringInInt("CID");
-            var EC = DC.Event_Category.FirstOrDefault(q => q.ECID == c.CID && q.ActiveFlag && !q.DeleteFlag);
+
+            var EC = DC.Event_Category.FirstOrDefault(q => q.ECID == ECID && !q.DeleteFlag);
             if (EC == null)
                 SetAlert("缺少類別資料...", 3, "/Admin/EventSet/Event_List?CID=1");
             else
+            {
+                c.ECID = EC.ECID;
                 c.CTitle = EC.Title;
+            }
+            switch (ECID)
+            {
+                case 1://主日
+                    c.E = new Event
+                    {
+                        ECID = 1,
+                        Title = "",
+                        EventType = 0,
+                        EventInfo = "",
+                        CircleFlag = false,
+                        EventDate = DT,
+                        WeeklyNo = 0,
+                        STime = new TimeSpan(9, 0, 0),
+                        ETime = new TimeSpan(12, 0, 0),
+                        SDate_AllowJoin = DT,
+                        EDate_AllowJoin = DT,
+                        STime_AllowJoin = new TimeSpan(0, 0, 0),
+                        ETime_AllowJoin = new TimeSpan(23, 59, 59),
+                        PhoneNo = "",
+                        Location_MID = 0,
+                        Location_URL = "",
+                        Location_Note = "",
+                        Note = "",
+                        ActiveFlag = true,
+                        DeleteFlag = false,
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = ACID
+                    };
+                    break;
 
+                case 2://小組
+                    break;
+                case 3://事工團
+                    break;
+
+                default://其他活動
+                    break;
+            }
+
+            //每周下拉
+            c.WeeklyNoList = new List<SelectListItem>();
+            for (int i = 0; i < sWeeks.Length; i++)
+                c.WeeklyNoList.Add(new SelectListItem { Text = sWeeks[i], Value = i.ToString(), Selected = i == 0 });
+            //主日聚會點下拉
+            int SetType = ECID == 1 ? 0 : (ECID == 1 ? 1 : (ECID == 2 ? 2 : 0));
+            c.ML0List = new List<SelectListItem>();
+            var MLs = from q in DC.OrganizeInfo.Where(q => !q.DeleteFlag)
+                      join p in DC.Meeting_Location_Set.Where(q => q.SetType == SetType && !q.DeleteFlag)
+                      on q.OIID equals p.OIID
+                      select new
+                      {
+                          MLSID = p.MLSID,
+                          OID = q.OID,
+                          OIID = q.OIID,
+                          OTitle = q.Organize.Title,
+                          OITitle = q.Title,
+                          MLID = p.MLID,
+                          MLTitle = p.Meeting_Location.Title
+                      };
+            foreach (var ML in MLs.OrderBy(q => q.OID).ThenBy(q => q.OIID))
+                c.ML0List.Add(new SelectListItem { Text = ML.OITitle + ML.OTitle + ":" + ML.MLTitle, Value = ML.MLSID.ToString() });
+            if (MLs.Count() == 0)
+                c.ML0List.Add(new SelectListItem { Text = "無主日聚會點可供選擇", Value = "0", Selected = true });
+            else
+                c.ML0List[0].Selected = true;
             #endregion
             #region 資料庫載入
+            if (c.ECID > 0)
+            {
+                if (EID > 0)
+                {
+                    c.E = DC.Event.FirstOrDefault(q => q.ECID == c.ECID && q.EID == EID && !q.DeleteFlag);
+
+                    c.WeeklyNoList.ForEach(q => q.Selected = false);
+                    c.WeeklyNoList.First(q => q.Value == c.E.WeeklyNo.ToString()).Selected = true;
+
+                    if (c.E.ECID == 1 && c.E.Location_MID > 0)//主日聚會+實體
+                    {
+                        c.ML0List.ForEach(q => q.Selected = false);
+                        c.ML0List.First(q => q.Value == c.E.Location_MID.ToString()).Selected = true;
+                    }
+                }
+            }
+
 
             #endregion
             #region 前端資料載入
+            if (FC != null)
+                if (FC.AllKeys.Count() == 0)
+                    FC = null;
+            if (FC != null)
+            {
+                c.E.Title = GetStringValue(c.E.Title, FC, "txb_Title");
+                if (c.E.Title == "" && c.ML0List.Any(q => q.Selected))
+                    c.E.Title = c.ML0List.First(q => q.Selected).Text + " 的主日聚會";
+                c.E.EventInfo = GetStringValue(c.E.Title, FC, "txb_EventInfo");
+                c.E.EventType = Convert.ToInt32(FC.Get("rbl_EventType"));
+                if (c.E.ECID == 1)//主日聚會欄位
+                {
+                    if (c.E.EventType == 0 || c.E.EventType == 1)//不限制或實體
+                    {
+                        string sMID = GetStringValue("0", FC, "ddl_ML");
+                        var ML = DC.Meeting_Location_Set.FirstOrDefault(q => q.MLSID.ToString() == sMID);
+                        if (ML != null)
+                            c.E.Location_MID = ML.MLSID;
+                    }
+                    else
+                        c.E.Location_MID = 0;
 
+                    if (c.E.EventType == 0 || c.E.EventType == 2)//不限制或線上
+                        c.E.Location_URL = GetStringValue(c.E.Location_URL, FC, "txb_URL");
+                    else
+                        c.E.Location_URL = "";
+                    c.E.CircleFlag = true;
+                    c.E.WeeklyNo = Convert.ToInt32(FC.Get("ddl_Weekly"));
+                    c.E.STime = TimeSpan.Parse(FC.Get("txb_STime"));
+                    c.E.ETime = TimeSpan.Parse(FC.Get("txb_ETime"));
+                }
+
+                c.E.Location_Note = GetStringValue(c.E.Location_Note, FC, "txb_LocationNote");
+                c.E.Note = GetStringValue(c.E.Note, FC, "txb_Note");
+                c.E.ActiveFlag = GetViewCheckBox("cbox_ActiveFlag");
+                if (c.E.EID > 0)
+                    c.E.DeleteFlag = GetViewCheckBox("cbox_DeleteFlag");
+                c.E.UpdDate = DT;
+                c.E.SaveACID = ACID;
+
+
+            }
             #endregion
             return c;
         }
+        
+
+        #endregion
+        #region 活動編輯-主日聚會
         [HttpGet]
         public ActionResult Event_Edit()
         {
@@ -188,8 +322,22 @@ namespace Banner.Areas.Admin.Controllers
         {
             GetViewBag();
             var c = GetEvent_Edit(FC);
+            Error = "";
+            if (c.E.STime >= c.E.ETime)
+                Error += "聚會起始時間與結束時間有誤";
+            if (Error != "")
+                SetAlert(Error, 2);
+            else
+            {
+                if (c.E.EID == 0)
+                    DC.Event.InsertOnSubmit(c.E);
+                DC.SubmitChanges();
+
+                SetAlert("存檔完成", 1, "/Admin/EventSet/Event_List?CID=1");
+            }
             return View(c);
         }
         #endregion
+
     }
 }

@@ -406,7 +406,7 @@ namespace Banner.Areas.Web.Controllers
             N.C.CreDate = N.C.CheckDate = DT;
 
             //主日聚會點初始化
-            N.MLs.AddRange((from q in DC.M_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag && q.SetType == 0)
+            N.MLs.AddRange((from q in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag && q.SetType == 0)
                             select new SelectListItem { Text = q.Meeting_Location.Title, Value = q.MLID.ToString() }).ToList());
             N.MLs[0].Selected = true;
             #endregion
@@ -449,7 +449,7 @@ namespace Banner.Areas.Web.Controllers
                     N.BaptizedTypes[1].Selected = N.AC.BaptizedType == 2;
                     //主日聚會點
                     var M_MLs = from q in DC.M_ML_Account.Where(q => q.ACID == N.iACID)
-                                join p in DC.M_Location_Set.Where(q => q.SetType == 0 && !q.DeleteFlag && q.ActiveFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag)
+                                join p in DC.Meeting_Location_Set.Where(q => q.SetType == 0 && !q.DeleteFlag && q.ActiveFlag && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag)
                                 on q.MLID equals p.MLID
                                 select q;
                     if (M_MLs.Count() > 0)
@@ -576,7 +576,7 @@ namespace Banner.Areas.Web.Controllers
                     DC.SubmitChanges();
                 }
                 //主日聚會點
-                var MLSs = from q in DC.M_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SetType == 0 && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag)
+                var MLSs = from q in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SetType == 0 && q.Meeting_Location.ActiveFlag && !q.Meeting_Location.DeleteFlag)
                            join p in DC.M_ML_Account.Where(q => !q.DeleteFlag && q.ACID == N.AC.ACID)
                            on q.MLID equals p.MLID
                            select p;

@@ -31,13 +31,13 @@
                                 <label>小組聚會時間</label>
                                 <div class="row">
                                     <div class="col-auto">
-                                        @Html.TextBox("txb_STime", (Model.MS.S_hour.ToString().PadLeft(2, '0') + ":" + Model.MS.S_minute.ToString().PadLeft(2, '0')), new { @class = "form-control form-control-lg input-underlin", type = "time" })
+                                        @Html.TextBox("txb_STime", (Model.MLS.S_hour.ToString().PadLeft(2, '0') + ":" + Model.MLS.S_minute.ToString().PadLeft(2, '0')), new { @class = "form-control form-control-lg input-underlin", type = "time" })
                                     </div>
                                     <div class="col-auto">
                                         至
                                     </div>
                                     <div class="col-auto">
-                                        @Html.TextBox("txb_ETime", (Model.MS.E_hour.ToString().PadLeft(2, '0') + ":" + Model.MS.E_minute.ToString().PadLeft(2, '0')), new { @class = "form-control form-control-lg input-underlin", type = "time" })
+                                        @Html.TextBox("txb_ETime", (Model.MLS.E_hour.ToString().PadLeft(2, '0') + ":" + Model.MLS.E_minute.ToString().PadLeft(2, '0')), new { @class = "form-control form-control-lg input-underlin", type = "time" })
                                     </div>
                                 </div>
                             </div>
@@ -56,7 +56,7 @@
             </div>
         </div>
         <div class="action-bar">
-                @if ((((bool[])ViewBag._Power)[1] && Model.MS.MID == 0) || (((bool[])ViewBag._Power)[2] && Model.MS.MID > 0) || true)
+                @if ((((bool[])ViewBag._Power)[1] && Model.MLS.MLSID == 0) || (((bool[])ViewBag._Power)[2] && Model.MLS.MLSID > 0) || true)
                 {
                     <div class="btn btn-primary btn-lg btn-round">
                         <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>

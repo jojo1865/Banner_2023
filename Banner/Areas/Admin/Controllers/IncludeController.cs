@@ -20,6 +20,9 @@ namespace Banner.Areas.Admin.Controllers
         public PartialViewResult _LeftMenu()
         {
             string sURL = GetShortURL()
+                .Replace("Event_Edit_1", "Event_List?CID=1")
+                .Replace("Event_Edit_2", "Event_List?CID=2")
+                .Replace("Event_Edit_3", "Event_List?CID=3")
                 .Replace("_Edit", "_List")
                 .Replace("ProductClass_", "Product_")
                 .Replace("ProductClassTeacher_", "Product_")
@@ -275,7 +278,7 @@ namespace Banner.Areas.Admin.Controllers
 
             if (FC != null)
             {
-                
+
                 cL.Z0List.First(q => q.Value == FC.Get("ddl_Zip0")).Selected = true;
                 cL.Address0 = FC.Get("txb_Address0");
                 cL.Address1_1 = FC.Get("txb_Address1_1");
@@ -451,6 +454,21 @@ namespace Banner.Areas.Admin.Controllers
         public PartialViewResult _Location_User(int LID, FormCollection FC = null)
         {
             return PartialView(SetLocation_User(LID, FC));
+        }
+        #endregion
+        #region 地址-使用者
+        public cLocation SetLocation_OnLine(int LID, FormCollection FC)
+        {
+            cLocation cL = new cLocation();
+            cL.LID = LID;
+            if (FC != null)
+                if (FC.Keys.Count == 0)
+                    FC = null;
+
+            if (FC != null)
+                cL.Address2 = FC.Get("txb_Address2");
+
+            return cL;
         }
         #endregion
         #region 目前組織架構參考表
