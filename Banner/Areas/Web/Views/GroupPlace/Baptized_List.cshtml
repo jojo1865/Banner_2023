@@ -19,7 +19,6 @@
         @Html.Action("_GroupTopMenu", "Include")
         <div class="w-100 mt-2">
             <form method="post" id="form1">
-                @Html.AntiForgeryToken()
                 @Html.Action("_TableList", "Include", new { cTL = Model })
             </form>
         </div>

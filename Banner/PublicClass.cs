@@ -2609,7 +2609,7 @@ namespace Banner
                 MAs = MAs.Where(q => q.ACID == ACID);
             return MAs;
         }
-
+        //取得會員是哪個旌旗
         public IQueryable<M_OI2_Account> GetMOI2AC(int OIID = 0, int ACID = 0)
         {
             var MAs = DC.M_OI2_Account.Where(q =>
@@ -2625,7 +2625,7 @@ namespace Banner
             return MAs;
         }
 
-
+        
         public IQueryable<M_Rool_Account> GetMRAC(int RID = 0, int ACID = 0)
         {
             var MAs = DC.M_Rool_Account.Where(q => !q.DeleteFlag &&

@@ -283,7 +283,6 @@ namespace Banner.Areas.Web.Controllers
             return View(GetAldult_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Aldult_List(FormCollection FC)
         {
             GetViewBag();
@@ -490,7 +489,6 @@ namespace Banner.Areas.Web.Controllers
             return View(GetNew_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult New_List(FormCollection FC)
         {
             GetViewBag();
@@ -648,7 +646,6 @@ namespace Banner.Areas.Web.Controllers
             return View(GetBaptized_List(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Baptized_List(FormCollection FC)
         {
             GetViewBag();
@@ -742,6 +739,61 @@ namespace Banner.Areas.Web.Controllers
                 }
             }
             return View(N);
+        }
+        #endregion
+
+        #region 小組聚會登記
+        [HttpGet]
+        public ActionResult GroupMeet_QRCode(int ID)
+        {
+            GetViewBag();
+            ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
+            GetID();
+            if (ID > 0)
+                SetBrowserData("OIID", ID.ToString());
+            else
+                ID = Convert.ToInt32(GetBrowserData("OIID"));
+
+            string sQRCode_URL = Create_QRCode("/Web/AccountPlace/GroupMeet_Join/" + ID);
+            TempData["QRCode_URL"] = sQRCode_URL;
+            ViewBag._OIID = ID;
+
+            var MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == ID && !q.DeleteFlag);
+            if(MLS==null)
+            {
+                if(MLS.WeeklyNo>0)
+                {
+                    if((int)DT.DayOfWeek == MLS.WeeklyNo)
+                    {
+                        TempData["QRCode_Show"] = true;
+                        string str = "小組聚會時間:" + sWeeks[MLS.WeeklyNo];
+                        if (MLS.TimeNo > 0)
+                            str += " " + sTimeSpans[MLS.TimeNo];
+                        str += " " + MLS.S_hour.ToString().PadLeft(2, '0') + ":" + MLS.S_minute.ToString().PadLeft(2, '0') + " ~ ";
+                        str += " " + MLS.E_hour.ToString().PadLeft(2, '0') + ":" + MLS.E_minute.ToString().PadLeft(2, '0');
+                        TempData["QRCode_Msg"] = str;
+                    }
+                    else
+                    {
+                        TempData["QRCode_Show"] = false;
+                        TempData["QRCode_Msg"] = "今日並非小組聚會時間...";
+                    }
+                    
+                }
+                else
+                {
+                    TempData["QRCode_Show"] = false;
+                    TempData["QRCode_Msg"] = "查無小組聚會時間...";
+                }
+                
+            }
+            else
+            {
+                TempData["QRCode_Show"] = false;
+                TempData["QRCode_Msg"] = "查無小組聚會時間...";
+            }
+            
+            return View();
         }
         #endregion
     }

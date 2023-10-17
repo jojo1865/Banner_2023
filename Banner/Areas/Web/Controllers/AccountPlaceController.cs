@@ -1083,7 +1083,116 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         #endregion
+        #region 小組聚會報到
+        [HttpGet]
+        public ActionResult GroupMeet_Join(int ID)
+        {
+            GetViewBag();
+            ACID = GetACID();
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == ID);
+            var MOIs = GetMOIAC(8, ID, ACID);
+            if (AC == null)
+                SetAlert("請先登入", 2, "/Web/Home/Login");
+            else if (OI == null)
+                SetAlert("缺少小組資訊,無法報到", 2, "/Web/Home/Index");
+            else if (OI.DeleteFlag)
+                SetAlert("該小組已被移除,無法報到", 2, "/Web/Home/Index");
+            else if (!OI.ActiveFlag)
+                SetAlert("該小組未被啟用,無法報到", 2, "/Web/Home/Index");
+            else if (!MOIs.Any())
+                SetAlert("您並非該小組成員,無法報到", 2, "/Web/Home/Index");
+            else
+            {
+                var MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == OI.OIID && !q.DeleteFlag);
+                if (MLS == null)
+                {
+                    if (MLS.WeeklyNo > 0)
+                    {
+                        if ((int)DT.DayOfWeek == MLS.WeeklyNo)
+                        {
+                            var EJH = DC.Event_Join_Header.FirstOrDefault(q => q.EID == 1 && q.OIID == OI.OIID && q.EventDate == DT.Date);
+                            if (EJH == null)
+                            {
+                                EJH = new Event_Join_Header
+                                {
+                                    EID = 1,
+                                    OIID = OI.OIID,
+                                    EventDate = DT.Date,
+                                    Note = "",
+                                    CreDate = DT,
+                                    UpdDate = DT,
+                                    SaveACID = ACID
+                                };
+                                DC.Event_Join_Header.InsertOnSubmit(EJH);
+                                DC.SubmitChanges();
+                            }
 
+                            var EJD = DC.Event_Join_Detail.FirstOrDefault(q => q.EJHID == EJH.EJHID && q.ACID == ACID);
+                            if (EJD != null)
+                                SetAlert("您已報到過了...", 4, "/Web/Home/Index");
+                            else
+                            {
+                                EJD = new Event_Join_Detail
+                                {
+                                    Event_Join_Header = EJH,
+                                    ACID = ACID,
+                                    Name = AC != null ? AC.Name_First + AC.Name_Last : "",
+                                    PhoneNo = "",
+                                    DeleteFlag = false,
+                                    JoinDate = DT,
+                                    CreDate = DT
+                                };
+                                DC.Event_Join_Detail.InsertOnSubmit(EJD);
+                                DC.SubmitChanges();
+
+                                SetAlert("您已報到完成", 1, "/Web/AccountPlace/GroupMeet_List");
+                            }
+                        }
+                        else
+                            SetAlert("今日並非小組聚會時間...", 3, "/Web/Home/Index");
+                    }
+                    else
+                        SetAlert("查無小組聚會時間...", 3, "/Web/Home/Index");
+                }
+                else
+                    SetAlert("查無小組聚會時間...", 3, "/Web/Home/Index");
+            }
+
+            return View();
+        }
+
+        #endregion
+        #region 我的小組聚會紀錄
+        public class cGroupMeet_List
+        {
+            public cTableList cTL = new cTableList();
+        }
+        public cGroupMeet_List GetGroupMeet_List(FormCollection FC)
+        {
+            cGroupMeet_List c = new cGroupMeet_List();
+
+
+
+
+
+            return c;
+        }
+        [HttpGet]
+        public ActionResult GroupMeet_List()
+        {
+            GetViewBag();
+            
+            return View(GetGroupMeet_List(null));
+        }
+        [HttpPost]
+        public ActionResult GroupMeet_List(FormCollection FC)
+        {
+            GetViewBag();
+
+            return View(GetGroupMeet_List(FC));
+        }
+        #endregion
     }
 }
 

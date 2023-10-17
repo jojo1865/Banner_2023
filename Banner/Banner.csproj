@@ -458,6 +458,10 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\icon.svg" />
+    <Content Include="Content\Image\CourseCategory_1.jpg" />
+    <Content Include="Content\Image\CourseCategory_2.jpg" />
+    <Content Include="Content\Image\CourseCategory_3.jpg" />
+    <Content Include="Content\Image\CourseCategory_4.jpg" />
     <Content Include="Error.html" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -630,6 +634,9 @@
     <Content Include="Areas\Admin\Views\MeetingLocation\JoinCt_List.cshtml" />
     <Content Include="Areas\Admin\Views\MeetingLocation\JoinCt_Edit.cshtml" />
     <Content Include="Areas\Admin\Views\MeetingLocation\JoinCt_Print.cshtml" />
+    <Content Include="Areas\Web\Views\GroupPlace\GroupMeet_QRCode.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupMeet_Join.cshtml" />
+    <Content Include="Areas\Web\Views\AccountPlace\GroupMeet_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

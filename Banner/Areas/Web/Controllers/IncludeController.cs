@@ -619,6 +619,10 @@ namespace Banner.Areas.Web.Controllers
         #region 商品卡
         public PartialViewResult _StoreSetProductCell(Product P)
         {
+            if(string.IsNullOrEmpty(P.ImgURL))
+            {
+                P.ImgURL = "/Content/Image/CourseCategory_" + P.Course.CCID + ".jpg";
+            }
             return PartialView(P);
         }
         #endregion

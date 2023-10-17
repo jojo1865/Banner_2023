@@ -413,7 +413,10 @@ namespace Banner.Areas.Admin.Controllers
                 N.P.SaveACID = ACID;
                 N.CCSL.ForEach(q => q.Selected = false);
                 N.CCSL.FirstOrDefault(q => q.Value == FC.Get("ddl_CCBasic")).Selected = true;
-                N.P.CID = Convert.ToInt32(FC.Get("ddl_CBasic"));
+                string zzz = FC.Get("ddl_CBasic");
+                var Cou = DC.Course.FirstOrDefault(q => q.CID == Convert.ToInt32(FC.Get("ddl_CBasic")));
+                if (Cou != null)
+                    N.P.Course = Cou;
                 N.CSL = new List<SelectListItem>();
                 var Cs = DC.Course.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CCID.ToString() == FC.Get("ddl_CCBasic")).OrderBy(q => q.CCID);
                 foreach (var C in Cs)
@@ -442,7 +445,6 @@ namespace Banner.Areas.Admin.Controllers
                     file_upload.SaveAs(SavaPath);
                     N.P.ImgURL = "/Photo/Product/" + FileName;
                 }
-
                 //擋修與對象
                 //新增UI新增的部分
                 #region 先修課程

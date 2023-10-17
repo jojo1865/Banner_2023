@@ -1,0 +1,35 @@
+﻿
+@{
+    ViewBag.Title = "GroupMeet_QRCode";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/GroupPlace/Index/@ViewBag._OIID">小組資訊</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/GroupPlace/Index/@ViewBag._OIID">小組聚會資訊更新</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">小組聚會報到QRCode</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">小組聚會報到QRCode</h5>
+            
+        </div>
+        <div class="body-container">
+            <div class="text-center">
+                <label>@TempData["QRCode_Msg"]</label>
+                @if((bool)TempData["QRCode_Show"])
+            {
+<img src="@TempData["QRCode_URL"]" style="width:100%; max-width:200px;" />
+            }
+                
+            </div>
+        </div>
+    </div>
+</div>
+

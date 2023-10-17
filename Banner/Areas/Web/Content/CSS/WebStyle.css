@@ -246,6 +246,10 @@ main {
     .table .pagination-container {
         display: block;
     }
+
+    .container_phone{
+        padding:0px;
+    }
 }
 
 
