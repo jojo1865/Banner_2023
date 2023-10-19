@@ -1,0 +1,67 @@
+﻿@model Banner.Areas.Web.Controllers.GroupPlaceController.cGroupMeet_List
+@{
+    ViewBag.Title = "GroupData_Aldult_List";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container container_phone">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/GroupPlace/Index/@ViewBag._OIID">小組資訊</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">小組聚會名單</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">@Html.Raw(ViewBag._GroupTitle)</h5>
+        </div>
+        @Html.Action("_GroupTopMenu", "Include")
+        <div class="container-lg">
+
+            <form method="post" id="form1">
+                <div class="card">
+                    <div class="row p-3">
+                        <div class="col-lg-4 col-12">
+                            <label>聚會日期</label>
+                            @Html.TextBox("txb_Date", Model.sDate, new { @class = "form-control form-control-lg input-underline", type = "date" })
+
+                        </div>
+                        <div class="col-lg-4 col-12">
+                            <label>姓名</label>
+                            @Html.TextBox("txb_Name", Model.sName, new { @class = "form-control form-control-lg input-underline" })
+                        </div>
+                        <div class="col-lg-4 col-12 text-lg-end text-center pt-4">
+                            <input type="hidden" id="hid_SubmitType" name="hid_SubmitType" value="Filter" />
+                            <a href="javascript:;" onclick="Filter();" name="a_Filter" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><i class="fa-solid fa-magnifying-glass"></i>查詢</a>
+                        </div>
+                    </div>
+                    <div class="row p-3">
+                        <div class="col-12">
+                            最近5次聚會統計數據：
+                        </div>
+                        @for (int i = 0; i < Model.GroupCt.Length; i++)
+                        {
+                            if (Model.GroupCt[i] != "")
+                            {
+                                <div class="col-12">
+                                    @Html.Raw(Model.GroupCt[i])
+                                </div>
+                            }
+                        }
+
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="action-bar">
+
+    <a href="javascript:;" onclick="SubmitConfirm();" name="a_Submit" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
+
+</div>

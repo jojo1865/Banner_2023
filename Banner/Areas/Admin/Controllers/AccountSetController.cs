@@ -118,44 +118,48 @@ namespace Banner.Areas.Admin.Controllers
                         Ns = Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.Birthday != q.CreDate);
                         #region 後台全職同工可檢視旌旗資料判斷
                         {
-                            var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
-                            if (MOI2 == null)//他沒有全部的權限
+                            if(ACID !=1)
                             {
-                                MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 2 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
-                                if (MOI2 == null)//他沒有看未入組的會員權限=需要依據他的旌旗角色篩選
+                                var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                                if (MOI2 == null)//他沒有全部的權限
                                 {
-                                    MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
-                                    if (MOI2 == null)//不具備旌旗的權限
+                                    MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 2 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                                    if (MOI2 == null)//他沒有看未入組的會員權限=需要依據他的旌旗角色篩選
                                     {
-                                        Ns = Ns.Where(q => q.ACID == 0);
+                                        MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                                        if (MOI2 == null)//不具備旌旗的權限
+                                        {
+                                            Ns = Ns.Where(q => q.ACID == 0);
+                                        }
+                                        else
+                                        {
+                                            var v_ACIDs = from q in DC.v_GetAC_O2_OI
+                                                          join p in DC.M_OI2_Account.Where(q => q.ACID == ACID)
+                                                          on q.OIID equals p.OIID
+                                                          select q;
+
+                                            Ns = from q in v_ACIDs
+                                                 join p in Ns
+                                                 on q.ACID equals p.ACID
+                                                 select p;
+                                        }
                                     }
                                     else
                                     {
-                                        var v_ACIDs = from q in DC.v_GetAC_O2_OI
-                                                      join p in DC.M_OI2_Account.Where(q => q.ACID == ACID)
-                                                      on q.OIID equals p.OIID
-                                                      select q;
-
-                                        Ns = from q in v_ACIDs
+                                        var M_ACIDs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CreDate != q.JoinDate && q.OIID > 0)
+                                                      group q by new { q.ACID } into g
+                                                      select new { g.Key.ACID };
+                                        var ACIDs = from q in Ns
+                                                    group q by new { q.ACID } into g
+                                                    select new { g.Key.ACID };
+                                        Ns = from q in ACIDs.Except(M_ACIDs)
                                              join p in Ns
                                              on q.ACID equals p.ACID
                                              select p;
                                     }
                                 }
-                                else
-                                {
-                                    var M_ACIDs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CreDate != q.JoinDate && q.OIID > 0)
-                                                  group q by new { q.ACID } into g
-                                                  select new { g.Key.ACID };
-                                    var ACIDs = from q in Ns
-                                                group q by new { q.ACID } into g
-                                                select new { g.Key.ACID };
-                                    Ns = from q in ACIDs.Except(M_ACIDs)
-                                         join p in Ns
-                                         on q.ACID equals p.ACID
-                                         select p;
-                                }
                             }
+
                         }
                         #endregion
                     }

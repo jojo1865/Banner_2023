@@ -6,6 +6,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.IO;
 using System.Security.Cryptography;
+using System.Web.Helpers;
+using System.Drawing;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -36,7 +38,7 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Login()
         {
             GetViewBag();
-            if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
+            /*if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
             {
                 if (GetACID() <= 0)
                 {
@@ -44,7 +46,7 @@ namespace Banner.Areas.Web.Controllers
                     SetBrowserData("UserName", "系統管理者");
                 }
                 Response.Redirect("/Web/Home/Index");
-            }
+            }*/
             TempData["login"] = "";
             TempData["pw"] = "";
             return View();
@@ -74,12 +76,12 @@ namespace Banner.Areas.Web.Controllers
             else
             {
                 string EncPW = HSM.Enc_1(PW);
-                var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.Login == Login && q.Password == EncPW);
+                var AC = DC.Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && (q.Login == Login || q.IDNumber == Login) && (q.Password == EncPW || q.Password == PW));
                 if (AC == null)
                 {
-                    AC = DC.Account.Where(q => q.Login == Login && q.ActiveFlag && !q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
+                    AC = DC.Account.Where(q => (q.Login == Login || q.IDNumber == Login) && q.ActiveFlag && !q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
                     if (AC == null)
-                        SetAlert("此帳號不存在", 2);
+                        SetAlert("此帳號/身分證字號不存在", 2);
                     /*else if (AC.DeleteFlag)
                         SetAlert("此帳號已被移除", 2);
                     else if (!AC.ActiveFlag)
@@ -130,6 +132,12 @@ namespace Banner.Areas.Web.Controllers
                 }
                 else
                 {
+                    if (AC.Password == PW)
+                    {
+                        AC.Password = EncPW;
+                        DC.SubmitChanges();
+                    }
+
                     DelSession("LoginCt");
                     DelSession("LoginAccount");
                     LogInAC(AC.ACID);
@@ -151,66 +159,55 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult ForgetPassword(FormCollection FC)
         {
             GetViewBag();
-            string Email = FC.Get("txb_Email");
-            string CellPhone = FC.Get("txb_CellPhone");
-            if (FC.Get("btn_SendEmail") != null)
+            string Login = FC.Get("txb_Login");
+            string IDNumber = FC.Get("txb_IDNumber");
+
+            var AC = DC.Account.FirstOrDefault(q => !q.DeleteFlag && q.ActiveFlag && (q.Login == Login || q.IDNumber == IDNumber));
+            if (AC != null)
             {
-                if (Email != "")
+                int PW = GetRand(1000000);
+
+
+                //先發Email
+                var Con_Mail = DC.Contect.FirstOrDefault(q => q.ContectType == 2 && q.TargetType == 2 && q.TargetID == AC.ACID);
+                var Con_Phone = DC.Contect.FirstOrDefault(q => q.ContectType == 1 && q.TargetType == 2 && q.TargetID == AC.ACID);
+                int ConSndType = 0;
+                if (Con_Mail != null)
+                    if (CheckEmail(Con_Mail.ContectValue))
+                        ConSndType = 2;
+
+                if (Con_Phone != null && ConSndType == 0)
+                    if (CheckCellPhone(Con_Phone.ContectValue))
+                        ConSndType = 1;
+
+                if (ConSndType == 1)//可發簡訊
                 {
-                    var AC = (from q in DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag)
-                              join p in DC.Contect.Where(q => q.ContectValue == Email && q.ContectType == 2 && q.TargetType == 2)
-                              on q.ACID equals p.TargetID
-                              select q).FirstOrDefault();
-                    if (AC != null)
-                    {
-                        int PW = GetRand(1000000);
-                        AC.Password = HSM.Enc_1(PW.ToString());
-                        AC.UpdDate = DT;
-                        DC.SubmitChanges();
-                        string MailData = "親愛的旌旗家人 您好：</br></br>" +
+                    AC.Password = HSM.Enc_1(PW.ToString());
+                    AC.UpdDate = DT;
+                    DC.SubmitChanges();
+
+                    SendSNS(Con_Phone.ContectValue, "【全球旌旗資訊網】忘記密碼通知簡訊", "親愛的旌旗家人,您的新密碼為：" + PW.ToString() + ",請立即登入，即可修改密碼。");
+                }
+                else if (ConSndType == 2)//可發Mail
+                {
+                    AC.Password = HSM.Enc_1(PW.ToString());
+                    AC.UpdDate = DT;
+                    DC.SubmitChanges();
+
+                    string MailData = "親愛的旌旗家人 您好：</br></br>" +
                             "這裡是【全球旌旗資訊網】自動發信系統</br></br>" +
                             "您的新密碼為：{0}</br>" +
                             "請立即登入，即可修改密碼。</br></br>" +
                             "如需有任何問題，請寫信至itsupport@wwbch.org</br></br>" +
                             "旌旗教會 敬上";
-                        SendMail(Email, AC.Name_First + AC.Name_Last, "【全球旌旗資訊網】忘記密碼通知信", string.Format(MailData, PW.ToString()));
-                        SetAlert("您的新密碼已發送,請查看您的信箱", 1, "/Web/Home/Login");
-                    }
-                    else
-                        SetAlert("查無帳號,請重新輸入", 3);
+                    SendMail(Con_Mail.ContectValue, AC.Name_First + AC.Name_Last, "【全球旌旗資訊網】忘記密碼通知信", string.Format(MailData, PW.ToString()));
+                    SetAlert("您的新密碼已發送,請查看您的信箱", 1, "/Web/Home/Login");
                 }
                 else
-                    SetAlert("請輸入Email", 2);
-            }
-            else if (FC.Get("btn_SendPhone") != null)
-            {
-                if (CellPhone != "")
-                {
-                    var AC = (from q in DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag && q.BackUsedFlag)
-                              join p in DC.Contect.Where(q => q.ContectValue == CellPhone && q.ContectType == 1 && q.TargetType == 2)
-                              on q.ACID equals p.TargetID
-                              select q).FirstOrDefault();
-
-                    if (AC != null)
-                    {
-                        int PW = GetRand(1000000);
-                        AC.Password = HSM.Enc_1(PW.ToString());
-                        AC.UpdDate = DT;
-                        DC.SubmitChanges();
-                        SendSNS(CellPhone, "【全球旌旗資訊網】忘記密碼通知簡訊", "親愛的旌旗家人,您的新密碼為：" + PW.ToString() + ",請立即登入，即可修改密碼。");
-
-                        SetAlert("您的新密碼已發送,請查看您的簡訊", 1, "/Web/Home/Login");
-                    }
-                    else
-                        SetAlert("查無帳號,請重新輸入", 3);
-                }
-                else
-                    SetAlert("請輸入手機號碼", 2);
+                    SetAlert("此帳號的Email或手機資料有問題,無法查詢密碼", 3);
             }
             else
-                SetAlert("操作不正確", 2);
-
-
+                SetAlert("查無帳號,請重新輸入", 3);
             return View();
         }
         #endregion
@@ -592,7 +589,7 @@ namespace Banner.Areas.Web.Controllers
                         }
                     }
                 }
-                if(Error=="")
+                if (Error == "")
                 {
                     if (ACID != 1)//非管理者
                     {

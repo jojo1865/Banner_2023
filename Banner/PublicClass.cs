@@ -2449,7 +2449,9 @@ namespace Banner
             else
             {
                 bool bCheck = false;
-                bool.TryParse(Input, out bCheck);
+                if (!bool.TryParse(Input, out bCheck))
+                    bCheck = Input == "on";
+
                 return bCheck;
             }
 

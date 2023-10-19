@@ -82,6 +82,10 @@ btns.forEach((btn) => {
 });
 /*確定送出修改 */
 function SubmitConfirm() {
+    var SubmitType = document.getElementById("hid_SubmitType");
+    if (SubmitType != null) {
+        SubmitType.value = "Save";
+    }
     Swal.fire({
         icon: 'warning',
         html: '確定儲存修改?',
@@ -98,6 +102,15 @@ function SubmitConfirm() {
             return;
         }
     });
+}
+/*搜尋 */
+function Filter() {
+    var SubmitType = document.getElementById("hid_SubmitType");
+    if (SubmitType != null) {
+        SubmitType.value = "Filter";
+    }
+        
+    document.getElementById('form1').submit();
 }
 function ClearLoading() {
     btns.forEach((btn) => {

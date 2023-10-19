@@ -51,7 +51,8 @@ namespace Banner.Areas.Admin.Controllers
                     Ms.Items = GetMenu(Rs.ToList(), sURL, 0);
                 }
             }
-
+            if(Ms.Items==null)
+                Ms.Items=new List<cMenu>();
             return PartialView(Ms);
         }
         //取得選單可以查的網址

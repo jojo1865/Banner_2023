@@ -4,7 +4,7 @@
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
 }
 
-<div class="body-container">
+<div class="body-container container_phone">
     <div class="section-container">
         <nav class="breadcrumb-nav">
             <ol class="breadcrumb">
@@ -18,7 +18,7 @@
             <h5 class="header">@Html.Raw(ViewBag._GroupTitle)</h5>
         </div>
         @Html.Action("_GroupTopMenu", "Include")
-        <div class="w-100 mt-2">
+        <div class="container-lg">
             <form method="post" id="form1">
                 <label><span>．落戶原則：小組員需聚會4次以上，再進行落戶。</span></label>
                 @Html.Action("_TableList", "Include", new { cTL = Model })

@@ -1,4 +1,4 @@
-﻿
+﻿@model Banner.Areas.Web.Controllers.AccountPlaceController.cGroupMeet_List
 @{
     ViewBag.Title = "GroupMeet_List";
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
@@ -28,15 +28,15 @@
                         <div class="row">
                             <div class="col-auto">
                                 <label class="lab_DarkBlue">聚會日：</label>
-                                <span class="lab_info">@("星期天")</span>
+                                <span class="lab_info">@(Model.sWeek)</span>
                             </div>
                             <div class="col-auto">
                                 <label class="lab_DarkBlue">聚會時間：</label>
-                                <span class="lab_info">@("12:00~13:00")</span>
+                                <span class="lab_info">@(Model.sTime)</span>
                             </div>
                             <div class="col-auto">
                                 <label class="lab_DarkBlue">聚會地點：</label>
-                                <span class="lab_info">@("台中旌旗")</span>
+                                <span class="lab_info">@(Model.sLocation)</span>
                             </div>
                         </div>
                         <div class="row">
@@ -45,11 +45,11 @@
                                     <label>聚會日期：</label>
                                     <div class="row">
                                         <div class="col-lg-auto col-12">
-                                            @Html.TextBox("txb_SDate", "2023-10-10", new {@class= "form-control", type="date"})
+                                            @Html.TextBox("txb_SDate", Model.SDate, new {@class= "form-control", type="date"})
                                         </div>
                                         <div class="col-lg-auto col-12 text-center">~</div>
                                         <div class="col-lg-auto col-12">
-                                            @Html.TextBox("txb_EDate", "2023-10-10", new { @class = "form-control", type = "date" })
+                                            @Html.TextBox("txb_EDate", Model.EDate, new { @class = "form-control", type = "date" })
                                         </div>
                                     </div>
                                 </div>
@@ -65,7 +65,7 @@
 
                 <div class="card mt-3">
                     <div class="card-body">
-                        @Html.Action("_TableList", "Include", new { cTL = Model })
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
                     </div>
                 </div>
 

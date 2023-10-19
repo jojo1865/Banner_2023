@@ -1,26 +1,14 @@
-﻿using Antlr.Runtime;
-using Banner.Models;
+﻿using Banner.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.UI.WebControls;
-using System.Xml.Linq;
-using static Banner.Areas.Admin.Controllers.AccountSetController;
-using static Banner.Areas.Admin.Controllers.OrganizeSetController;
-using static Banner.Areas.Web.Controllers.AccountPlaceController;
-using static ZXing.QrCode.Internal.Mode;
 
 namespace Banner.Areas.Web.Controllers
 {
     public class AccountPlaceController : PublicClass
     {
-        int ACID = 0;
         #region 會員中心-首頁
         public class cAccountPlace_Index
         {
@@ -489,7 +477,21 @@ namespace Banner.Areas.Web.Controllers
                     }
                     if (N.JoinGroupType == 2)
                     {
-                        N.AC.GroupType = N.GroupNo = FC.Get("txb_GroupNo");
+                        string sGT = FC.Get("txb_GroupNo");
+                        if (sGT != null)
+                        {
+                            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID.ToString() == sGT && !q.DeleteFlag);
+                            if (OI != null)
+                            {
+                                var MOI = DC.M_OI_Account.FirstOrDefault(q => q.OIID == OI.OIID && q.ACID == ACID);
+                                if (MOI != null)
+                                    Error += "此小組您曾經加入過或仍在小組內,不能重複申請</br>";
+                                else
+                                    N.AC.GroupType = N.GroupNo = sGT;
+                            }
+                            else
+                                Error += "您期望加入的小組編號輸入錯誤</br>";
+                        }
                     }
                     else
                     {
@@ -579,24 +581,54 @@ namespace Banner.Areas.Web.Controllers
                 var WNo = cJGW.ddl_Weekly.ddlList.FirstOrDefault(q => q.Selected);
                 var TNo = cJGW.ddl_Time.ddlList.FirstOrDefault(q => q.Selected);
                 var JGW = Js.FirstOrDefault(q => q.JoinType == cJGW.JoinType && q.SortNo == cJGW.SortNo);
-                if (JGW != null)
+                if (WNo != null && TNo != null)
                 {
-                    JGW.WeeklyNo = Convert.ToInt32(WNo.Value);
-                    JGW.TimeNo = Convert.ToInt32(TNo.Value);
-                }
-                else
-                {
-                    JGW = new JoinGroupWish
+                    if (JGW != null)
                     {
-                        ACID = N.AC.ACID,
-                        JoinType = cJGW.JoinType,
-                        SortNo = cJGW.SortNo,
-                        WeeklyNo = Convert.ToInt32(WNo.Value),
-                        TimeNo = Convert.ToInt32(TNo.Value)
-                    };
-                    DC.JoinGroupWish.InsertOnSubmit(JGW);
+                        JGW.WeeklyNo = Convert.ToInt32(WNo.Value);
+                        JGW.TimeNo = Convert.ToInt32(TNo.Value);
+                    }
+                    else
+                    {
+                        JGW = new JoinGroupWish
+                        {
+                            ACID = N.AC.ACID,
+                            JoinType = cJGW.JoinType,
+                            SortNo = cJGW.SortNo,
+                            WeeklyNo = Convert.ToInt32(WNo.Value),
+                            TimeNo = Convert.ToInt32(TNo.Value)
+                        };
+                        DC.JoinGroupWish.InsertOnSubmit(JGW);
+                    }
+                    DC.SubmitChanges();
                 }
-                DC.SubmitChanges();
+            }
+            //所在小組資料檢查
+            //2023.10.19改為若有填寫現有小組編號就直接派到該小組~但尚未落戶
+            if (N.AC.GroupType != "無意願" && N.AC.GroupType != "有意願")
+            {
+                var MOI = DC.M_OI_Account.FirstOrDefault(q => q.ACID == N.AC.ACID && q.OIID.ToString() == N.AC.GroupType);
+                if (MOI == null)
+                {
+                    var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID.ToString() == N.AC.GroupType && !q.DeleteFlag);
+                    if (OI != null)
+                    {
+                        MOI = new M_OI_Account
+                        {
+                            OrganizeInfo = OI,
+                            Account = N.AC,
+                            JoinDate = DT,
+                            LeaveDate = DT,
+                            ActiveFlag = true,
+                            DeleteFlag = false,
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = N.AC.ACID
+                        };
+                        DC.M_OI_Account.InsertOnSubmit(MOI);
+                        DC.SubmitChanges();
+                    }
+                }
             }
             SetAlert("已完成儲存", 1);
             return View(N);
@@ -1105,11 +1137,17 @@ namespace Banner.Areas.Web.Controllers
             else
             {
                 var MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == OI.OIID && !q.DeleteFlag);
-                if (MLS == null)
+                if (MLS != null)
                 {
                     if (MLS.WeeklyNo > 0)
                     {
-                        if ((int)DT.DayOfWeek == MLS.WeeklyNo)
+                        DateTime SDT = Convert.ToDateTime(DT.ToString(DateFormat) + " " + MLS.S_hour.ToString().PadLeft(2, '0') + ":" + MLS.S_minute.ToString().PadLeft(2, '0') + ":00");
+                        DateTime EDT = Convert.ToDateTime(DT.ToString(DateFormat) + " " + MLS.E_hour.ToString().PadLeft(2, '0') + ":" + MLS.E_minute.ToString().PadLeft(2, '0') + ":00");
+                        if ((int)DT.DayOfWeek != MLS.WeeklyNo)
+                            SetAlert("今日並非小組聚會時間...", 3, "/Web/Home/Index");
+                        else if (DT < SDT || DT > EDT)
+                            SetAlert("小組聚會時間為" + SDT.ToString("HH:mm") + "~" + EDT.ToString("HH:mm") + ",請在這段時間內報到", 3, "/Web/Home/Index");
+                        else
                         {
                             var EJH = DC.Event_Join_Header.FirstOrDefault(q => q.EID == 1 && q.OIID == OI.OIID && q.EventDate == DT.Date);
                             if (EJH == null)
@@ -1149,8 +1187,6 @@ namespace Banner.Areas.Web.Controllers
                                 SetAlert("您已報到完成", 1, "/Web/AccountPlace/GroupMeet_List");
                             }
                         }
-                        else
-                            SetAlert("今日並非小組聚會時間...", 3, "/Web/Home/Index");
                     }
                     else
                         SetAlert("查無小組聚會時間...", 3, "/Web/Home/Index");
@@ -1167,13 +1203,97 @@ namespace Banner.Areas.Web.Controllers
         public class cGroupMeet_List
         {
             public cTableList cTL = new cTableList();
+            public string SDate = "";
+            public string EDate = "";
+
+            public string sWeek = "";
+            public string sTime = "";
+            public string sLocation = "";
         }
         public cGroupMeet_List GetGroupMeet_List(FormCollection FC)
         {
             cGroupMeet_List c = new cGroupMeet_List();
+            #region 物件初始化
+            c.cTL = new cTableList();
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            c.cTL.Title = "";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.ItemID = "";
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
+            ACID = GetACID();
+            #endregion
+            #region 前端條件導入
+            DateTime _sdt = Convert.ToDateTime("2010/1/1");
+            DateTime _edt = Convert.ToDateTime("2010/1/1");
+            if (FC != null)
+            {
+                string s_sdt = FC.Get("txb_SDate");
+                string s_edt = FC.Get("txb_EDate");
+                if (DateTime.TryParse(s_sdt, out _sdt))
+                    c.SDate = s_sdt;
+                if (DateTime.TryParse(s_edt, out _edt))
+                    c.EDate = s_edt;
+                if (c.SDate != "" && c.EDate != "" && _sdt > _edt)
+                {
+                    c.SDate = s_edt;
+                    c.EDate = s_sdt;
+
+                    DateTime dt_ = _sdt;
+                    _sdt = _edt;
+                    _edt = dt_;
+                }
+            }
+            #endregion
+            #region 資料庫納入
+            var OIs = GetMOIAC(8, 0, ACID);
+            var OI = OIs.OrderByDescending(q => q.JoinDate).FirstOrDefault();
+            if (OI == null)
+                SetAlert("您並未落戶,無法使用本功能", 3, "/Web/AccountPlace/Index");
+            else
+            {
+                #region 聚會點資訊
+                var M = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == OI.OIID && !q.DeleteFlag);
+                if (M != null)
+                {
+                    c.sWeek = sWeeks[M.WeeklyNo];
+                    c.sTime = M.S_hour.ToString().PadLeft(2, '0') + ":" + M.S_minute.ToString().PadLeft(2, '0') + "~" + M.E_hour.ToString().PadLeft(2, '0') + ":" + M.E_minute.ToString().PadLeft(2, '0');
+                    c.sLocation = M.Meeting_Location.Title;
+                }
+                #endregion
+
+                var Hs = from q in DC.Event_Join_Header.Where(q => q.OIID > 0)
+                         join p in OIs
+                         on q.OIID equals p.OIID
+                         select q;
+                if (c.EDate != "")
+                    Hs = Hs.Where(q => q.EventDate.Date <= _edt.Date);
+                if (c.SDate != "")
+                    Hs = Hs.Where(q => q.EventDate.Date >= _sdt.Date);
 
 
+                var TopTitles = new List<cTableCell>();
+                TopTitles.Add(new cTableCell { Title = "小組名稱" });
+                TopTitles.Add(new cTableCell { Title = "聚會日期" });
+                TopTitles.Add(new cTableCell { Title = "出席狀況" });
+                c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
 
+                c.cTL.TotalCt = Hs.Count();
+                c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+                Hs = Hs.OrderByDescending(q => q.EventDate).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
+                foreach (var H in Hs)
+                {
+                    OI = OIs.First(q => q.OIID == H.OIID);
+                    var D = H.Event_Join_Detail.FirstOrDefault(q => q.ACID == ACID);
+                    cTableRow cTR = new cTableRow();
+                    cTR.Cs.Add(new cTableCell { Value = OI.OrganizeInfo.Title + OI.OrganizeInfo.Organize.Title });//小組名稱
+                    cTR.Cs.Add(new cTableCell { Value = H.EventDate.ToString(DateFormat) });//聚會日期
+                    cTR.Cs.Add(new cTableCell { Value = D == null ? "未出席" : "出席" });//出席狀況
+                    c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+                }
+            }
+            #endregion
 
 
             return c;
@@ -1182,7 +1302,7 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult GroupMeet_List()
         {
             GetViewBag();
-            
+
             return View(GetGroupMeet_List(null));
         }
         [HttpPost]

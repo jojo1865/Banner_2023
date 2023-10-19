@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using static Banner.Areas.Admin.Controllers.OrganizeSetController;
@@ -12,10 +14,17 @@ namespace Banner.Areas.Web.Controllers
     {
         // GET: Web/GroupPlace
         private int OIID = 0;
-        private void GetID()
+        private void GetID(int ID = 0)
         {
-            if (GetBrowserData("OIID") != "")
+            if (ID > 0)
+            {
+                SetBrowserData("OIID", ID.ToString());
+                OIID = ID;
+            }
+            else if (GetBrowserData("OIID") != "")
                 OIID = Convert.ToInt32(GetBrowserData("OIID"));
+            else if (GetQueryStringInInt("OIID") > 0)
+                OIID = GetQueryStringInInt("OIID");
             ViewBag._OIID = OIID;
         }
         #region 小組資訊-首頁-聚會資料
@@ -32,19 +41,14 @@ namespace Banner.Areas.Web.Controllers
         {
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
-            if (ID > 0)
-                SetBrowserData("OIID", ID.ToString());
-            else
-                ID = Convert.ToInt32(GetBrowserData("OIID"));
-
+            GetID(ID);
             cIndex N = new cIndex();
             N.AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             if (N.AC != null)
             {
                 for (int i = 1; i < sWeeks.Length; i++)
-                    N.SLIs.Add(new SelectListItem { Text = sWeeks[i], Value = (i + 1).ToString(), Selected = i == 0 });
-                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag && q.OIID == ID);
+                    N.SLIs.Add(new SelectListItem { Text = sWeeks[i], Value = (i).ToString(), Selected = i == 0 });
+                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag && q.OIID == OIID);
                 if (OI == null)
                     SetAlert("您尚未被指定為某小組的小組長,無法進行設定", 2, "/Web/GroupPlace/Index");
                 else
@@ -89,13 +93,13 @@ namespace Banner.Areas.Web.Controllers
         {
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
+            GetID(ID);
             cIndex N = new cIndex();
             N.AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             for (int i = 1; i < sWeeks.Length; i++)
                 N.SLIs.Add(new SelectListItem { Text = sWeeks[i], Value = (i + 1).ToString(), Selected = i == 0 });
 
-            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag && q.OIID == ID);
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag && q.OIID == OIID);
             if (OI != null)
             {
                 N.MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == OI.OIID && !q.DeleteFlag);
@@ -276,17 +280,19 @@ namespace Banner.Areas.Web.Controllers
             return cTL;
         }
         [HttpGet]
-        public ActionResult Aldult_List()
+        public ActionResult Aldult_List(int ID)
         {
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+            SetBrowserData("OIID", ID.ToString());
             return View(GetAldult_List(null));
         }
         [HttpPost]
-        public ActionResult Aldult_List(FormCollection FC)
+        public ActionResult Aldult_List(int ID, FormCollection FC)
         {
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+            SetBrowserData("OIID", ID.ToString());
             return View(GetAldult_List(FC));
         }
         #endregion
@@ -675,7 +681,7 @@ namespace Banner.Areas.Web.Controllers
                         OIID = M.OIID,
                         BaptismDate = DT_,
                         ImplementFlag = false,
-                        CreDate= DT_
+                        CreDate = DT_
                     };
                 }
             }
@@ -756,14 +762,16 @@ namespace Banner.Areas.Web.Controllers
 
             string sQRCode_URL = Create_QRCode("/Web/AccountPlace/GroupMeet_Join/" + ID);
             TempData["QRCode_URL"] = sQRCode_URL;
+            TempData["JoinGroup_URL"] = ("/Web/AccountPlace/GroupMeet_Join/" + ID);
             ViewBag._OIID = ID;
 
             var MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == ID && !q.DeleteFlag);
-            if(MLS==null)
+            if (MLS != null)
             {
-                if(MLS.WeeklyNo>0)
+                if (MLS.WeeklyNo > 0)
                 {
-                    if((int)DT.DayOfWeek == MLS.WeeklyNo)
+                    int ixx = (int)DT.DayOfWeek;
+                    if ((int)DT.DayOfWeek == MLS.WeeklyNo || ((int)DT.DayOfWeek == 0 && MLS.WeeklyNo == 7))
                     {
                         TempData["QRCode_Show"] = true;
                         string str = "小組聚會時間:" + sWeeks[MLS.WeeklyNo];
@@ -778,22 +786,158 @@ namespace Banner.Areas.Web.Controllers
                         TempData["QRCode_Show"] = false;
                         TempData["QRCode_Msg"] = "今日並非小組聚會時間...";
                     }
-                    
+
                 }
                 else
                 {
                     TempData["QRCode_Show"] = false;
                     TempData["QRCode_Msg"] = "查無小組聚會時間...";
                 }
-                
+
             }
             else
             {
                 TempData["QRCode_Show"] = false;
                 TempData["QRCode_Msg"] = "查無小組聚會時間...";
             }
-            
+
             return View();
+        }
+        #endregion
+        #region 小組聚會名單維護
+        public class cGroupMeet_List
+        {
+            public cTableList cTL = new cTableList();
+            public string sDate = "";
+            public string sName = "";
+
+            public string[] GroupCt = new string[5] { "", "", "", "", "" };
+        }
+        public cGroupMeet_List GetGroupMeet_List(FormCollection FC)
+        {
+            cGroupMeet_List c = new cGroupMeet_List();
+            GetID();
+            #region 物件初始化
+
+
+            string sSubmitType = "Filter";
+            c.cTL = new cTableList();
+            c.cTL.Title = "";
+            c.cTL.NowPage = 1;
+            c.cTL.ItemID = "";
+            c.cTL.NumCut = 0;
+            c.cTL.Rs = new List<cTableRow>();
+            #endregion
+            #region 前端帶入
+            if (FC != null)
+            {
+                sSubmitType = FC.Get("hid_SubmitType");
+                c.sDate = FC.Get("txb_Date");
+                c.sName = FC.Get("txb_Name");
+            }
+            #endregion
+            #region 資料庫帶入
+
+            var Ns = DC.Event_Join_Header.Where(q => q.EID == 2 && q.OIID == OIID);
+            if (c.sDate != "")
+            {
+                DateTime dt_ = DT;
+                if (DateTime.TryParse(c.sDate, out dt_))
+                    Ns = Ns.Where(q => q.EventDate.Date == dt_.Date);
+            }
+
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "聚會日期", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "會友名稱" });
+            TopTitles.Add(new cTableCell { Title = "報到狀況" });
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            c.cTL.MaxNum = c.cTL.TotalCt = Ns.Count();
+            Ns = Ns.OrderByDescending(q => q.EventDate).Take(5);//只抓最近5次集會
+
+            var MOIs = GetMOIAC(8, OIID, 0).OrderBy(q => q.ACID).ToList();
+            int i = 0;
+            int j = 0;
+            foreach (var N in Ns)
+            {
+                int k = 0;
+                foreach (var MOI in MOIs)
+                {
+                    bool bShow = true;
+                    if (c.sName != "")
+                        if (MOI.Account.Name_First + MOI.Account.Name_Last != c.sName)
+                            bShow = false;
+
+                    if (bShow)
+                    {
+                        cTableRow cTR = new cTableRow();
+                        cTR.ID = i;
+                        cTR.Cs.Add(new cTableCell { Value = N.EventDate.ToString(DateFormat) });//聚會日期
+                        cTR.Cs.Add(new cTableCell { Value = MOI.Account.Name_First + MOI.Account.Name_Last });//會友名稱
+                        var EJD = N.Event_Join_Detail.FirstOrDefault(q => q.ACID == MOI.ACID);
+                        if (sSubmitType == "Save")
+                        {
+                            if (GetViewCheckBox(FC.Get("cbox_Join" + i)) && EJD == null)
+                            {
+                                EJD = new Event_Join_Detail
+                                {
+                                    Event_Join_Header = N,
+                                    ACID = MOI.ACID,
+                                    Name = MOI.Account.Name_First + MOI.Account.Name_Last,
+                                    PhoneNo = "",
+                                    DeleteFlag = false,
+                                    JoinDate = DT,
+                                    CreDate = DT
+                                };
+                                DC.Event_Join_Detail.InsertOnSubmit(EJD);
+                                DC.SubmitChanges();
+                            }
+                        }
+
+                        if (EJD != null)
+                        {
+                            if (EJD.JoinDate.Date == N.EventDate.Date)
+                                cTR.Cs.Add(new cTableCell { Value = "已於" + EJD.JoinDate.ToString("HH:mm") + "報到" });//報到狀況
+                            else
+                                cTR.Cs.Add(new cTableCell { Value = "已於" + EJD.JoinDate.ToString("yyyy/MM/dd HH:mm") + "報到" });//報到狀況
+                            k++;
+                        }
+                        else
+                        {
+                            cTR.Cs.Add(new cTableCell { Type = "checkbox", ControlName = "cbox_Join", Disabled = false, Title = "手動報到" });
+                        }
+
+                        c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+                        i++;
+                    }
+                }
+
+                string sColor = "";
+                if (MOIs.Count() == k)
+                    sColor = "Green";
+                else if (k == 0)
+                    sColor = "Red";
+                else
+                    sColor = "Orange";
+                c.GroupCt[j] = N.EventDate.ToString(DateFormat) + " 的集會 應到 " + MOIs.Count() + " 人，實到 <span style='color:"+sColor+"'>" + k + "</span> 人";
+                j++;
+            }
+            if (sSubmitType == "Save")
+                SetAlert("已存檔完成", 1);
+            #endregion
+
+            return c;
+        }
+        [HttpGet]
+        public ActionResult GroupMeet_List()
+        {
+            GetViewBag();
+            return View(GetGroupMeet_List(null));
+        }
+        [HttpPost]
+        public ActionResult GroupMeet_List(FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetGroupMeet_List(FC));
         }
         #endregion
     }

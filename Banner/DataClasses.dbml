@@ -687,7 +687,7 @@
   </Table>
   <Table Name="dbo.Event_Join_Header" Member="Event_Join_Header">
     <Type Name="Event_Join_Header">
-      <Column Name="EJHID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EJHID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="EID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="EventDate" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />

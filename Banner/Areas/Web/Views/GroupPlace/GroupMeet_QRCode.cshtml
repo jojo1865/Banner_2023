@@ -18,16 +18,18 @@
         <div class="header-container">
             <div class="header-left-border"></div>
             <h5 class="header">小組聚會報到QRCode</h5>
-            
         </div>
+        @Html.Action("_GroupTopMenu", "Include")
         <div class="body-container">
             <div class="text-center">
-                <label>@TempData["QRCode_Msg"]</label>
-                @if((bool)TempData["QRCode_Show"])
-            {
-<img src="@TempData["QRCode_URL"]" style="width:100%; max-width:200px;" />
-            }
-                
+                <label>@TempData["QRCode_Msg"]</label><br /><br />
+                @if ((bool)TempData["QRCode_Show"])
+                {
+                    <img src="@TempData["QRCode_URL"]" style="width:100%; max-width:200px;" />
+                    <br />
+                    <br />
+                    <a href="@TempData["JoinGroup_URL"]">@TempData["JoinGroup_URL"]</a>
+                }
             </div>
         </div>
     </div>

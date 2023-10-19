@@ -4,7 +4,7 @@
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
     if (Model != null)
     {
-        <div class="body-container">
+        <div class="body-container container_phone">
             <div class="section-container">
                 <nav class="breadcrumb-nav">
                     <ol class="breadcrumb">
@@ -18,7 +18,7 @@
                     <h5 class="header">@Html.Raw(ViewBag._GroupTitle) - 小組長專區</h5>
                 </div>
                 @Html.Action("_GroupTopMenu", "Include")
-                <div class="container">
+                <div class="container-lg">
                     <div class="section-card">
                         <form method="post" id="form1">
                             @Html.AntiForgeryToken()
@@ -30,13 +30,13 @@
                             <div class="form-group">
                                 <label>小組聚會時間</label>
                                 <div class="row">
-                                    <div class="col-auto">
+                                    <div class="col-lg-auto col-12">
                                         @Html.TextBox("txb_STime", (Model.MLS.S_hour.ToString().PadLeft(2, '0') + ":" + Model.MLS.S_minute.ToString().PadLeft(2, '0')), new { @class = "form-control form-control-lg input-underlin", type = "time" })
                                     </div>
-                                    <div class="col-auto">
+                                    <div class="col-lg-auto col-12">
                                         至
                                     </div>
-                                    <div class="col-auto">
+                                    <div class="col-lg-auto col-12">
                                         @Html.TextBox("txb_ETime", (Model.MLS.E_hour.ToString().PadLeft(2, '0') + ":" + Model.MLS.E_minute.ToString().PadLeft(2, '0')), new { @class = "form-control form-control-lg input-underlin", type = "time" })
                                     </div>
                                 </div>
@@ -45,7 +45,7 @@
                                 <label>小組聚會地點</label>
                                 @Html.Action("_Location_Meeting", "Include", new { LID = Model.L.LID })
                             </div>
-                            <div class="form-group">
+                            <div class="form-group mb-5">
                                 <label>小組聚會電話</label>
                                 @Html.Action("_ContectEdit", "Include", new { C = Model.C })
                             </div>
@@ -56,15 +56,14 @@
             </div>
         </div>
         <div class="action-bar">
-                @if ((((bool[])ViewBag._Power)[1] && Model.MLS.MLSID == 0) || (((bool[])ViewBag._Power)[2] && Model.MLS.MLSID > 0) || true)
-                {
-                    <div class="btn btn-primary btn-lg btn-round">
-                        <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
-                    </div>
-                }
-                <div class="btn btn-outline-primary btn-lg btn-round">
-                    <a href="/Web/GroupPlace/Index/@ViewBag._OIID "><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />取消</a>
-                </div>
+
+            <div class="btn btn-primary btn-lg btn-round">
+                <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
+            </div>
+
+            <div class="btn btn-outline-primary btn-lg btn-round">
+                <a href="/Web/GroupPlace/Index/@ViewBag._OIID "><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />取消</a>
+            </div>
         </div>
     }
 }

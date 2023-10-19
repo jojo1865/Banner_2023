@@ -1,12 +1,12 @@
 ﻿@model Banner.Account_Note
-    <style>
-        .section-card {
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-            gap: 16px;
-        }
-    </style>
+<style>
+    .section-card {
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        gap: 16px;
+    }
+</style>
 @{
     ViewBag.Title = "GroupLeaderIndex";
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
@@ -28,14 +28,14 @@
                     <h5 class="header">@Html.Raw(ViewBag._GroupTitle) - 更新備註</h5>
                 </div>
                 @Html.Action("_GroupTopMenu", "Include")
-                <div class="container">
+                <div class="container-lg">
                     <div class="section-card">
                         <form method="post" id="form1">
                             @Html.AntiForgeryToken()
 
                             <div class="form-group">
                                 <label>組員姓名</label>
-                                @Html.Label((Model.Account != null ? Model.Account.Name : ""), new { @class = "form-control form-control-lg input-underlin lab_gray" })
+                                @Html.Label((Model.Account != null ? Model.Account.Name_First + Model.Account.Name_Last : ""), new { @class = "form-control form-control-lg input-underlin lab_gray" })
                             </div>
                             <div class="form-group">
                                 <label>備註</label>
@@ -49,11 +49,10 @@
             </div>
         </div>
         <div class="action-bar">
-            @if ((((bool[])ViewBag._Power)[1] && Model.ANID == 0) || (((bool[])ViewBag._Power)[2] && Model.ANID > 0) || true)
-            {
-                <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
-            }
-            <a href="/Web/GroupPlace/Aldult_List" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />取消</a>
+
+            <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
+
+            <a href="/Web/GroupPlace/Aldult_List/@ViewBag._OIID" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />取消</a>
         </div>
     }
     else

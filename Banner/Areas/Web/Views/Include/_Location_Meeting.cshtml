@@ -1,35 +1,35 @@
 ﻿@model Banner.Models.cLocation
 @{string ShowControl = "none"; }
 <div class="row">
-    <div class="col-2">
+    <div class="col-lg-2 col-12">
         @Html.DropDownList("ddl_Zip0", Model.Z0List,
            new { @class = "form-select form-select-lg", @onchange = "ShowArea(this);" })
     </div>
-    <div class="col-10">
+    <div class="col-lg-10 col-12">
         @{ ShowControl = Model.Z0List[0].Selected ? "" : "display:none"; }
         <div class="div_Zip0 row" style="@ShowControl">
-            <div class="col-3">
+            <div class="col-lg-3 col-12">
                 @Html.DropDownList("ddl_Zip1", Model.Z1List,
                    new { @class = "form-select form-select-lg", @onchange = "GetZipddl(this);" })
             </div>
-            <div class="col-3">
+            <div class="col-lg-3 col-12">
                 @Html.DropDownList("ddl_Zip2", Model.Z2List,
                    new { @class = "form-select form-select-lg" })
             </div>
-            <div class="col-6">
+            <div class="col-lg-6 col-12">
                 @Html.TextBox("txb_Address0", Model.Address0, new { @class = "form-control form-control-lg input-underline", @placeholder = "地址內容" })
             </div>
         </div>
         @{ ShowControl = Model.Z0List[1].Selected ? "" : "display:none"; }
         <div class="div_Zip1 row" style="@ShowControl">
-            <div class="col-4">
+            <div class="col-lg-4 col-12">
                 @Html.DropDownList("ddl_Zip3", Model.Z3List,
                    new { @class = "form-select form-select-lg" })
             </div>
-            <div class="col-4 div_Zip1">
+            <div class="col-lg-4 col-12 div_Zip1">
                 @Html.TextBox("txb_Address1_1", Model.Address1_1, new { @class = "form-control form-control-lg input-underline", @placeholder="地址行1" })
             </div>
-            <div class="col-4 div_Zip1">
+            <div class="col-lg-4 col-12 div_Zip1">
                 @Html.TextBox("txb_Address1_2", Model.Address1_2, new { @class = "form-control form-control-lg input-underline", @placeholder = "地址行2" })
             </div>
         </div>
