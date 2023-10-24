@@ -25,7 +25,7 @@
                         <div class="row">
                             <!--課程主要區域-->
                             <div class="col-12">
-                                <h3 class="mb-3">@(Model.P.Title +"-"+ Model.P.SubTitle)</h3>
+                                <h3 class="mb-3">@((Model.P.Title == "" ? "" : Model.P.Title + "-")+ Model.P.SubTitle)</h3>
                                 <!---->
                                 <h4 class="mt-2 mb-3 lab_DarkBlue"><i class="fa-solid fa-address-card me-1"></i>課程簡介</h4>
                                 <div class="card mb-3">

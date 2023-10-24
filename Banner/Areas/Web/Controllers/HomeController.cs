@@ -17,7 +17,9 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Index()
         {
             GetViewBag();
+            Response.Redirect("/Web/AccountPlace/Index");
 
+            //Response.Write("2023/10/22" + " = "+ (int)((Convert.ToDateTime("2023/10/22")).DayOfWeek));
             return View();
         }
         #region 作弊登入

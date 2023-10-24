@@ -12,11 +12,11 @@
                 @Html.DropDownList("ddl_Zip1", Model.Z1List,
                    new { @class = "form-select form-select-lg", @onchange = "GetZipddl(this);" })
             </div>
-            <div class="col-lg-3 col-12">
+            <div class="col-lg-4 col-12">
                 @Html.DropDownList("ddl_Zip2", Model.Z2List,
                    new { @class = "form-select form-select-lg" })
             </div>
-            <div class="col-lg-6 col-12">
+            <div class="col-lg-5 col-12">
                 @Html.TextBox("txb_Address0", Model.Address0, new { @class = "form-control form-control-lg input-underline", @placeholder = "地址內容" })
             </div>
         </div>

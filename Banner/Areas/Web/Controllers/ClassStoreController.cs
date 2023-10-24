@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -177,7 +178,7 @@ namespace Banner.Areas.Web.Controllers
 
                     case 2://2:性別/
                         {
-                            if(PR.TargetType>=0)
+                            if (PR.TargetType >= 0)
                                 c.sRool[PR.TargetType] = "限定性別：" + (PR.TargetInt1 == 1 ? "男性" : "女性");
                         }
                         break;
@@ -212,6 +213,75 @@ namespace Banner.Areas.Web.Controllers
             return View(GETProduct_Info(ID));
         }
 
+        #endregion
+
+        #region 購物車1
+        public class cOrder_Step1
+        {
+            public int OHID = 0;
+            public List<cProduct> cPs = new List<cProduct>();
+        }
+        public class cProduct
+        {
+            public int OPID;
+            public int PID = 0;
+            public string UmgURL = "";
+            public string ClassType = "";//實體/虛擬課程
+            public string Title = "";//商品名稱
+
+            public int Price = 0;
+        }
+        public cOrder_Step1 GetOrder_Step1(FormCollection FC)
+        {
+            cOrder_Step1 c = new cOrder_Step1();
+
+
+
+
+            return c;
+        }
+        [HttpGet]
+        public ActionResult Order_Step1()
+        {
+            GetViewBag();
+            return View(GetOrder_Step1(null));
+        }
+        [HttpPost]
+        public ActionResult Order_Step1(FormCollection FC)
+        {
+            GetViewBag();
+            var c = GetOrder_Step1(FC);
+            return View(c);
+        }
+        #endregion
+        #region 購物車2
+
+        public class cOrder_Step2
+        {
+
+        }
+        public cOrder_Step2 GetOrder_Step2(FormCollection FC)
+        {
+            cOrder_Step2 c = new cOrder_Step2();
+
+
+
+
+            return c;
+        }
+        [HttpGet]
+        public ActionResult Order_Step2()
+        {
+            GetViewBag();
+            return View(GetOrder_Step2(null));
+        }
+        [HttpPost]
+        public ActionResult Order_Step2(FormCollection FC)
+        {
+            GetViewBag();
+            var c = GetOrder_Step2(FC);
+            return View(c);
+        }
         #endregion
     }
 }

@@ -1143,7 +1143,7 @@ namespace Banner.Areas.Web.Controllers
                     {
                         DateTime SDT = Convert.ToDateTime(DT.ToString(DateFormat) + " " + MLS.S_hour.ToString().PadLeft(2, '0') + ":" + MLS.S_minute.ToString().PadLeft(2, '0') + ":00");
                         DateTime EDT = Convert.ToDateTime(DT.ToString(DateFormat) + " " + MLS.E_hour.ToString().PadLeft(2, '0') + ":" + MLS.E_minute.ToString().PadLeft(2, '0') + ":00");
-                        if ((int)DT.DayOfWeek != MLS.WeeklyNo)
+                        if (((int)DT.DayOfWeek == 0 && MLS.WeeklyNo != 7) || ((int)DT.DayOfWeek != 0 && (int)DT.DayOfWeek != MLS.WeeklyNo))
                             SetAlert("今日並非小組聚會時間...", 3, "/Web/Home/Index");
                         else if (DT < SDT || DT > EDT)
                             SetAlert("小組聚會時間為" + SDT.ToString("HH:mm") + "~" + EDT.ToString("HH:mm") + ",請在這段時間內報到", 3, "/Web/Home/Index");

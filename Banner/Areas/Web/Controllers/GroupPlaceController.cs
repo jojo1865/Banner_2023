@@ -1,4 +1,5 @@
 ﻿using Banner.Models;
+using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace Banner.Areas.Web.Controllers
                 OIID = Convert.ToInt32(GetBrowserData("OIID"));
             else if (GetQueryStringInInt("OIID") > 0)
                 OIID = GetQueryStringInInt("OIID");
+
             ViewBag._OIID = OIID;
         }
         #region 小組資訊-首頁-聚會資料
@@ -36,8 +38,9 @@ namespace Banner.Areas.Web.Controllers
             public Account AC = new Account();
             public Contect C = new Contect();
         }
+
         [HttpGet]
-        public ActionResult Index(int ID)
+        public ActionResult Index(int ID = 0)
         {
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
@@ -46,6 +49,17 @@ namespace Banner.Areas.Web.Controllers
             N.AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             if (N.AC != null)
             {
+                var Ms = GetMOIAC(8, 0, ACID);
+                if (Ms != null)
+                {
+                    if (Ms.Count() > 0)
+                    {
+                        var M = Ms.OrderByDescending(q => q.JoinDate).First();
+                        OIID = M.OIID;
+                        SetBrowserData("OIID", OIID.ToString());
+                    }
+                }
+
                 for (int i = 1; i < sWeeks.Length; i++)
                     N.SLIs.Add(new SelectListItem { Text = sWeeks[i], Value = (i).ToString(), Selected = i == 0 });
                 var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ACID == ACID && q.OID == 8 && !q.DeleteFlag && q.ActiveFlag && q.OIID == OIID);
@@ -420,12 +434,18 @@ namespace Banner.Areas.Web.Controllers
                     DC.Account_Note.InsertOnSubmit(N);
                     DC.SubmitChanges();
 
+                    M.Account.GroupType = "有意願";
+                    M.Account.UpdDate = DT;
+                    N.Account.SaveACID = ACID;
+
                     M.ActiveFlag = false;
                     M.LeaveDate = DT;
                     M.SaveACID = ACID;
                     DC.SubmitChanges();
 
-                    SetAlert("已將組員移出此小組", 1, "/Web/GroupPlace/Aldult_List");
+
+
+                    SetAlert("已將組員移出此小組", 1, "/Web/GroupPlace/Aldult_List/" + M.OIID);
 
                 }
 
@@ -918,7 +938,7 @@ namespace Banner.Areas.Web.Controllers
                     sColor = "Red";
                 else
                     sColor = "Orange";
-                c.GroupCt[j] = N.EventDate.ToString(DateFormat) + " 的集會 應到 " + MOIs.Count() + " 人，實到 <span style='color:"+sColor+"'>" + k + "</span> 人";
+                c.GroupCt[j] = N.EventDate.ToString(DateFormat) + " 的集會 應到 " + MOIs.Count() + " 人，實到 <span style='color:" + sColor + "'>" + k + "</span> 人";
                 j++;
             }
             if (sSubmitType == "Save")

@@ -71,7 +71,7 @@ namespace Banner.Areas.Web.Controllers
             var MOIs = GetMOIAC(0, 0, ACID);
             bool bGroupLeaderFlag = false;
             if (MOIs.Count() > 0)//是否已有小組
-                bGroupLeaderFlag = MOIs.Count(q => q.OrganizeInfo.OID == 8) > 0;//是否為小組長
+                bGroupLeaderFlag = MOIs.Count(q => q.OrganizeInfo.OID == 8 && q.OrganizeInfo.ACID == ACID) > 0;//是否為小組長
 
             if (bGroupLeaderFlag)
                 Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
@@ -133,7 +133,7 @@ namespace Banner.Areas.Web.Controllers
             var MOIs = GetMOIAC(0, 0, ACID);
             bool bGroupLeaderFlag = false;
             if (MOIs.Count() > 0)//是否已有小組
-                bGroupLeaderFlag = MOIs.Count(q => q.OrganizeInfo.OID == 8) > 0;//是否為小組長
+                bGroupLeaderFlag = MOIs.Count(q => q.OrganizeInfo.OID == 8 && q.OrganizeInfo.ACID == ACID) > 0;//是否為小組長
 
             if (bGroupLeaderFlag)
                 Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
@@ -405,7 +405,7 @@ namespace Banner.Areas.Web.Controllers
                 foreach (var Z1 in Z1s)
                     cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID.ToString() == FC.Get("ddl_Zip1") });
 
-                var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ParentID).OrderBy(q => q.Code);
+                var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID.ToString() == FC.Get("ddl_Zip1")).OrderBy(q => q.Code);
                 foreach (var Z2 in Z2s)
                     cL.Z2List.Add(new SelectListItem { Text = Z2.Code + " " + Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID.ToString() == FC.Get("ddl_Zip2") });
 
