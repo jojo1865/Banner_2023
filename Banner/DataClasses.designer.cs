@@ -57,6 +57,12 @@ namespace Banner
     partial void InsertContect(Contect instance);
     partial void UpdateContect(Contect instance);
     partial void DeleteContect(Contect instance);
+    partial void InsertCoupon_Account(Coupon_Account instance);
+    partial void UpdateCoupon_Account(Coupon_Account instance);
+    partial void DeleteCoupon_Account(Coupon_Account instance);
+    partial void InsertCoupon_Header(Coupon_Header instance);
+    partial void UpdateCoupon_Header(Coupon_Header instance);
+    partial void DeleteCoupon_Header(Coupon_Header instance);
     partial void InsertCourse(Course instance);
     partial void UpdateCourse(Course instance);
     partial void DeleteCourse(Course instance);
@@ -75,6 +81,9 @@ namespace Banner
     partial void InsertEvent_Join_Detail(Event_Join_Detail instance);
     partial void UpdateEvent_Join_Detail(Event_Join_Detail instance);
     partial void DeleteEvent_Join_Detail(Event_Join_Detail instance);
+    partial void InsertEvent_Join_Header(Event_Join_Header instance);
+    partial void UpdateEvent_Join_Header(Event_Join_Header instance);
+    partial void DeleteEvent_Join_Header(Event_Join_Header instance);
     partial void InsertFamily(Family instance);
     partial void UpdateFamily(Family instance);
     partial void DeleteFamily(Family instance);
@@ -120,6 +129,12 @@ namespace Banner
     partial void InsertOrder_Header(Order_Header instance);
     partial void UpdateOrder_Header(Order_Header instance);
     partial void DeleteOrder_Header(Order_Header instance);
+    partial void InsertOrder_Paid(Order_Paid instance);
+    partial void UpdateOrder_Paid(Order_Paid instance);
+    partial void DeleteOrder_Paid(Order_Paid instance);
+    partial void InsertOrder_PaidDetail(Order_PaidDetail instance);
+    partial void UpdateOrder_PaidDetail(Order_PaidDetail instance);
+    partial void DeleteOrder_PaidDetail(Order_PaidDetail instance);
     partial void InsertOrder_Product(Order_Product instance);
     partial void UpdateOrder_Product(Order_Product instance);
     partial void DeleteOrder_Product(Order_Product instance);
@@ -147,9 +162,6 @@ namespace Banner
     partial void InsertTeacher(Teacher instance);
     partial void UpdateTeacher(Teacher instance);
     partial void DeleteTeacher(Teacher instance);
-    partial void InsertEvent_Join_Header(Event_Join_Header instance);
-    partial void UpdateEvent_Join_Header(Event_Join_Header instance);
-    partial void DeleteEvent_Join_Header(Event_Join_Header instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -248,6 +260,22 @@ namespace Banner
 			}
 		}
 		
+		public System.Data.Linq.Table<Coupon_Account> Coupon_Account
+		{
+			get
+			{
+				return this.GetTable<Coupon_Account>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Coupon_Header> Coupon_Header
+		{
+			get
+			{
+				return this.GetTable<Coupon_Header>();
+			}
+		}
+		
 		public System.Data.Linq.Table<Course> Course
 		{
 			get
@@ -293,6 +321,14 @@ namespace Banner
 			get
 			{
 				return this.GetTable<Event_Join_Detail>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Event_Join_Header> Event_Join_Header
+		{
+			get
+			{
+				return this.GetTable<Event_Join_Header>();
 			}
 		}
 		
@@ -416,6 +452,22 @@ namespace Banner
 			}
 		}
 		
+		public System.Data.Linq.Table<Order_Paid> Order_Paid
+		{
+			get
+			{
+				return this.GetTable<Order_Paid>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Order_PaidDetail> Order_PaidDetail
+		{
+			get
+			{
+				return this.GetTable<Order_PaidDetail>();
+			}
+		}
+		
 		public System.Data.Linq.Table<Order_Product> Order_Product
 		{
 			get
@@ -504,14 +556,6 @@ namespace Banner
 			}
 		}
 		
-		public System.Data.Linq.Table<Event_Join_Header> Event_Join_Header
-		{
-			get
-			{
-				return this.GetTable<Event_Join_Header>();
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.sp_GetOI2List")]
 		public ISingleResult<sp_GetOI2ListResult> sp_GetOI2List([global::System.Data.Linq.Mapping.ParameterAttribute(Name="ACID", DbType="Int")] System.Nullable<int> aCID)
 		{
@@ -588,6 +632,8 @@ namespace Banner
 		private EntitySet<Baptized> _Baptized;
 		
 		private EntitySet<Community> _Community;
+		
+		private EntitySet<Coupon_Account> _Coupon_Account;
 		
 		private EntitySet<Family> _Family;
 		
@@ -666,6 +712,7 @@ namespace Banner
 			this._Account_Performance = new EntitySet<Account_Performance>(new Action<Account_Performance>(this.attach_Account_Performance), new Action<Account_Performance>(this.detach_Account_Performance));
 			this._Baptized = new EntitySet<Baptized>(new Action<Baptized>(this.attach_Baptized), new Action<Baptized>(this.detach_Baptized));
 			this._Community = new EntitySet<Community>(new Action<Community>(this.attach_Community), new Action<Community>(this.detach_Community));
+			this._Coupon_Account = new EntitySet<Coupon_Account>(new Action<Coupon_Account>(this.attach_Coupon_Account), new Action<Coupon_Account>(this.detach_Coupon_Account));
 			this._Family = new EntitySet<Family>(new Action<Family>(this.attach_Family), new Action<Family>(this.detach_Family));
 			this._JoinGroupWish = new EntitySet<JoinGroupWish>(new Action<JoinGroupWish>(this.attach_JoinGroupWish), new Action<JoinGroupWish>(this.detach_JoinGroupWish));
 			this._M_ML_Account = new EntitySet<M_ML_Account>(new Action<M_ML_Account>(this.attach_M_ML_Account), new Action<M_ML_Account>(this.detach_M_ML_Account));
@@ -1203,6 +1250,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Coupon_Account", Storage="_Coupon_Account", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<Coupon_Account> Coupon_Account
+		{
+			get
+			{
+				return this._Coupon_Account;
+			}
+			set
+			{
+				this._Coupon_Account.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Family", Storage="_Family", ThisKey="ACID", OtherKey="ACID")]
 		public EntitySet<Family> Family
 		{
@@ -1395,6 +1455,18 @@ namespace Banner
 		}
 		
 		private void detach_Community(Community entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_Coupon_Account(Coupon_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_Coupon_Account(Coupon_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -3504,6 +3576,809 @@ namespace Banner
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Coupon_Account")]
+	public partial class Coupon_Account : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _CAID;
+		
+		private int _CHID;
+		
+		private int _ACID;
+		
+		private int _OHID;
+		
+		private int _OPID;
+		
+		private System.DateTime _UsedDate;
+		
+		private string _Note;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<Coupon_Header> _Coupon_Header;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnCAIDChanging(int value);
+    partial void OnCAIDChanged();
+    partial void OnCHIDChanging(int value);
+    partial void OnCHIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnOHIDChanging(int value);
+    partial void OnOHIDChanged();
+    partial void OnOPIDChanging(int value);
+    partial void OnOPIDChanged();
+    partial void OnUsedDateChanging(System.DateTime value);
+    partial void OnUsedDateChanged();
+    partial void OnNoteChanging(string value);
+    partial void OnNoteChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Coupon_Account()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._Coupon_Header = default(EntityRef<Coupon_Header>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CAID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int CAID
+		{
+			get
+			{
+				return this._CAID;
+			}
+			set
+			{
+				if ((this._CAID != value))
+				{
+					this.OnCAIDChanging(value);
+					this.SendPropertyChanging();
+					this._CAID = value;
+					this.SendPropertyChanged("CAID");
+					this.OnCAIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CHID", DbType="Int NOT NULL")]
+		public int CHID
+		{
+			get
+			{
+				return this._CHID;
+			}
+			set
+			{
+				if ((this._CHID != value))
+				{
+					if (this._Coupon_Header.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnCHIDChanging(value);
+					this.SendPropertyChanging();
+					this._CHID = value;
+					this.SendPropertyChanged("CHID");
+					this.OnCHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OHID", DbType="Int NOT NULL")]
+		public int OHID
+		{
+			get
+			{
+				return this._OHID;
+			}
+			set
+			{
+				if ((this._OHID != value))
+				{
+					this.OnOHIDChanging(value);
+					this.SendPropertyChanging();
+					this._OHID = value;
+					this.SendPropertyChanged("OHID");
+					this.OnOHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPID", DbType="Int NOT NULL")]
+		public int OPID
+		{
+			get
+			{
+				return this._OPID;
+			}
+			set
+			{
+				if ((this._OPID != value))
+				{
+					this.OnOPIDChanging(value);
+					this.SendPropertyChanging();
+					this._OPID = value;
+					this.SendPropertyChanged("OPID");
+					this.OnOPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UsedDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UsedDate
+		{
+			get
+			{
+				return this._UsedDate;
+			}
+			set
+			{
+				if ((this._UsedDate != value))
+				{
+					this.OnUsedDateChanging(value);
+					this.SendPropertyChanging();
+					this._UsedDate = value;
+					this.SendPropertyChanged("UsedDate");
+					this.OnUsedDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Note", DbType="NVarChar(MAX)")]
+		public string Note
+		{
+			get
+			{
+				return this._Note;
+			}
+			set
+			{
+				if ((this._Note != value))
+				{
+					this.OnNoteChanging(value);
+					this.SendPropertyChanging();
+					this._Note = value;
+					this.SendPropertyChanged("Note");
+					this.OnNoteChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Coupon_Account", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.Coupon_Account.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.Coupon_Account.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Header_Coupon_Account", Storage="_Coupon_Header", ThisKey="CHID", OtherKey="CHID", IsForeignKey=true)]
+		public Coupon_Header Coupon_Header
+		{
+			get
+			{
+				return this._Coupon_Header.Entity;
+			}
+			set
+			{
+				Coupon_Header previousValue = this._Coupon_Header.Entity;
+				if (((previousValue != value) 
+							|| (this._Coupon_Header.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Coupon_Header.Entity = null;
+						previousValue.Coupon_Account.Remove(this);
+					}
+					this._Coupon_Header.Entity = value;
+					if ((value != null))
+					{
+						value.Coupon_Account.Add(this);
+						this._CHID = value.CHID;
+					}
+					else
+					{
+						this._CHID = default(int);
+					}
+					this.SendPropertyChanged("Coupon_Header");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Coupon_Header")]
+	public partial class Coupon_Header : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _CHID;
+		
+		private int _PID;
+		
+		private int _Price_Cut;
+		
+		private System.DateTime _SDateTime;
+		
+		private System.DateTime _EDateTime;
+		
+		private int _OID;
+		
+		private string _Note;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntitySet<Coupon_Account> _Coupon_Account;
+		
+		private EntityRef<Product> _Product;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnCHIDChanging(int value);
+    partial void OnCHIDChanged();
+    partial void OnPIDChanging(int value);
+    partial void OnPIDChanged();
+    partial void OnPrice_CutChanging(int value);
+    partial void OnPrice_CutChanged();
+    partial void OnSDateTimeChanging(System.DateTime value);
+    partial void OnSDateTimeChanged();
+    partial void OnEDateTimeChanging(System.DateTime value);
+    partial void OnEDateTimeChanged();
+    partial void OnOIDChanging(int value);
+    partial void OnOIDChanged();
+    partial void OnNoteChanging(string value);
+    partial void OnNoteChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Coupon_Header()
+		{
+			this._Coupon_Account = new EntitySet<Coupon_Account>(new Action<Coupon_Account>(this.attach_Coupon_Account), new Action<Coupon_Account>(this.detach_Coupon_Account));
+			this._Product = default(EntityRef<Product>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CHID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int CHID
+		{
+			get
+			{
+				return this._CHID;
+			}
+			set
+			{
+				if ((this._CHID != value))
+				{
+					this.OnCHIDChanging(value);
+					this.SendPropertyChanging();
+					this._CHID = value;
+					this.SendPropertyChanged("CHID");
+					this.OnCHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PID", DbType="Int NOT NULL")]
+		public int PID
+		{
+			get
+			{
+				return this._PID;
+			}
+			set
+			{
+				if ((this._PID != value))
+				{
+					if (this._Product.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnPIDChanging(value);
+					this.SendPropertyChanging();
+					this._PID = value;
+					this.SendPropertyChanged("PID");
+					this.OnPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Cut", DbType="Int NOT NULL")]
+		public int Price_Cut
+		{
+			get
+			{
+				return this._Price_Cut;
+			}
+			set
+			{
+				if ((this._Price_Cut != value))
+				{
+					this.OnPrice_CutChanging(value);
+					this.SendPropertyChanging();
+					this._Price_Cut = value;
+					this.SendPropertyChanged("Price_Cut");
+					this.OnPrice_CutChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SDateTime", DbType="DateTime NOT NULL")]
+		public System.DateTime SDateTime
+		{
+			get
+			{
+				return this._SDateTime;
+			}
+			set
+			{
+				if ((this._SDateTime != value))
+				{
+					this.OnSDateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._SDateTime = value;
+					this.SendPropertyChanged("SDateTime");
+					this.OnSDateTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EDateTime", DbType="DateTime NOT NULL")]
+		public System.DateTime EDateTime
+		{
+			get
+			{
+				return this._EDateTime;
+			}
+			set
+			{
+				if ((this._EDateTime != value))
+				{
+					this.OnEDateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._EDateTime = value;
+					this.SendPropertyChanged("EDateTime");
+					this.OnEDateTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OID", DbType="Int NOT NULL")]
+		public int OID
+		{
+			get
+			{
+				return this._OID;
+			}
+			set
+			{
+				if ((this._OID != value))
+				{
+					this.OnOIDChanging(value);
+					this.SendPropertyChanging();
+					this._OID = value;
+					this.SendPropertyChanged("OID");
+					this.OnOIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Note", DbType="NVarChar(MAX)")]
+		public string Note
+		{
+			get
+			{
+				return this._Note;
+			}
+			set
+			{
+				if ((this._Note != value))
+				{
+					this.OnNoteChanging(value);
+					this.SendPropertyChanging();
+					this._Note = value;
+					this.SendPropertyChanged("Note");
+					this.OnNoteChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Header_Coupon_Account", Storage="_Coupon_Account", ThisKey="CHID", OtherKey="CHID")]
+		public EntitySet<Coupon_Account> Coupon_Account
+		{
+			get
+			{
+				return this._Coupon_Account;
+			}
+			set
+			{
+				this._Coupon_Account.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Coupon_Header", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
+		public Product Product
+		{
+			get
+			{
+				return this._Product.Entity;
+			}
+			set
+			{
+				Product previousValue = this._Product.Entity;
+				if (((previousValue != value) 
+							|| (this._Product.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Product.Entity = null;
+						previousValue.Coupon_Header.Remove(this);
+					}
+					this._Product.Entity = value;
+					if ((value != null))
+					{
+						value.Coupon_Header.Add(this);
+						this._PID = value.PID;
+					}
+					else
+					{
+						this._PID = default(int);
+					}
+					this.SendPropertyChanged("Product");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Coupon_Account(Coupon_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Coupon_Header = this;
+		}
+		
+		private void detach_Coupon_Account(Coupon_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Coupon_Header = null;
 		}
 	}
 	
@@ -5740,6 +6615,305 @@ namespace Banner
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Event_Join_Header")]
+	public partial class Event_Join_Header : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _EJHID;
+		
+		private int _EID;
+		
+		private int _OIID;
+		
+		private System.DateTime _EventDate;
+		
+		private string _Note;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntitySet<Event_Join_Detail> _Event_Join_Detail;
+		
+		private EntityRef<Event> _Event;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnEJHIDChanging(int value);
+    partial void OnEJHIDChanged();
+    partial void OnEIDChanging(int value);
+    partial void OnEIDChanged();
+    partial void OnOIIDChanging(int value);
+    partial void OnOIIDChanged();
+    partial void OnEventDateChanging(System.DateTime value);
+    partial void OnEventDateChanged();
+    partial void OnNoteChanging(string value);
+    partial void OnNoteChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Event_Join_Header()
+		{
+			this._Event_Join_Detail = new EntitySet<Event_Join_Detail>(new Action<Event_Join_Detail>(this.attach_Event_Join_Detail), new Action<Event_Join_Detail>(this.detach_Event_Join_Detail));
+			this._Event = default(EntityRef<Event>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EJHID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int EJHID
+		{
+			get
+			{
+				return this._EJHID;
+			}
+			set
+			{
+				if ((this._EJHID != value))
+				{
+					this.OnEJHIDChanging(value);
+					this.SendPropertyChanging();
+					this._EJHID = value;
+					this.SendPropertyChanged("EJHID");
+					this.OnEJHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EID", DbType="Int NOT NULL")]
+		public int EID
+		{
+			get
+			{
+				return this._EID;
+			}
+			set
+			{
+				if ((this._EID != value))
+				{
+					if (this._Event.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnEIDChanging(value);
+					this.SendPropertyChanging();
+					this._EID = value;
+					this.SendPropertyChanged("EID");
+					this.OnEIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int NOT NULL")]
+		public int OIID
+		{
+			get
+			{
+				return this._OIID;
+			}
+			set
+			{
+				if ((this._OIID != value))
+				{
+					this.OnOIIDChanging(value);
+					this.SendPropertyChanging();
+					this._OIID = value;
+					this.SendPropertyChanged("OIID");
+					this.OnOIIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EventDate", DbType="Date NOT NULL")]
+		public System.DateTime EventDate
+		{
+			get
+			{
+				return this._EventDate;
+			}
+			set
+			{
+				if ((this._EventDate != value))
+				{
+					this.OnEventDateChanging(value);
+					this.SendPropertyChanging();
+					this._EventDate = value;
+					this.SendPropertyChanged("EventDate");
+					this.OnEventDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Note", DbType="NVarChar(300)")]
+		public string Note
+		{
+			get
+			{
+				return this._Note;
+			}
+			set
+			{
+				if ((this._Note != value))
+				{
+					this.OnNoteChanging(value);
+					this.SendPropertyChanging();
+					this._Note = value;
+					this.SendPropertyChanged("Note");
+					this.OnNoteChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_Join_Header_Event_Join_Detail", Storage="_Event_Join_Detail", ThisKey="EJHID", OtherKey="EJHID")]
+		public EntitySet<Event_Join_Detail> Event_Join_Detail
+		{
+			get
+			{
+				return this._Event_Join_Detail;
+			}
+			set
+			{
+				this._Event_Join_Detail.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_Event_Join_Header", Storage="_Event", ThisKey="EID", OtherKey="EID", IsForeignKey=true)]
+		public Event Event
+		{
+			get
+			{
+				return this._Event.Entity;
+			}
+			set
+			{
+				Event previousValue = this._Event.Entity;
+				if (((previousValue != value) 
+							|| (this._Event.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Event.Entity = null;
+						previousValue.Event_Join_Header.Remove(this);
+					}
+					this._Event.Entity = value;
+					if ((value != null))
+					{
+						value.Event_Join_Header.Add(this);
+						this._EID = value.EID;
+					}
+					else
+					{
+						this._EID = default(int);
+					}
+					this.SendPropertyChanged("Event");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Event_Join_Detail(Event_Join_Detail entity)
+		{
+			this.SendPropertyChanging();
+			entity.Event_Join_Header = this;
+		}
+		
+		private void detach_Event_Join_Detail(Event_Join_Detail entity)
+		{
+			this.SendPropertyChanging();
+			entity.Event_Join_Header = null;
 		}
 	}
 	
@@ -10334,6 +11508,8 @@ namespace Banner
 		
 		private int _SaveACID;
 		
+		private EntitySet<Order_Paid> _Order_Paid;
+		
 		private EntitySet<Order_Product> _Order_Product;
 		
 		private EntityRef<Account> _Account;
@@ -10364,6 +11540,7 @@ namespace Banner
 		
 		public Order_Header()
 		{
+			this._Order_Paid = new EntitySet<Order_Paid>(new Action<Order_Paid>(this.attach_Order_Paid), new Action<Order_Paid>(this.detach_Order_Paid));
 			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
 			this._Account = default(EntityRef<Account>);
 			OnCreated();
@@ -10553,6 +11730,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Header_Order_Paid", Storage="_Order_Paid", ThisKey="OHID", OtherKey="OHID")]
+		public EntitySet<Order_Paid> Order_Paid
+		{
+			get
+			{
+				return this._Order_Paid;
+			}
+			set
+			{
+				this._Order_Paid.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Header_Order_Product", Storage="_Order_Product", ThisKey="OHID", OtherKey="OHID")]
 		public EntitySet<Order_Product> Order_Product
 		{
@@ -10620,6 +11810,18 @@ namespace Banner
 			}
 		}
 		
+		private void attach_Order_Paid(Order_Paid entity)
+		{
+			this.SendPropertyChanging();
+			entity.Order_Header = this;
+		}
+		
+		private void detach_Order_Paid(Order_Paid entity)
+		{
+			this.SendPropertyChanging();
+			entity.Order_Header = null;
+		}
+		
 		private void attach_Order_Product(Order_Product entity)
 		{
 			this.SendPropertyChanging();
@@ -10633,8 +11835,8 @@ namespace Banner
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Order_Product")]
-	public partial class Order_Product : INotifyPropertyChanging, INotifyPropertyChanged
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Order_Paid")]
+	public partial class Order_Paid : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
 		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
@@ -10643,23 +11845,25 @@ namespace Banner
 		
 		private int _OHID;
 		
-		private int _PID;
+		private int _PaidType;
 		
-		private int _Ct;
+		private bool _PaidFlag;
 		
-		private int _Price;
+		private System.DateTime _PaidDateTime;
 		
-		private int _Price_Type;
+		private string _TradeNo;
+		
+		private double _TradeAmt;
+		
+		private double _PayAmt;
 		
 		private System.DateTime _CreDate;
 		
 		private System.DateTime _UpdDate;
 		
-		private int _SaveACID;
+		private EntitySet<Order_PaidDetail> _Order_PaidDetail;
 		
 		private EntityRef<Order_Header> _Order_Header;
-		
-		private EntityRef<Product> _Product;
 		
     #region 擴充性方法定義
     partial void OnLoaded();
@@ -10669,26 +11873,28 @@ namespace Banner
     partial void OnOPIDChanged();
     partial void OnOHIDChanging(int value);
     partial void OnOHIDChanged();
-    partial void OnPIDChanging(int value);
-    partial void OnPIDChanged();
-    partial void OnCtChanging(int value);
-    partial void OnCtChanged();
-    partial void OnPriceChanging(int value);
-    partial void OnPriceChanged();
-    partial void OnPrice_TypeChanging(int value);
-    partial void OnPrice_TypeChanged();
+    partial void OnPaidTypeChanging(int value);
+    partial void OnPaidTypeChanged();
+    partial void OnPaidFlagChanging(bool value);
+    partial void OnPaidFlagChanged();
+    partial void OnPaidDateTimeChanging(System.DateTime value);
+    partial void OnPaidDateTimeChanged();
+    partial void OnTradeNoChanging(string value);
+    partial void OnTradeNoChanged();
+    partial void OnTradeAmtChanging(double value);
+    partial void OnTradeAmtChanged();
+    partial void OnPayAmtChanging(double value);
+    partial void OnPayAmtChanged();
     partial void OnCreDateChanging(System.DateTime value);
     partial void OnCreDateChanged();
     partial void OnUpdDateChanging(System.DateTime value);
     partial void OnUpdDateChanged();
-    partial void OnSaveACIDChanging(int value);
-    partial void OnSaveACIDChanged();
     #endregion
 		
-		public Order_Product()
+		public Order_Paid()
 		{
+			this._Order_PaidDetail = new EntitySet<Order_PaidDetail>(new Action<Order_PaidDetail>(this.attach_Order_PaidDetail), new Action<Order_PaidDetail>(this.detach_Order_PaidDetail));
 			this._Order_Header = default(EntityRef<Order_Header>);
-			this._Product = default(EntityRef<Product>);
 			OnCreated();
 		}
 		
@@ -10736,66 +11942,636 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PID", DbType="Int NOT NULL")]
-		public int PID
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PaidType", DbType="Int NOT NULL")]
+		public int PaidType
 		{
 			get
 			{
-				return this._PID;
+				return this._PaidType;
 			}
 			set
 			{
-				if ((this._PID != value))
+				if ((this._PaidType != value))
 				{
-					if (this._Product.HasLoadedOrAssignedValue)
+					this.OnPaidTypeChanging(value);
+					this.SendPropertyChanging();
+					this._PaidType = value;
+					this.SendPropertyChanged("PaidType");
+					this.OnPaidTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PaidFlag", DbType="Bit NOT NULL")]
+		public bool PaidFlag
+		{
+			get
+			{
+				return this._PaidFlag;
+			}
+			set
+			{
+				if ((this._PaidFlag != value))
+				{
+					this.OnPaidFlagChanging(value);
+					this.SendPropertyChanging();
+					this._PaidFlag = value;
+					this.SendPropertyChanged("PaidFlag");
+					this.OnPaidFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PaidDateTime", DbType="DateTime NOT NULL")]
+		public System.DateTime PaidDateTime
+		{
+			get
+			{
+				return this._PaidDateTime;
+			}
+			set
+			{
+				if ((this._PaidDateTime != value))
+				{
+					this.OnPaidDateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._PaidDateTime = value;
+					this.SendPropertyChanged("PaidDateTime");
+					this.OnPaidDateTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TradeNo", DbType="VarChar(100)")]
+		public string TradeNo
+		{
+			get
+			{
+				return this._TradeNo;
+			}
+			set
+			{
+				if ((this._TradeNo != value))
+				{
+					this.OnTradeNoChanging(value);
+					this.SendPropertyChanging();
+					this._TradeNo = value;
+					this.SendPropertyChanged("TradeNo");
+					this.OnTradeNoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TradeAmt", DbType="Float NOT NULL")]
+		public double TradeAmt
+		{
+			get
+			{
+				return this._TradeAmt;
+			}
+			set
+			{
+				if ((this._TradeAmt != value))
+				{
+					this.OnTradeAmtChanging(value);
+					this.SendPropertyChanging();
+					this._TradeAmt = value;
+					this.SendPropertyChanged("TradeAmt");
+					this.OnTradeAmtChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayAmt", DbType="Float NOT NULL")]
+		public double PayAmt
+		{
+			get
+			{
+				return this._PayAmt;
+			}
+			set
+			{
+				if ((this._PayAmt != value))
+				{
+					this.OnPayAmtChanging(value);
+					this.SendPropertyChanging();
+					this._PayAmt = value;
+					this.SendPropertyChanged("PayAmt");
+					this.OnPayAmtChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Paid_Order_PaidDetail", Storage="_Order_PaidDetail", ThisKey="OPID", OtherKey="OPID")]
+		public EntitySet<Order_PaidDetail> Order_PaidDetail
+		{
+			get
+			{
+				return this._Order_PaidDetail;
+			}
+			set
+			{
+				this._Order_PaidDetail.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Header_Order_Paid", Storage="_Order_Header", ThisKey="OHID", OtherKey="OHID", IsForeignKey=true)]
+		public Order_Header Order_Header
+		{
+			get
+			{
+				return this._Order_Header.Entity;
+			}
+			set
+			{
+				Order_Header previousValue = this._Order_Header.Entity;
+				if (((previousValue != value) 
+							|| (this._Order_Header.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Order_Header.Entity = null;
+						previousValue.Order_Paid.Remove(this);
+					}
+					this._Order_Header.Entity = value;
+					if ((value != null))
+					{
+						value.Order_Paid.Add(this);
+						this._OHID = value.OHID;
+					}
+					else
+					{
+						this._OHID = default(int);
+					}
+					this.SendPropertyChanged("Order_Header");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Order_PaidDetail(Order_PaidDetail entity)
+		{
+			this.SendPropertyChanging();
+			entity.Order_Paid = this;
+		}
+		
+		private void detach_Order_PaidDetail(Order_PaidDetail entity)
+		{
+			this.SendPropertyChanging();
+			entity.Order_Paid = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Order_PaidDetail")]
+	public partial class Order_PaidDetail : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _OPDID;
+		
+		private int _OPID;
+		
+		private int _OPDType;
+		
+		private string _Title;
+		
+		private string _Description;
+		
+		private EntityRef<Order_Paid> _Order_Paid;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnOPDIDChanging(int value);
+    partial void OnOPDIDChanged();
+    partial void OnOPIDChanging(int value);
+    partial void OnOPIDChanged();
+    partial void OnOPDTypeChanging(int value);
+    partial void OnOPDTypeChanged();
+    partial void OnTitleChanging(string value);
+    partial void OnTitleChanged();
+    partial void OnDescriptionChanging(string value);
+    partial void OnDescriptionChanged();
+    #endregion
+		
+		public Order_PaidDetail()
+		{
+			this._Order_Paid = default(EntityRef<Order_Paid>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPDID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int OPDID
+		{
+			get
+			{
+				return this._OPDID;
+			}
+			set
+			{
+				if ((this._OPDID != value))
+				{
+					this.OnOPDIDChanging(value);
+					this.SendPropertyChanging();
+					this._OPDID = value;
+					this.SendPropertyChanged("OPDID");
+					this.OnOPDIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPID", DbType="Int NOT NULL")]
+		public int OPID
+		{
+			get
+			{
+				return this._OPID;
+			}
+			set
+			{
+				if ((this._OPID != value))
+				{
+					if (this._Order_Paid.HasLoadedOrAssignedValue)
 					{
 						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
 					}
-					this.OnPIDChanging(value);
+					this.OnOPIDChanging(value);
 					this.SendPropertyChanging();
-					this._PID = value;
-					this.SendPropertyChanged("PID");
-					this.OnPIDChanged();
+					this._OPID = value;
+					this.SendPropertyChanged("OPID");
+					this.OnOPIDChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Ct", DbType="Int NOT NULL")]
-		public int Ct
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPDType", DbType="Int NOT NULL")]
+		public int OPDType
 		{
 			get
 			{
-				return this._Ct;
+				return this._OPDType;
 			}
 			set
 			{
-				if ((this._Ct != value))
+				if ((this._OPDType != value))
 				{
-					this.OnCtChanging(value);
+					this.OnOPDTypeChanging(value);
 					this.SendPropertyChanging();
-					this._Ct = value;
-					this.SendPropertyChanged("Ct");
-					this.OnCtChanged();
+					this._OPDType = value;
+					this.SendPropertyChanged("OPDType");
+					this.OnOPDTypeChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price", DbType="Int NOT NULL")]
-		public int Price
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
+		public string Title
 		{
 			get
 			{
-				return this._Price;
+				return this._Title;
 			}
 			set
 			{
-				if ((this._Price != value))
+				if ((this._Title != value))
 				{
-					this.OnPriceChanging(value);
+					this.OnTitleChanging(value);
 					this.SendPropertyChanging();
-					this._Price = value;
-					this.SendPropertyChanged("Price");
-					this.OnPriceChanged();
+					this._Title = value;
+					this.SendPropertyChanged("Title");
+					this.OnTitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Description", DbType="NVarChar(MAX)")]
+		public string Description
+		{
+			get
+			{
+				return this._Description;
+			}
+			set
+			{
+				if ((this._Description != value))
+				{
+					this.OnDescriptionChanging(value);
+					this.SendPropertyChanging();
+					this._Description = value;
+					this.SendPropertyChanged("Description");
+					this.OnDescriptionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Paid_Order_PaidDetail", Storage="_Order_Paid", ThisKey="OPID", OtherKey="OPID", IsForeignKey=true)]
+		public Order_Paid Order_Paid
+		{
+			get
+			{
+				return this._Order_Paid.Entity;
+			}
+			set
+			{
+				Order_Paid previousValue = this._Order_Paid.Entity;
+				if (((previousValue != value) 
+							|| (this._Order_Paid.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Order_Paid.Entity = null;
+						previousValue.Order_PaidDetail.Remove(this);
+					}
+					this._Order_Paid.Entity = value;
+					if ((value != null))
+					{
+						value.Order_PaidDetail.Add(this);
+						this._OPID = value.OPID;
+					}
+					else
+					{
+						this._OPID = default(int);
+					}
+					this.SendPropertyChanged("Order_Paid");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Order_Product")]
+	public partial class Order_Product : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _OPID;
+		
+		private int _OHID;
+		
+		private int _PCID;
+		
+		private int _CAID;
+		
+		private int _Price_Basic;
+		
+		private int _Price_Finally;
+		
+		private int _Price_Type;
+		
+		private System.DateTime _JoinDate;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Order_Header> _Order_Header;
+		
+		private EntityRef<Product_Class> _Product_Class;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnOPIDChanging(int value);
+    partial void OnOPIDChanged();
+    partial void OnOHIDChanging(int value);
+    partial void OnOHIDChanged();
+    partial void OnPCIDChanging(int value);
+    partial void OnPCIDChanged();
+    partial void OnCAIDChanging(int value);
+    partial void OnCAIDChanged();
+    partial void OnPrice_BasicChanging(int value);
+    partial void OnPrice_BasicChanged();
+    partial void OnPrice_FinallyChanging(int value);
+    partial void OnPrice_FinallyChanged();
+    partial void OnPrice_TypeChanging(int value);
+    partial void OnPrice_TypeChanged();
+    partial void OnJoinDateChanging(System.DateTime value);
+    partial void OnJoinDateChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Order_Product()
+		{
+			this._Order_Header = default(EntityRef<Order_Header>);
+			this._Product_Class = default(EntityRef<Product_Class>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int OPID
+		{
+			get
+			{
+				return this._OPID;
+			}
+			set
+			{
+				if ((this._OPID != value))
+				{
+					this.OnOPIDChanging(value);
+					this.SendPropertyChanging();
+					this._OPID = value;
+					this.SendPropertyChanged("OPID");
+					this.OnOPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OHID", DbType="Int NOT NULL")]
+		public int OHID
+		{
+			get
+			{
+				return this._OHID;
+			}
+			set
+			{
+				if ((this._OHID != value))
+				{
+					if (this._Order_Header.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOHIDChanging(value);
+					this.SendPropertyChanging();
+					this._OHID = value;
+					this.SendPropertyChanged("OHID");
+					this.OnOHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PCID", DbType="Int NOT NULL")]
+		public int PCID
+		{
+			get
+			{
+				return this._PCID;
+			}
+			set
+			{
+				if ((this._PCID != value))
+				{
+					if (this._Product_Class.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnPCIDChanging(value);
+					this.SendPropertyChanging();
+					this._PCID = value;
+					this.SendPropertyChanged("PCID");
+					this.OnPCIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CAID", DbType="Int NOT NULL")]
+		public int CAID
+		{
+			get
+			{
+				return this._CAID;
+			}
+			set
+			{
+				if ((this._CAID != value))
+				{
+					this.OnCAIDChanging(value);
+					this.SendPropertyChanging();
+					this._CAID = value;
+					this.SendPropertyChanged("CAID");
+					this.OnCAIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Basic", DbType="Int NOT NULL")]
+		public int Price_Basic
+		{
+			get
+			{
+				return this._Price_Basic;
+			}
+			set
+			{
+				if ((this._Price_Basic != value))
+				{
+					this.OnPrice_BasicChanging(value);
+					this.SendPropertyChanging();
+					this._Price_Basic = value;
+					this.SendPropertyChanged("Price_Basic");
+					this.OnPrice_BasicChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Finally", DbType="Int NOT NULL")]
+		public int Price_Finally
+		{
+			get
+			{
+				return this._Price_Finally;
+			}
+			set
+			{
+				if ((this._Price_Finally != value))
+				{
+					this.OnPrice_FinallyChanging(value);
+					this.SendPropertyChanging();
+					this._Price_Finally = value;
+					this.SendPropertyChanged("Price_Finally");
+					this.OnPrice_FinallyChanged();
 				}
 			}
 		}
@@ -10816,6 +12592,26 @@ namespace Banner
 					this._Price_Type = value;
 					this.SendPropertyChanged("Price_Type");
 					this.OnPrice_TypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JoinDate", DbType="DateTime NOT NULL")]
+		public System.DateTime JoinDate
+		{
+			get
+			{
+				return this._JoinDate;
+			}
+			set
+			{
+				if ((this._JoinDate != value))
+				{
+					this.OnJoinDateChanging(value);
+					this.SendPropertyChanging();
+					this._JoinDate = value;
+					this.SendPropertyChanged("JoinDate");
+					this.OnJoinDateChanged();
 				}
 			}
 		}
@@ -10914,36 +12710,36 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Order_Product", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
-		public Product Product
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Order_Product", Storage="_Product_Class", ThisKey="PCID", OtherKey="PCID", IsForeignKey=true)]
+		public Product_Class Product_Class
 		{
 			get
 			{
-				return this._Product.Entity;
+				return this._Product_Class.Entity;
 			}
 			set
 			{
-				Product previousValue = this._Product.Entity;
+				Product_Class previousValue = this._Product_Class.Entity;
 				if (((previousValue != value) 
-							|| (this._Product.HasLoadedOrAssignedValue == false)))
+							|| (this._Product_Class.HasLoadedOrAssignedValue == false)))
 				{
 					this.SendPropertyChanging();
 					if ((previousValue != null))
 					{
-						this._Product.Entity = null;
+						this._Product_Class.Entity = null;
 						previousValue.Order_Product.Remove(this);
 					}
-					this._Product.Entity = value;
+					this._Product_Class.Entity = value;
 					if ((value != null))
 					{
 						value.Order_Product.Add(this);
-						this._PID = value.PID;
+						this._PCID = value.PCID;
 					}
 					else
 					{
-						this._PID = default(int);
+						this._PCID = default(int);
 					}
-					this.SendPropertyChanged("Product");
+					this.SendPropertyChanged("Product_Class");
 				}
 			}
 		}
@@ -11881,9 +13677,9 @@ namespace Banner
 		
 		private int _SaveACID;
 		
-		private EntitySet<M_Product_Teacher> _M_Product_Teacher;
+		private EntitySet<Coupon_Header> _Coupon_Header;
 		
-		private EntitySet<Order_Product> _Order_Product;
+		private EntitySet<M_Product_Teacher> _M_Product_Teacher;
 		
 		private EntitySet<Product_Class> _Product_Class;
 		
@@ -11959,8 +13755,8 @@ namespace Banner
 		
 		public Product()
 		{
+			this._Coupon_Header = new EntitySet<Coupon_Header>(new Action<Coupon_Header>(this.attach_Coupon_Header), new Action<Coupon_Header>(this.detach_Coupon_Header));
 			this._M_Product_Teacher = new EntitySet<M_Product_Teacher>(new Action<M_Product_Teacher>(this.attach_M_Product_Teacher), new Action<M_Product_Teacher>(this.detach_M_Product_Teacher));
-			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
 			this._Product_Class = new EntitySet<Product_Class>(new Action<Product_Class>(this.attach_Product_Class), new Action<Product_Class>(this.detach_Product_Class));
 			this._Product_File = new EntitySet<Product_File>(new Action<Product_File>(this.attach_Product_File), new Action<Product_File>(this.detach_Product_File));
 			this._Product_Rool = new EntitySet<Product_Rool>(new Action<Product_Rool>(this.attach_Product_Rool), new Action<Product_Rool>(this.detach_Product_Rool));
@@ -12537,6 +14333,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Coupon_Header", Storage="_Coupon_Header", ThisKey="PID", OtherKey="PID")]
+		public EntitySet<Coupon_Header> Coupon_Header
+		{
+			get
+			{
+				return this._Coupon_Header;
+			}
+			set
+			{
+				this._Coupon_Header.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_M_Product_Teacher", Storage="_M_Product_Teacher", ThisKey="PID", OtherKey="PID")]
 		public EntitySet<M_Product_Teacher> M_Product_Teacher
 		{
@@ -12547,19 +14356,6 @@ namespace Banner
 			set
 			{
 				this._M_Product_Teacher.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Order_Product", Storage="_Order_Product", ThisKey="PID", OtherKey="PID")]
-		public EntitySet<Order_Product> Order_Product
-		{
-			get
-			{
-				return this._Order_Product;
-			}
-			set
-			{
-				this._Order_Product.Assign(value);
 			}
 		}
 		
@@ -12690,6 +14486,18 @@ namespace Banner
 			}
 		}
 		
+		private void attach_Coupon_Header(Coupon_Header entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = this;
+		}
+		
+		private void detach_Coupon_Header(Coupon_Header entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = null;
+		}
+		
 		private void attach_M_Product_Teacher(M_Product_Teacher entity)
 		{
 			this.SendPropertyChanging();
@@ -12697,18 +14505,6 @@ namespace Banner
 		}
 		
 		private void detach_M_Product_Teacher(M_Product_Teacher entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = null;
-		}
-		
-		private void attach_Order_Product(Order_Product entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = this;
-		}
-		
-		private void detach_Order_Product(Order_Product entity)
 		{
 			this.SendPropertyChanging();
 			entity.Product = null;
@@ -12791,6 +14587,8 @@ namespace Banner
 		
 		private EntitySet<M_Product_Teacher> _M_Product_Teacher;
 		
+		private EntitySet<Order_Product> _Order_Product;
+		
 		private EntityRef<Product> _Product;
 		
     #region 擴充性方法定義
@@ -12834,6 +14632,7 @@ namespace Banner
 		public Product_Class()
 		{
 			this._M_Product_Teacher = new EntitySet<M_Product_Teacher>(new Action<M_Product_Teacher>(this.attach_M_Product_Teacher), new Action<M_Product_Teacher>(this.detach_M_Product_Teacher));
+			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
 			this._Product = default(EntityRef<Product>);
 			OnCreated();
 		}
@@ -13175,6 +14974,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Order_Product", Storage="_Order_Product", ThisKey="PCID", OtherKey="PCID")]
+		public EntitySet<Order_Product> Order_Product
+		{
+			get
+			{
+				return this._Order_Product;
+			}
+			set
+			{
+				this._Order_Product.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Product_Class", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
 		public Product Product
 		{
@@ -13236,6 +15048,18 @@ namespace Banner
 		}
 		
 		private void detach_M_Product_Teacher(M_Product_Teacher entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_Class = null;
+		}
+		
+		private void attach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_Class = this;
+		}
+		
+		private void detach_Order_Product(Order_Product entity)
 		{
 			this.SendPropertyChanging();
 			entity.Product_Class = null;
@@ -15143,305 +16967,6 @@ namespace Banner
 					this._OID_1 = value;
 				}
 			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Event_Join_Header")]
-	public partial class Event_Join_Header : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _EJHID;
-		
-		private int _EID;
-		
-		private int _OIID;
-		
-		private System.DateTime _EventDate;
-		
-		private string _Note;
-		
-		private System.DateTime _CreDate;
-		
-		private System.DateTime _UpdDate;
-		
-		private int _SaveACID;
-		
-		private EntitySet<Event_Join_Detail> _Event_Join_Detail;
-		
-		private EntityRef<Event> _Event;
-		
-    #region 擴充性方法定義
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnEJHIDChanging(int value);
-    partial void OnEJHIDChanged();
-    partial void OnEIDChanging(int value);
-    partial void OnEIDChanged();
-    partial void OnOIIDChanging(int value);
-    partial void OnOIIDChanged();
-    partial void OnEventDateChanging(System.DateTime value);
-    partial void OnEventDateChanged();
-    partial void OnNoteChanging(string value);
-    partial void OnNoteChanged();
-    partial void OnCreDateChanging(System.DateTime value);
-    partial void OnCreDateChanged();
-    partial void OnUpdDateChanging(System.DateTime value);
-    partial void OnUpdDateChanged();
-    partial void OnSaveACIDChanging(int value);
-    partial void OnSaveACIDChanged();
-    #endregion
-		
-		public Event_Join_Header()
-		{
-			this._Event_Join_Detail = new EntitySet<Event_Join_Detail>(new Action<Event_Join_Detail>(this.attach_Event_Join_Detail), new Action<Event_Join_Detail>(this.detach_Event_Join_Detail));
-			this._Event = default(EntityRef<Event>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EJHID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int EJHID
-		{
-			get
-			{
-				return this._EJHID;
-			}
-			set
-			{
-				if ((this._EJHID != value))
-				{
-					this.OnEJHIDChanging(value);
-					this.SendPropertyChanging();
-					this._EJHID = value;
-					this.SendPropertyChanged("EJHID");
-					this.OnEJHIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EID", DbType="Int NOT NULL")]
-		public int EID
-		{
-			get
-			{
-				return this._EID;
-			}
-			set
-			{
-				if ((this._EID != value))
-				{
-					if (this._Event.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnEIDChanging(value);
-					this.SendPropertyChanging();
-					this._EID = value;
-					this.SendPropertyChanged("EID");
-					this.OnEIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int NOT NULL")]
-		public int OIID
-		{
-			get
-			{
-				return this._OIID;
-			}
-			set
-			{
-				if ((this._OIID != value))
-				{
-					this.OnOIIDChanging(value);
-					this.SendPropertyChanging();
-					this._OIID = value;
-					this.SendPropertyChanged("OIID");
-					this.OnOIIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EventDate", DbType="Date NOT NULL")]
-		public System.DateTime EventDate
-		{
-			get
-			{
-				return this._EventDate;
-			}
-			set
-			{
-				if ((this._EventDate != value))
-				{
-					this.OnEventDateChanging(value);
-					this.SendPropertyChanging();
-					this._EventDate = value;
-					this.SendPropertyChanged("EventDate");
-					this.OnEventDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Note", DbType="NVarChar(300)")]
-		public string Note
-		{
-			get
-			{
-				return this._Note;
-			}
-			set
-			{
-				if ((this._Note != value))
-				{
-					this.OnNoteChanging(value);
-					this.SendPropertyChanging();
-					this._Note = value;
-					this.SendPropertyChanged("Note");
-					this.OnNoteChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
-		public System.DateTime CreDate
-		{
-			get
-			{
-				return this._CreDate;
-			}
-			set
-			{
-				if ((this._CreDate != value))
-				{
-					this.OnCreDateChanging(value);
-					this.SendPropertyChanging();
-					this._CreDate = value;
-					this.SendPropertyChanged("CreDate");
-					this.OnCreDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
-		public System.DateTime UpdDate
-		{
-			get
-			{
-				return this._UpdDate;
-			}
-			set
-			{
-				if ((this._UpdDate != value))
-				{
-					this.OnUpdDateChanging(value);
-					this.SendPropertyChanging();
-					this._UpdDate = value;
-					this.SendPropertyChanged("UpdDate");
-					this.OnUpdDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
-		public int SaveACID
-		{
-			get
-			{
-				return this._SaveACID;
-			}
-			set
-			{
-				if ((this._SaveACID != value))
-				{
-					this.OnSaveACIDChanging(value);
-					this.SendPropertyChanging();
-					this._SaveACID = value;
-					this.SendPropertyChanged("SaveACID");
-					this.OnSaveACIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_Join_Header_Event_Join_Detail", Storage="_Event_Join_Detail", ThisKey="EJHID", OtherKey="EJHID")]
-		public EntitySet<Event_Join_Detail> Event_Join_Detail
-		{
-			get
-			{
-				return this._Event_Join_Detail;
-			}
-			set
-			{
-				this._Event_Join_Detail.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_Event_Join_Header", Storage="_Event", ThisKey="EID", OtherKey="EID", IsForeignKey=true)]
-		public Event Event
-		{
-			get
-			{
-				return this._Event.Entity;
-			}
-			set
-			{
-				Event previousValue = this._Event.Entity;
-				if (((previousValue != value) 
-							|| (this._Event.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Event.Entity = null;
-						previousValue.Event_Join_Header.Remove(this);
-					}
-					this._Event.Entity = value;
-					if ((value != null))
-					{
-						value.Event_Join_Header.Add(this);
-						this._EID = value.EID;
-					}
-					else
-					{
-						this._EID = default(int);
-					}
-					this.SendPropertyChanged("Event");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_Event_Join_Detail(Event_Join_Detail entity)
-		{
-			this.SendPropertyChanging();
-			entity.Event_Join_Header = this;
-		}
-		
-		private void detach_Event_Join_Detail(Event_Join_Detail entity)
-		{
-			this.SendPropertyChanging();
-			entity.Event_Join_Header = null;
 		}
 	}
 	

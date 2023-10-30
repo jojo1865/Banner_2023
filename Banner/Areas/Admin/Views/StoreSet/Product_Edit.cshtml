@@ -4,8 +4,8 @@
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
 }
 <style>
-    .pt-40{
-        padding-top:40px;
+    .pt-40 {
+        padding-top: 40px;
     }
 </style>
 <div class="main-container">
@@ -44,84 +44,85 @@
                                             @Html.DropDownList("ddl_CBasic", Model.CSL, new { @class = "form-select form-control-lg", onchange = "GetCourse(this.value);" })
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label>課程副標題<span>*</span></label>
-                                        @Html.TextBox("txb_SubTitle", Model.P.SubTitle, new { @class = "form-control form-control-lg input-underline" })
-                                    </div>
-                                    <div class="form-group">
-                                        <label>課程類型</label><br />
-                                        @for (int i = 0; i < Model.sCourseType.Length; i++)
-                                        {
-                                            <div class="form-check form-check-inline">
-                                                @Html.RadioButton("rbl_ProductType", i, Model.P.ProductType == i, new { @id = ("rbl_CourseType" + i), @class = "form-check-input" })
-                                                @Html.Label(Model.sCourseType[i], new { @class = "form-check-label", @for = ("rbl_CourseType" + i) })
-                                            </div>
-                                        }
-                                    </div>
-                                    <div class="form-group">
-                                        <label>課程內容</label>
-                                        @Html.TextArea("txb_ProductInfo", Model.P.ProductInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
-                                    </div>
-                                    <div class="form-group">
-                                        <label>對象資格說明</label>
-                                        @Html.TextArea("txb_TargetInfo", Model.P.TargetInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
-                                    </div>
-                                    <div class="form-group">
-                                        <label>結業資格說明</label>
-                                        @Html.TextArea("txb_GraduationInfo", Model.P.GraduationInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
-                                    </div>
-                                    <div class="form-group">
-                                        <label>前台顯示</label>
-                                        <div class="row">
-                                            <div class="col-auto">
-                                                <div class="form-check form-check-inline">
-                                                    @Html.RadioButton("cbox_ShowFlag", true, Model.P.ShowFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
-                                                    @Html.Label("已顯示", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <div class="form-check form-check-inline">
-                                                    @Html.RadioButton("cbox_ShowFlag", false, !Model.P.ShowFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
-                                                    @Html.Label("已隱藏", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>啟用狀態</label>
-                                        <div class="row">
-                                            <div class="col-auto">
-                                                <div class="form-check form-check-inline">
-                                                    @Html.RadioButton("cbox_ActiveFlag", true, Model.P.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
-                                                    @Html.Label("啟用", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <div class="form-check form-check-inline">
-                                                    @Html.RadioButton("cbox_ActiveFlag", false, !Model.P.ActiveFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
-                                                    @Html.Label("停用", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @if (Model.P.CID > 0 && ((bool[])ViewBag._Power)[3])
+                                </div>
+                                <div class="form-group">
+                                    <label>課程副標題<span>*</span></label>
+                                    @Html.TextBox("txb_SubTitle", Model.P.SubTitle, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                                <div class="form-group">
+                                    <label>課程類型</label><br />
+                                    @for (int i = 0; i < Model.sCourseType.Length; i++)
                                     {
-                                        <div class="form-group">
-                                            <label>刪除</label>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <div class="form-check form-check-inline">
-                                                        @Html.CheckBox("cbox_DeleteFlag", Model.P.DeleteFlag, new { @class = "form-check-input" })
-                                                        @Html.Label("更新後刪除", new { @class = "form-check-label" })
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("rbl_ProductType", i, Model.P.ProductType == i, new { @id = ("rbl_CourseType" + i), @class = "form-check-input" })
+                                            @Html.Label(Model.sCourseType[i], new { @class = "form-check-label", @for = ("rbl_CourseType" + i) })
                                         </div>
                                     }
                                 </div>
+                                <div class="form-group">
+                                    <label>課程內容</label>
+                                    @Html.TextArea("txb_ProductInfo", Model.P.ProductInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
+                                </div>
+                                <div class="form-group">
+                                    <label>對象資格說明</label>
+                                    @Html.TextArea("txb_TargetInfo", Model.P.TargetInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
+                                </div>
+                                <div class="form-group">
+                                    <label>結業資格說明</label>
+                                    @Html.TextArea("txb_GraduationInfo", Model.P.GraduationInfo, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
+                                </div>
+                                <div class="form-group">
+                                    <label>前台顯示</label>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("cbox_ShowFlag", true, Model.P.ShowFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
+                                                @Html.Label("已顯示", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("cbox_ShowFlag", false, !Model.P.ShowFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
+                                                @Html.Label("已隱藏", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>啟用狀態</label>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("cbox_ActiveFlag", true, Model.P.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
+                                                @Html.Label("啟用", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("cbox_ActiveFlag", false, !Model.P.ActiveFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
+                                                @Html.Label("停用", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (Model.P.CID > 0 && ((bool[])ViewBag._Power)[3])
+                                {
+                                    <div class="form-group">
+                                        <label>刪除</label>
+                                        <div class="row">
+                                            <div class="col-auto">
+                                                <div class="form-check form-check-inline">
+                                                    @Html.CheckBox("cbox_DeleteFlag", Model.P.DeleteFlag, new { @class = "form-check-input" })
+                                                    @Html.Label("更新後刪除", new { @class = "form-check-label" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
+
                     <div class="form-body mt-4">
                         <div class="form-card-group">
                             <div id="personal-info" class="header-container">
@@ -163,7 +164,7 @@
                                 <div class="row">
                                     <div class="col-lg-6 col-12">
                                         <label>開課起始日<span>*</span></label>
-                                        @Html.TextBox("txb_SDate",(Model.P.SDate.Date >= Model.P.CreDate.Date ? Model.P.SDate.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_SDate", (Model.P.SDate.Date >= Model.P.CreDate.Date ? Model.P.SDate.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                     <div class="col-lg-6 col-12">
                                         <label>開課結束日<span>*</span></label>
@@ -229,12 +230,12 @@
                                     }
                                     <input type="hidden" id="txb_AddCourseCt" name="txb_AddCourseCt" value="0" />
                                     <div id="div_BeforeCourse">
-                                        @foreach (var PB in Model.PBs.Where(q => q.PRID > 0 && q.CRID==0).OrderBy(q => q.PRID))
+                                        @foreach (var PB in Model.PBs.Where(q => q.PRID > 0 && q.CRID == 0).OrderBy(q => q.PRID))
                                         {
                                             <div id="div_AddCourse_@PB.PRID" class="mt-3">
                                                 <div class="row">
                                                     <div class="col-lg-4 col-12">
-                                                       @Html.DropDownList("ddl_CCDB_" + PB.PRID, PB.CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this);" })
+                                                        @Html.DropDownList("ddl_CCDB_" + PB.PRID, PB.CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this);" })
                                                     </div>
                                                     <div class="col-lg-6 col-12">
                                                         @Html.DropDownList("ddl_CCDB_" + PB.PRID, PB.CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this);" })
@@ -250,7 +251,7 @@
                                             <div id="div_AddCourse_@PB.PRID" class="mt-3">
                                                 <div class="row">
                                                     <div class="col-lg-4 col-12">
-                                                       @Html.Label(PB.CCSL_Before.FirstOrDefault(q => q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
+                                                        @Html.Label(PB.CCSL_Before.FirstOrDefault(q => q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
                                                     </div>
                                                     <div class="col-lg-6 col-12">
                                                         @Html.Label(PB.CSL_Before.First().Text, new { @class = "form-select form-control-lg lab_gray" })
@@ -278,7 +279,7 @@
                                         {
                                             @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input" });
                                         }
-                                        else if (PR2.PRID == 0 || PR2.CRID>0)
+                                        else if (PR2.PRID == 0 || PR2.CRID > 0)
                                         {
                                             @Html.RadioButton("rbl_Sex", -1, iSex == -1, new { @id = "cbox_Sex0", @class = "form-check-input", @disabled = "true" });
                                         }
@@ -392,7 +393,6 @@
                         </div>
                     </div>
 
-
                 </form>
             }
         </div>
@@ -454,7 +454,7 @@
         document.getElementById('div_BeforeCourse').innerHTML += str;
         sCt.value = iCt;
     }
-    
+
     /*取得課程選單*/
     function GetCourseddl(ddl, CID) {
         var sControlTitle = '';
@@ -551,7 +551,7 @@
                     else if (res.Rools[index].TargetType == 1) {//職分
                         $.each(Os, function (j) {
                             Os[j].disabled = true;
-                            if (res.Rools[index].TargetInt1.toString() == Os[j].id.replace('cbox_O','')) {
+                            if (res.Rools[index].TargetInt1.toString() == Os[j].id.replace('cbox_O', '')) {
                                 Os[j].checked = true;
                             }
                         });

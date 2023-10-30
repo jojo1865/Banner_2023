@@ -639,6 +639,9 @@
     <Content Include="Areas\Web\Views\AccountPlace\GroupMeet_List.cshtml" />
     <Content Include="Areas\Web\Views\GroupPlace\GroupMeet_List.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Order_Step1.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\Coupon_List.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\Coupon_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\Coupon_Account_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

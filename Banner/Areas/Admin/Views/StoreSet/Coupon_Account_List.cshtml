@@ -1,0 +1,47 @@
+﻿@model Banner.Areas.Admin.Controllers.StoreSetController.cCoupon_Account_List
+@{
+    ViewBag.Title = "Coupon_Account_List";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        <form method="post" id="form1">
+            @if (Model != null)
+            {
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-lg-6 col-12">
+                                <label>會友姓名</label>
+                                @Html.TextBox("txb_Key", Model.sKey, new { @class = "form-control form-control-lg input-underline", @placeholder = "會友名稱關鍵字" })
+                            </div>
+                            <div class="col-lg-6 col-12">
+                                <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+
+
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="table-container">
+                    @if (((bool[])ViewBag._Power)[1])
+                    {
+                        <div class="table-func-container mb-4">
+                            <a class="btn btn-primary btn-lg btn-round" href="/Admin/StoreSet/Coupon_Account_Add/0">
+                                <i class="fa-solid fa-circle-plus"></i>匯入
+                            </a>
+                        </div>
+                    }
+                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                </div>
+            }
+
+        </form>
+    </div>
+</div>
+

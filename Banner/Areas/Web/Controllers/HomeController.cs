@@ -525,7 +525,7 @@ namespace Banner.Areas.Web.Controllers
                                         {
                                             var Os = from q in DC.Order_Product.Where(q => q.Order_Header.ACID == AC.ACID && q.Order_Header.Order_Type == 2 && !q.Order_Header.DeleteFlag)
                                                      join p in DC.Product_Rool.Where(q => q.PID == P.PID && q.TargetType == 0 && q.TargetInt1 > 0)
-                                                     on q.PID equals p.TargetInt1
+                                                     on q.Product_Class.PID equals p.TargetInt1
                                                      select p;
                                             if (Os.Count() == 0)
                                                 Error = "本課程有限制需先參加先修課程,您不具備此資格";
@@ -606,14 +606,62 @@ namespace Banner.Areas.Web.Controllers
                     var OH = DC.Order_Header.FirstOrDefault(q => q.Order_Type == 0 && q.ACID == ACID);
                     if (OH != null)
                     {
-                        if (!OH.Order_Product.Any(q => q.PID == PID))//這商品目前尚未加入購物車中
+                        if (!OH.Order_Product.Any(q => q.Product_Class.PID == PID))//這商品目前尚未加入購物車中
                         {
+                            var PC = DC.Product_Class.Where(q => q.PID == PID).OrderBy(q => q.PCID).FirstOrDefault();
+                            if (PC != null)
+                            {
+                                Order_Product OP = new Order_Product
+                                {
+                                    OHID = OH.OHID,
+                                    PCID = PC.PCID,
+                                    CAID = 0,
+                                    Price_Basic = PC.Product.Price_Basic,
+                                    Price_Finally = PC.Product.Price_Basic,
+
+                                    Price_Type = PriceType,
+                                    CreDate = DT,
+                                    UpdDate = DT,
+                                    SaveACID = ACID
+                                };
+                                DC.Order_Product.InsertOnSubmit(OP);
+                                DC.SubmitChanges();
+
+                                OH.TotalPrice = OH.Order_Product.Sum(q => q.Price_Finally);
+                                OH.DeleteFlag = false;
+                                DC.SubmitChanges();
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                       
+
+                        var PC = DC.Product_Class.Where(q => q.PID == PID).OrderBy(q => q.PCID).FirstOrDefault();
+                        if (PC != null)
+                        {
+                            OH = new Order_Header
+                            {
+                                OIID = 0,
+                                ACID = ACID,
+                                Order_Type = 0,
+                                TotalPrice = Price,
+                                DeleteFlag = false,
+                                CreDate = DT,
+                                UpdDate = DT,
+                                SaveACID = ACID
+                            };
+                            DC.Order_Header.InsertOnSubmit(OH);
+                            DC.SubmitChanges();
+
                             Order_Product OP = new Order_Product
                             {
                                 OHID = OH.OHID,
-                                PID = PID,
-                                Ct = 1,
-                                Price = Price,
+                                PCID = PC.PCID,
+                                CAID = 0,
+                                Price_Basic = PC.Product.Price_Basic,
+                                Price_Finally = PC.Product.Price_Basic,
                                 Price_Type = PriceType,
                                 CreDate = DT,
                                 UpdDate = DT,
@@ -621,41 +669,8 @@ namespace Banner.Areas.Web.Controllers
                             };
                             DC.Order_Product.InsertOnSubmit(OP);
                             DC.SubmitChanges();
-
-                            OH.TotalPrice = OH.Order_Product.Sum(q => q.Ct * q.Price);
-                            OH.DeleteFlag = false;
-                            DC.SubmitChanges();
                         }
-                    }
-                    else
-                    {
-                        OH = new Order_Header
-                        {
-                            OIID = 0,
-                            ACID = ACID,
-                            Order_Type = 0,
-                            TotalPrice = Price,
-                            DeleteFlag = false,
-                            CreDate = DT,
-                            UpdDate = DT,
-                            SaveACID = ACID
-                        };
-                        DC.Order_Header.InsertOnSubmit(OH);
-                        DC.SubmitChanges();
-
-                        Order_Product OP = new Order_Product
-                        {
-                            OHID = OH.OHID,
-                            PID = PID,
-                            Ct = 1,
-                            Price = Price,
-                            Price_Type = PriceType,
-                            CreDate = DT,
-                            UpdDate = DT,
-                            SaveACID = ACID
-                        };
-                        DC.Order_Product.InsertOnSubmit(OP);
-                        DC.SubmitChanges();
+                            
                     }
 
                 }
