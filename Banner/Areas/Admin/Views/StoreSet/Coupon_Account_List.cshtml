@@ -9,7 +9,8 @@
         <h5 class="header font-bold">@ViewBag._Title</h5>
     </div>
     <div class="body-container">
-        <form method="post" id="form1">
+        <form method="post" id="form1" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
             @if (Model != null)
             {
                 <div class="search-form">
@@ -19,24 +20,31 @@
                                 <label>會友姓名</label>
                                 @Html.TextBox("txb_Key", Model.sKey, new { @class = "form-control form-control-lg input-underline", @placeholder = "會友名稱關鍵字" })
                             </div>
-                            <div class="col-lg-6 col-12">
+                            <div class="col-lg-6 col-12 text-lg-end text-center">
                                 <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
-
-
                             </div>
                         </div>
-                        
+                        @if (Model.OID == 0)
+                        {
+                            <div class="row">
+                                <div class="col-12">
+                                    <label>匯入名單</label>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <input type="file" name="fu" class="form-control form-control-lg" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+                                </div>
+                                <div class="col-lg-3 col-12">
+                                    <a href="~/Files/Down/Temp_Coupon.xlsx" class="btn btn-primary btn-lg  btn-round" download target="_blank">空白表單下載</a>
+                                </div>
+                                <div class="col-lg-3 col-12 text-lg-end text-center">
+                                    <a href="javascript:;" onclick="document.getElementById('form1').submit();" name="fu" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-circle-plus"></i>上傳</a>
+                                </div>
+                            </div>
+                        }
+
                     </div>
                 </div>
                 <div class="table-container">
-                    @if (((bool[])ViewBag._Power)[1])
-                    {
-                        <div class="table-func-container mb-4">
-                            <a class="btn btn-primary btn-lg btn-round" href="/Admin/StoreSet/Coupon_Account_Add/0">
-                                <i class="fa-solid fa-circle-plus"></i>匯入
-                            </a>
-                        </div>
-                    }
                     @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
                 </div>
             }

@@ -1,4 +1,4 @@
-﻿@model Banner.Product
+﻿@model Banner.Areas.Web.Controllers.IncludeController.cProductCard
 
 <div class="card">
     <div class="img_Product">
@@ -8,14 +8,21 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col fw-bolder" style="font-size:20px">@(Model.Course.Title + Model.SubTitle)<span class="lab_Category">@(Model.ProductType == 0 ? "實體+線上" : (Model.ProductType==1 ? "實體課程" : "線上課程"))</span></div>
+            <div class="col fw-bolder" style="font-size:20px">@(Model.Title)<span class="lab_Category">@(Model.ProductType)</span></div>
         </div>
         <div class="row">
             <div class="col-12 mt-1">
                 <i class="fa-solid fa-dollar-sign me-1"></i>
-                @if (Model.Price_Early > 0)
+                @if (Model.Price_Basic != Model.Price_New)
                 {
-                    <span style="color: #3764AC">早鳥價 NT$@(Model.Price_Early)</span>
+                    if (Model.Price_Early == Model.Price_New)//目前優惠價=早鳥
+                    {
+                        <span style="color: #3764AC">早鳥價 NT$@(Model.Price_New)</span>
+                    }
+                    else//折價比早鳥好
+                    {
+                        <span style="color: #3764AC">優惠價 NT$@(Model.Price_New)</span>
+                    }
                     <span style="text-decoration: line-through;">原價 NT@(Model.Price_Basic)</span>
                 }
                 else if (Model.Price_Basic > 0)

@@ -579,7 +579,7 @@ namespace Banner.Areas.Web.Controllers
         }
         #endregion
         #region 取得/設定聯絡方式
-        public PartialViewResult _ContectEdit(Contect C, bool required = false,bool doublecheck=false)
+        public PartialViewResult _ContectEdit(Contect C, bool required = false, bool doublecheck = false)
         {
             c_ContectEdit cN = new c_ContectEdit();
             if (C == null)
@@ -617,13 +617,47 @@ namespace Banner.Areas.Web.Controllers
         }
         #endregion
         #region 商品卡
+        public class cProductCard
+        {
+            public int PID = 0;
+            public string Title = "";
+            public string ImgURL = "";
+            public string ProductType = "";
+            public int Price_Early = 0;
+            public int Price_Basic = 0;
+            public int Price_Cut = 0;
+            public int Price_New = 0;
+            public DateTime SDate = DateTime.Now;
+            public DateTime EDate = DateTime.Now;
+            public string TargetInfo = "";
+        }
         public PartialViewResult _StoreSetProductCell(Product P)
         {
-            if(string.IsNullOrEmpty(P.ImgURL))
+            ACID = GetACID();
+            var OIs = DC.M_OI_Account.Where(q => q.ACID == ACID);
+            var CA = (from q in DC.Coupon_Account.Where(q => q.ACID == ACID && q.Coupon_Header.PID == P.PID && !q.DeleteFlag && q.ActiveFlag && q.OPID == 0 && q.OHID == 0 && q.Coupon_Header.ActiveFlag && !q.Coupon_Header.DeleteFlag && q.Coupon_Header.SDateTime <= DT && q.Coupon_Header.EDateTime >= DT)
+                     join p in OIs
+                     on q.Coupon_Header.OID equals p.OrganizeInfo.OID
+                     select q).FirstOrDefault();
+            cProductCard c = new cProductCard
             {
-                P.ImgURL = "/Content/Image/CourseCategory_" + P.Course.CCID + ".jpg";
-            }
-            return PartialView(P);
+                PID = P.PID,
+                Title = P.Course.Title + P.SubTitle,
+                ImgURL = string.IsNullOrEmpty(P.ImgURL) ? "/Content/Image/CourseCategory_" + P.Course.CCID + ".jpg" : P.ImgURL,
+                ProductType = P.ProductType == 0 ? "實體+線上" : (P.ProductType == 1 ? "實體課程" : "線上課程"),
+                Price_Early = P.Price_Early,
+                Price_Basic = P.Price_Basic,
+                Price_Cut = CA!=null ? CA.Coupon_Header.Price_Cut : 0,
+                Price_New = 0,
+                SDate = P.SDate,
+                EDate = P.EDate,
+                TargetInfo=P.TargetInfo,
+            };
+            if (c.Price_Basic + c.Price_New < c.Price_Early)
+                c.Price_New = c.Price_Basic + c.Price_New;
+            else
+                c.Price_New = c.Price_Early;
+            return PartialView(c);
         }
         #endregion
         #region 商品上方加入購物車列
@@ -631,7 +665,7 @@ namespace Banner.Areas.Web.Controllers
         {
             return PartialView();
         }
-        
+
         #endregion
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Banner.Models;
 using Microsoft.Ajax.Utilities;
+using OfficeOpenXml.ConditionalFormatting;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.IO;
@@ -1063,11 +1065,14 @@ namespace Banner.Areas.Admin.Controllers
             else
                 Error += "請先建立商品";
 
-            var Os = DC.Organize.Where(q => q.JobTitle != "" && q.ActiveFlag && !q.DeleteFlag);
-            c.O_SL.Add(new SelectListItem { Text = "自行匯入", Value = "-1", Selected = true });
-            c.O_SL.Add(new SelectListItem { Text = "全體會友", Value = "0" });
+            var Os = DC.Organize.Where(q => q.JobTitle != "" && q.ActiveFlag && !q.DeleteFlag && q.ItemID == "Shepherding");
+            c.O_SL.Add(new SelectListItem { Text = "會員", Value = "-1" });
+            c.O_SL.Add(new SelectListItem { Text = "會員-兒童", Value = "-2" });
+            c.O_SL.Add(new SelectListItem { Text = "自行匯入", Value = "0", Selected = true });
             foreach (var O in Os)
-                c.O_SL.Add(new SelectListItem { Text = O.JobTitle, Value = O.OID.ToString() });//不統計人數的版本
+                c.O_SL.Add(new SelectListItem { Text = "會友-" + O.JobTitle, Value = O.OID.ToString() });//不統計人數的版本
+            c.O_SL.Add(new SelectListItem { Text = "會友-小組員", Value = "-3" });
+            c.O_SL.Add(new SelectListItem { Text = "會友-講師", Value = "-4" });
             //c.O_SL.Add(new SelectListItem { Text = O.JobTitle + "(共" + O.OrganizeInfo.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID>1 && q.Account.ActiveFlag && !q.Account.DeleteFlag) + "人)", Value = O.OID.ToString() });
             #endregion
             #region 資料庫匯入
@@ -1154,49 +1159,11 @@ namespace Banner.Areas.Admin.Controllers
 
                 List<Coupon_Account> CAs_New = new List<Coupon_Account>();
                 var CAs = DC.Coupon_Account.Where(q => q.CHID == c.CH.CHID).ToList();
-                if (c.CH.OID == 0)//全部會員都有
+
+
+                if (c.CH.OID > 0)//會友-職分/事工團
                 {
-                    var As = DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag);
-                    foreach (var A in As)
-                    {
-                        if (CAs.Count() == 0)//新建資料=一開始就沒有配發
-                        {
-                            CAs_New.Add(new Coupon_Account
-                            {
-                                Coupon_Header = c.CH,
-                                Account = A,
-                                OHID = 0,
-                                OPID = 0,
-                                UsedDate = DT,
-                                Note = "",
-                                ActiveFlag = true,
-                                DeleteFlag = false,
-                                CreDate = DT,
-                                UpdDate = DT,
-                                SaveACID = ACID
-                            });
-                        }
-                        else if (!CAs.Any(q => q.ACID == A.ACID))//非新增資料,但是資料庫沒有=補配發
-                        {
-                            CAs_New.Add(new Coupon_Account
-                            {
-                                Coupon_Header = c.CH,
-                                Account = A,
-                                OHID = 0,
-                                OPID = 0,
-                                UsedDate = DT,
-                                Note = "",
-                                ActiveFlag = true,
-                                DeleteFlag = false,
-                                CreDate = DT,
-                                UpdDate = DT,
-                                SaveACID = ACID
-                            });
-                        }
-                    }
-                }
-                else if (c.CH.OID > 0)//依據職分
-                {
+
                     var OIs = DC.OrganizeInfo.Where(q => q.OID == c.CH.OID && q.ACID > 1 && q.ActiveFlag && !q.DeleteFlag).ToList();
                     foreach (var OI in OIs)
                     {
@@ -1253,6 +1220,80 @@ namespace Banner.Areas.Admin.Controllers
                         }
                     }
                 }
+                else if (c.CH.OID < 0)
+                {
+                    var As = DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag);
+                    switch (c.CH.OID)
+                    {
+
+                        case -1://全部會員
+                            {
+
+                            }
+                            break;
+
+                        case -2://會員-兒童
+                            {
+                                As = As.Where(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
+                            }
+                            break;
+                        case -3://會友-小組員
+                            {
+                                As = from q in As
+                                     join p in GetMOIAC(8, 0, 0)
+                                     on q.ACID equals p.ACID
+                                     select q;
+                            }
+                            break;
+                        case -4://會友-講師
+                            {
+                                As = from q in As
+                                     join p in DC.Teacher.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID > 1)
+                                     on q.ACID equals p.ACID
+                                     select q;
+                            }
+                            break;
+
+                    }
+                    foreach (var A in As)
+                    {
+                        if (CAs.Count() == 0)//新建資料=一開始就沒有配發
+                        {
+                            CAs_New.Add(new Coupon_Account
+                            {
+                                Coupon_Header = c.CH,
+                                Account = A,
+                                OHID = 0,
+                                OPID = 0,
+                                UsedDate = DT,
+                                Note = "",
+                                ActiveFlag = true,
+                                DeleteFlag = false,
+                                CreDate = DT,
+                                UpdDate = DT,
+                                SaveACID = ACID
+                            });
+                        }
+                        else if (!CAs.Any(q => q.ACID == A.ACID))//非新增資料,但是資料庫沒有=補配發
+                        {
+                            CAs_New.Add(new Coupon_Account
+                            {
+                                Coupon_Header = c.CH,
+                                Account = A,
+                                OHID = 0,
+                                OPID = 0,
+                                UsedDate = DT,
+                                Note = "",
+                                ActiveFlag = true,
+                                DeleteFlag = false,
+                                CreDate = DT,
+                                UpdDate = DT,
+                                SaveACID = ACID
+                            });
+                        }
+                    }
+                }
+
 
                 if (CAs_New.Count() > 0)
                     DC.Coupon_Account.InsertAllOnSubmit(CAs_New);
@@ -1268,6 +1309,7 @@ namespace Banner.Areas.Admin.Controllers
         {
             public cTableList cTL = new cTableList();
             public string sKey = "";
+            public int OID = 0;
         }
         public cCoupon_Account_List GetCoupon_Account_List(int ID, FormCollection FC)
         {
@@ -1296,7 +1338,11 @@ namespace Banner.Areas.Admin.Controllers
             if (c.sKey != "")
                 Ns = Ns.Where(q => (q.Account.Name_First + q.Account.Name_Last) == c.sKey);
 
-
+            var CH = DC.Coupon_Header.FirstOrDefault(q => q.CHID == ID);
+            if (CH == null)
+                Error += "參數錯誤...無法顯示";
+            else
+                c.OID = CH.OID;
             //旌旗權限檢視門檻設置
             var OI2s = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
             if (OI2s.Any())
@@ -1341,6 +1387,8 @@ namespace Banner.Areas.Admin.Controllers
                     cTR.Cs.Add(new cTableCell { Value = "可正常使用" });
                 c.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
+            if (Error != "")
+                SetAlert(Error, 2, "/Admin/StoreSet/Coupon_List");
             #endregion
             return c;
         }
@@ -1351,9 +1399,67 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCoupon_Account_List(ID, null));
         }
         [HttpPost]
-        public ActionResult Coupon_Account_List(int ID, FormCollection FC)
+        public ActionResult Coupon_Account_List(int ID, FormCollection FC, HttpPostedFileBase fu)
         {
             GetViewBag();
+            ACID = GetACID();
+            if (fu != null)
+            {
+                var fileValid = true;
+                // Limit File Szie Below : 5MB
+                if (fu.ContentLength <= 0 || fu.ContentLength > 5242880)
+                    fileValid = false;
+                else if (fu.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    fileValid = false;
+
+                if (fileValid == true)
+                {
+                    string extension = Path.GetExtension(fu.FileName);
+                    string fileName = $"{Guid.NewGuid()}{extension}";
+                    string savePath = Path.Combine(Server.MapPath("~/Files/Coupon/"), fileName);
+                    fu.SaveAs(savePath);
+                    //ViewBag.Message = "檔案上傳成功。";
+
+                    ArrayList IDList = ReadExcel("~/Files/Coupon/" + fileName);
+                    List<Coupon_Account> CAs_New = new List<Coupon_Account>();
+                    var CH = DC.Coupon_Header.FirstOrDefault(q => q.CHID == ID);
+                    foreach (string[] str in IDList)
+                    {
+                        int iACID = 0;
+                        if (int.TryParse(str[0], out iACID))
+                        {
+                            var AC = DC.Account.FirstOrDefault(q => q.ACID == iACID && !q.DeleteFlag);
+                            var CA = DC.Coupon_Account.FirstOrDefault(q => q.ACID == iACID && q.CHID == CH.CHID);
+                            if (CH != null && AC != null && CA == null)
+                            {
+                                CAs_New.Add(new Coupon_Account
+                                {
+                                    Coupon_Header = CH,
+                                    Account = AC,
+                                    OHID = 0,
+                                    OPID = 0,
+                                    UsedDate = DT,
+                                    Note = "",
+                                    ActiveFlag = true,
+                                    DeleteFlag = false,
+                                    CreDate = DT,
+                                    UpdDate = DT,
+                                    SaveACID = ACID
+                                });
+                            }
+                        }
+                    }
+                    if (CAs_New.Count > 0)
+                    {
+                        DC.Coupon_Account.InsertAllOnSubmit(CAs_New);
+                        DC.SubmitChanges();
+
+                        SetAlert("上傳名單完成", 1);
+                    }
+                }
+
+            }
+
             return View(GetCoupon_Account_List(ID, FC));
         }
 

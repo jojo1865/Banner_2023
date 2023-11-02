@@ -2164,9 +2164,9 @@ namespace Banner
         {
             string pathFile = Server.MapPath(FilePath);
             FileStream fs = new FileStream(pathFile, FileMode.Open, FileAccess.Read);
-
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             OfficeOpenXml.ExcelPackage p = new OfficeOpenXml.ExcelPackage(fs);
-            OfficeOpenXml.ExcelWorksheet sheet = p.Workbook.Worksheets[1];
+            OfficeOpenXml.ExcelWorksheet sheet = p.Workbook.Worksheets[0];
             ArrayList AL = new ArrayList();
 
             int i = 1, j = 0, CellCt = 0;
