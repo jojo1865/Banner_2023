@@ -625,7 +625,7 @@ namespace Banner.Areas.Web.Controllers
             public string ProductType = "";
             public int Price_Early = 0;
             public int Price_Basic = 0;
-            public int Price_Cut = 0;
+            public int Price_Type = 0;
             public int Price_New = 0;
             public DateTime SDate = DateTime.Now;
             public DateTime EDate = DateTime.Now;
@@ -634,11 +634,12 @@ namespace Banner.Areas.Web.Controllers
         public PartialViewResult _StoreSetProductCell(Product P)
         {
             ACID = GetACID();
-            var OIs = DC.M_OI_Account.Where(q => q.ACID == ACID);
+
             var CA = (from q in DC.Coupon_Account.Where(q => q.ACID == ACID && q.Coupon_Header.PID == P.PID && !q.DeleteFlag && q.ActiveFlag && q.OPID == 0 && q.OHID == 0 && q.Coupon_Header.ActiveFlag && !q.Coupon_Header.DeleteFlag && q.Coupon_Header.SDateTime <= DT && q.Coupon_Header.EDateTime >= DT)
-                     join p in OIs
-                     on q.Coupon_Header.OID equals p.OrganizeInfo.OID
-                     select q).FirstOrDefault();
+                      join p in DC.M_OI_Account.Where(q => q.ACID == ACID)
+                      on q.Coupon_Header.OID equals p.OrganizeInfo.OID
+                      select q).FirstOrDefault();
+            int[] iPrice = GetPrice(ACID, P);
             cProductCard c = new cProductCard
             {
                 PID = P.PID,
@@ -647,16 +648,13 @@ namespace Banner.Areas.Web.Controllers
                 ProductType = P.ProductType == 0 ? "實體+線上" : (P.ProductType == 1 ? "實體課程" : "線上課程"),
                 Price_Early = P.Price_Early,
                 Price_Basic = P.Price_Basic,
-                Price_Cut = CA!=null ? CA.Coupon_Header.Price_Cut : 0,
-                Price_New = 0,
+                Price_Type = iPrice[0],
+                Price_New = iPrice[1],
                 SDate = P.SDate,
                 EDate = P.EDate,
-                TargetInfo=P.TargetInfo,
+                TargetInfo = P.TargetInfo,
             };
-            if (c.Price_Basic + c.Price_New < c.Price_Early)
-                c.Price_New = c.Price_Basic + c.Price_New;
-            else
-                c.Price_New = c.Price_Early;
+
             return PartialView(c);
         }
         #endregion

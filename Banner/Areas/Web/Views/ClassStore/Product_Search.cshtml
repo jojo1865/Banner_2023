@@ -1,0 +1,31 @@
+﻿@model Banner.Areas.Web.Controllers.ClassStoreController.cProduct_Search
+@{
+    ViewBag.Title = "Product_Search";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+<script>
+    function Search() {
+        var sKey = document.getElementById("txb_Search");
+        document.location.href = "/Web/ClassStore/Product_Search?Key=" + sKey.value;
+    }
+</script>
+<div class="bg-white w-100 mt-4 mb-4 pt-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 p-4">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1"><a href="javascript:;" onclick="Search();"><i class="fa-solid fa-magnifying-glass"></i></a></span>
+                    <input type="text" id="txb_Search" class="form-control" placeholder="搜尋" aria-label="Username" aria-describedby="basic-addon1" onkeydown="Search();" >
+                </div>
+            </div>
+        </div>
+        <div class="row ">
+            @foreach (var P_ in Model.Ps)
+            {
+                <div class="col-lg-4 col-12 mb-3">
+                    @Html.Action("_StoreSetProductCell", "Include", new { P = P_ })
+                </div>
+            }
+        </div>
+    </div>
+</div>

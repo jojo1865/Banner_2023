@@ -437,9 +437,7 @@ namespace Banner.Areas.Web.Controllers
         {
             int ACID = GetQueryStringInInt("ACID");
             int PID = GetQueryStringInInt("PID");
-
-
-
+            int PCID = 0;
             Error = "";
             if (ACID <= 0)
                 Error = "無登入會員資料";
@@ -467,13 +465,66 @@ namespace Banner.Areas.Web.Controllers
                             Error = "無課程資料";
                         else if (!P.ActiveFlag)
                             Error = "課程並未允許交易";
+                        else
+                        {
+                            var OP = DC.Order_Product.FirstOrDefault(q =>
+                            q.Order_Header.ACID == ACID &&
+                            !q.Order_Header.DeleteFlag &&
+                            q.Product_Class.PID == P.PID
+                            );
+                            if(OP!=null)
+                            {
+                                if(OP.Order_Header.Order_Type == 0)
+                                    Error = "此課程已在購物車中";
+                                else if (OP.Order_Header.Order_Type == 1)
+                                    Error = "此課程正在結帳中...";
+                                else if (OP.Order_Header.Order_Type == 2)
+                                    Error = "此課程您已經買過了";
+                                else
+                                {
+                                    //人數限制檢查
+
+                                    //有買這個商品且結帳完成的正常訂單,統計每個班級的人數
+                                    var OP_Gs = (from q in DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 2 && q.Product_Class.PID == PID)
+                                                 group q by new { q.PCID } into g
+                                                 select new { g.Key.PCID, Ct = g.Count() }).ToList();
+
+                                    var PCs = DC.Product_Class.Where(q => q.PID == PID).OrderBy(q => q.PCID).ToList();
+                                    if (PCs.Count() > 0)//有班級可以上
+                                    {
+                                        //先檢查限制名額的
+                                        var PC_Ns = PCs.Where(q => q.PeopleCt > 0).OrderBy(q => q.PCID).ToList();
+                                        foreach (var PC_N in PC_Ns)
+                                        {
+                                            var OP_G = OP_Gs.FirstOrDefault(q => q.PCID == PC_N.PCID);
+                                            if (OP_G == null)
+                                                PCID = OP_G.PCID;
+                                            else if (PC_N.PeopleCt < OP_G.Ct)
+                                                PCID = OP_G.PCID;
+                                            if (PCID > 0)
+                                                break;
+                                        }
+                                        if (PCID == 0)//沒班級再檢查不限名額的
+                                        {
+                                            var PC_0s = PCs.Where(q => q.PeopleCt == 0).OrderBy(q => q.PCID).ToList();
+                                            if (PC_0s.Count() > 0)
+                                                PCID = PC_0s.First().PCID;
+                                        }
+                                        if (PCID == 0)
+                                            Error += "目前班級均已額滿";
+                                    }
+                                    else
+                                        Error += "目前沒有班級可以上課";
+                                }
+                            }             
+                        }
                     }
                     else
                         Error = "無課程資料";
                 }
                 #endregion
                 #region 購買資格檢查
-                int Price = 0, PriceType = 0;
+
                 if (Error == "")
                 {
                     //有線上報名日期
@@ -483,35 +534,6 @@ namespace Banner.Areas.Web.Controllers
                         Error = "本課程已結束線上報名";
                     else
                     {
-                        if (P.SDate_Early.Date >= P.CreDate.Date && P.SDate_Early.Date >= DT.Date)//有早鳥起始日,且今天在起始日之後
-                        {
-                            if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
-                            {
-                                Price = P.Price_Early;
-                                PriceType = 1;
-                            }
-                            else if (P.EDate_Early.Date < P.CreDate.Date)//沒有早鳥結束日
-                            {
-                                Price = P.Price_Early;
-                                PriceType = 1;
-                            }
-                            else//不符早鳥設定=基本價
-                            {
-                                Price = P.Price_Basic;
-                                PriceType = 0;
-                            }
-                        }
-                        else if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
-                        {
-                            Price = P.Price_Early;
-                            PriceType = 1;
-                        }
-                        else//沒早鳥設定=基本價
-                        {
-                            Price = P.Price_Basic;
-                            PriceType = 0;
-                        }
-
                         bool bCheck0 = false;//先修課程檢查過沒?
                         bool bCheck1 = false;//職分檢查過沒?
                         //有購買限制規則
@@ -603,23 +625,23 @@ namespace Banner.Areas.Web.Controllers
                 #endregion
                 if (Error == "")
                 {
+                    int[] iPrice = GetPrice(ACID, P);
                     var OH = DC.Order_Header.FirstOrDefault(q => q.Order_Type == 0 && q.ACID == ACID);
                     if (OH != null)
                     {
                         if (!OH.Order_Product.Any(q => q.Product_Class.PID == PID))//這商品目前尚未加入購物車中
                         {
-                            var PC = DC.Product_Class.Where(q => q.PID == PID).OrderBy(q => q.PCID).FirstOrDefault();
+                            var PC = DC.Product_Class.FirstOrDefault(q => q.PID == PID && q.PCID == PCID);
                             if (PC != null)
                             {
                                 Order_Product OP = new Order_Product
                                 {
-                                    OHID = OH.OHID,
-                                    PCID = PC.PCID,
-                                    CAID = 0,
+                                    Order_Header = OH,
+                                    Product_Class = PC,
+                                    CAID = iPrice[2],
                                     Price_Basic = PC.Product.Price_Basic,
-                                    Price_Finally = PC.Product.Price_Basic,
-
-                                    Price_Type = PriceType,
+                                    Price_Finally = iPrice[1],
+                                    Price_Type = iPrice[0],
                                     CreDate = DT,
                                     UpdDate = DT,
                                     SaveACID = ACID
@@ -646,7 +668,7 @@ namespace Banner.Areas.Web.Controllers
                                 OIID = 0,
                                 ACID = ACID,
                                 Order_Type = 0,
-                                TotalPrice = Price,
+                                TotalPrice = iPrice[1],
                                 DeleteFlag = false,
                                 CreDate = DT,
                                 UpdDate = DT,
@@ -659,10 +681,10 @@ namespace Banner.Areas.Web.Controllers
                             {
                                 OHID = OH.OHID,
                                 PCID = PC.PCID,
-                                CAID = 0,
+                                CAID = iPrice[2],
                                 Price_Basic = PC.Product.Price_Basic,
-                                Price_Finally = PC.Product.Price_Basic,
-                                Price_Type = PriceType,
+                                Price_Finally = iPrice[1],
+                                Price_Type = iPrice[0],
                                 CreDate = DT,
                                 UpdDate = DT,
                                 SaveACID = ACID

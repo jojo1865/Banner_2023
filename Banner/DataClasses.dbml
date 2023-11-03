@@ -175,26 +175,6 @@
       <Association Name="Product_Coupon_Header" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.Course" Member="Course">
-    <Type Name="Course">
-      <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="CCID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="CourseType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="CourseInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="TargetInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="GraduationInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="ClassicalFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Course_Course_Rool" Member="Course_Rool" ThisKey="CID" OtherKey="CID" Type="Course_Rool" />
-      <Association Name="Course_Product" Member="Product" ThisKey="CID" OtherKey="CID" Type="Product" />
-      <Association Name="Course_Category_Course" Member="Course_Category" ThisKey="CCID" OtherKey="CCID" Type="Course_Category" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.Course_Category" Member="Course_Category">
     <Type Name="Course_Category">
       <Column Name="CCID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -635,8 +615,8 @@
       <Association Name="Product_Product_Class" Member="Product_Class" ThisKey="PID" OtherKey="PID" Type="Product_Class" />
       <Association Name="Product_Product_File" Member="Product_File" ThisKey="PID" OtherKey="PID" Type="Product_File" />
       <Association Name="Product_Product_Rool" Member="Product_Rool" ThisKey="PID" OtherKey="PID" Type="Product_Rool" />
-      <Association Name="Course_Product" Member="Course" ThisKey="CID" OtherKey="CID" Type="Course" IsForeignKey="true" />
       <Association Name="OrganizeInfo_Product" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
+      <Association Name="Course_Product" Member="Course" ThisKey="CID" OtherKey="CID" Type="Course" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Product_Class" Member="Product_Class">
@@ -764,6 +744,27 @@
       <Column Name="OITitle_1" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
       <Column Name="OIID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="OID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Course" Member="Course">
+    <Type Name="Course">
+      <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="CCID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="VarChar(10)" CanBeNull="true" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="CourseType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CourseInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="TargetInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="GraduationInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="ClassicalFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Course_Course_Rool" Member="Course_Rool" ThisKey="CID" OtherKey="CID" Type="Course_Rool" />
+      <Association Name="Course_Product" Member="Product" ThisKey="CID" OtherKey="CID" Type="Product" />
+      <Association Name="Course_Category_Course" Member="Course_Category" ThisKey="CCID" OtherKey="CCID" Type="Course_Category" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

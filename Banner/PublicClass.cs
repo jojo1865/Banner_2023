@@ -27,6 +27,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Data.SqlTypes;
 using System.Web.Helpers;
+using System.Diagnostics;
 
 namespace Banner
 {
@@ -2683,6 +2684,51 @@ namespace Banner
                 sReturn = FC.Get(sKey);
 
             return sReturn;
+        }
+        public int[] GetPrice(int ACID,Product P)
+        {
+            int[] iReturn = new int[3] { 0,0,0};//價格類別,最終價格,折價劵ID
+            var CA = (from q in DC.Coupon_Account.Where(q => q.ACID == ACID && q.Coupon_Header.PID == P.PID && !q.DeleteFlag && q.ActiveFlag && q.OPID == 0 && q.OHID == 0 && q.Coupon_Header.ActiveFlag && !q.Coupon_Header.DeleteFlag && q.Coupon_Header.SDateTime <= DT && q.Coupon_Header.EDateTime >= DT)
+                      join p in DC.M_OI_Account.Where(q => q.ACID == ACID)
+                      on q.Coupon_Header.OID equals p.OrganizeInfo.OID
+                      select q).FirstOrDefault();
+            int Price_Cut = CA != null ? CA.Coupon_Header.Price_Cut : 0;
+            bool bEarly = false;//早鳥日期判定
+            if (P.SDate_Early.Date >= P.CreDate.Date && P.SDate_Early.Date >= DT.Date)//有早鳥起始日,且今天在起始日之後
+            {
+                if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
+                    bEarly=true;
+                else if (P.EDate_Early.Date < P.CreDate.Date)//沒有早鳥結束日
+                    bEarly = true;
+            }
+            else if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
+                bEarly = true;
+
+            if(P.Price_Basic>0)
+            {
+                if (P.Price_Basic + Price_Cut <= P.Price_Early && CA != null)
+                {
+                    iReturn[0] = 2;
+                    iReturn[1] = P.Price_Basic + Price_Cut > 0 ? P.Price_Basic + Price_Cut : 0;
+                    iReturn[2] = CA.CAID;
+                }
+                else if (P.Price_Early < P.Price_Basic && bEarly && P.Price_Early > 0)
+                {
+                    iReturn[0] = 1;
+                    iReturn[1] = P.Price_Early;
+                }
+                else
+                {
+                    iReturn[0] = 0;
+                    iReturn[1] = P.Price_Basic;
+                }
+            }
+            else//免費課程
+            {
+                iReturn[0] = 0;
+                iReturn[1] = P.Price_Basic;
+            }
+            return iReturn;
         }
         #endregion
     }

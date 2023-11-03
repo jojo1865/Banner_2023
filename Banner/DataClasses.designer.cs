@@ -63,9 +63,6 @@ namespace Banner
     partial void InsertCoupon_Header(Coupon_Header instance);
     partial void UpdateCoupon_Header(Coupon_Header instance);
     partial void DeleteCoupon_Header(Coupon_Header instance);
-    partial void InsertCourse(Course instance);
-    partial void UpdateCourse(Course instance);
-    partial void DeleteCourse(Course instance);
     partial void InsertCourse_Category(Course_Category instance);
     partial void UpdateCourse_Category(Course_Category instance);
     partial void DeleteCourse_Category(Course_Category instance);
@@ -162,6 +159,9 @@ namespace Banner
     partial void InsertTeacher(Teacher instance);
     partial void UpdateTeacher(Teacher instance);
     partial void DeleteTeacher(Teacher instance);
+    partial void InsertCourse(Course instance);
+    partial void UpdateCourse(Course instance);
+    partial void DeleteCourse(Course instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -273,14 +273,6 @@ namespace Banner
 			get
 			{
 				return this.GetTable<Coupon_Header>();
-			}
-		}
-		
-		public System.Data.Linq.Table<Course> Course
-		{
-			get
-			{
-				return this.GetTable<Course>();
 			}
 		}
 		
@@ -553,6 +545,14 @@ namespace Banner
 			get
 			{
 				return this.GetTable<v_GetAC_OITree>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Course> Course
+		{
+			get
+			{
+				return this.GetTable<Course>();
 			}
 		}
 		
@@ -4379,453 +4379,6 @@ namespace Banner
 		{
 			this.SendPropertyChanging();
 			entity.Coupon_Header = null;
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Course")]
-	public partial class Course : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _CID;
-		
-		private int _CCID;
-		
-		private string _Title;
-		
-		private int _CourseType;
-		
-		private string _CourseInfo;
-		
-		private string _TargetInfo;
-		
-		private string _GraduationInfo;
-		
-		private bool _ClassicalFlag;
-		
-		private bool _ActiveFlag;
-		
-		private bool _DeleteFlag;
-		
-		private System.DateTime _CreDate;
-		
-		private System.DateTime _UpdDate;
-		
-		private int _SaveACID;
-		
-		private EntitySet<Course_Rool> _Course_Rool;
-		
-		private EntitySet<Product> _Product;
-		
-		private EntityRef<Course_Category> _Course_Category;
-		
-    #region 擴充性方法定義
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnCIDChanging(int value);
-    partial void OnCIDChanged();
-    partial void OnCCIDChanging(int value);
-    partial void OnCCIDChanged();
-    partial void OnTitleChanging(string value);
-    partial void OnTitleChanged();
-    partial void OnCourseTypeChanging(int value);
-    partial void OnCourseTypeChanged();
-    partial void OnCourseInfoChanging(string value);
-    partial void OnCourseInfoChanged();
-    partial void OnTargetInfoChanging(string value);
-    partial void OnTargetInfoChanged();
-    partial void OnGraduationInfoChanging(string value);
-    partial void OnGraduationInfoChanged();
-    partial void OnClassicalFlagChanging(bool value);
-    partial void OnClassicalFlagChanged();
-    partial void OnActiveFlagChanging(bool value);
-    partial void OnActiveFlagChanged();
-    partial void OnDeleteFlagChanging(bool value);
-    partial void OnDeleteFlagChanged();
-    partial void OnCreDateChanging(System.DateTime value);
-    partial void OnCreDateChanged();
-    partial void OnUpdDateChanging(System.DateTime value);
-    partial void OnUpdDateChanged();
-    partial void OnSaveACIDChanging(int value);
-    partial void OnSaveACIDChanged();
-    #endregion
-		
-		public Course()
-		{
-			this._Course_Rool = new EntitySet<Course_Rool>(new Action<Course_Rool>(this.attach_Course_Rool), new Action<Course_Rool>(this.detach_Course_Rool));
-			this._Product = new EntitySet<Product>(new Action<Product>(this.attach_Product), new Action<Product>(this.detach_Product));
-			this._Course_Category = default(EntityRef<Course_Category>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int CID
-		{
-			get
-			{
-				return this._CID;
-			}
-			set
-			{
-				if ((this._CID != value))
-				{
-					this.OnCIDChanging(value);
-					this.SendPropertyChanging();
-					this._CID = value;
-					this.SendPropertyChanged("CID");
-					this.OnCIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CCID", DbType="Int NOT NULL")]
-		public int CCID
-		{
-			get
-			{
-				return this._CCID;
-			}
-			set
-			{
-				if ((this._CCID != value))
-				{
-					if (this._Course_Category.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnCCIDChanging(value);
-					this.SendPropertyChanging();
-					this._CCID = value;
-					this.SendPropertyChanged("CCID");
-					this.OnCCIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
-		public string Title
-		{
-			get
-			{
-				return this._Title;
-			}
-			set
-			{
-				if ((this._Title != value))
-				{
-					this.OnTitleChanging(value);
-					this.SendPropertyChanging();
-					this._Title = value;
-					this.SendPropertyChanged("Title");
-					this.OnTitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CourseType", DbType="Int NOT NULL")]
-		public int CourseType
-		{
-			get
-			{
-				return this._CourseType;
-			}
-			set
-			{
-				if ((this._CourseType != value))
-				{
-					this.OnCourseTypeChanging(value);
-					this.SendPropertyChanging();
-					this._CourseType = value;
-					this.SendPropertyChanged("CourseType");
-					this.OnCourseTypeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CourseInfo", DbType="NVarChar(MAX)")]
-		public string CourseInfo
-		{
-			get
-			{
-				return this._CourseInfo;
-			}
-			set
-			{
-				if ((this._CourseInfo != value))
-				{
-					this.OnCourseInfoChanging(value);
-					this.SendPropertyChanging();
-					this._CourseInfo = value;
-					this.SendPropertyChanged("CourseInfo");
-					this.OnCourseInfoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetInfo", DbType="NVarChar(MAX)")]
-		public string TargetInfo
-		{
-			get
-			{
-				return this._TargetInfo;
-			}
-			set
-			{
-				if ((this._TargetInfo != value))
-				{
-					this.OnTargetInfoChanging(value);
-					this.SendPropertyChanging();
-					this._TargetInfo = value;
-					this.SendPropertyChanged("TargetInfo");
-					this.OnTargetInfoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GraduationInfo", DbType="NVarChar(MAX)")]
-		public string GraduationInfo
-		{
-			get
-			{
-				return this._GraduationInfo;
-			}
-			set
-			{
-				if ((this._GraduationInfo != value))
-				{
-					this.OnGraduationInfoChanging(value);
-					this.SendPropertyChanging();
-					this._GraduationInfo = value;
-					this.SendPropertyChanged("GraduationInfo");
-					this.OnGraduationInfoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ClassicalFlag", DbType="Bit NOT NULL")]
-		public bool ClassicalFlag
-		{
-			get
-			{
-				return this._ClassicalFlag;
-			}
-			set
-			{
-				if ((this._ClassicalFlag != value))
-				{
-					this.OnClassicalFlagChanging(value);
-					this.SendPropertyChanging();
-					this._ClassicalFlag = value;
-					this.SendPropertyChanged("ClassicalFlag");
-					this.OnClassicalFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
-		public bool ActiveFlag
-		{
-			get
-			{
-				return this._ActiveFlag;
-			}
-			set
-			{
-				if ((this._ActiveFlag != value))
-				{
-					this.OnActiveFlagChanging(value);
-					this.SendPropertyChanging();
-					this._ActiveFlag = value;
-					this.SendPropertyChanged("ActiveFlag");
-					this.OnActiveFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
-		public bool DeleteFlag
-		{
-			get
-			{
-				return this._DeleteFlag;
-			}
-			set
-			{
-				if ((this._DeleteFlag != value))
-				{
-					this.OnDeleteFlagChanging(value);
-					this.SendPropertyChanging();
-					this._DeleteFlag = value;
-					this.SendPropertyChanged("DeleteFlag");
-					this.OnDeleteFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
-		public System.DateTime CreDate
-		{
-			get
-			{
-				return this._CreDate;
-			}
-			set
-			{
-				if ((this._CreDate != value))
-				{
-					this.OnCreDateChanging(value);
-					this.SendPropertyChanging();
-					this._CreDate = value;
-					this.SendPropertyChanged("CreDate");
-					this.OnCreDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
-		public System.DateTime UpdDate
-		{
-			get
-			{
-				return this._UpdDate;
-			}
-			set
-			{
-				if ((this._UpdDate != value))
-				{
-					this.OnUpdDateChanging(value);
-					this.SendPropertyChanging();
-					this._UpdDate = value;
-					this.SendPropertyChanged("UpdDate");
-					this.OnUpdDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
-		public int SaveACID
-		{
-			get
-			{
-				return this._SaveACID;
-			}
-			set
-			{
-				if ((this._SaveACID != value))
-				{
-					this.OnSaveACIDChanging(value);
-					this.SendPropertyChanging();
-					this._SaveACID = value;
-					this.SendPropertyChanged("SaveACID");
-					this.OnSaveACIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Course_Rool", Storage="_Course_Rool", ThisKey="CID", OtherKey="CID")]
-		public EntitySet<Course_Rool> Course_Rool
-		{
-			get
-			{
-				return this._Course_Rool;
-			}
-			set
-			{
-				this._Course_Rool.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Product", Storage="_Product", ThisKey="CID", OtherKey="CID")]
-		public EntitySet<Product> Product
-		{
-			get
-			{
-				return this._Product;
-			}
-			set
-			{
-				this._Product.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Category_Course", Storage="_Course_Category", ThisKey="CCID", OtherKey="CCID", IsForeignKey=true)]
-		public Course_Category Course_Category
-		{
-			get
-			{
-				return this._Course_Category.Entity;
-			}
-			set
-			{
-				Course_Category previousValue = this._Course_Category.Entity;
-				if (((previousValue != value) 
-							|| (this._Course_Category.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Course_Category.Entity = null;
-						previousValue.Course.Remove(this);
-					}
-					this._Course_Category.Entity = value;
-					if ((value != null))
-					{
-						value.Course.Add(this);
-						this._CCID = value.CCID;
-					}
-					else
-					{
-						this._CCID = default(int);
-					}
-					this.SendPropertyChanged("Course_Category");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_Course_Rool(Course_Rool entity)
-		{
-			this.SendPropertyChanging();
-			entity.Course = this;
-		}
-		
-		private void detach_Course_Rool(Course_Rool entity)
-		{
-			this.SendPropertyChanging();
-			entity.Course = null;
-		}
-		
-		private void attach_Product(Product entity)
-		{
-			this.SendPropertyChanging();
-			entity.Course = this;
-		}
-		
-		private void detach_Product(Product entity)
-		{
-			this.SendPropertyChanging();
-			entity.Course = null;
 		}
 	}
 	
@@ -13687,9 +13240,9 @@ namespace Banner
 		
 		private EntitySet<Product_Rool> _Product_Rool;
 		
-		private EntityRef<Course> _Course;
-		
 		private EntityRef<OrganizeInfo> _OrganizeInfo;
+		
+		private EntityRef<Course> _Course;
 		
     #region 擴充性方法定義
     partial void OnLoaded();
@@ -13760,8 +13313,8 @@ namespace Banner
 			this._Product_Class = new EntitySet<Product_Class>(new Action<Product_Class>(this.attach_Product_Class), new Action<Product_Class>(this.detach_Product_Class));
 			this._Product_File = new EntitySet<Product_File>(new Action<Product_File>(this.attach_Product_File), new Action<Product_File>(this.detach_Product_File));
 			this._Product_Rool = new EntitySet<Product_Rool>(new Action<Product_Rool>(this.attach_Product_Rool), new Action<Product_Rool>(this.detach_Product_Rool));
-			this._Course = default(EntityRef<Course>);
 			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
+			this._Course = default(EntityRef<Course>);
 			OnCreated();
 		}
 		
@@ -14398,40 +13951,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Product", Storage="_Course", ThisKey="CID", OtherKey="CID", IsForeignKey=true)]
-		public Course Course
-		{
-			get
-			{
-				return this._Course.Entity;
-			}
-			set
-			{
-				Course previousValue = this._Course.Entity;
-				if (((previousValue != value) 
-							|| (this._Course.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Course.Entity = null;
-						previousValue.Product.Remove(this);
-					}
-					this._Course.Entity = value;
-					if ((value != null))
-					{
-						value.Product.Add(this);
-						this._CID = value.CID;
-					}
-					else
-					{
-						this._CID = default(int);
-					}
-					this.SendPropertyChanged("Course");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Product", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
 		public OrganizeInfo OrganizeInfo
 		{
@@ -14462,6 +13981,40 @@ namespace Banner
 						this._OIID = default(int);
 					}
 					this.SendPropertyChanged("OrganizeInfo");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Product", Storage="_Course", ThisKey="CID", OtherKey="CID", IsForeignKey=true)]
+		public Course Course
+		{
+			get
+			{
+				return this._Course.Entity;
+			}
+			set
+			{
+				Course previousValue = this._Course.Entity;
+				if (((previousValue != value) 
+							|| (this._Course.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Course.Entity = null;
+						previousValue.Product.Remove(this);
+					}
+					this._Course.Entity = value;
+					if ((value != null))
+					{
+						value.Product.Add(this);
+						this._CID = value.CID;
+					}
+					else
+					{
+						this._CID = default(int);
+					}
+					this.SendPropertyChanged("Course");
 				}
 			}
 		}
@@ -16967,6 +16520,477 @@ namespace Banner
 					this._OID_1 = value;
 				}
 			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Course")]
+	public partial class Course : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _CID;
+		
+		private int _CCID;
+		
+		private string _Code;
+		
+		private string _Title;
+		
+		private int _CourseType;
+		
+		private string _CourseInfo;
+		
+		private string _TargetInfo;
+		
+		private string _GraduationInfo;
+		
+		private bool _ClassicalFlag;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntitySet<Course_Rool> _Course_Rool;
+		
+		private EntitySet<Product> _Product;
+		
+		private EntityRef<Course_Category> _Course_Category;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnCIDChanging(int value);
+    partial void OnCIDChanged();
+    partial void OnCCIDChanging(int value);
+    partial void OnCCIDChanged();
+    partial void OnCodeChanging(string value);
+    partial void OnCodeChanged();
+    partial void OnTitleChanging(string value);
+    partial void OnTitleChanged();
+    partial void OnCourseTypeChanging(int value);
+    partial void OnCourseTypeChanged();
+    partial void OnCourseInfoChanging(string value);
+    partial void OnCourseInfoChanged();
+    partial void OnTargetInfoChanging(string value);
+    partial void OnTargetInfoChanged();
+    partial void OnGraduationInfoChanging(string value);
+    partial void OnGraduationInfoChanged();
+    partial void OnClassicalFlagChanging(bool value);
+    partial void OnClassicalFlagChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Course()
+		{
+			this._Course_Rool = new EntitySet<Course_Rool>(new Action<Course_Rool>(this.attach_Course_Rool), new Action<Course_Rool>(this.detach_Course_Rool));
+			this._Product = new EntitySet<Product>(new Action<Product>(this.attach_Product), new Action<Product>(this.detach_Product));
+			this._Course_Category = default(EntityRef<Course_Category>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int CID
+		{
+			get
+			{
+				return this._CID;
+			}
+			set
+			{
+				if ((this._CID != value))
+				{
+					this.OnCIDChanging(value);
+					this.SendPropertyChanging();
+					this._CID = value;
+					this.SendPropertyChanged("CID");
+					this.OnCIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CCID", DbType="Int NOT NULL")]
+		public int CCID
+		{
+			get
+			{
+				return this._CCID;
+			}
+			set
+			{
+				if ((this._CCID != value))
+				{
+					if (this._Course_Category.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnCCIDChanging(value);
+					this.SendPropertyChanging();
+					this._CCID = value;
+					this.SendPropertyChanged("CCID");
+					this.OnCCIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Code", DbType="VarChar(10)")]
+		public string Code
+		{
+			get
+			{
+				return this._Code;
+			}
+			set
+			{
+				if ((this._Code != value))
+				{
+					this.OnCodeChanging(value);
+					this.SendPropertyChanging();
+					this._Code = value;
+					this.SendPropertyChanged("Code");
+					this.OnCodeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
+		public string Title
+		{
+			get
+			{
+				return this._Title;
+			}
+			set
+			{
+				if ((this._Title != value))
+				{
+					this.OnTitleChanging(value);
+					this.SendPropertyChanging();
+					this._Title = value;
+					this.SendPropertyChanged("Title");
+					this.OnTitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CourseType", DbType="Int NOT NULL")]
+		public int CourseType
+		{
+			get
+			{
+				return this._CourseType;
+			}
+			set
+			{
+				if ((this._CourseType != value))
+				{
+					this.OnCourseTypeChanging(value);
+					this.SendPropertyChanging();
+					this._CourseType = value;
+					this.SendPropertyChanged("CourseType");
+					this.OnCourseTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CourseInfo", DbType="NVarChar(MAX)")]
+		public string CourseInfo
+		{
+			get
+			{
+				return this._CourseInfo;
+			}
+			set
+			{
+				if ((this._CourseInfo != value))
+				{
+					this.OnCourseInfoChanging(value);
+					this.SendPropertyChanging();
+					this._CourseInfo = value;
+					this.SendPropertyChanged("CourseInfo");
+					this.OnCourseInfoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetInfo", DbType="NVarChar(MAX)")]
+		public string TargetInfo
+		{
+			get
+			{
+				return this._TargetInfo;
+			}
+			set
+			{
+				if ((this._TargetInfo != value))
+				{
+					this.OnTargetInfoChanging(value);
+					this.SendPropertyChanging();
+					this._TargetInfo = value;
+					this.SendPropertyChanged("TargetInfo");
+					this.OnTargetInfoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GraduationInfo", DbType="NVarChar(MAX)")]
+		public string GraduationInfo
+		{
+			get
+			{
+				return this._GraduationInfo;
+			}
+			set
+			{
+				if ((this._GraduationInfo != value))
+				{
+					this.OnGraduationInfoChanging(value);
+					this.SendPropertyChanging();
+					this._GraduationInfo = value;
+					this.SendPropertyChanged("GraduationInfo");
+					this.OnGraduationInfoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ClassicalFlag", DbType="Bit NOT NULL")]
+		public bool ClassicalFlag
+		{
+			get
+			{
+				return this._ClassicalFlag;
+			}
+			set
+			{
+				if ((this._ClassicalFlag != value))
+				{
+					this.OnClassicalFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ClassicalFlag = value;
+					this.SendPropertyChanged("ClassicalFlag");
+					this.OnClassicalFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Course_Rool", Storage="_Course_Rool", ThisKey="CID", OtherKey="CID")]
+		public EntitySet<Course_Rool> Course_Rool
+		{
+			get
+			{
+				return this._Course_Rool;
+			}
+			set
+			{
+				this._Course_Rool.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Product", Storage="_Product", ThisKey="CID", OtherKey="CID")]
+		public EntitySet<Product> Product
+		{
+			get
+			{
+				return this._Product;
+			}
+			set
+			{
+				this._Product.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Category_Course", Storage="_Course_Category", ThisKey="CCID", OtherKey="CCID", IsForeignKey=true)]
+		public Course_Category Course_Category
+		{
+			get
+			{
+				return this._Course_Category.Entity;
+			}
+			set
+			{
+				Course_Category previousValue = this._Course_Category.Entity;
+				if (((previousValue != value) 
+							|| (this._Course_Category.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Course_Category.Entity = null;
+						previousValue.Course.Remove(this);
+					}
+					this._Course_Category.Entity = value;
+					if ((value != null))
+					{
+						value.Course.Add(this);
+						this._CCID = value.CCID;
+					}
+					else
+					{
+						this._CCID = default(int);
+					}
+					this.SendPropertyChanged("Course_Category");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Course_Rool(Course_Rool entity)
+		{
+			this.SendPropertyChanging();
+			entity.Course = this;
+		}
+		
+		private void detach_Course_Rool(Course_Rool entity)
+		{
+			this.SendPropertyChanging();
+			entity.Course = null;
+		}
+		
+		private void attach_Product(Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Course = this;
+		}
+		
+		private void detach_Product(Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Course = null;
 		}
 	}
 	

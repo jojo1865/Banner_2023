@@ -232,8 +232,8 @@ namespace Banner.Areas.Admin.Controllers
 
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
-            TopTitles.Add(new cTableCell { Title = "課程分類代碼" });
             TopTitles.Add(new cTableCell { Title = "課程分類" });
+            TopTitles.Add(new cTableCell { Title = "課程代碼" });
             TopTitles.Add(new cTableCell { Title = "課程名稱" });
             TopTitles.Add(new cTableCell { Title = "類型", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "狀態" });
@@ -247,8 +247,8 @@ namespace Banner.Areas.Admin.Controllers
             {
                 cTableRow cTR = new cTableRow();
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/Course/Course_Edit/" + N_.CID, Target = "_self", Value = "編輯" });//編輯
-                cTR.Cs.Add(new cTableCell { Value = N_.Course_Category.Code });//課程分類代碼
                 cTR.Cs.Add(new cTableCell { Value = N_.Course_Category.Title });//課程分類名稱
+                cTR.Cs.Add(new cTableCell { Value = N_.Code });//課程代碼
                 cTR.Cs.Add(new cTableCell { Value = N_.Title });//課程名稱
                 cTR.Cs.Add(new cTableCell { Value = sCourseType[N_.CourseType] });//課程類型
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "啟用" : "停用" });//狀態
@@ -333,9 +333,22 @@ namespace Banner.Areas.Admin.Controllers
             N.C = DC.Course.FirstOrDefault(q => q.CID == ID);
             if (N.C == null)
             {
+                int Sort = 1;
+                string Code = "E";
+                int iCCID = 5;
+                if (CCs.Count() > 0)
+                {
+                    iCCID = CCs[0].CCID;
+                    Code = CCs[0].Code;
+                }
+                    
+                var Cs = DC.Course.Where(q => q.CCID == iCCID);
+                if (Cs.Count() > 0)
+                    Sort = Cs.Count() + 1;
                 N.C = new Course
                 {
-                    CCID = CCs.Count() > 0 ? CCs[0].CCID : 0,
+                    CCID = iCCID,
+                    Code = Code + Sort,
                     Title = "",
                     CourseType = 0,
                     CourseInfo = "",
@@ -392,6 +405,7 @@ namespace Banner.Areas.Admin.Controllers
             if (FC != null)
             {
                 N.C.Title = FC.Get("txb_Title");
+                N.C.Code = FC.Get("txb_Code");
                 N.C.CourseInfo = FC.Get("txb_CourseInfo");
                 N.C.TargetInfo = FC.Get("txb_TargetInfo");
                 N.C.GraduationInfo = FC.Get("txb_GraduationInfo");

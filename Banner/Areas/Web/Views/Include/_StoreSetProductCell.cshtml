@@ -13,25 +13,26 @@
         <div class="row">
             <div class="col-12 mt-1">
                 <i class="fa-solid fa-dollar-sign me-1"></i>
-                @if (Model.Price_Basic != Model.Price_New)
+                @if (Model.Price_Type == 0)
                 {
-                    if (Model.Price_Early == Model.Price_New)//目前優惠價=早鳥
+                    if (Model.Price_Basic > 0)
                     {
-                        <span style="color: #3764AC">早鳥價 NT$@(Model.Price_New)</span>
+                        <span style="color: #3764AC">定價：NT$@(Model.Price_Basic)</span>
                     }
-                    else//折價比早鳥好
+                    else
                     {
-                        <span style="color: #3764AC">優惠價 NT$@(Model.Price_New)</span>
+                        <span style="color: #3764AC">免費</span>
                     }
-                    <span style="text-decoration: line-through;">原價 NT@(Model.Price_Basic)</span>
                 }
-                else if (Model.Price_Basic > 0)
+                else if (Model.Price_Type == 1)
                 {
-                    <span style="color: #3764AC">定價 NT$@(Model.Price_Basic)</span>
+                    <span style="text-decoration: line-through;">原價：NT@(Model.Price_Basic)</span>
+                    <span style="color: #3764AC">早鳥價：NT$@(Model.Price_New)</span>
                 }
-                else
+                else if (Model.Price_Type == 2)
                 {
-                    <span style="color: #3764AC">免費</span>
+                    <span style="text-decoration: line-through;">原價：NT@(Model.Price_Basic)</span>
+                    <span style="color: #3764AC">優惠價：NT$@(Model.Price_New)</span>
                 }
             </div>
             <div class="col-12 mt-1">

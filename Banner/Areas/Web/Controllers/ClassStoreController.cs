@@ -1,7 +1,9 @@
 ﻿using Banner.Models;
+using OfficeOpenXml.ConditionalFormatting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
@@ -91,7 +93,38 @@ namespace Banner.Areas.Web.Controllers
             return View(GetIndex());
         }
         #endregion
+        #region 搜尋
 
+        public class cProduct_Search
+        {
+            public List<Product> Ps = new List<Product>();
+        }
+        public cProduct_Search GetProduct_Search(FormCollection FC)
+        {
+            cProduct_Search c = new cProduct_Search();
+            string sKey = GetQueryStringInString("Key");
+            var Ns = DC.Product.Where(q => !q.DeleteFlag);
+            if (sKey != "")
+                Ns = Ns.Where(q => q.Course.Title.Contains(sKey) || q.SubTitle.Contains(sKey) || q.Title.Contains(sKey));
+
+            c.Ps = Ns.OrderByDescending(q => q.CreDate).ToList();
+
+            return c;
+        }
+        [HttpGet]
+        public ActionResult Product_Search()
+        {
+            GetViewBag();
+            return View(GetProduct_Search(null));
+        }
+        [HttpPost]
+        public ActionResult Product_Search(FormCollection FC)
+        {
+            GetViewBag();
+            var c = GetProduct_Search(FC);
+            return View(c);
+        }
+        #endregion
         #region 課程內頁
         public class cProduct_Info
         {
@@ -225,16 +258,88 @@ namespace Banner.Areas.Web.Controllers
         {
             public int OPID;
             public int PID = 0;
-            public string UmgURL = "";
+            public string ImgURL = "";
             public string ClassType = "";//實體/虛擬課程
             public string Title = "";//商品名稱
-
-            public int Price = 0;
+            public int Price_Type = 0;
+            public int Price_Basic = 0;
+            public int Price_New = 0;
+            public int CAID = 0;
+            public ListSelect LS = new ListSelect();
         }
+
         public cOrder_Step1 GetOrder_Step1(FormCollection FC)
         {
             cOrder_Step1 c = new cOrder_Step1();
+            ACID = GetACID();
+            #region 資料庫導入
 
+
+            var OPs = DC.Order_Product.Where(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag).OrderBy(q => q.OPID);
+            foreach (var OP in OPs)
+            {
+                var P = OP.Product_Class.Product;
+                int[] iPrice = GetPrice(ACID, P);
+                c.OHID = OP.OHID;
+                cProduct cP = new cProduct();
+                cP.OPID = OP.OPID;
+                cP.PID = P.PID;
+                cP.ImgURL = string.IsNullOrEmpty(P.ImgURL) ? "/Content/Image/CourseCategory_" + P.Course.CCID + ".jpg" : P.ImgURL;
+                cP.ClassType = P.ProductType == 0 ? "實體+線上" : (P.ProductType == 1 ? "實體課程" : "線上課程");
+                cP.Title = "【" + P.Course.Title + "】" + P.SubTitle;
+                cP.Price_Basic = P.Price_Basic;
+                cP.Price_Type = iPrice[0];
+                cP.Price_New = iPrice[1];
+                cP.CAID = iPrice[2];
+                cP.LS = new ListSelect();
+                cP.LS.Title = "開課班別";
+                cP.LS.ControlName = "rbl_Class_" + P.PID;
+                cP.LS.SortNo = 0;
+                cP.LS.ddlList = new List<SelectListItem>();
+
+                //有買這個商品且結帳完成的正常訂單,統計每個班級的人數
+                var OP_Gs = (from q in DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 2 && q.Product_Class.PID == P.PID)
+                             group q by new { q.PCID } into g
+                             select new { g.Key.PCID, Ct = g.Count() }).ToList();
+
+                var PCs = DC.Product_Class.Where(q => q.PID == P.PID).OrderBy(q => q.PCID);
+                foreach (var PC in PCs)
+                {
+                    SelectListItem SL = new SelectListItem();
+                    SL.Value = PC.PCID.ToString();
+                    SL.Selected = false;
+                    #region 課程文字
+                    //A班：2023/9/14 09:00-12:00 | 台北台中高雄宜蘭
+                    SL.Text = PC.Title + "：";
+                    if (PC.LoopFlag)
+                        SL.Text += "每周" + sWeeks[PC.WeeklyNo];
+                    else
+                        SL.Text = PC.TargetDate.ToString(DateFormat);
+                    if (string.IsNullOrEmpty(PC.LocationName) && string.IsNullOrEmpty(PC.Address)) { }
+                    else if (string.IsNullOrEmpty(PC.LocationName) && !string.IsNullOrEmpty(PC.Address))
+                        SL.Text += " | " + PC.Address;
+                    else if (!string.IsNullOrEmpty(PC.LocationName) && string.IsNullOrEmpty(PC.Address))
+                        SL.Text += " | " + PC.LocationName;
+                    else if (!string.IsNullOrEmpty(PC.LocationName) && !string.IsNullOrEmpty(PC.Address))
+                        SL.Text += " | " + PC.LocationName + "(" + PC.Address + ")";
+                    #endregion
+                    #region 是否可以選課
+                    var OP_G = OP_Gs.FirstOrDefault(q => q.PCID == PC.PCID);
+                    if (OP_G != null)//這堂課有人買
+                    {
+                        if (OP.Product_Class.PeopleCt > 0 && OP_G.Ct >= OP.Product_Class.PeopleCt)//有限制人數 + 名額已滿
+                            SL.Disabled = true;
+                    }
+                    #endregion
+                    cP.LS.ddlList.Add(SL);
+                }
+
+            }
+            #endregion
+
+            #region 前端載入
+
+            #endregion
 
 
 

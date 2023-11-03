@@ -40,6 +40,12 @@
         color: var(--bs-primary-text-emphasis) !important;
     }
 </style>
+<script>
+    function Search() {
+        var sKey = document.getElementById("txb_Search");
+        document.location.href = "/Web/ClassStore/Product_Search?Key="+sKey.value;
+    }
+</script>
 <div class="row w-100">
     <div class="col-12">
         <div class="topimg">
@@ -69,7 +75,7 @@
                     <div class="card" style="margin-top: 50px;">
                         <div class="card-body">
                             <div class="input-group mb-3">
-                                <span class="input-group-text" id="basic-addon1"><a href="javascript:;" onclick=""><i class="fa-solid fa-magnifying-glass"></i></a></span>
+                                <span class="input-group-text" id="basic-addon1"><a href="javascript:;" onclick="Search();"><i class="fa-solid fa-magnifying-glass"></i></a></span>
                                 <input type="text" id="txb_Search" class="form-control" placeholder="搜尋" aria-label="Username" aria-describedby="basic-addon1">
                             </div>
                         </div>

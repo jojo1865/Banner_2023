@@ -19,123 +19,94 @@
                     <div class="header-left-border"></div>
                     <h5 class="header font-bold">購課明細</h5>
                 </div>
-                <!-- 複製區域 -->
-                <div class="row mx-0">
-                    <div class="card px-none mb-3 col-lg-12 p-md-4">
-                        <div class="row g-0 d-flex">
-                            <div class="col-12 col-lg-5">
-                                <div class="d-sm-flex d-block">
-                                    <img src="~/Content/Image/CourseCategory_1.jpg" class="rounded-sm-4 me-3 mt-lg-0 mt-3" style="width:auto; height:120px;"
-                                         alt="...">
-                                    <div class="w-100 px-3 px-md-0">
-                                        <h6 class="py-1 mb-2 bg-secondary-subtle text-center mt-2 mt-sm-0"
-                                            style="display: inline-block;white-space: nowrap;padding-left: 10px;padding: 10px;">
-                                            實體課程
-                                        </h6>
-                                        <div class="mb-2">
-                                            <h6 class="fw-bold ">【E1生命更新營】實現 幸福夢想</h6>
-                                        </div>
-                                        <div class="d-block">
+                @foreach (var P in Model.cPs)
+                {
+                    <!-- 複製區域 -->
+                    <div class="row mx-0">
+                        <div class="card px-none mb-3 col-lg-12 p-md-4">
+                            <div class="row g-0 d-flex">
+                                <div class="col-12 col-lg-5">
+                                    <div class="d-sm-flex d-block">
+                                        <img src="@P.ImgURL" class="rounded-sm-4 me-3 mt-lg-0 mt-3" style="width:auto; height:120px;" alt="@P.Title">
+                                        <div class="w-100 px-3 px-md-0">
+                                            <h6 class="py-1 mb-2 bg-secondary-subtle text-center mt-2 mt-sm-0" style="display: inline-block;white-space: nowrap;padding-left: 10px;padding: 10px;">
+                                                @P.ClassType
+                                            </h6>
+                                            <div class="mb-2">
+                                                <h6 class="fw-bold ">@P.Title</h6>
+                                            </div>
+                                            <div class="d-block">
+                                                @if (P.Price_Type == 0)
+                                                {
+                                                    if (P.Price_New > 0)
+                                                    {
+                                                        <span style="color: #3764AC">定價：NT$@(P.Price_Basic)</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span style="color: #3764AC">免費</span>
+                                                    }
+                                                }
+                                                else if (P.Price_Type == 1)
+                                                {
+                                                    <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
+                                                    <p class="mb-0">早鳥價：NT$@P.Price_New</p>
+                                                }
+                                                else if (P.Price_Type == 2)
+                                                {
+                                                    <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
+                                                    <p class="mb-0">優惠價：NT$@P.Price_New</p>
+                                                }
 
-                                            <p class="mb-0" style="text-decoration: line-through;">原價：NT$900</p>
-                                            <p class="mb-0">早鳥價：NT$900</p>
-
-                                            <!--
-    <hr class="me-2 d-xl-block d-none" style="border-top: 1px dashed #28282899;width: 2rem;">
-    <p class="my-0" style="color: #28282861">台中旌旗教會</p>
-    <p class="mx-1" style="color: #28282861">-</p>
-    <p class="my-0" style="color: rgba(40, 40, 40, 0.38)">國光分點</p>
-    <div class="vr mx-1" style="height: 1.5rem;"></div>
-    <p class="my-0" style="color: rgba(40, 40, 40, 0.60)">開課</p>
-        -->
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-12 col-lg-2 my-lg-auto my-2 px-3 px-md-0 d-none">
-                            </div>
-                            <div class="col-12 col-lg-5 my-auto d-lg-block px-3 px-md-0">
-                                <div class="d-block mb-2">
-                                    <input type="radio" value="1" name="rbl_Class" class="me-2" />A班：2023/9/14 09:00-12:00 | 台北台中高雄宜蘭
+                                <div class="col-12 col-lg-2 my-lg-auto my-2 px-3 px-md-0 d-none">
                                 </div>
-                                <div class="d-block mb-2">
-                                    <input type="radio" value="1" name="rbl_Class" class="me-2" />B班：2023/9/14 09:00-12:00 | 台北台中高雄宜蘭
+                                <div class="col-12 col-lg-5 my-auto d-lg-block px-3 px-md-0">
+                                    @foreach (var d in P.LS.ddlList)
+                                    {
+                                        if (d.Disabled)
+                                        {
+                                            <div class="d-block mb-2">
+                                                @Html.RadioButton(P.LS.ControlName, d.Value, d.Selected, new { @class = "form-check me-2", id = P.LS.ControlName + d.Value, disabled = string.Empty })
+                                                @Html.Label(d.Text, new { @for = P.LS.ControlName + d.Value,@class="lab_gray" })
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-block mb-2">
+                                                @Html.RadioButton(P.LS.ControlName, d.Value, d.Selected, new { @class = "form-check me-2", id = P.LS.ControlName + d.Value })
+                                                @Html.Label(d.Text, new { @for = P.LS.ControlName + d.Value })
+                                            </div>
+                                        }
+
+                                    }
+
+
                                 </div>
-                                <div class="d-block mb-2">
-                                    <input type="radio" value="1" name="rbl_Class" class="me-2" />C班：2023/9/14 09:00-12:00 | 台北台中高雄宜蘭
-                                </div>
-                                <div class="d-block mb-2">
-                                    <input type="radio" value="1" name="rbl_Class" class="me-2" />D班：2023/9/14 09:00-12:00 | 台北台中高雄宜蘭
-                                </div>
-                            </div>
-                            <div class="col-12 col-lg-2 my-auto text-lg-end text-center pb-2 d-flex d-sm-block gap-2 justify-content-lg-end justify-content-center">
-                                <div class="btn btn-outline-primary btn-lg btn-round mb-none mb-lg-2 d-none">
-                                    <img class="d-none d-sm-block" src="/public/assets/img/star_border.svg" alt="" />加入追蹤
-                                </div>
-                                <div class="btn btn-outline-primary btn-lg btn-round">
-                                    <i class="fa-solid fa-circle-minus"></i>移除項目
+                                <div class="col-12 col-lg-2 my-auto text-lg-end text-center pb-2 d-flex d-sm-block gap-2 justify-content-lg-end justify-content-center">
+                                    <div class="btn btn-outline-primary btn-lg btn-round">
+                                        <i class="fa-solid fa-circle-minus"></i>移除項目
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <!------------>
-                <!-- 複製區域 -->
-                <div class="row mx-0">
-                    <div class="card px-none mb-3 col-lg-12 p-md-4">
-                        <div class="row g-0 d-flex">
-                            <div class="col-12 col-lg-7">
-                                <div class="d-sm-flex d-block">
-                                    <img src="~/Content/Image/CourseCategory_1.jpg" class="img-fluid rounded-sm-4 me-3 mt-lg-0 mt-3"
-                                         alt="...">
-                                    <div class="w-100 px-3 px-md-0">
-                                        <h6 class="py-1 mb-2 bg-secondary-subtle text-center mt-2 mt-sm-0"
-                                            style="display: inline-block;white-space: nowrap;padding-left: 10px;padding: 10px;">
-                                            實體課程
-                                        </h6>
-                                        <div class="mb-2">
-                                            <h6 class="fw-bold ">【E1生命更新營】實現 幸福夢想</h6>
-                                        </div>
-                                        <div class="d-flex">
-                                            <hr class="me-2 d-xl-block d-none" style="border-top: 1px dashed #28282899;width: 2rem;">
-                                            <p class="my-0" style="color: #28282861">台中旌旗教會</p>
-                                            <p class="mx-1" style="color: #28282861">-</p>
-                                            <p class="my-0" style="color: rgba(40, 40, 40, 0.38)">國光分點</p>
-                                            <div class="vr mx-1" style="height: 1.5rem;"></div>
-                                            <p class="my-0" style="color: rgba(40, 40, 40, 0.60)">開課</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-lg-1 my-lg-auto my-2 d-flex px-3 px-md-0">
-                                <p class="mb-0">NT$900</p>
-                            </div>
-                            <div class="col-12 col-lg-2 my-auto d-flex d-lg-block px-3 px-md-0">
-                                <div class="mb-2 d-flex d-lg-block d-xxl-flex">
-                                    <p>2022/02/19 (六)</p>
-                                    <p class="d-none d-md-block"> 9:00-18:00</p>
-                                </div>
-                                <p class="d-lg-none mx-2">~</p>
-                                <div class="mb-2 d-flex d-lg-block d-xxl-flex">
-                                    <p>2022/02/19 (六)</p>
-                                    <p class="d-none d-md-block"> 9:00-18:00</p>
-                                </div>
-                            </div>
-                            <div class="col-12 col-lg-2 my-auto text-lg-end text-center pb-2 d-flex d-sm-block gap-2 justify-content-lg-end justify-content-center">
-                                <div class="btn btn-outline-primary btn-lg btn-round mb-none mb-lg-2 d-none">
-                                    <img class="d-none d-sm-block" src="/public/assets/img/star_border.svg" alt="" />加入追蹤
-                                </div>
-                                <div class="btn btn-outline-primary btn-lg btn-round">
-                                    <i class="fa-solid fa-circle-minus"></i>移除項目
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!------------>
+                    <!------------>
+                }
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col mt-3 mb-5 text-center">
+                <a style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit" href="/Web/ClassStore/Index"><img src="/Areas/Web/Content/Img/Back.svg" style="width:25px;" alt="" />返回商城</a>
+
+                <button type="submit" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
+
             </div>
         </div>
     </div>
-
 </div>
 
