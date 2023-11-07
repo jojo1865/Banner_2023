@@ -199,6 +199,8 @@ namespace Banner.Areas.Admin.Controllers
                 }
             }
             //所屬旌旗
+
+            //後臺使用者限制使用那些旌旗資訊
             var OI2s = DC.M_OI2_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.OIID == 1);
             if (OI2s.Any())
             {
@@ -217,7 +219,10 @@ namespace Banner.Areas.Admin.Controllers
                               .OrderBy(q => q.OIID);
                     foreach (var OI in OIs) N.OI2SL.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = OI.OIID == OIs.Min(q => q.OIID) });
                 }
+                else
+                    SetAlert("此使用者未設定所屬旌旗,請設定完成後再新增/編輯上架課程", 2, "/Admin/StoreSet/Product_List");
             }
+
             //擋修用選單
             N.PBs = new List<cProduct_Before>();
             cProduct_Before PB = new cProduct_Before();
@@ -273,14 +278,14 @@ namespace Banner.Areas.Admin.Controllers
                     ImgURL = "",
                     Price_Basic = 0,
                     Price_Early = 0,
-                    SDate = DT.AddDays(-1),
-                    EDate = DT.AddDays(-1),
-                    SDate_Signup_OnSite = DT.AddDays(-1),
-                    EDate_Signup_OnSite = DT.AddDays(-1),
-                    SDate_Signup_OnLine = DT.AddDays(-1),
-                    EDate_Signup_OnLine = DT.AddDays(-1),
-                    SDate_Early = DT.AddDays(-1),
-                    EDate_Early = DT.AddDays(-1),
+                    SDate = DT,
+                    EDate = DT,
+                    SDate_Signup_OnSite = DT,
+                    EDate_Signup_OnSite = DT,
+                    SDate_Signup_OnLine = DT,
+                    EDate_Signup_OnLine = DT,
+                    SDate_Early = DT,
+                    EDate_Early = DT,
                     ShowFlag = false,
                     ActiveFlag = true,
                     DeleteFlag = false,

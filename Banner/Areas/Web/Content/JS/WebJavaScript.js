@@ -591,4 +591,28 @@ function AddCart(ACID, PID) {
     });
     return;
 }
+function RemoveCart(URL,OPID) {
+    $.ajax({
+        url: '/Web/Home/RemoveCart?OPID=' + OPID,
+        method: 'GET',
+        dataType: 'text',
+        success: function (res) {
+            const Return = res.split(';');
+            if (Return[0] == 'OK') {
+                Swal.fire({
+                    icon: 'success',
+                    html: '已移除'
+                }).then((result) => { if (result.isConfirmed) { document.location.href = URL; } });
+                
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    html: Return[1]
+                });
+            }
+        }
+    });
+    return;
+}
 //關鍵字搜尋

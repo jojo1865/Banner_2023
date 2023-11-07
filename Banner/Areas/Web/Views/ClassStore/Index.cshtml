@@ -96,7 +96,7 @@
                 <div class="container">
                     <div class="row pt-3 pb-3">
                         <div class="col-6"><h2 class="lab_DarkBlue">經典課程</h2></div>
-                        <div class="col-6 text-end"><a href="/Web/ClassStore/Search/1" class="lab_info">更多經典課程...</a></div>
+                        <div class="col-6 text-end"><a href="/Web/ClassStore/Product_Search?Type=1" class="lab_info">更多經典課程...</a></div>
                     </div>
                     <div class="row">
                         <div class="col">
@@ -134,7 +134,7 @@
         <!--經典課程-手機板-->
         <div class="row d-lg-none w-100 mt-2 mb-2">
             <div class="col-6"><h2 class="lab_DarkBlue">經典課程</h2></div>
-            <div class="col-6 text-end"><a href="/Web/ClassStore/Search/1" class="lab_info">更多經典課程...</a></div>
+            <div class="col-6 text-end"><a href="/Web/ClassStore/Product_Search?Type=1" class="lab_info">更多經典課程...</a></div>
         </div>
         <div id="div_Classical_2" class="carousel slide d-lg-none w-100 mt-2 mb-2" data-bs-ride="carousel">
             <div class="carousel-inner">
@@ -163,7 +163,7 @@
                 <div class="container">
                     <div class="row pt-3 pb-3">
                         <div class="col-6"><h2 class="lab_DarkBlue">最新課程</h2></div>
-                        <div class="col-6 text-end"><a href="/Web/ClassStore/Search/2" class="lab_info">更多最新課程...</a></div>
+                        <div class="col-6 text-end"><a href="/Web/ClassStore/Product_Search?Type=2" class="lab_info">更多最新課程...</a></div>
                     </div>
                     <div class="row">
                         <div class="col">
@@ -178,7 +178,7 @@
 
                                         <div class="carousel-item @(ActiveClass)" data-bs-interval="5000">
                                             <div class="row">
-                                                @for (int j = i * 3; j < ((j + 1) * 3 <= Model.Ps_News.Count ? (j + 1) * 3 : Model.Ps_News.Count); j++)
+                                                @for (int j = i * 3; j < ((i + 1) * 3 <= Model.Ps_News.Count ? (i + 1) * 3 : Model.Ps_News.Count); j++)
                                                 {
                                                     <div class="col-4">
                                                         @Html.Action("_StoreSetProductCell", "Include", new { P = Model.Ps_News[j] })
@@ -203,7 +203,7 @@
         <!--最新課程-手機板-->
         <div class="row d-lg-none w-100 mt-2 mb-2">
             <div class="col-6"><h2 class="lab_DarkBlue">最新課程</h2></div>
-            <div class="col-6 text-end"><a href="/Web/ClassStore/Search/2" class="lab_info">更多最新課程...</a></div>
+            <div class="col-6 text-end"><a href="/Web/ClassStore/Product_Search?Type=2" class="lab_info">更多最新課程...</a></div>
         </div>
         <div id="div_News_2" class="carousel slide d-lg-none w-100 mt-2 mb-2" data-bs-ride="carousel">
             <div class="carousel-inner">
@@ -232,7 +232,7 @@
                 <div class="container">
                     <div class="row pt-3 pb-3">
                         <div class="col-6"><h2 class="lab_DarkBlue">即將結束報名課程</h2></div>
-                        <div class="col-6 text-end"><a href="/Web/ClassStore/Search/3" class="lab_info">更多即將結束報名課程...</a></div>
+                        <div class="col-6 text-end"><a href="/Web/ClassStore/Product_Search?Type=3" class="lab_info">更多即將結束報名課程...</a></div>
                     </div>
                     <div class="row">
                         <div class="col">
@@ -246,7 +246,7 @@
                                         string ActiveClass = i == 0 ? "active" : "";
                                         <div class="carousel-item @(ActiveClass)" data-bs-interval="5000">
                                             <div class="row">
-                                                @for (int j = i * 3; j < ((j + 1) * 3 <= Model.Ps_Close.Count ? (j + 1) * 3 : Model.Ps_Close.Count); j++)
+                                                @for (int j = i * 3; j < ((i + 1) * 3 <= Model.Ps_Close.Count ? (i + 1) * 3 : Model.Ps_Close.Count); j++)
                                                 {
                                                     var P = Model.Ps_Close[j];
                                                     <div class="col-4">
@@ -272,7 +272,7 @@
         <!--即將結束報名課程-手機板-->
         <div class="row d-lg-none w-100 mt-2 mb-2">
             <div class="col-6"><h2 class="lab_DarkBlue">即將結束報名課程</h2></div>
-            <div class="col-6 text-end"><a href="/Web/ClassStore/Search/3" class="lab_info">更多即將結束報名課程...</a></div>
+            <div class="col-6 text-end"><a href="/Web/ClassStore/Product_Search?Type=3" class="lab_info">更多即將結束報名課程...</a></div>
         </div>
         <div id="div_Close_2" class="carousel slide d-lg-none w-100 mt-2 mb-2" data-bs-ride="carousel">
             <div class="carousel-inner">

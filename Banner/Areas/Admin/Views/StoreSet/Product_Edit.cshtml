@@ -164,11 +164,11 @@
                                 <div class="row">
                                     <div class="col-lg-6 col-12">
                                         <label>開課起始日<span>*</span></label>
-                                        @Html.TextBox("txb_SDate", (Model.P.SDate.Date >= Model.P.CreDate.Date ? Model.P.SDate.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_SDate", (Model.P.SDate != Model.P.CreDate ? Model.P.SDate.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                     <div class="col-lg-6 col-12">
                                         <label>開課結束日<span>*</span></label>
-                                        @Html.TextBox("txb_EDate", (Model.P.EDate.Date >= Model.P.CreDate.Date ? Model.P.EDate.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_EDate", (Model.P.EDate != Model.P.CreDate ? Model.P.EDate.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                 </div>
                             </div>
@@ -176,11 +176,11 @@
                                 <div class="row">
                                     <div class="col-lg-6 col-12">
                                         <label>早鳥起始日</label>
-                                        @Html.TextBox("txb_SDate_Early", (Model.P.SDate_Early.Date >= Model.P.CreDate.Date ? Model.P.SDate_Early.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_SDate_Early", (Model.P.SDate_Early != Model.P.CreDate ? Model.P.SDate_Early.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                     <div class="col-lg-6 col-12">
                                         <label>早鳥結束日</label>
-                                        @Html.TextBox("txb_EDate_Early", (Model.P.EDate_Early.Date >= Model.P.CreDate.Date ? Model.P.EDate_Early.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_EDate_Early", (Model.P.EDate_Early != Model.P.CreDate ? Model.P.EDate_Early.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                 </div>
                             </div>
@@ -188,11 +188,11 @@
                                 <div class="row">
                                     <div class="col-lg-6 col-12">
                                         <label>臨櫃報名起始日</label>
-                                        @Html.TextBox("txb_SDate_Signup_OnSite", (Model.P.SDate_Signup_OnSite.Date >= Model.P.CreDate.Date ? Model.P.SDate_Signup_OnSite.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_SDate_Signup_OnSite", (Model.P.SDate_Signup_OnSite != Model.P.CreDate ? Model.P.SDate_Signup_OnSite.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                     <div class="col-lg-6 col-12">
                                         <label>臨櫃報名結束日</label>
-                                        @Html.TextBox("txb_EDate_Signup_OnSite", (Model.P.EDate_Signup_OnSite.Date >= Model.P.CreDate.Date ? Model.P.EDate_Signup_OnSite.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_EDate_Signup_OnSite", (Model.P.EDate_Signup_OnSite != Model.P.CreDate ? Model.P.EDate_Signup_OnSite.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                 </div>
                             </div>
@@ -200,11 +200,11 @@
                                 <div class="row">
                                     <div class="col-lg-6 col-12">
                                         <label>線上報名起始日</label>
-                                        @Html.TextBox("txb_SDate_Signup_OnLine", (Model.P.SDate_Signup_OnLine.Date >= Model.P.CreDate.Date ? Model.P.SDate_Signup_OnLine.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_SDate_Signup_OnLine", (Model.P.SDate_Signup_OnLine != Model.P.CreDate ? Model.P.SDate_Signup_OnLine.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                     <div class="col-lg-6 col-12">
                                         <label>線上報名結束日</label>
-                                        @Html.TextBox("txb_EDate_Signup_OnLine", (Model.P.EDate_Signup_OnLine.Date >= Model.P.CreDate.Date ? Model.P.EDate_Signup_OnLine.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_EDate_Signup_OnLine", (Model.P.EDate_Signup_OnLine != Model.P.CreDate ? Model.P.EDate_Signup_OnLine.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                 </div>
                             </div>
@@ -401,15 +401,22 @@
 <div id="div_BeforeCourse_Bata" class="d-none">
     <div id="div_AddCourse_*" class="mt-3">
         <div class="row">
-            <div class="col-lg-4 col-12">
-                @Html.DropDownList("ddl_CC_*", Model.PBs[0].CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this," + Model.P.CID + ");" })
-            </div>
-            <div class="col-lg-6 col-12">
-                @Html.DropDownList("ddl_C_*", Model.PBs[0].CSL_Before, new { @class = "form-select form-control-lg", @id = "ddl_C_*" })
-            </div>
-            <div class="col-lg-2 col-12 text-lg-end text-start">
-                <a href="javascript:;" onclick="RemoveRow('div_AddCourse_*');"><i class="fa-solid fa-trash lab_DarkBlue"></i></a>
-            </div>
+            @if (Model.PBs.Any())
+            {
+                <div class="col-lg-4 col-12">
+                    @Html.DropDownList("ddl_CC_*", Model.PBs[0].CCSL_Before, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this," + Model.P.CID + ");" })
+                </div>
+                <div class="col-lg-6 col-12">
+                    @Html.DropDownList("ddl_C_*", Model.PBs[0].CSL_Before, new { @class = "form-select form-control-lg", @id = "ddl_C_*" })
+                </div>
+                <div class="col-lg-2 col-12 text-lg-end text-start">
+                    <a href="javascript:;" onclick="RemoveRow('div_AddCourse_*');"><i class="fa-solid fa-trash lab_DarkBlue"></i></a>
+                </div>
+            }
+            else
+            {
+                <div class="col-12">無先修課程可新增</div>
+            }
         </div>
     </div>
 </div>

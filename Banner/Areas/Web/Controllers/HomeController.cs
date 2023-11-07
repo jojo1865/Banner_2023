@@ -440,9 +440,9 @@ namespace Banner.Areas.Web.Controllers
             int PCID = 0;
             Error = "";
             if (ACID <= 0)
-                Error = "無登入會員資料";
+                Error += "無登入會員資料<br/>";
             else if (PID <= 0)
-                Error = "無課程資料";
+                Error += "無課程資料<br/>";
             else
             {
                 var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
@@ -451,76 +451,75 @@ namespace Banner.Areas.Web.Controllers
                 if (AC != null)
                 {
                     if (AC.DeleteFlag)
-                        Error = "無會員資料";
+                        Error += "無會員資料<br/>";
                     else if (!AC.ActiveFlag)
-                        Error = "會員資料未啟用";
+                        Error += "會員資料未啟用<br/>";
                 }
                 else
-                    Error = "無會員資料";
+                    Error += "無會員資料<br/>";
                 if (Error == "")
                 {
                     if (P != null)
                     {
                         if (P.DeleteFlag)
-                            Error = "無課程資料";
+                            Error += "無課程資料<br/>";
                         else if (!P.ActiveFlag)
-                            Error = "課程並未允許交易";
+                            Error += "課程並未允許交易<br/>";
                         else
                         {
                             var OP = DC.Order_Product.FirstOrDefault(q =>
                             q.Order_Header.ACID == ACID &&
                             !q.Order_Header.DeleteFlag &&
-                            q.Product_Class.PID == P.PID
+                            q.PID == P.PID
                             );
-                            if(OP!=null)
+                            if (OP != null)
                             {
-                                if(OP.Order_Header.Order_Type == 0)
-                                    Error = "此課程已在購物車中";
+                                if (OP.Order_Header.Order_Type == 0)
+                                    Error += "此課程已在購物車中<br/>";
                                 else if (OP.Order_Header.Order_Type == 1)
-                                    Error = "此課程正在結帳中...";
+                                    Error += "此課程正在結帳中...<br/>";
                                 else if (OP.Order_Header.Order_Type == 2)
-                                    Error = "此課程您已經買過了";
-                                else
+                                    Error += "此課程您已經買過了<br/>";
+
+                            }
+
+                            //人數限制檢查
+                            //有買這個商品且結帳完成的正常訂單,統計每個班級的人數
+                            var OP_Gs = (from q in DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 2 && q.PID == PID)
+                                         group q by new { q.PCID } into g
+                                         select new { g.Key.PCID, Ct = g.Count() }).ToList();
+
+                            var PCs = DC.Product_Class.Where(q => q.PID == PID).OrderBy(q => q.PCID).ToList();
+                            if (PCs.Count() > 0)//有班級可以上
+                            {
+                                //先檢查限制名額的
+                                var PC_Ns = PCs.Where(q => q.PeopleCt > 0).OrderBy(q => q.PCID).ToList();
+                                foreach (var PC_N in PC_Ns)
                                 {
-                                    //人數限制檢查
-
-                                    //有買這個商品且結帳完成的正常訂單,統計每個班級的人數
-                                    var OP_Gs = (from q in DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 2 && q.Product_Class.PID == PID)
-                                                 group q by new { q.PCID } into g
-                                                 select new { g.Key.PCID, Ct = g.Count() }).ToList();
-
-                                    var PCs = DC.Product_Class.Where(q => q.PID == PID).OrderBy(q => q.PCID).ToList();
-                                    if (PCs.Count() > 0)//有班級可以上
-                                    {
-                                        //先檢查限制名額的
-                                        var PC_Ns = PCs.Where(q => q.PeopleCt > 0).OrderBy(q => q.PCID).ToList();
-                                        foreach (var PC_N in PC_Ns)
-                                        {
-                                            var OP_G = OP_Gs.FirstOrDefault(q => q.PCID == PC_N.PCID);
-                                            if (OP_G == null)
-                                                PCID = OP_G.PCID;
-                                            else if (PC_N.PeopleCt < OP_G.Ct)
-                                                PCID = OP_G.PCID;
-                                            if (PCID > 0)
-                                                break;
-                                        }
-                                        if (PCID == 0)//沒班級再檢查不限名額的
-                                        {
-                                            var PC_0s = PCs.Where(q => q.PeopleCt == 0).OrderBy(q => q.PCID).ToList();
-                                            if (PC_0s.Count() > 0)
-                                                PCID = PC_0s.First().PCID;
-                                        }
-                                        if (PCID == 0)
-                                            Error += "目前班級均已額滿";
-                                    }
-                                    else
-                                        Error += "目前沒有班級可以上課";
+                                    var OP_G = OP_Gs.FirstOrDefault(q => q.PCID == PC_N.PCID);
+                                    if (OP_G == null)
+                                        PCID = OP_G.PCID;
+                                    else if (PC_N.PeopleCt < OP_G.Ct)
+                                        PCID = OP_G.PCID;
+                                    if (PCID > 0)
+                                        break;
                                 }
-                            }             
+                                if (PCID == 0)//沒班級再檢查不限名額的
+                                {
+                                    var PC_0s = PCs.Where(q => q.PeopleCt == 0).OrderBy(q => q.PCID).ToList();
+                                    if (PC_0s.Count() > 0)
+                                        PCID = PC_0s.First().PCID;
+                                }
+                                if (PCID == 0)
+                                    Error += "目前班級均已額滿<br/>";
+                            }
+                            else
+                                Error += "目前沒有班級可以上課<br/>";
+
                         }
                     }
                     else
-                        Error = "無課程資料";
+                        Error += "無課程資料<br/>";
                 }
                 #endregion
                 #region 購買資格檢查
@@ -528,10 +527,10 @@ namespace Banner.Areas.Web.Controllers
                 if (Error == "")
                 {
                     //有線上報名日期
-                    if (P.SDate_Signup_OnLine.Date >= P.CreDate.Date && P.SDate_Signup_OnLine.Date < DT.Date)
-                        Error = "本課程尚未開始線上報名";
-                    else if (P.EDate_Signup_OnLine.Date >= P.CreDate.Date && P.EDate_Signup_OnLine.Date > DT.Date)
-                        Error = "本課程已結束線上報名";
+                    if (P.SDate_Signup_OnLine.Date >= P.CreDate.Date && P.SDate_Signup_OnLine.Date > DT.Date)
+                        Error += "本課程尚未開始線上報名<br/>";
+                    else if (P.EDate_Signup_OnLine.Date >= P.CreDate.Date && P.EDate_Signup_OnLine.Date < DT.Date)
+                        Error += "本課程已結束線上報名<br/>";
                     else
                     {
                         bool bCheck0 = false;//先修課程檢查過沒?
@@ -547,10 +546,10 @@ namespace Banner.Areas.Web.Controllers
                                         {
                                             var Os = from q in DC.Order_Product.Where(q => q.Order_Header.ACID == AC.ACID && q.Order_Header.Order_Type == 2 && !q.Order_Header.DeleteFlag)
                                                      join p in DC.Product_Rool.Where(q => q.PID == P.PID && q.TargetType == 0 && q.TargetInt1 > 0)
-                                                     on q.Product_Class.PID equals p.TargetInt1
+                                                     on q.PID equals p.TargetInt1
                                                      select p;
                                             if (Os.Count() == 0)
-                                                Error = "本課程有限制需先參加先修課程,您不具備此資格";
+                                                Error += "本課程有限制需先參加先修課程,您不具備此資格<br/>";
                                             bCheck0 = true;
                                         }
                                     }
@@ -565,7 +564,7 @@ namespace Banner.Areas.Web.Controllers
                                                      on q.OID equals p.TargetInt1
                                                      select p;
                                             if (Os.Count() == 0)
-                                                Error = "本課程有限制指定職分參加,您不具備職分資格";
+                                                Error += "本課程有限制指定職分參加,您不具備職分資格<br/>";
                                             bCheck1 = true;
                                         }
                                     }
@@ -576,9 +575,9 @@ namespace Banner.Areas.Web.Controllers
                                         if (R.TargetInt1 >= 0)//有限制
                                         {
                                             if (AC.ManFlag && R.TargetInt1 == 0)
-                                                Error = "本課程限制女性參加";
+                                                Error += "本課程限制女性參加<br/>";
                                             if (!AC.ManFlag && R.TargetInt1 == 1)
-                                                Error = "本課程限制男性參加";
+                                                Error += "本課程限制男性參加<br/>";
                                         }
                                     }
                                     break;
@@ -590,12 +589,12 @@ namespace Banner.Areas.Web.Controllers
                                             if (R.TargetInt1 > 0)//有最小年齡限制
                                             {
                                                 if ((DT.Year - AC.Birthday.Year) < R.TargetInt1)//今年-生日年<最小年齡限制
-                                                    Error = "您的年紀不符最小年齡限制";
+                                                    Error += "您的年紀不符最小年齡限制<br/>";
                                             }
                                             else if (R.TargetInt2 > 0)//有最大年齡限制
                                             {
                                                 if ((DT.Year - AC.Birthday.Year) > R.TargetInt1)//今年-生日年>最大年齡限制
-                                                    Error = "您的年紀不符最大年齡限制";
+                                                    Error += "您的年紀不符最大年齡限制<br/>";
                                             }
                                         }
 
@@ -607,7 +606,7 @@ namespace Banner.Areas.Web.Controllers
 
                                 case 5://指定會員ACID
                                     if (AC.ACID != R.TargetInt1)
-                                        Error = "您非本課程指定會員";
+                                        Error += "您非本課程指定會員<br/>";
                                     break;
                             }
                         }
@@ -619,7 +618,7 @@ namespace Banner.Areas.Web.Controllers
                     {
                         var OICheck = DC.v_GetAC_O2_OI.Where(q => q.ACID == ACID && q.OIID == P.OIID);
                         if (OICheck == null)//本課程限制的旌旗與報名者不符
-                            Error = "本課程只允許特定旌旗教會下的會友報名";
+                            Error += "本課程只允許特定旌旗教會下的會友報名<br/>";
                     }
                 }
                 #endregion
@@ -629,70 +628,64 @@ namespace Banner.Areas.Web.Controllers
                     var OH = DC.Order_Header.FirstOrDefault(q => q.Order_Type == 0 && q.ACID == ACID);
                     if (OH != null)
                     {
-                        if (!OH.Order_Product.Any(q => q.Product_Class.PID == PID))//這商品目前尚未加入購物車中
+                        if (!OH.Order_Product.Any(q => q.PID == PID))//這商品目前尚未加入購物車中
                         {
                             var PC = DC.Product_Class.FirstOrDefault(q => q.PID == PID && q.PCID == PCID);
-                            if (PC != null)
-                            {
-                                Order_Product OP = new Order_Product
-                                {
-                                    Order_Header = OH,
-                                    Product_Class = PC,
-                                    CAID = iPrice[2],
-                                    Price_Basic = PC.Product.Price_Basic,
-                                    Price_Finally = iPrice[1],
-                                    Price_Type = iPrice[0],
-                                    CreDate = DT,
-                                    UpdDate = DT,
-                                    SaveACID = ACID
-                                };
-                                DC.Order_Product.InsertOnSubmit(OP);
-                                DC.SubmitChanges();
-
-                                OH.TotalPrice = OH.Order_Product.Sum(q => q.Price_Finally);
-                                OH.DeleteFlag = false;
-                                DC.SubmitChanges();
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                       
-
-                        var PC = DC.Product_Class.Where(q => q.PID == PID).OrderBy(q => q.PCID).FirstOrDefault();
-                        if (PC != null)
-                        {
-                            OH = new Order_Header
-                            {
-                                OIID = 0,
-                                ACID = ACID,
-                                Order_Type = 0,
-                                TotalPrice = iPrice[1],
-                                DeleteFlag = false,
-                                CreDate = DT,
-                                UpdDate = DT,
-                                SaveACID = ACID
-                            };
-                            DC.Order_Header.InsertOnSubmit(OH);
-                            DC.SubmitChanges();
-
                             Order_Product OP = new Order_Product
                             {
-                                OHID = OH.OHID,
-                                PCID = PC.PCID,
+                                Order_Header = OH,
+                                Product = P,
+                                PCID = PC != null ? PC.PCID : 0,
                                 CAID = iPrice[2],
-                                Price_Basic = PC.Product.Price_Basic,
+                                Price_Basic = P.Price_Basic,
                                 Price_Finally = iPrice[1],
                                 Price_Type = iPrice[0],
+                                JoinDate = DT,
                                 CreDate = DT,
                                 UpdDate = DT,
                                 SaveACID = ACID
                             };
                             DC.Order_Product.InsertOnSubmit(OP);
                             DC.SubmitChanges();
+
+                            OH.TotalPrice = OH.Order_Product.Sum(q => q.Price_Finally);
+                            OH.DeleteFlag = false;
+                            DC.SubmitChanges();
                         }
-                            
+                    }
+                    else
+                    {
+                        var PC = DC.Product_Class.Where(q => q.PID == PID).OrderBy(q => q.PCID).FirstOrDefault();
+                        OH = new Order_Header
+                        {
+                            OIID = 0,
+                            ACID = ACID,
+                            Order_Type = 0,
+                            TotalPrice = iPrice[1],
+                            DeleteFlag = false,
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = ACID
+                        };
+                        DC.Order_Header.InsertOnSubmit(OH);
+                        DC.SubmitChanges();
+
+                        Order_Product OP = new Order_Product
+                        {
+                            OHID = OH.OHID,
+                            PID = P.PID,
+                            PCID = PC != null ? PC.PCID : 0,
+                            CAID = iPrice[2],
+                            Price_Basic = P.Price_Basic,
+                            Price_Finally = iPrice[1],
+                            Price_Type = iPrice[0],
+                            JoinDate = DT,
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = ACID
+                        };
+                        DC.Order_Product.InsertOnSubmit(OP);
+                        DC.SubmitChanges();
                     }
 
                 }
@@ -704,6 +697,37 @@ namespace Banner.Areas.Web.Controllers
                 Error = "OK;";
             return Error;
         }
+        #endregion
+        #region 自購物車移除
+        public string RemoveCart(int OPID)
+        {
+            var OP = DC.Order_Product.FirstOrDefault(q => q.OPID == OPID && q.Order_Header.Order_Type == 0);
+            if (OP != null)
+            {
+                var OHID = OP.OHID;
+                DC.Order_Product.DeleteOnSubmit(OP);
+                DC.SubmitChanges();
+
+                var OH = DC.Order_Header.FirstOrDefault(q => q.OHID == OHID && q.Order_Type == 0);
+                if (OH != null)
+                {
+                    var OPs = DC.Order_Product.Where(q => q.OHID == OHID);
+                    OH.TotalPrice = OPs.Count() > 0 ? OPs.Sum(q => q.Price_Finally) : 0;
+                    OH.UpdDate = DT;
+                    OH.DeleteFlag = OPs.Count() == 0;
+                    DC.SubmitChanges();
+                }
+            }
+            else
+                Error = "此課程不存在";
+
+            if (Error != "")
+                Error = "Error;" + Error;
+            else
+                Error = "OK;";
+            return Error;
+        }
+
         #endregion
     }
 }

@@ -494,6 +494,23 @@ namespace Banner.Areas.Admin.Controllers
                             Msg = "查無此權限";
                     }
                     break;
+                case "Token_Check":
+                    {
+                        var M = DC.Token_Check.FirstOrDefault(q => q.TCID == ID);
+                        if (M != null)
+                        {
+                            M.ActiveFlag = !M.ActiveFlag;
+                            M.UpdDate = DT;
+                            M.SaveACID = ACID;
+                            DC.SubmitChanges();
+
+                            Msg = "OK";
+                        }
+                        else
+                            Msg = "查無此權限";
+                    }
+                    break;
+
             }
             return Msg;
         }

@@ -300,6 +300,7 @@ namespace Banner.Areas.Admin.Controllers
         }
         private cOrganize_Info_List GetOrganize_Info_List(string ItemID, int OID, int OIID, FormCollection FC)
         {
+            ACID = GetACID();
             string sKey = "";
             if (FC != null)
             {
@@ -320,12 +321,12 @@ namespace Banner.Areas.Admin.Controllers
 
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
-
+            
             cOrganize_Info_List cOL = new cOrganize_Info_List();
             cOL.sAddURL = "/Admin/OrganizeSet/Organize_Info_Edit/" + ItemID + "/" + OID + "/" + OIID + "/0";
             cOL.OID = OID;
             cOL.OTitle = sKey;
-            //cOL.cOrganize = new cTableRow();
+
             cOL.cTL = new cTableList();
             cOL.cTL.Title = "";
             cOL.cTL.NowPage = iNowPage;
@@ -334,11 +335,11 @@ namespace Banner.Areas.Admin.Controllers
             cOL.cTL.NumCut = iNumCut;
             cOL.cTL.Rs = new List<cTableRow>();
 
-
             string ParentTitle = "上層名稱";
             string NowTitle = "本層名稱";
             string NextTitle = "下層名稱";
             int POID = 0, NOID = 0;
+
             var O_ = DC.Organize.FirstOrDefault(q => q.OID == OID);
             if (O_ != null)
             {

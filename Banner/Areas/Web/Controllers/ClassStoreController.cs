@@ -57,7 +57,7 @@ namespace Banner.Areas.Web.Controllers
             //即將結束報名課程
             List<c_TempProduct> c_TP = new List<c_TempProduct>();
             //找臨櫃
-            Ps_ = Ps.Where(q => (q.EDate_Signup_OnSite >= q.CreDate && q.EDate_Signup_OnSite >= DT.Date)
+            Ps_ = Ps.Where(q => (q.EDate_Signup_OnSite > q.CreDate && q.EDate_Signup_OnSite > DT.Date)
             ).OrderBy(q => (DT.Date - q.EDate_Signup_OnSite)).Take(12);
             foreach (var P_ in Ps_)
             {
@@ -68,7 +68,7 @@ namespace Banner.Areas.Web.Controllers
                 });
             }
             //找線上
-            Ps_ = Ps.Where(q => (q.EDate_Signup_OnLine >= q.CreDate && q.EDate_Signup_OnLine >= DT.Date)
+            Ps_ = Ps.Where(q => (q.EDate_Signup_OnLine > q.CreDate && q.EDate_Signup_OnLine > DT.Date)
             ).OrderBy(q => (DT.Date - q.EDate_Signup_OnLine)).Take(12);
             foreach (var P_ in Ps_)
             {
@@ -103,11 +103,63 @@ namespace Banner.Areas.Web.Controllers
         {
             cProduct_Search c = new cProduct_Search();
             string sKey = GetQueryStringInString("Key");
+            int iType = GetQueryStringInInt("Type");
             var Ns = DC.Product.Where(q => !q.DeleteFlag);
             if (sKey != "")
                 Ns = Ns.Where(q => q.Course.Title.Contains(sKey) || q.SubTitle.Contains(sKey) || q.Title.Contains(sKey));
+            switch (iType)
+            {
+                case 1://更多經典課程
+                    {
+                        c.Ps = Ns.Where(q => q.Course.ClassicalFlag).OrderByDescending(q => q.UpdDate).ToList();
+                    }
+                    break;
+                case 2://更多最新課程
+                    {
+                        c.Ps = Ns.OrderByDescending(q => q.UpdDate).ToList();
+                    }
+                    break;
+                case 3://更多即將結束報名課程
+                    {
+                        List<c_TempProduct> c_TP = new List<c_TempProduct>();
+                        //找臨櫃
+                        var Ps_ = Ns.Where(q => (q.EDate_Signup_OnSite > q.CreDate && q.EDate_Signup_OnSite > DT.Date)
+                        ).OrderBy(q => (DT.Date - q.EDate_Signup_OnSite)).Take(25);
+                        foreach (var P_ in Ps_)
+                        {
+                            c_TP.Add(new c_TempProduct
+                            {
+                                P = P_,
+                                iDay = (DT.Date - P_.EDate_Signup_OnSite).Days
+                            });
+                        }
+                        //找線上
+                        Ps_ = Ns.Where(q => (q.EDate_Signup_OnLine > q.CreDate && q.EDate_Signup_OnLine > DT.Date)
+                        ).OrderBy(q => (DT.Date - q.EDate_Signup_OnLine)).Take(25);
+                        foreach (var P_ in Ps_)
+                        {
+                            if (!c_TP.Any(q => q.P.PID == P_.PID))//排除重複
+                            {
+                                c_TP.Add(new c_TempProduct
+                                {
+                                    P = P_,
+                                    iDay = (DT.Date - P_.EDate_Signup_OnLine).Days
+                                });
+                            }
+                        }
+                        //排序剩餘天數後塞入物件
+                        foreach (var P_ in c_TP.OrderBy(q => q.iDay))
+                            c.Ps.Add(P_.P);
+                    }
+                    break;
 
-            c.Ps = Ns.OrderByDescending(q => q.CreDate).ToList();
+                default:
+                    {
+                        c.Ps = Ns.OrderByDescending(q => q.CreDate).ToList();
+                    }
+                    break;
+            }
+
 
             return c;
         }
@@ -274,40 +326,38 @@ namespace Banner.Areas.Web.Controllers
             ACID = GetACID();
             #region 資料庫導入
 
-
             var OPs = DC.Order_Product.Where(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag).OrderBy(q => q.OPID);
             foreach (var OP in OPs)
             {
-                var P = OP.Product_Class.Product;
-                int[] iPrice = GetPrice(ACID, P);
+                int[] iPrice = GetPrice(ACID, OP.Product);
                 c.OHID = OP.OHID;
                 cProduct cP = new cProduct();
                 cP.OPID = OP.OPID;
-                cP.PID = P.PID;
-                cP.ImgURL = string.IsNullOrEmpty(P.ImgURL) ? "/Content/Image/CourseCategory_" + P.Course.CCID + ".jpg" : P.ImgURL;
-                cP.ClassType = P.ProductType == 0 ? "實體+線上" : (P.ProductType == 1 ? "實體課程" : "線上課程");
-                cP.Title = "【" + P.Course.Title + "】" + P.SubTitle;
-                cP.Price_Basic = P.Price_Basic;
+                cP.PID = OP.Product.PID;
+                cP.ImgURL = string.IsNullOrEmpty(OP.Product.ImgURL) ? "/Content/Image/CourseCategory_" + OP.Product.Course.CCID + ".jpg" : OP.Product.ImgURL;
+                cP.ClassType = OP.Product.ProductType == 0 ? "實體+線上" : (OP.Product.ProductType == 1 ? "實體課程" : "線上課程");
+                cP.Title = "【" + OP.Product.Course.Title + "】" + OP.Product.SubTitle;
+                cP.Price_Basic = OP.Product.Price_Basic;
                 cP.Price_Type = iPrice[0];
                 cP.Price_New = iPrice[1];
                 cP.CAID = iPrice[2];
                 cP.LS = new ListSelect();
                 cP.LS.Title = "開課班別";
-                cP.LS.ControlName = "rbl_Class_" + P.PID;
+                cP.LS.ControlName = "rbl_Class_" + OP.Product.PID;
                 cP.LS.SortNo = 0;
                 cP.LS.ddlList = new List<SelectListItem>();
 
                 //有買這個商品且結帳完成的正常訂單,統計每個班級的人數
-                var OP_Gs = (from q in DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 2 && q.Product_Class.PID == P.PID)
+                var OP_Gs = (from q in DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 2 && q.PID == OP.PID)
                              group q by new { q.PCID } into g
                              select new { g.Key.PCID, Ct = g.Count() }).ToList();
 
-                var PCs = DC.Product_Class.Where(q => q.PID == P.PID).OrderBy(q => q.PCID);
+                var PCs = DC.Product_Class.Where(q => q.PID == OP.PID).OrderBy(q => q.PCID);
                 foreach (var PC in PCs)
                 {
                     SelectListItem SL = new SelectListItem();
                     SL.Value = PC.PCID.ToString();
-                    SL.Selected = false;
+                    
                     #region 課程文字
                     //A班：2023/9/14 09:00-12:00 | 台北台中高雄宜蘭
                     SL.Text = PC.Title + "：";
@@ -327,17 +377,38 @@ namespace Banner.Areas.Web.Controllers
                     var OP_G = OP_Gs.FirstOrDefault(q => q.PCID == PC.PCID);
                     if (OP_G != null)//這堂課有人買
                     {
-                        if (OP.Product_Class.PeopleCt > 0 && OP_G.Ct >= OP.Product_Class.PeopleCt)//有限制人數 + 名額已滿
+                        if (PC.PeopleCt > 0 && OP_G.Ct >= PC.PeopleCt)//有限制人數 + 名額已滿
+                        {
                             SL.Disabled = true;
+                            if (PC.PCID == OP.PCID)//已額滿,所以把之前選擇的拿掉
+                                OP.PCID = 0;
+                        }
                     }
+
                     #endregion
+                    SL.Selected = PC.PCID == OP.PCID;
                     cP.LS.ddlList.Add(SL);
                 }
 
+                if(OP.PCID == 0 || !cP.LS.ddlList.Any(q=>q.Selected))
+                {
+                    if (cP.LS.ddlList.Count(q => !q.Disabled) > 0)
+                    {
+                        cP.LS.ddlList.Where(q => !q.Disabled).OrderBy(q => q.Value).First().Selected = true;
+                        string sPCID = cP.LS.ddlList.First(q => q.Selected).Value; 
+                        OP.PCID = Convert.ToInt32(sPCID);
+                        DC.SubmitChanges();
+                    }
+                        
+                }
+                c.cPs.Add(cP);
             }
             #endregion
 
             #region 前端載入
+
+
+
 
             #endregion
 
@@ -358,6 +429,7 @@ namespace Banner.Areas.Web.Controllers
             var c = GetOrder_Step1(FC);
             return View(c);
         }
+
         #endregion
         #region 購物車2
 

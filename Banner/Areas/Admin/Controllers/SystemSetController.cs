@@ -879,5 +879,98 @@ namespace Banner.Areas.Admin.Controllers
 
 
         #endregion
+
+        #region API管理-列表
+        public string[] sCheckType = new string[] { "請選擇", "牧養組織(三層)", "牧養身份(三層)", "聚會點組織(三層)", "事工團身份", "小組出缺席紀錄", "事工團出席紀錄", "課程歷程", "屬靈健檢表" };
+        public class cToken_List
+        {
+            public cTableList cTL = new cTableList();
+
+            public ListSelect LS = new ListSelect();
+            public int ActiveFlag = -1;
+
+        }
+        private cToken_List GetToken_List(FormCollection FC)
+        {
+            cToken_List ML = new cToken_List();
+            ML.cTL = new cTableList();
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            ML.cTL.Title = "";
+            ML.cTL.NowPage = iNowPage;
+            ML.cTL.ItemID = "";
+            ML.cTL.NowURL = "/Admin/SystemSet/Token_List";
+            ML.cTL.NumCut = iNumCut;
+            ML.cTL.ShowFloor = false;
+            ML.cTL.Rs = new List<cTableRow>();
+
+            var Ns = DC.Token_Check.Where(q => !q.DeleteFlag);
+            if (FC != null)
+            {
+                if (FC.Get("ddl_CheckType") != "0")
+                {
+                    Ns = Ns.Where(q => q.CheckType.Contains(FC.Get("ddl_CheckType")+","));
+                }
+
+                if (FC.Get("rbl_ActiveFlag") != "-1")
+                {
+                    ML.ActiveFlag = Convert.ToInt32(FC.Get("rbl_ActiveFlag"));
+                    Ns = Ns.Where(q => q.ActiveFlag == (ML.ActiveFlag == 1));
+                }
+            }
+
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "控制", WidthPX = 250 });
+            TopTitles.Add(new cTableCell { Title = "標題" });
+            TopTitles.Add(new cTableCell { Title = "Token" });
+            TopTitles.Add(new cTableCell { Title = "可使用內容" });
+            TopTitles.Add(new cTableCell { Title = "狀態" });
+
+            ML.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+
+            ML.cTL.TotalCt = Ns.Count();
+            ML.cTL.MaxNum = GetMaxNum(ML.cTL.TotalCt, ML.cTL.NumCut);
+
+            foreach (var N in Ns.OrderBy(q => q.TCID))
+            {
+                cTableRow cTR = new cTableRow();
+                cTR.ID = N.TCID;
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/Token_Edit/" + N.TCID, Target = "_self", Value = "編輯" });
+
+                cTR.Cs.Add(new cTableCell { Value = N.Title });//標題
+                cTR.Cs.Add(new cTableCell { Value = N.CheckCode });//Token
+                string[] sTypes = N.CheckType.Split(',');
+                string sType = "";
+                for (int i = 0; i < sTypes.Length; i++)
+                {
+                    int y = 0;
+                    if (int.TryParse(sTypes[i],out y))
+                        sType += (sType == "" ? "" : "、") + sCheckType[y];
+                }
+                cTR.Cs.Add(new cTableCell { Value = sType });//可使用內容
+
+                if (N.ActiveFlag)
+                    cTR.Cs.Add(new cTableCell { Value = "啟用", CSS = "btn btn-outline-success", Type = "activebutton", URL = "ChangeActive(this,'Token_Check'," + N.TCID + ")" });//狀態
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "停用", CSS = "btn btn-outline-danger", Type = "activebutton", URL = "ChangeActive(this,'Token_Check'," + N.TCID + ")" });//狀態
+                ML.cTL.Rs.Add(SetTableCellSortNo(cTR));
+
+            }
+            return ML;
+        }
+        [HttpGet]
+        public ActionResult Token_List()
+        {
+            GetViewBag();
+            return View(GetToken_List(null));
+        }
+        [HttpPost]
+        public ActionResult Token_List(FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetToken_List(FC));
+        }
+
+        #endregion
     }
 }
