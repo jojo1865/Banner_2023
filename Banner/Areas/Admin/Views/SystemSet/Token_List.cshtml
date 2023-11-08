@@ -1,0 +1,49 @@
+﻿@model Banner.Areas.Admin.Controllers.SystemSetController.cToken_List
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+<!--帳號管理-->
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        <form method="post" id="form1">
+            @if (Model != null)
+            {
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-xxl-6 col">
+                                @Html.TextBox("txb_Account", @Model.sKey, new { @class = "form-control form-control-lg input-underline", @placeholder = "標題關鍵字" })
+                            </div>
+                            <div class="col-xxl-6 col-12">
+                                <div class="form-control-lg">
+                                    @Html.RadioButton("rbl_ActiveFlag", -1, (Model.ActiveFlag == -1), new { @class = "form-check-input" })
+                                    @Html.Label("全部")
+                                    @Html.RadioButton("rbl_ActiveFlag", 1, (Model.ActiveFlag == 1), new { @class = "form-check-input" })
+                                    @Html.Label("已啟用")
+                                    @Html.RadioButton("rbl_ActiveFlag", 0, (Model.ActiveFlag == 0), new { @class = "form-check-input" })
+                                    @Html.Label("已終止")
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="d-flex justify-content-end">
+                                <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                </div>
+            }
+        </form>
+    </div>
+</div>
+

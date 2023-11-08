@@ -28,6 +28,7 @@ using Newtonsoft.Json;
 using System.Data.SqlTypes;
 using System.Web.Helpers;
 using System.Diagnostics;
+using OfficeOpenXml.ConditionalFormatting.Contracts;
 
 namespace Banner
 {
@@ -44,6 +45,7 @@ namespace Banner
         public string DateFormat = "yyyy-MM-dd";
         public string DateTimeFormat = "yyyy-MM-dd HH:mm";
         public string CompanyTitle = "【全球旌旗資訊網】";
+        public string sDomanName = "";
         public bool bUsedNewName = true;
         public bool[] bGroup = new bool[] { false, false, false, false, false, false }; //權限
         public static List<SelectListItem> ddl_EducationTypes = new List<SelectListItem> {
@@ -79,11 +81,21 @@ namespace Banner
                 new SelectListItem{ Text="學生",Value="22"},
                 new SelectListItem{ Text="其他",Value="23"},
             };
+        public static List<cCheckType> cCheckType_List = new List<cCheckType>{
+            new cCheckType{ SortNo=1,Title= "牧養組織(三層)",URL="/API/GetAPI_1"},
+            new cCheckType{ SortNo=2,Title= "牧養身份(三層)",URL="/API/GetAPI_2"},
+            new cCheckType{ SortNo=3,Title= "聚會點組織(三層)",URL="/API/GetAPI_3"},
+            new cCheckType{ SortNo=4,Title= "事工團身份",URL="/API/GetAPI_4"},
+            new cCheckType{ SortNo=5,Title= "小組出缺席紀錄",URL="/API/GetAPI_5"},
+            new cCheckType{ SortNo=6,Title= "事工團出席紀錄",URL="/API/GetAPI_6"},
+            new cCheckType{ SortNo=7,Title= "課程歷程",URL="/API/GetAPI_7"},
+            new cCheckType{ SortNo=8,Title= "屬靈健檢表",URL="/API/GetAPI_8"}
+            };
         public string[] CommunityTitle = new string[] { "其他", "LineID", "InstagramID", "WeChat" };
         public string[] JoinTitle = new string[] { "無意願", "已入組未落戶", "跟進中(已分發)", "被退回(未分發)", "跟進中(未分發)" };
         public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
         public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)" };
-        public string[] sCourseType = new string[] {"不限制", "實體", "線上" };
+        public string[] sCourseType = new string[] { "不限制", "實體", "線上" };
         public string Error = "";
         public int iChildAge = 12;
         public int ACID = 0;
@@ -2226,8 +2238,8 @@ namespace Banner
             ViewBag._Power = bGroup;
             ViewBag._Login = "";
             ViewBag._GroupTitle = "小組資訊";
-
-
+            //http://localhost:1897
+            sDomanName = Request.Url.Scheme + "://" + Request.Url.Host + (Request.Url.Port == 80 || Request.Url.Port == 443 ? "" : ":" + Request.Url.Port);
             string NowURL = Request.Url.AbsolutePath;
             ACID = GetACID();
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
@@ -2236,7 +2248,7 @@ namespace Banner
                 ViewBag._UserName = AC.Name_First + AC.Name_Last;
                 ViewBag._UserID = ACID;
                 ViewBag._Login = AC.Login;
-                
+
                 #region 上層
                 string GroupMapTitle = "";
                 var OIs = DC.OrganizeInfo.Where(q => q.ACID == AC.ACID && q.OID == 8 && q.ActiveFlag && !q.DeleteFlag);
@@ -2628,7 +2640,7 @@ namespace Banner
             return MAs;
         }
 
-        
+
         public IQueryable<M_Rool_Account> GetMRAC(int RID = 0, int ACID = 0)
         {
             var MAs = DC.M_Rool_Account.Where(q => !q.DeleteFlag &&
@@ -2685,9 +2697,9 @@ namespace Banner
 
             return sReturn;
         }
-        public int[] GetPrice(int ACID,Product P)
+        public int[] GetPrice(int ACID, Product P)
         {
-            int[] iReturn = new int[3] { 0,0,0};//價格類別,最終價格,折價劵ID
+            int[] iReturn = new int[3] { 0, 0, 0 };//價格類別,最終價格,折價劵ID
             var CA = (from q in DC.Coupon_Account.Where(q => q.ACID == ACID && q.Coupon_Header.PID == P.PID && !q.DeleteFlag && q.ActiveFlag && q.OPID == 0 && q.OHID == 0 && q.Coupon_Header.ActiveFlag && !q.Coupon_Header.DeleteFlag && q.Coupon_Header.SDateTime <= DT && q.Coupon_Header.EDateTime >= DT)
                       join p in DC.M_OI_Account.Where(q => q.ACID == ACID)
                       on q.Coupon_Header.OID equals p.OrganizeInfo.OID
@@ -2697,14 +2709,14 @@ namespace Banner
             if (P.SDate_Early.Date >= P.CreDate.Date && P.SDate_Early.Date >= DT.Date)//有早鳥起始日,且今天在起始日之後
             {
                 if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
-                    bEarly=true;
+                    bEarly = true;
                 else if (P.EDate_Early.Date < P.CreDate.Date)//沒有早鳥結束日
                     bEarly = true;
             }
             else if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
                 bEarly = true;
 
-            if(P.Price_Basic>0)
+            if (P.Price_Basic > 0)
             {
                 if (P.Price_Basic + Price_Cut <= P.Price_Early && CA != null)
                 {

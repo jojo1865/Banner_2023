@@ -169,6 +169,7 @@
     <Compile Include="Areas\Web\Controllers\HomeController.cs" />
     <Compile Include="Areas\Web\Controllers\IncludeController.cs" />
     <Compile Include="Areas\Web\WebAreaRegistration.cs" />
+    <Compile Include="Controllers\APIController.cs" />
     <Compile Include="Controllers\StarHomeController.cs" />
     <Compile Include="DataClasses.designer.cs">
       <AutoGen>True</AutoGen>
@@ -632,6 +633,7 @@
     <Content Include="Areas\Admin\Views\StoreSet\Coupon_Edit.cshtml" />
     <Content Include="Areas\Admin\Views\StoreSet\Coupon_Account_List.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Product_Search.cshtml" />
+    <Content Include="Areas\Admin\Views\SystemSet\Token_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -675,6 +677,7 @@
     <Folder Include="Files\Coupon\" />
     <Folder Include="Files\Product\" />
     <Folder Include="Photo\Product\" />
+    <Folder Include="Views\API\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

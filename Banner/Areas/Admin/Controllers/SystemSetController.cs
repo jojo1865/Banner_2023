@@ -881,28 +881,34 @@ namespace Banner.Areas.Admin.Controllers
         #endregion
 
         #region API管理-列表
-        public string[] sCheckType = new string[] { "請選擇", "牧養組織(三層)", "牧養身份(三層)", "聚會點組織(三層)", "事工團身份", "小組出缺席紀錄", "事工團出席紀錄", "課程歷程", "屬靈健檢表" };
+       
         public class cToken_List
         {
             public cTableList cTL = new cTableList();
-
             public ListSelect LS = new ListSelect();
             public int ActiveFlag = -1;
-
+            public string sKey = "";
         }
         private cToken_List GetToken_List(FormCollection FC)
         {
-            cToken_List ML = new cToken_List();
-            ML.cTL = new cTableList();
+            cToken_List c = new cToken_List();
+            c.cTL = new cTableList();
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
-            ML.cTL.Title = "";
-            ML.cTL.NowPage = iNowPage;
-            ML.cTL.ItemID = "";
-            ML.cTL.NowURL = "/Admin/SystemSet/Token_List";
-            ML.cTL.NumCut = iNumCut;
-            ML.cTL.ShowFloor = false;
-            ML.cTL.Rs = new List<cTableRow>();
+            c.cTL.Title = "";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.ItemID = "";
+            c.cTL.NowURL = "/Admin/SystemSet/Token_List";
+            c.cTL.NumCut = iNumCut;
+            c.cTL.ShowFloor = false;
+            c.cTL.Rs = new List<cTableRow>();
+
+            c.LS = new ListSelect();
+            c.LS.ControlName = "ddl_CheckType";
+            c.LS.ddlList = new List<SelectListItem>();
+            c.LS.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
+            foreach (var cCT in  cCheckType_List.OrderBy(q=>q.SortNo))
+                c.LS.ddlList.Add(new SelectListItem { Text = cCT.Title, Value = cCT.SortNo.ToString() });
 
             var Ns = DC.Token_Check.Where(q => !q.DeleteFlag);
             if (FC != null)
@@ -914,8 +920,8 @@ namespace Banner.Areas.Admin.Controllers
 
                 if (FC.Get("rbl_ActiveFlag") != "-1")
                 {
-                    ML.ActiveFlag = Convert.ToInt32(FC.Get("rbl_ActiveFlag"));
-                    Ns = Ns.Where(q => q.ActiveFlag == (ML.ActiveFlag == 1));
+                    c.ActiveFlag = Convert.ToInt32(FC.Get("rbl_ActiveFlag"));
+                    Ns = Ns.Where(q => q.ActiveFlag == (c.ActiveFlag == 1));
                 }
             }
 
@@ -926,10 +932,10 @@ namespace Banner.Areas.Admin.Controllers
             TopTitles.Add(new cTableCell { Title = "可使用內容" });
             TopTitles.Add(new cTableCell { Title = "狀態" });
 
-            ML.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
 
-            ML.cTL.TotalCt = Ns.Count();
-            ML.cTL.MaxNum = GetMaxNum(ML.cTL.TotalCt, ML.cTL.NumCut);
+            c.cTL.TotalCt = Ns.Count();
+           c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
 
             foreach (var N in Ns.OrderBy(q => q.TCID))
             {
@@ -945,7 +951,12 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     int y = 0;
                     if (int.TryParse(sTypes[i],out y))
-                        sType += (sType == "" ? "" : "、") + sCheckType[y];
+                    {
+                        var cCT = cCheckType_List.FirstOrDefault(q => q.SortNo == y);
+                        if(cCT!=null)
+                            sType += (sType == "" ? "" : "、") + cCT.Title;
+                    }
+                        
                 }
                 cTR.Cs.Add(new cTableCell { Value = sType });//可使用內容
 
@@ -953,10 +964,10 @@ namespace Banner.Areas.Admin.Controllers
                     cTR.Cs.Add(new cTableCell { Value = "啟用", CSS = "btn btn-outline-success", Type = "activebutton", URL = "ChangeActive(this,'Token_Check'," + N.TCID + ")" });//狀態
                 else
                     cTR.Cs.Add(new cTableCell { Value = "停用", CSS = "btn btn-outline-danger", Type = "activebutton", URL = "ChangeActive(this,'Token_Check'," + N.TCID + ")" });//狀態
-                ML.cTL.Rs.Add(SetTableCellSortNo(cTR));
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
 
             }
-            return ML;
+            return c;
         }
         [HttpGet]
         public ActionResult Token_List()

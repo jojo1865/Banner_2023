@@ -122,4 +122,11 @@ namespace Banner.Models
         public string sGroupKey = "";
         public cTableList cTL = new cTableList();
     }
+
+    public class cCheckType
+    {
+        public string Title = "";
+        public int SortNo = 0;
+        public string URL;
+    }
 }
