@@ -30,6 +30,11 @@ using System.Web.Helpers;
 using System.Diagnostics;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+
+
 namespace Banner
 {
     public class PublicClass : Controller
@@ -2521,7 +2526,81 @@ namespace Banner
         }
         #endregion
 
+        #region JWT處理
+        //參考:https://sunnote.xyz/zh-tw/tutorials/jwt-authentication-mechanism/
 
+        // 取得JWT字串
+
+        public string SetJWT(int TCID,String CheckData)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(CheckData));
+            var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, TCID.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // 設定 JWT ID
+            };
+
+            // 設定 JWT 的有效期限為 1 年
+            var expires = DateTime.UtcNow.AddYears(1);
+
+            // 建立 JWT 物件
+            var token = new JwtSecurityToken(
+                issuer: "Banner",
+                audience: "Banner",
+                claims: claims,
+                expires: expires,
+                signingCredentials: signingCredentials);
+
+            // 把物件轉成 JWT 字串
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            //印出 JWT 字串
+            return tokenString;
+        }
+
+        public string CheckJWT(string JWTData, String CheckData)
+        {
+
+            // 設定 JWT 的驗證參數
+            var validationParameters = new TokenValidationParameters
+            {
+                // 設定 JWT 的發行者和接收者
+                ValidIssuer = "Banner",
+                ValidAudience = "Banner",
+                // 設定驗證 JWT 的簽名金鑰和加密算法
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(CheckData)),
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            try
+            {
+                // 驗證 JWT
+                var jwtHandler = new JwtSecurityTokenHandler();
+                var principal = jwtHandler.ValidateToken(JWTData, validationParameters, out var validatedToken);
+                var jwtToken = validatedToken as JwtSecurityToken;
+
+                // 取得使用者名稱和 JWTID
+                var username = jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sub).Value;
+                var jwtId = jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+
+                // 在這裡可以執行額外的驗證，例如檢查使用者是否存在於資料庫中，以及檢查使用者是否有權限存取資源等等
+
+                // 驗證成功
+                //Console.WriteLine($"Token validated. Username: {username}, JWT ID: {jwtId}");
+                Error += "JWT=OK&TCID=" + username;
+            }
+            catch (SecurityTokenException e)
+            {
+                // 驗證失敗
+                //Console.WriteLine($"Token validation failed: {e.Message}");
+                Error += "驗證失敗:" + e.Message;
+            }
+            return Error;
+        }
+        #endregion
         #region 旌旗
         //取得某組織與旗下所有組織
         public List<OrganizeInfo> GetThisOIsFromTree(ref List<OrganizeInfo> OIs, int PID)

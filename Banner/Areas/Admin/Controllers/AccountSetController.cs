@@ -497,8 +497,10 @@ namespace Banner.Areas.Admin.Controllers
                                 cTR.Cs.Add(new cTableCell { Value = "" });//區
                                 cTR.Cs.Add(new cTableCell { Value = "" });//小組
                             }
-
-                            cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });//姓名
+                            //去識別
+                            //cTR.Cs.Add(new cTableCell { Value = (N.Name_First + new string('*', N.Name_Last.Length)) });
+                            cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last.Length) });//姓名
+                            
                             cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
 
                             var B = DC.Baptized.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.BID).FirstOrDefault();
@@ -518,7 +520,10 @@ namespace Banner.Areas.Admin.Controllers
                         {
                             cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
                             cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Childen_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
+                            //去識別
+                            //cTR.Cs.Add(new cTableCell { Value = (N.Name_First + new string('*', N.Name_Last.Length)) });//姓名
                             cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });//姓名
+
                             cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
                             var B = DC.Baptized.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.BID).FirstOrDefault();
                             if (B == null)
@@ -564,7 +569,10 @@ namespace Banner.Areas.Admin.Controllers
                                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_New_Edit/" + N.ACID, Target = "_black", Value = "分發" });//操作
                             else
                                 cTR.Cs.Add(new cTableCell { Value = "" });//操作
+                            //去識別
+                            //cTR.Cs.Add(new cTableCell { Value = (N.Name_First + new string('*',N.Name_Last.Length)) });//姓名
                             cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });//姓名
+                            
                             cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
                             cTR.Cs.Add(new cTableCell { Value = N.Birthday != N.CreDate ? N.Birthday.ToString(DateFormat) : "" });//生日
                             cTR.Cs.Add(new cTableCell { Value = CellPhone });//手機
@@ -600,7 +608,10 @@ namespace Banner.Areas.Admin.Controllers
                                     cTR.Cs.Add(new cTableCell { Value = "資料未同步" });
                             }
                             //操作
+                            //去識別
+                            //cTR.Cs.Add(new cTableCell { Value = (N.Name_First + new string('*', N.Name_Last.Length)) });//姓名
                             cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });//姓名
+
                             cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
                             cTR.Cs.Add(new cTableCell { Value = N.Birthday != N.CreDate ? N.Birthday.ToString(DateFormat) : "" });//生日
                             cTR.Cs.Add(new cTableCell { Value = CellPhone });//手機
@@ -877,7 +888,8 @@ namespace Banner.Areas.Admin.Controllers
             else
             {
                 #region 基本資料
-
+                //N.AC.Name_Last = new string('*', N.AC.Name_Last.Length);//去識別
+                //N.AC.IDNumber = N.AC.IDNumber.Length > 5 ? N.AC.IDNumber.Substring(0, 5) + new string('*', N.AC.IDNumber.Length-5) : new string('*',10);//去識別
                 //教育程度
                 N.EducationTypes.ForEach(q => q.Selected = false);
                 N.EducationTypes.First(q => q.Value == N.AC.EducationType.ToString()).Selected = true;
