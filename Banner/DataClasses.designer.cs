@@ -17049,6 +17049,8 @@ namespace Banner
 		
 		private string _CheckCode;
 		
+		private string _JWT;
+		
 		private string _CheckType;
 		
 		private bool _ActiveFlag;
@@ -17079,6 +17081,8 @@ namespace Banner
     partial void OnNoEndFlagChanged();
     partial void OnCheckCodeChanging(string value);
     partial void OnCheckCodeChanged();
+    partial void OnJWTChanging(string value);
+    partial void OnJWTChanged();
     partial void OnCheckTypeChanging(string value);
     partial void OnCheckTypeChanged();
     partial void OnActiveFlagChanging(bool value);
@@ -17218,7 +17222,7 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CheckCode", DbType="VarChar(200)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CheckCode", DbType="VarChar(500)")]
 		public string CheckCode
 		{
 			get
@@ -17234,6 +17238,26 @@ namespace Banner
 					this._CheckCode = value;
 					this.SendPropertyChanged("CheckCode");
 					this.OnCheckCodeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JWT", DbType="VarChar(500)")]
+		public string JWT
+		{
+			get
+			{
+				return this._JWT;
+			}
+			set
+			{
+				if ((this._JWT != value))
+				{
+					this.OnJWTChanging(value);
+					this.SendPropertyChanging();
+					this._JWT = value;
+					this.SendPropertyChanged("JWT");
+					this.OnJWTChanged();
 				}
 			}
 		}

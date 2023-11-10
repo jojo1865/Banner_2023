@@ -2528,10 +2528,35 @@ namespace Banner
 
         #region JWT處理
         //參考:https://sunnote.xyz/zh-tw/tutorials/jwt-authentication-mechanism/
+        //透過JWT取得可用API權限
+        public bool CheckJWT(int APINo)
+        {
+            string sJWT = Request.Headers.Get("Token");
+            bool[] bRool = new bool[cCheckType_List.Count + 1];
+            for (int i = 0; i < bRool.Length; i++)
+                bRool[i] = false;
+            var C = DC.Token_Check.FirstOrDefault(q => q.JWT == sJWT && q.ActiveFlag && !q.DeleteFlag && (q.NoEndFlag || (!q.NoEndFlag && q.S_DateTime < DT && q.E_DateTime > DT)));
+            if (C != null)
+            {
+                string[] str = C.CheckType.Split(',');
+                for (int j = 0; j < str.Length; j++)
+                {
+                    int k = 0;
+                    if (int.TryParse(str[j], out k))
+                    {
+                        bRool[k] = true;
+                    }
+                }
+            }
+            if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
+                return true;
+            else
+                return bRool[APINo];
 
+        }
         // 取得JWT字串
 
-        public string SetJWT(int TCID,String CheckData)
+        public string SetJWT(int TCID, String CheckData)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(CheckData));
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

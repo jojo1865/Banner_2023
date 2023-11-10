@@ -776,7 +776,8 @@
       <Column Name="S_DateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="E_DateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="NoEndFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CheckCode" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="CheckCode" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="JWT" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
       <Column Name="CheckType" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
       <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
