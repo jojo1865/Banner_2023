@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
@@ -31,53 +32,86 @@ namespace Banner.Controllers
         {
             public string Status = "Error";
             public string ErrorMsg = "";
-            public List<cItem> Items = new List<cItem>();
+            public List<cItem1> Items = new List<cItem1>();
         }
-        public class cItem
+        public class cItem1
         {
             public string Title = "";
-            public string Value = "";
-            public List<cItem> Items = new List<cItem>();
+            public string JobTitle = "";
+            public List<cItem1> Items = new List<cItem1>();
         }
 
         [HttpGet]
-        public string API_1()//牧養組織(三層)
+        public string API_1()//牧養組織(全部)
         {
             Return1 R = new Return1();
             if (CheckJWT(1))
             {
                 R.Status = "OK";
-                R.Items = new List<cItem>();
-                //從旌旗開始
-                var OI_1s = DC.OrganizeInfo.Where(q => q.OID == 2 && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OIID);
-                foreach (var OI_1 in OI_1s)
+                R.Items = new List<cItem1>();
+                var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
+                var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
+                var O = Os.First(q => q.OID == 1);
+                do
                 {
-                    cItem c1 = new cItem();
-                    c1.Title = OI_1.Title + OI_1.Organize.Title;
-                    c1.Value = "";
-                    c1.Items = new List<cItem>();
-                    var OI_2s = DC.OrganizeInfo.Where(q => q.ParentID == OI_1.OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OIID);
-                    foreach (var OI_2 in OI_2s)
-                    {
-                        cItem c2 = new cItem();
-                        c2.Title = OI_2.Title + OI_2.Organize.Title;
-                        c2.Value = "";
-                        c2.Items = new List<cItem>();
-                        var OI_3s = DC.OrganizeInfo.Where(q => q.ParentID == OI_2.OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OIID);
-                        foreach (var OI_3 in OI_3s)
-                        {
-                            cItem c3 = new cItem();
-                            c3.Title = OI_3.Title + OI_3.Organize.Title;
-                            if (OI_3.ACID > 1)
-                                c3.Value = OI_3.Account.Name_First + OI_3.Account.Name_Last + " " + OI_3.Organize.JobTitle;
-                            else
-                                c3.Value = "--";
-                            c3.Items = null;
-                            c2.Items.Add(c3);
-                        }
-                        c1.Items.Add(c2);
-                    }
-                    R.Items.Add(c1);
+                    var OI_s = OIs.Where(q => q.OID == O.OID).OrderBy(q => q.OIID).ToList();
+                    foreach (var OI_ in OI_s)
+                        R.Items.Add(GetItem1(ref OIs, OI_));
+
+                    O = Os.FirstOrDefault(q => q.ParentID == O.OID);
+                } while (O != null);
+            }
+            else
+                R.ErrorMsg = "您不具備查詢此項目的許可";
+            sReturn = JsonConvert.SerializeObject(R);
+            return sReturn;
+        }
+        private cItem1 GetItem1(ref List<OrganizeInfo> OIs, OrganizeInfo OI)
+        {
+            cItem1 c = new cItem1();
+            c.Title = OI.Title + OI.Organize.Title;
+            if (OI.Organize.JobTitle == "")
+                c.JobTitle = "";
+            else if (OI.ACID == 1)
+                c.JobTitle = "--";
+            else
+                c.JobTitle = OI.Account.Name_First + OI.Account.Name_Last + " " + OI.Organize.JobTitle;
+            c.Items = new List<cItem1>();
+            if (OI.OID != 8)
+                foreach (var OI_ in OIs.Where(q => q.ParentID == OI.OIID).OrderBy(q => q.OIID).ToList())
+                    c.Items.Add(GetItem1(ref OIs, OI_));
+            return c;
+        }
+
+        #endregion
+        #region API_2 牧養身份(三層)
+        public class Return2
+        {
+            public string Status = "Error";
+            public string ErrorMsg = "";
+            public string Name = "";
+            public List<string> JobTitle = new List<string>();
+        }
+
+        public string API_2()//牧養身份(三層)
+        {
+            Return2 R = new Return2();
+            if (CheckJWT(2))
+            {
+                int ACID = GetQueryStringInInt("ID");
+                var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag);
+                if(AC==null)
+                {
+                    R.Status = "Error";
+                    R.ErrorMsg = "此會員不存在";
+                }
+                else
+                {
+                    R.Status = "OK";
+                    R.Name = AC.Name_First + AC.Name_Last;
+                    var OIs = DC.OrganizeInfo.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OID).ThenBy(q => q.OIID);
+                    foreach (var OI in OIs)
+                        R.JobTitle.Add(OI.Title + OI.Organize.Title + ":" + OI.Organize.JobTitle);
                 }
             }
             else
@@ -86,34 +120,26 @@ namespace Banner.Controllers
             return sReturn;
         }
         #endregion
-        #region API_2 牧養身份(三層)
-
-
-        public string API_2()//牧養身份(三層)
-        {
-            Return1 R = new Return1();
-            if (CheckJWT(2))
-            {
-                R.Status = "OK";
-                R.Items = new List<cItem>();
-                
-
-
-            }
-            else
-                R.ErrorMsg = "您不具備查詢此項目的許可";
-            sReturn = JsonConvert.SerializeObject(R);
-            return sReturn;
-        }
-        #endregion
         #region API_3 聚會點組織(三層)
+        public class Return3
+        {
+            public string Status = "Error";
+            public string ErrorMsg = "";
+            public List<cItem3> Items = new List<cItem3>();
+        }
+        public class cItem3
+        {
+            public string Title = "";
+            public string Address = "";
+            public List<cItem3> Items = new List<cItem3>();
+        }
         public string API_3()//聚會點組織(三層)
         {
-            Return1 R = new Return1();
+            Return3 R = new Return3();
             if (CheckJWT(3))
             {
                 R.Status = "OK";
-                R.Items = new List<cItem>();
+                R.Items = new List<cItem3>();
 
                 var Ls = DC.Location.Where(q => q.TargetType == 3).ToList();
                 var Z10s = DC.ZipCode.Where(q => q.ParentID == 10 && q.ActiveFlag).ToList();
@@ -121,28 +147,28 @@ namespace Banner.Controllers
                 var OI_1s = DC.OrganizeInfo.Where(q => q.OID == 1 && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OIID);
                 foreach (var OI_1 in OI_1s)
                 {
-                    cItem c1 = new cItem();
+                    cItem3 c1 = new cItem3();
                     c1.Title = OI_1.Title + OI_1.Organize.Title;
-                    c1.Value = "";
-                    c1.Items = new List<cItem>();
+                    c1.Address = "";
+                    c1.Items = new List<cItem3>();
                     var OI_2s = DC.OrganizeInfo.Where(q => q.ParentID == OI_1.OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OIID);
                     foreach (var OI_2 in OI_2s)
                     {
-                        cItem c2 = new cItem();
+                        cItem3 c2 = new cItem3();
                         c2.Title = OI_2.Title + OI_2.Organize.Title;
-                        c2.Value = "";
-                        c2.Items = new List<cItem>();
-                        var MLSs = DC.Meeting_Location_Set.Where(q => q.OIID == OI_2.OIID && q.ActiveFlag && !q.DeleteFlag && q.SetType==0).OrderBy(q => q.OIID);
+                        c2.Address = "";
+                        c2.Items = new List<cItem3>();
+                        var MLSs = DC.Meeting_Location_Set.Where(q => q.OIID == OI_2.OIID && q.ActiveFlag && !q.DeleteFlag && q.SetType == 0).OrderBy(q => q.OIID);
                         foreach (var MLS in MLSs)
                         {
-                            cItem c3 = new cItem();
+                            cItem3 c3 = new cItem3();
                             c3.Title = MLS.Meeting_Location.Title;
-                            c3.Value = "--";
+                            c3.Address = "--";
                             var L = Ls.FirstOrDefault(q => q.TargetID == MLS.MLID);
-                            if(L!=null)
+                            if (L != null)
                             {
                                 var Z10 = Z10s.FirstOrDefault(q => q.ZID == L.ZipCode.ParentID);
-                                c3.Value = (Z10!=null ? Z10.Title : "") + L.ZipCode.Title+L.Address;
+                                c3.Address = (Z10 != null ? Z10.Title : "") + L.ZipCode.Title + L.Address;
                             }
                             c3.Items = null;
                             c2.Items.Add(c3);

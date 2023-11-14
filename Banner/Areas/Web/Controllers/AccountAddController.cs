@@ -148,6 +148,8 @@ namespace Banner.Areas.Web.Controllers
                         DeleteFlag = false,
                         CreDate = DT,
                         UpdDate = DT,
+                        LoginDate=DT,
+                        LogoutDate=DT,
                         SaveACID = 0,
                         OldID = 0
                     };

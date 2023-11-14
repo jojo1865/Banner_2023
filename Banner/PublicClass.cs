@@ -189,12 +189,25 @@ namespace Banner
         //登入前台
         public void LogInAC(long ACID)
         {
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
+            if(AC!=null)
+            {
+                AC.LoginDate = DT;
+                AC.LogoutDate = DT.AddDays(1);
+                DC.SubmitChanges();
+            }
             SetSession("ACID", ACID.ToString());
             SetCookie("ACID", ACID.ToString());
         }
         //登出前台
         public void LogOutAC()
         {
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
+            if (AC != null)
+            {
+                AC.LogoutDate = DT;
+                DC.SubmitChanges();
+            }
             DelSession("ACID");
             DelCookie("ACID");
         }

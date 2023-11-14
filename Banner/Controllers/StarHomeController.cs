@@ -51,6 +51,8 @@ namespace Banner.Controllers
                         DeleteFlag = false,
                         CreDate = DT_,
                         UpdDate = DT_,
+                        LoginDate = DT_,
+                        LogoutDate = DT_,
                         SaveACID = 1,
                         OldID = 0
                     };
@@ -170,6 +172,8 @@ namespace Banner.Controllers
                             DeleteFlag = false,
                             CreDate = DT_,
                             UpdDate = DT_,
+                            LoginDate = DT_,
+                            LogoutDate = DT_,
                             SaveACID = 1,
                             OldID = 0
                         };
