@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Policy;
@@ -881,7 +882,7 @@ namespace Banner.Areas.Admin.Controllers
         #endregion
 
         #region API管理-列表
-       
+
         public class cToken_List
         {
             public cTableList cTL = new cTableList();
@@ -907,7 +908,7 @@ namespace Banner.Areas.Admin.Controllers
             c.LS.ControlName = "ddl_CheckType";
             c.LS.ddlList = new List<SelectListItem>();
             c.LS.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-            foreach (var cCT in  cCheckType_List.OrderBy(q=>q.SortNo))
+            foreach (var cCT in cCheckType_List.OrderBy(q => q.SortNo))
                 c.LS.ddlList.Add(new SelectListItem { Text = cCT.Title, Value = cCT.SortNo.ToString() });
 
             var Ns = DC.Token_Check.Where(q => !q.DeleteFlag);
@@ -915,7 +916,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (FC.Get("ddl_CheckType") != "0")
                 {
-                    Ns = Ns.Where(q => q.CheckType.Contains(FC.Get("ddl_CheckType")+","));
+                    Ns = Ns.Where(q => q.CheckType.Contains(FC.Get("ddl_CheckType") + ","));
                 }
 
                 if (FC.Get("rbl_ActiveFlag") != "-1")
@@ -928,14 +929,14 @@ namespace Banner.Areas.Admin.Controllers
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "控制", WidthPX = 250 });
             TopTitles.Add(new cTableCell { Title = "標題" });
-            TopTitles.Add(new cTableCell { Title = "Token" });
+            TopTitles.Add(new cTableCell { Title = "使用期限" });
             TopTitles.Add(new cTableCell { Title = "可使用內容" });
             TopTitles.Add(new cTableCell { Title = "狀態" });
 
             c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
 
             c.cTL.TotalCt = Ns.Count();
-           c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+            c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
 
             foreach (var N in Ns.OrderBy(q => q.TCID))
             {
@@ -944,19 +945,19 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/Token_Edit/" + N.TCID, Target = "_self", Value = "編輯" });
 
                 cTR.Cs.Add(new cTableCell { Value = N.Title });//標題
-                cTR.Cs.Add(new cTableCell { Value = N.CheckCode });//Token
+                cTR.Cs.Add(new cTableCell { Value = N.NoEndFlag ? "無限期" : N.S_DateTime.ToString(DateFormat) + "~" + N.E_DateTime.ToString(DateFormat) });//使用期限
                 string[] sTypes = N.CheckType.Split(',');
                 string sType = "";
                 for (int i = 0; i < sTypes.Length; i++)
                 {
                     int y = 0;
-                    if (int.TryParse(sTypes[i],out y))
+                    if (int.TryParse(sTypes[i], out y))
                     {
                         var cCT = cCheckType_List.FirstOrDefault(q => q.SortNo == y);
-                        if(cCT!=null)
+                        if (cCT != null)
                             sType += (sType == "" ? "" : "、") + cCT.Title;
                     }
-                        
+
                 }
                 cTR.Cs.Add(new cTableCell { Value = sType });//可使用內容
 
@@ -980,6 +981,147 @@ namespace Banner.Areas.Admin.Controllers
         {
             GetViewBag();
             return View(GetToken_List(FC));
+        }
+
+        #endregion
+        #region API管理-新增/修改/刪除
+
+        public class cToken_Edit
+        {
+            public Token_Check N = new Token_Check();
+
+            public List<SelectListItem> TypeList = new List<SelectListItem>();
+        }
+        private cToken_Edit GetToken_Edit(int ID, FormCollection FC)
+        {
+            cToken_Edit c = new cToken_Edit();
+            ACID = GetACID();
+            #region 物件初始化
+            foreach (cCheckType cT in cCheckType_List.OrderBy(q => q.SortNo))
+                c.TypeList.Add(new SelectListItem { Text = cT.Title, Value = cT.SortNo.ToString() });
+            #endregion
+            #region 資料庫載入
+            c.N = DC.Token_Check.FirstOrDefault(q => !q.DeleteFlag && q.TCID == ID);
+            if (c.N == null)
+            {
+                c.N = new Token_Check
+                {
+                    TCID = 0,
+                    Title = "",
+                    Note = "",
+                    S_DateTime = DT,
+                    E_DateTime = DT.AddYears(1),
+                    NoEndFlag = true,
+                    CheckCode = "",
+                    JWT = "",
+                    CheckType = "",
+                    Doman = "",
+                    LoginBack = "",
+                    ActiveFlag = true,
+                    DeleteFlag = false,
+                    CreDate = DT,
+                    UpdDate = DT,
+                    SaveACID = ACID
+                };
+            }
+            else
+            {
+                string[] s = c.N.CheckType.Split(',');
+                for (int i = 0; i < s.Length; i++)
+                {
+                    for (int j = 0; j < c.TypeList.Count; j++)
+                    {
+                        if (c.TypeList[j].Value == s[i])
+                        {
+                            c.TypeList[j].Selected = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            #endregion
+            #region 前端載入
+            if (FC != null)
+            {
+                c.N.Title = FC.Get("txb_Title");
+                c.N.NoEndFlag = GetViewCheckBox(FC.Get("cbox_NoEndFlag"));
+                c.N.Doman = FC.Get("txb_Doman");
+                c.N.LoginBack = FC.Get("txb_LoginBack");
+                c.N.Note = FC.Get("txb_Note");
+
+                DateTime DT_ = c.N.CreDate;
+                if (DateTime.TryParse(FC.Get("txb_S_DateTime"), out DT_))
+                    c.N.S_DateTime = DT_;
+
+                if (c.N.NoEndFlag)
+                    c.N.E_DateTime = c.N.CreDate;
+                else
+                {
+                    DT_ = c.N.CreDate;
+                    if (DateTime.TryParse(FC.Get("txb_E_DateTime"), out DT_))
+                        c.N.E_DateTime = DT_;
+                    else
+                        c.N.E_DateTime = c.N.CreDate;
+                }
+                c.N.CheckType = "";
+                for (int i = 0; i < c.TypeList.Count; i++)
+                {
+                    if (GetViewCheckBox(FC.Get("cbox_CheckType_" + c.TypeList[i].Value)))
+                    {
+                        c.TypeList[i].Selected = true;
+                        c.N.CheckType += c.TypeList[i].Value + ",";
+                    }
+                    else
+                        c.TypeList[i].Selected = false;
+                }
+            }
+            #endregion
+            #region 檢查
+            Error = "";
+            if (string.IsNullOrEmpty(c.N.Title))
+                Error += "請填寫對象名稱<br/>";
+            if (!c.N.NoEndFlag)
+            {
+                if (c.N.E_DateTime == c.N.CreDate)
+                    Error += "請填期限結束日<br/>";
+                if (c.N.S_DateTime > c.N.E_DateTime)
+                    Error += "期限起始與結束日填寫錯誤<br/>";
+            }
+            #endregion
+            return c;
+        }
+        [HttpGet]
+        public ActionResult Token_Edit(int ID)
+        {
+            GetViewBag();
+            return View(GetToken_Edit(ID, null));
+        }
+        [HttpPost]
+        public ActionResult Token_Edit(int ID, FormCollection FC)
+        {
+            GetViewBag();
+            var c = GetToken_Edit(ID, FC);
+            if (Error != "")
+                SetAlert(Error);
+            else
+            {
+
+                if (c.N.TCID == 0)
+                    DC.Token_Check.InsertOnSubmit(c.N);
+                DC.SubmitChanges();
+                if (ID == 0 || c.N.CheckCode == "")
+                {
+                    if (c.N.NoEndFlag)
+                        c.N.CheckCode = "Banner_0_" + c.N.CreDate.AddYears(1).ToString("yyyyMMdd_hhmmssfff") + "_" + GetRand(1000000);
+                    else
+                        c.N.CheckCode = "Banner_1_" + c.N.E_DateTime.ToString("yyyyMMdd_hhmmssfff") + "_" + GetRand(1000000);
+                    c.N.JWT = SetJWT(c.N.TCID, c.N.CheckCode);
+                    DC.SubmitChanges();
+                }
+                SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/SystemSet/Token_List");
+            }
+
+            return View(c);
         }
 
         #endregion

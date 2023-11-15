@@ -87,9 +87,9 @@ namespace Banner
                 new SelectListItem{ Text="其他",Value="23"},
             };
         public static List<cCheckType> cCheckType_List = new List<cCheckType>{
-            new cCheckType{ SortNo=1,Title= "牧養組織(三層)",URL="/API/GetAPI_1"},
-            new cCheckType{ SortNo=2,Title= "牧養身份(三層)",URL="/API/GetAPI_2"},
-            new cCheckType{ SortNo=3,Title= "聚會點組織(三層)",URL="/API/GetAPI_3"},
+            new cCheckType{ SortNo=1,Title= "牧養組織",URL="/API/GetAPI_1"},
+            new cCheckType{ SortNo=2,Title= "牧養身份",URL="/API/GetAPI_2"},
+            new cCheckType{ SortNo=3,Title= "聚會點組織",URL="/API/GetAPI_3"},
             new cCheckType{ SortNo=4,Title= "事工團身份",URL="/API/GetAPI_4"},
             new cCheckType{ SortNo=5,Title= "小組出缺席紀錄",URL="/API/GetAPI_5"},
             new cCheckType{ SortNo=6,Title= "事工團出席紀錄",URL="/API/GetAPI_6"},

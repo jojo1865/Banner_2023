@@ -1,0 +1,120 @@
+﻿@model Banner.Areas.Admin.Controllers.SystemSetController.cToken_Edit
+@{
+    ViewBag.Title = "Token_Edit";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+<div class="main-container">
+    <div class="form-container-list">
+        <div class="form-container">
+            <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
+            @if (Model != null)
+            {
+                <form method="post" id="form1">
+                    @Html.AntiForgeryToken()
+                    <div class="form-body">
+                        <div class="form-card-group">
+                            <div class="form-card">
+                                <div class="form-group">
+                                    <label>對象名稱<span>*</span></label>
+                                    @Html.TextBox("txb_Title", Model.N.Title, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                                <div class="form-group">
+                                    <label>可用期限<span>*</span></label>
+                                    <div class="row">
+                                        <div class="col-auto pt-3">
+                                            @Html.CheckBox("cbox_NoEndFlag", Model.N.NoEndFlag, new { @class = "form-check-input", id = "cbox_NoEndFlag" })
+                                            @Html.Label("無限期使用", new { @class = "form-check-label", @for = "cbox_NoEndFlag" })
+                                        </div>
+                                        <div class="col-auto">
+                                            @Html.TextBox("txb_S_DateTime", Model.N.S_DateTime.ToString("yyyy-MM-dd"), new { @class = "form-control form-control-lg input-underline", Type = "date" })
+                                        </div>
+                                        <div class="col-auto">~</div>
+                                        <div class="col-auto">
+                                            @Html.TextBox("txb_S_DateTime", Model.N.E_DateTime.ToString("yyyy-MM-dd"), new { @class = "form-control form-control-lg input-underline", Type = "date" })
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label>限制網域名稱</label>
+                                    @Html.TextBox("txb_Doman", Model.N.Doman, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                                <div class="form-group">
+                                    <label>登入完成返回網址</label>
+                                    @Html.TextBox("txb_LoginBack", Model.N.LoginBack, new { @class = "form-control form-control-lg input-underline", Type = "url" })
+                                </div>
+                                <div class="form-group">
+                                    <label>備註</label>
+                                    @Html.TextArea("txb_Note", Model.N.Note, new { @class = "form-control form-control-lg" })
+                                </div>
+                                <div class="form-group">
+                                    <label>Token</label>
+                                    @Html.TextArea("txb_JWT", Model.N.JWT, new { @class = "form-control form-control-lg lab_gray",style="height:120px", @readonly = string.Empty })
+                                </div>
+                                <div class="form-group">
+                                    <label>可使用內容</label>
+                                    <div class="row">
+                                        @foreach (var SL in Model.TypeList)
+                                        {
+                                            <div class="col-auto">
+                                                <div class="form-check form-check-inline">
+                                                    @Html.CheckBox("cbox_CheckType_" + SL.Value, SL.Selected, new { @class = "form-check-input", id = "cbox_CheckType_" + SL.Value })
+                                                    @Html.Label(SL.Text, new { @class = "form-check-label", @for = "cbox_CheckType_" + SL.Value })
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>啟用狀態</label>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("cbox_ActiveFlag", true, Model.N.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
+                                                @Html.Label("啟用", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("cbox_ActiveFlag", false, !Model.N.ActiveFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
+                                                @Html.Label("停用", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (Model.N.TCID > 0 && ((bool[])ViewBag._Power)[3] && false)
+                                {
+                                    <div class="form-group">
+                                        <label>刪除</label>
+                                        <div class="row">
+                                            <div class="col-auto">
+                                                <div class="form-check form-check-inline">
+                                                    @Html.CheckBox("cbox_DeleteFlag", Model.N.DeleteFlag, new { @class = "form-check-input" })
+                                                    @Html.Label("更新後刪除", new { @class = "form-check-label" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+
+                        <div class="row text-center">
+                            <div class="col m-3">
+                                @if ((((bool[])ViewBag._Power)[1] && Model.N.TCID == 0) || (((bool[])ViewBag._Power)[2] && Model.N.TCID > 0))
+                                {
+                                    <a href="javascript:;" onclick="SubmitConfirm();" class="btn_Basic btn btn-primary btn-sm btn-round"><i class="fa-solid fa-floppy-disk"></i>儲存</a>
+                                }
+                                <a href="/Admin/SystemSet/Token_List" class="btn_Basic btn btn-outline-primary btn-sm btn-round"><i class="fa-solid fa-xmark"></i>返回列表</a>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+

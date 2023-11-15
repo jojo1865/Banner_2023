@@ -264,6 +264,10 @@ a {
         cursor: not-allowed;
     }
 
+.bn-theme .btn-round.btn-primary {
+    border: 2px solid #3764ac;
+}
+
 .div_OI {
 }
 
