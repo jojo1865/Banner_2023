@@ -27,7 +27,7 @@ namespace Banner.Controllers
             }*/
             return View();
         }
-        #region API_1 牧養組織(三層)
+        #region API_1 牧養組織
         public class Return1
         {
             public string Status = "Error";
@@ -42,7 +42,7 @@ namespace Banner.Controllers
         }
 
         [HttpGet]
-        public string API_1()//牧養組織(全部)
+        public string API_1()//牧養組織
         {
             Return1 R = new Return1();
             if (CheckJWT(1))
@@ -84,35 +84,53 @@ namespace Banner.Controllers
         }
 
         #endregion
-        #region API_2 牧養身份(三層)
+        #region API_2 牧養身份
         public class Return2
         {
             public string Status = "Error";
             public string ErrorMsg = "";
             public string Name = "";
-            public List<string> JobTitle = new List<string>();
+            public List<cItem2> Items = new List<cItem2>();
+        }
+        public class cItem2
+        {
+            public string Title = "";
+            public string JobTitle = "";
         }
 
-        public string API_2()//牧養身份(三層)
+        public string API_2()//牧養身份
         {
             Return2 R = new Return2();
             if (CheckJWT(2))
             {
-                int ACID = GetQueryStringInInt("ID");
-                var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag);
-                if(AC==null)
+                string sACID = HSM.Des_1(GetQueryStringInString("ID"));
+                int iACID = 0;
+                if (int.TryParse(sACID, out iACID))
                 {
-                    R.Status = "Error";
-                    R.ErrorMsg = "此會員不存在";
+                    if (iACID > 1)
+                    {
+                        var AC = DC.Account.FirstOrDefault(q => q.ACID == iACID && q.ActiveFlag && !q.DeleteFlag);
+                        if (AC == null)
+                            R.ErrorMsg = "此會員不存在";
+                        else
+                        {
+                            R.Status = "OK";
+                            R.Name = AC.Name_First + AC.Name_Last;
+                            R.Items = new List<cItem2>();
+                            var OIs = DC.OrganizeInfo.Where(q => q.ACID == iACID && q.ActiveFlag && !q.DeleteFlag && q.Organize.ItemID == "Shepherding").OrderBy(q => q.OID).ThenBy(q => q.OIID);
+                            foreach (var OI in OIs)
+                                R.Items.Add(new cItem2 { Title = OI.Title + OI.Organize.Title, JobTitle = OI.Organize.JobTitle });
+
+                            var MOIs = GetMOIAC(8, 0, AC.ACID);
+                            foreach (var OI in MOIs)
+                                R.Items.Add(new cItem2 { Title = OI.OrganizeInfo.Title + OI.OrganizeInfo.Organize.Title, JobTitle = "小組員" });
+                        }
+                    }
+                    else
+                        R.ErrorMsg = "此會員不被允許進行此查詢";
                 }
                 else
-                {
-                    R.Status = "OK";
-                    R.Name = AC.Name_First + AC.Name_Last;
-                    var OIs = DC.OrganizeInfo.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OID).ThenBy(q => q.OIID);
-                    foreach (var OI in OIs)
-                        R.JobTitle.Add(OI.Title + OI.Organize.Title + ":" + OI.Organize.JobTitle);
-                }
+                    R.ErrorMsg = "參數傳遞錯誤";
             }
             else
                 R.ErrorMsg = "您不具備查詢此項目的許可";
@@ -120,7 +138,7 @@ namespace Banner.Controllers
             return sReturn;
         }
         #endregion
-        #region API_3 聚會點組織(三層)
+        #region API_3 聚會點組織
         public class Return3
         {
             public string Status = "Error";
@@ -133,7 +151,7 @@ namespace Banner.Controllers
             public string Address = "";
             public List<cItem3> Items = new List<cItem3>();
         }
-        public string API_3()//聚會點組織(三層)
+        public string API_3()//聚會點組織
         {
             Return3 R = new Return3();
             if (CheckJWT(3))

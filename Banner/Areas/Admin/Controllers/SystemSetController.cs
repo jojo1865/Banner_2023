@@ -1048,7 +1048,8 @@ namespace Banner.Areas.Admin.Controllers
                 c.N.Doman = FC.Get("txb_Doman");
                 c.N.LoginBack = FC.Get("txb_LoginBack");
                 c.N.Note = FC.Get("txb_Note");
-
+                c.N.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
+                c.N.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
                 DateTime DT_ = c.N.CreDate;
                 if (DateTime.TryParse(FC.Get("txb_S_DateTime"), out DT_))
                     c.N.S_DateTime = DT_;

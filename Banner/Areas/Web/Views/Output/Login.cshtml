@@ -1,0 +1,111 @@
+﻿
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Areas/Web/Views/Include/_MasterLogin.cshtml";
+}
+
+<main class="main" style="height:auto">
+    <div class="left-area">
+        <div class="div_login_img">
+            <div class="logo">
+                <img src="/Areas/Web/Content/Img/top_logo.svg" alt="" />
+            </div>
+        </div>
+    </div>
+    <div class="right-area">
+
+        <div class="login-container">
+            <div class="backend-login-title">
+                <img src="/Areas/Web/Content/Img/top_logo.svg" alt="" class="img_Login_logo" /><p>全球旌旗資訊網</p>
+            </div>
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <div class="account-with-icon">
+                    <img src="/Areas/Web/Content/Img/user.png" alt="" />
+                    <p>帳號</p>
+                </div>
+
+                <div class="input">
+                    @Html.TextBox("txb_Login", (TempData["login"].ToString()), new { @class = "form-control input-underline", @placeholder = "帳號、身分證字號" })
+                </div>
+
+                <div class="password-with-icon">
+                    <img src="/Areas/Web/Content/Img/password.png" alt="" />
+                    <p>密碼</p>
+                </div>
+
+                <div class="input input-group">
+                    @Html.Password("txb_Password", (TempData["pw"].ToString()), new { @class = "form-control input-underline", @placeholder = "請輸入密碼" })
+                    <div class="visibility-container">
+                        <span class="material-icons" onclick="togglePasswordVisibility()">
+                            visibility_off
+                        </span>
+                    </div>
+                </div>
+
+                <div class="verify-with-icon">
+                    <img src="/Areas/Web/Content/Img/verified.png" alt="" />
+                    <p>驗證碼</p>
+                </div>
+
+                <div class="input verify-with-code">
+                    @Html.TextBox("txb_ValidateCode", "", new { @class = "form-control input-underline verify-form", @placeholder = "請輸入右方驗證碼" })
+                    <img src="/Web/Home/ValidateCode" alt="" id="img_ValidateCode" />
+                </div>
+                <div class="login-button-container">
+                    <button class="btn btn-primary btn-lg btn-round btn-login"
+                            type="submit">
+                        登入
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</main>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById("txb_Password");
+        const visibility = document.querySelector(
+            ".visibility-container .material-icons"
+        );
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            visibility.textContent = "visibility";
+        } else {
+            passwordInput.type = "password";
+            visibility.textContent = "visibility_off";
+        }
+    }
+
+
+</script>
+<script src="~/Areas/Web/Content/JS/jquery-3.7.0.js"></script>
+@if (TempData["json"].ToString() != "")
+{
+    if (TempData["rurl"].ToString() != "")
+    {
+        <script>
+    $.ajax({
+        url: '@(TempData["rurl"].ToString())',
+        method: 'POST',
+        data: '@(TempData["json"].ToString())',
+        dataType: 'json',
+        success: function (res) {
+            window.close();
+        },
+        error: function (err) { console.log(err) },
+    })
+        </script>
+    }
+    else
+    {
+        TempData["msg"] = "沒有回傳網址...無法傳送資料";
+    }
+}
+else
+{
+    TempData["msg"] = "沒有回傳資料";
+}
+

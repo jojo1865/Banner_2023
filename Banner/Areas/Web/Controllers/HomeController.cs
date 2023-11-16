@@ -54,7 +54,7 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult Login(FormCollection FC)
         {
             GetViewBag();
