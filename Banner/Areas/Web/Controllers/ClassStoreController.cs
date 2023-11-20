@@ -1,7 +1,9 @@
 ﻿using Banner.Models;
+using Newtonsoft.Json.Converters;
 using OfficeOpenXml.ConditionalFormatting;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Web;
@@ -304,6 +306,12 @@ namespace Banner.Areas.Web.Controllers
         public class cOrder_Step1
         {
             public int OHID = 0;
+            public List<cPayType> cPTs = new List<cPayType>();
+        }
+        public class cPayType
+        {
+            public int PayID = 0;
+            public string PayTitle = "";
             public List<cProduct> cPs = new List<cProduct>();
         }
         public class cProduct
@@ -325,7 +333,11 @@ namespace Banner.Areas.Web.Controllers
             cOrder_Step1 c = new cOrder_Step1();
             ACID = GetACID();
             #region 資料庫導入
-
+            c.cPTs = new List<cPayType>();
+            for (int i = 0; i < sPayType.Length; i++)
+            {
+                c.cPTs.Add(new cPayType { PayID = i, PayTitle = sPayType[i], cPs = new List<cProduct>() });
+            }
             var OPs = DC.Order_Product.Where(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag).OrderBy(q => q.OPID);
             foreach (var OP in OPs)
             {
@@ -357,7 +369,7 @@ namespace Banner.Areas.Web.Controllers
                 {
                     SelectListItem SL = new SelectListItem();
                     SL.Value = PC.PCID.ToString();
-                    
+
                     #region 課程文字
                     //A班：2023/9/14 09:00-12:00 | 台北台中高雄宜蘭
                     SL.Text = PC.Title + "：";
@@ -390,18 +402,33 @@ namespace Banner.Areas.Web.Controllers
                     cP.LS.ddlList.Add(SL);
                 }
 
-                if(OP.PCID == 0 || !cP.LS.ddlList.Any(q=>q.Selected))
+                if (OP.PCID == 0 || !cP.LS.ddlList.Any(q => q.Selected))
                 {
                     if (cP.LS.ddlList.Count(q => !q.Disabled) > 0)
                     {
                         cP.LS.ddlList.Where(q => !q.Disabled).OrderBy(q => q.Value).First().Selected = true;
-                        string sPCID = cP.LS.ddlList.First(q => q.Selected).Value; 
+                        string sPCID = cP.LS.ddlList.First(q => q.Selected).Value;
                         OP.PCID = Convert.ToInt32(sPCID);
                         DC.SubmitChanges();
                     }
-                        
+
                 }
-                c.cPs.Add(cP);
+
+                for(int i=0;i< c.cPTs.Count;i++)
+                {
+                    var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OID == 1 && q.OIID == OP.Product.OrganizeInfo.ParentID);
+                    if(OI!=null)
+                    {
+                        var PTs = DC.PayType.Where(q => q.OIID == OI.OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.PayTypeID);
+                        foreach(var PT in PTs)
+                        {
+                            if(PT.PayTypeID == c.cPTs[i].PayID)
+                            {
+                                c.cPTs[i].cPs.Add(cP);
+                            }
+                        }
+                    }
+                }
             }
             #endregion
 
@@ -458,6 +485,130 @@ namespace Banner.Areas.Web.Controllers
             GetViewBag();
             var c = GetOrder_Step2(FC);
             return View(c);
+        }
+        #endregion
+        #region 信用卡付款
+
+        public class cOrder_Paid_Credit_Card
+        {
+            public string MerchantID = "";
+            public string TradeInfo = "";//將交易資料參數（下方列表中參數）透過商店Key及IV進行AES 加密
+            public string TradeSha = "";//將交易資料經過上述AES加密過的字串，透過商店Key及IV進行SHA256 加密
+            public string Version = "2.0";
+
+            /*設定加密模式
+            1 = 加密模式AES/GCM
+            0或者未有此參數=
+            原加密模式AES/CBC/PKCS7Padding*/
+            public int EncryptType = 1;
+        }
+        //正式用
+        public cOrder_Paid_Credit_Card GetOrder_Paid_Credit_Card(int OHID)
+        {
+            var OH = DC.Order_Header.FirstOrDefault(q => q.OHID == OHID);
+            cOrder_Paid_Credit_Card c = new cOrder_Paid_Credit_Card();
+            string str = "";
+            str += "MerchantID=" + sMerchantID;//MerchantID 商店代號 String(15)
+            str += "&RespondType=JSON";//RespondType 回傳格式 String(6)
+            str += "&TimeStamp=" + DT.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString();//TimeStamp 時間戳記 String(50)
+            str += "&Version=2.0";//Version 串接程式版本 String(5)
+            str += "&LangType=zh-tw";//LangType 語系 String(5)
+            str += "&MerchantOrderNo=" + GetRand(1000);//MerchantOrderNo 商店訂單編號 String(30)
+            str += "&Amt=30";//Amt 訂單金額 int(10)
+            str += "&temDesc=測試商品";//temDesc 商品資訊
+            str += "&TradeLimit=600";//TradeLimit 交易有效時間  Int(3)
+            str += "&ExpireDate=" + DT.AddDays(2).ToString("yyyyMMdd");//ExpireDate 繳費有效期限 String(10)
+            str += "&ReturnURL=" + sDomanName + "/Web/Order_End/" + OHID;//ReturnURL 支付完成返回商店網址 String(200)
+            str += "&NotifyURL=" + sDomanName + "/Web/Order_Paid/" + OHID;//NotifyURL 支付通知網址 String(200)
+            str += "&CustomerURL=" + sDomanName + "/Web/Order_GetNo/" + OHID;//CustomerURL 商店取號網址 String(200)
+                                                                             //4.2.3 回應參數-取號完成
+                                                                             //適用交易類別：超商代碼、超商條碼、超商取貨付款、ATM
+            str += "&ClientBackURL=";//ClientBackURL 返回商店網址 String(200)
+            str += "&Email=minto.momoko.jojo1865@gmail.com";//Email 付款人電子信箱 String(50)
+            str += "&EmailModify=1";//EmailModify 付款人電子信箱是否開放修改 Int(1) 1=可修改 0=不可修改
+            str += "&LoginType=0";//LoginType 藍新金流會員 0 = 不須登入藍新金流會員
+            str += "&OrderComment=";//OrderComment 商店備註 String(300)
+
+            str += "&CREDIT=1";//CREDIT 信用卡一次付清啟用 Int(1)
+            str += "&ANDROIDPAY=0";//ANDROIDPAY Google Pay 啟用 Int(1)
+            str += "&SAMSUNGPAY=0";//SAMSUNGPAY Samsung Pay 啟用 Int(1)
+            str += "&LINEPAY=0";//LINEPAY LINE Pay 啟用 Int(1)
+            str += "&ImageUrl=";//ImageUrl 產品圖檔連結網址 String(200)
+            str += "&InstFlag=0";//InstFlag 信用卡分期付款啟用 String(18)
+            str += "&CreditRed=0";//CreditRed 信用卡紅利啟用 Int(1)
+            str += "&UNIONPAY=1";//UNIONPAY 信用卡銀聯卡啟用 Int(1)
+            str += "&CREDITAE=1";//CREDITAE 信用卡美國運通卡啟用 Int(1)
+            str += "&WEBATM=0";//WEBATM WEBATM啟用 Int(1)
+            str += "&VACC=0";//VACC ATM轉帳啟用 Int(1)
+            str += "&BankType=";//BankType 金融機構 String(26)
+            str += "&CVS=0";//CVS 超商代碼繳費啟用 Int(1)
+            str += "&BARCODE=0";//BARCODE 超商條碼繳費啟用 Int(1)
+            str += "&ESUNWALLET=0";//ESUNWALLET 玉山Wallet Int(1)
+            str += "&TAIWANPAY=0";//TAIWANPAY 台灣Pay Int(1)
+            str += "&FULA=0";//FULA Fula付啦 String(20)
+            str += "&CVSCOM=0";//CVSCOM 物流啟用 Int(1)
+            str += "&EZPAY=0";//EZPAY 簡單付電子錢包 Int(1)
+            str += "&EZPWECHAT=0";//EZPWECHAT 簡單付微信支付 Int(1)
+            str += "&EZPALIPAY=0";//EZPALIPAY 簡單付支付寶 Int(1)
+            str += "&LgsType=";//LgsType 物流型態 String(3)
+            return c;
+        }
+        //測試用
+        public cOrder_Paid_Credit_Card GetOrderTest_Paid_Credit_Card(int OHID)
+        {
+            cOrder_Paid_Credit_Card c = new cOrder_Paid_Credit_Card();
+            string str = "";
+            str += "MerchantID=" + sMerchantID;//MerchantID 商店代號 String(15)
+            str += "&RespondType=JSON";//RespondType 回傳格式 String(6)
+            str += "&TimeStamp="+DT.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString();//TimeStamp 時間戳記 String(50)
+            str += "&Version=2.0";//Version 串接程式版本 String(5)
+            str += "&LangType=zh-tw";//LangType 語系 String(5)
+            str += "&MerchantOrderNo=" + GetRand(1000);//MerchantOrderNo 商店訂單編號 String(30)
+            str += "&Amt=10";//Amt 訂單金額 int(10)
+            str += "&temDesc=測試商品";//temDesc 商品資訊
+            str += "&TradeLimit=600";//TradeLimit 交易有效時間  Int(3)
+            str += "&ExpireDate=" + DT.AddDays(2).ToString("yyyyMMdd");//ExpireDate 繳費有效期限 String(10)
+            str += "&ReturnURL="+sDomanName + "/Web/Order_End/" + OHID;//ReturnURL 支付完成返回商店網址 String(200)
+            str += "&NotifyURL=" + sDomanName + "/Web/Order_Paid/" + OHID;//NotifyURL 支付通知網址 String(200)
+            str += "&CustomerURL=" + sDomanName + "/Web/Order_GetNo/" + OHID;//CustomerURL 商店取號網址 String(200)
+                                                                             //4.2.3 回應參數-取號完成
+                                                                             //適用交易類別：超商代碼、超商條碼、超商取貨付款、ATM
+            str += "&ClientBackURL=";//ClientBackURL 返回商店網址 String(200)
+            str += "&Email=minto.momoko.jojo1865@gmail.com";//Email 付款人電子信箱 String(50)
+            str += "&EmailModify=1";//EmailModify 付款人電子信箱是否開放修改 Int(1) 1=可修改 0=不可修改
+            str += "&LoginType=0";//LoginType 藍新金流會員 0 = 不須登入藍新金流會員
+            str += "&OrderComment=";//OrderComment 商店備註 String(300)
+
+            str += "&CREDIT=1";//CREDIT 信用卡一次付清啟用 Int(1)
+            str += "&ANDROIDPAY=0";//ANDROIDPAY Google Pay 啟用 Int(1)
+            str += "&SAMSUNGPAY=0";//SAMSUNGPAY Samsung Pay 啟用 Int(1)
+            str += "&LINEPAY=0";//LINEPAY LINE Pay 啟用 Int(1)
+            str += "&ImageUrl=";//ImageUrl 產品圖檔連結網址 String(200)
+            str += "&InstFlag=0";//InstFlag 信用卡分期付款啟用 String(18)
+            str += "&CreditRed=0";//CreditRed 信用卡紅利啟用 Int(1)
+            str += "&UNIONPAY=1";//UNIONPAY 信用卡銀聯卡啟用 Int(1)
+            str += "&CREDITAE=1";//CREDITAE 信用卡美國運通卡啟用 Int(1)
+            str += "&WEBATM=0";//WEBATM WEBATM啟用 Int(1)
+            str += "&VACC=0";//VACC ATM轉帳啟用 Int(1)
+            str += "&BankType=";//BankType 金融機構 String(26)
+            str += "&CVS=0";//CVS 超商代碼繳費啟用 Int(1)
+            str += "&BARCODE=0";//BARCODE 超商條碼繳費啟用 Int(1)
+            str += "&ESUNWALLET=0";//ESUNWALLET 玉山Wallet Int(1)
+            str += "&TAIWANPAY=0";//TAIWANPAY 台灣Pay Int(1)
+            str += "&FULA=0";//FULA Fula付啦 String(20)
+            str += "&CVSCOM=0";//CVSCOM 物流啟用 Int(1)
+            str += "&EZPAY=0";//EZPAY 簡單付電子錢包 Int(1)
+            str += "&EZPWECHAT=0";//EZPWECHAT 簡單付微信支付 Int(1)
+            str += "&EZPALIPAY=0";//EZPALIPAY 簡單付支付寶 Int(1)
+            str += "&LgsType=";//LgsType 物流型態 String(3)
+
+            return c;
+        }
+        [HttpGet]
+        public ActionResult Order_Paid_Credit_Card(int OHID)
+        {
+            GetViewBag();
+            return View(GetOrderTest_Paid_Credit_Card(OHID));
         }
         #endregion
     }

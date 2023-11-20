@@ -162,7 +162,8 @@ namespace Banner.Areas.Admin.Controllers
             //細節設定
             public ListSelect Years = new ListSelect();
             public ListSelect Echelons = new ListSelect();
-
+            //付款設定
+            public ListSelect PTSL = new ListSelect();
         }
         public class cProduct_Before
         {
@@ -198,14 +199,23 @@ namespace Banner.Areas.Admin.Controllers
                         N.CSL.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString() });
                 }
             }
+            //付款方式
+            N.PTSL = new ListSelect();
+            N.PTSL.ControlName = "cbox_PayType";
+            N.PTSL.ddlList = new List<SelectListItem>();
+            for (int i = 0; i < sPayType.Length; i++)
+                N.PTSL.ddlList.Add(new SelectListItem { Text = sPayType[i], Value = i.ToString() });
             //所屬旌旗
 
             //後臺使用者限制使用那些旌旗資訊
+            int Min_OIID = 0;
             var OI2s = DC.M_OI2_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.OIID == 1);
             if (OI2s.Any())
             {
                 var OIs = DC.OrganizeInfo.Where(q => q.OID == 2 && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OIID);
                 foreach (var OI in OIs) N.OI2SL.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = OI.OIID == OIs.Min(q => q.OIID) });
+
+                Min_OIID = OIs.Min(q => q.OIID);
             }
             else
             {
@@ -218,6 +228,8 @@ namespace Banner.Areas.Admin.Controllers
                                select q)
                               .OrderBy(q => q.OIID);
                     foreach (var OI in OIs) N.OI2SL.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = OI.OIID == OIs.Min(q => q.OIID) });
+
+                    Min_OIID = OIs.Min(q => q.OIID);
                 }
                 else
                     SetAlert("此使用者未設定所屬旌旗,請設定完成後再新增/編輯上架課程", 2, "/Admin/StoreSet/Product_List");
@@ -263,10 +275,11 @@ namespace Banner.Areas.Admin.Controllers
             N.P = DC.Product.FirstOrDefault(q => q.PID == ID);
             if (N.P == null)
             {
+                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 2 && q.OIID == Min_OIID);
                 N.P = new Product
                 {
                     CID = 0,
-                    OIID = 0,
+                    OIID = OI.OIID,
                     Title = "",
                     SubTitle = "",
                     ProductType = 0,
@@ -328,11 +341,27 @@ namespace Banner.Areas.Admin.Controllers
                             UpdDate = DT,
                             SaveACID = ACID
                         });
+
+
                     }
+                }
+
+
+                //依據所屬旌旗的協會初始化付款方式可選擇的部分
+                var OI1 = DC.OrganizeInfo.FirstOrDefault(q => q.OID == 1 && q.OIID == N.P.OrganizeInfo.ParentID);
+                if (OI1 != null)
+                {
+                    var PTs = DC.PayType.Where(q => q.OIID == OI1.OIID);
+                    foreach (var PT in PTs)
+                        N.PTSL.ddlList.First(q => q.Value == PT.PayTypeID.ToString()).Disabled = !PT.ActiveFlag;
                 }
             }
             else
             {
+                //所屬旌旗
+                N.OI2SL.ForEach(q => q.Selected = false);
+                N.OI2SL.Find(q => q.Value == N.P.OIID.ToString()).Selected = true;
+
                 if (N.CCSL.FirstOrDefault(q => q.Value == N.P.Course.CCID.ToString()) != null)
                 {
                     N.CCSL.ForEach(q => q.Selected = false);
@@ -388,14 +417,36 @@ namespace Banner.Areas.Admin.Controllers
                 N.Echelons.ddlList.ForEach(q => q.Selected = false);
                 N.Echelons.ddlList.First(q => q.Value == N.P.EchelonNo.ToString()).Selected = true;
 
+
+                //依據所屬旌旗的協會初始化付款方式可選擇的部分
+                var OI1 = DC.OrganizeInfo.FirstOrDefault(q => q.OID == 1 && q.OIID == N.P.OrganizeInfo.ParentID);
+                if (OI1 != null)
+                {
+                    var PTs = DC.PayType.Where(q => q.OIID == OI1.OIID);
+                    if (PTs.Count() > 0)
+                        foreach (var PT in PTs)
+                            N.PTSL.ddlList.First(q => q.Value == PT.PayTypeID.ToString()).Disabled = !PT.ActiveFlag;
+                    else
+                        N.PTSL.ddlList.ForEach(q => q.Disabled = true);  
+                }
+
+                //付款方式
+                var PPTs = DC.M_Product_PayType.Where(q => q.PID == N.P.PID);
+                foreach (var PPT in PPTs)
+                    N.PTSL.ddlList.Find(q => q.Value == PPT.PayType.PayTypeID.ToString()).Selected = PPT.ActiveFlag;
             }
 
             #endregion
             #region 前端資料帶入
             if (FC != null)
             {
+                
                 if (!string.IsNullOrEmpty(FC.Get("rbl_OI")))
-                    N.P.OIID = Convert.ToInt32(FC.Get("rbl_OI"));
+                {
+                    var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID.ToString() == FC.Get("rbl_OI"));
+                    if (OI != null)
+                        N.P.OrganizeInfo = OI;
+                }
                 //N.P.Title = FC.Get("txb_Title");
 
                 N.P.SubTitle = FC.Get("txb_SubTitle");
@@ -557,7 +608,10 @@ namespace Banner.Areas.Admin.Controllers
                 }
 
                 #endregion
-
+                #region 付款方式
+                foreach (var ddl in N.PTSL.ddlList)
+                    ddl.Selected = GetViewCheckBox(FC.Get(N.PTSL.ControlName + ddl.Value));
+                #endregion
             }
 
             #endregion
@@ -620,6 +674,44 @@ namespace Banner.Areas.Admin.Controllers
 
                 //DC.Product_Rool.DeleteAllOnSubmit(N.PRs.Where(q => q.TargetInt2 < 0));
                 //DC.SubmitChanges();
+                var Ms = DC.M_Product_PayType.Where(q => q.PID == N.P.PID).ToList();
+                foreach (var ddl in N.PTSL.ddlList)
+                {
+                    if (Ms.Any(q => q.PayType.PayTypeID.ToString() == ddl.Value))
+                    {
+                        var M = Ms.Find(q => q.PayType.PayTypeID.ToString() == ddl.Value);
+                        M.ActiveFlag = ddl.Selected;
+                        M.UpdDate = DT;
+                        M.SaveACID = ACID;
+                        DC.SubmitChanges();
+                    }
+                    else if (ddl.Selected)
+                    {
+                        var OI1 = (from q in DC.OrganizeInfo.Where(q => q.OID == 2 && q.OIID == N.P.OIID)
+                                   join p in DC.OrganizeInfo.Where(q => q.OID == 1)
+                                   on q.ParentID equals p.OIID
+                                   select p).FirstOrDefault();
+                        if (OI1 != null)
+                        {
+                            var PT = DC.PayType.FirstOrDefault(q => q.OIID == OI1.OIID && q.PayTypeID.ToString() == ddl.Value);
+                            if (PT != null)
+                            {
+                                M_Product_PayType M = new M_Product_PayType
+                                {
+                                    Product = N.P,
+                                    PayType = PT,
+                                    ActiveFlag = ddl.Selected,
+                                    CreDate = DT,
+                                    UpdDate = DT,
+                                    SaveACID = ACID
+                                };
+                                DC.M_Product_PayType.InsertOnSubmit(M);
+                                DC.SubmitChanges();
+                            }
+                        }
+                    }
+                }
+
 
                 SetAlert("存檔完成", 1, "/Admin/StoreSet/Product_List");
             }

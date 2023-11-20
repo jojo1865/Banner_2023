@@ -1,0 +1,14 @@
+﻿
+@{
+    ViewBag.Title = "Order_Paid_Credit_Card";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<form method="post" id="form_Paid" action="https://ccore.newebpay.com/MPG/mpg_gateway">
+    <input name="MerchantID" value="" />
+    <input name="TradeInfo" value="" />
+    <input name="TradeSha" value="" />
+    <input name="Version" value="2.0" />
+    <input name="EncryptType" value="1" />
+</form>
+

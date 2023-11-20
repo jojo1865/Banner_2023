@@ -29,7 +29,7 @@
                                     @foreach (var OI2 in Model.OI2SL)
                                     {
                                         <div class="form-check form-check-inline">
-                                            @Html.RadioButton("rbl_OI", OI2.Value, OI2.Selected, new { @id = ("rbl_OI_" + OI2.Value), @class = "form-check-input" })
+                                            @Html.RadioButton("rbl_OI", OI2.Value, OI2.Selected, new { @id = ("rbl_OI_" + OI2.Value), @class = "form-check-input", onclick = "ShowPayType(" + OI2.Value + ")" })
                                             @Html.Label(OI2.Text, new { @class = "form-check-label", @for = ("rbl_OI_" + OI2.Value) })
                                         </div>
                                     }
@@ -393,6 +393,29 @@
                         </div>
                     </div>
 
+
+                    <div class="form-body mt-4">
+                        <div class="form-card-group">
+                            <div id="personal-info" class="header-container">
+                                <div class="header-left-border"></div>
+                                <div class="header">付款選項</div>
+                            </div>
+                            <div class="form-card">
+                                <div class="form-group">
+                                    @{
+                                        foreach (var PT in Model.PTSL.ddlList)
+                                        {
+                                            string sHide = PT.Disabled ? "d-none" : "";
+                                            @Html.CheckBox(Model.PTSL.ControlName + PT.Value, PT.Selected, new { @class = "form-check-input me-2 " + sHide, id = Model.PTSL.ControlName + PT.Value })
+                                            @Html.Label(PT.Text, new { @class = "form-check-label me-4 " + sHide, @for = Model.PTSL.ControlName + PT.Value, @ID = "lab_PayType_" + PT.Value })
+                                        }
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </form>
             }
         </div>
@@ -595,6 +618,43 @@
     function ShowTeacher() {
         Swal.fire({
             html: ''
+        });
+    }
+
+    //修改可選擇付款方式
+    function ShowPayType(OIID) {
+        var Cbox_Name = '@Model.PTSL.ControlName';
+        $.ajax({
+            url: '/Admin/Home/GetPayType?OIID=' + OIID,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                var PayType = res.split(',');
+                for (var i = 0; i < 5; i++) {
+                    var check = false
+                    for (var j = 0; j < PayType.length; j++) {
+                        if (i == PayType[j]) {
+                            check = true;
+                            break;
+                        }
+                    }
+                    var cbox = document.getElementById(Cbox_Name + i);
+                    var lab = document.getElementById('lab_PayType_' + i)
+                    if (cbox != null) {
+                        if (check) {
+                            cbox.classList.remove("d-none");
+                            lab.classList.remove("d-none");
+                        }
+                        else {
+                            cbox.classList.add("d-none");
+                            cbox.checked = false;
+                            lab.classList.add("d-none");
+                        }
+                    }
+                }
+            },
+            error: function (err) { console.log(err) },
+
         });
     }
 </script>

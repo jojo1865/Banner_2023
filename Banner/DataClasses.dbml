@@ -398,8 +398,8 @@
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="PayType_M_Product_PayType" Member="PayType" ThisKey="PTID" OtherKey="PTID" Type="PayType" IsForeignKey="true" />
       <Association Name="Product_M_Product_PayType" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
+      <Association Name="PayType_M_Product_PayType" Member="PayType" ThisKey="PTID" OtherKey="PTID" Type="PayType" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.M_Product_Teacher" Member="M_Product_Teacher">
@@ -613,37 +613,10 @@
       <Column Name="OldID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="OrganizeInfo_M_OI_Account" Member="M_OI_Account" ThisKey="OIID" OtherKey="OIID" Type="M_OI_Account" />
       <Association Name="OrganizeInfo_M_OI2_Account" Member="M_OI2_Account" ThisKey="OIID" OtherKey="OIID" Type="M_OI2_Account" />
-      <Association Name="OrganizeInfo_PayType" Member="PayType" ThisKey="OIID" OtherKey="OIID" Type="PayType" />
       <Association Name="OrganizeInfo_Product" Member="Product" ThisKey="OIID" OtherKey="OIID" Type="Product" />
+      <Association Name="OrganizeInfo_PayType" Member="PayType" ThisKey="OIID" OtherKey="OIID" Type="PayType" />
       <Association Name="Account_OrganizeInfo" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
       <Association Name="Organize_OrganizeInfo" Member="Organize" ThisKey="OID" OtherKey="OID" Type="Organize" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.PayType" Member="PayType">
-    <Type Name="PayType">
-      <Column Name="PTID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="PayType" Member="PayType1" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="TargetURL" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
-      <Column Name="BackURL" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
-      <Column Name="MerchantID" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
-      <Column Name="HashKey" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="HashIV" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="PayKey1" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="PayKey2" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="PayKey3" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="PayKey4" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="PayKey5" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="PayType_M_Product_PayType" Member="M_Product_PayType" ThisKey="PTID" OtherKey="PTID" Type="M_Product_PayType" />
-      <Association Name="PayType_Order_Paid" Member="Order_Paid" ThisKey="PTID" OtherKey="PTID" Type="Order_Paid" />
-      <Association Name="OrganizeInfo_PayType" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Product" Member="Product">
@@ -831,6 +804,33 @@
       <Column Name="OITitle_1" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
       <Column Name="OIID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="OID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PayType" Member="PayType">
+    <Type Name="PayType">
+      <Column Name="PTID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PayTypeID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="TargetURL" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="BackURL" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="MerchantID" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="HashKey" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="HashIV" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="PayKey1" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="PayKey2" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="PayKey3" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="PayKey4" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="PayKey5" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="PayType_M_Product_PayType" Member="M_Product_PayType" ThisKey="PTID" OtherKey="PTID" Type="M_Product_PayType" />
+      <Association Name="PayType_Order_Paid" Member="Order_Paid" ThisKey="PTID" OtherKey="PTID" Type="Order_Paid" />
+      <Association Name="OrganizeInfo_PayType" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

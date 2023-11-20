@@ -45,7 +45,6 @@
                                             @Html.TextBox("txb_JobTitle", Model.O.JobTitle, new { @class = "form-control form-control-lg input-underline" })
                                         }
                                     </div>
-
                                     <div class="form-group">
                                         <label>啟用狀態</label>
                                         @if (Model.O.OID <= 2 && Model.O.OID > 0)
@@ -55,7 +54,7 @@
                                                     <div class="form-check form-check-inline">
                                                         @Html.RadioButton("cbox_ActiveFlag_1", true, Model.O.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input", @disabled = "disabled" })
                                                         @Html.Label("啟用", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
-                                                        @Html.Hidden("cbox_ActiveFlag","true")
+                                                        @Html.Hidden("cbox_ActiveFlag", "true")
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
@@ -100,7 +99,7 @@
                                         </div>
                                     }
                                 </div>
-                            </div>
+                                </div>
                         </div>
                     </form>
                 }

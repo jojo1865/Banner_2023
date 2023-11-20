@@ -662,6 +662,25 @@ namespace Banner.Areas.Admin.Controllers
             return Error;
         }
         #endregion
+        #region 取得所選旌旗之上協會允許的交易方式
+        public string GetPayType(int OIID)
+        {
+            string sPayType = "";
+            var OI = (from q in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == OIID)
+                     join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 1)
+                     on q.ParentID equals p.OIID
+                     select p).FirstOrDefault();
+            if(OI!=null)
+            {
+                var PTs = DC.PayType.Where(q => q.OIID == OI.OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q=>q.PayTypeID);
+                foreach(var PT in PTs)
+                    sPayType += (sPayType == "" ? "" : ",") + PT.PayTypeID;
+            }
+            
+            return sPayType;
+        }
+        #endregion
+
         #region 測試用(檔案上傳)
         [HttpGet]
         public ActionResult Test()

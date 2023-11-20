@@ -147,9 +147,6 @@ namespace Banner
     partial void InsertOrganizeInfo(OrganizeInfo instance);
     partial void UpdateOrganizeInfo(OrganizeInfo instance);
     partial void DeleteOrganizeInfo(OrganizeInfo instance);
-    partial void InsertPayType(PayType instance);
-    partial void UpdatePayType(PayType instance);
-    partial void DeletePayType(PayType instance);
     partial void InsertProduct(Product instance);
     partial void UpdateProduct(Product instance);
     partial void DeleteProduct(Product instance);
@@ -171,6 +168,9 @@ namespace Banner
     partial void InsertToken_Check(Token_Check instance);
     partial void UpdateToken_Check(Token_Check instance);
     partial void DeleteToken_Check(Token_Check instance);
+    partial void InsertPayType(PayType instance);
+    partial void UpdatePayType(PayType instance);
+    partial void DeletePayType(PayType instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -509,14 +509,6 @@ namespace Banner
 			}
 		}
 		
-		public System.Data.Linq.Table<PayType> PayType
-		{
-			get
-			{
-				return this.GetTable<PayType>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Product> Product
 		{
 			get
@@ -586,6 +578,14 @@ namespace Banner
 			get
 			{
 				return this.GetTable<v_GetAC_OITree>();
+			}
+		}
+		
+		public System.Data.Linq.Table<PayType> PayType
+		{
+			get
+			{
+				return this.GetTable<PayType>();
 			}
 		}
 		
@@ -9055,9 +9055,9 @@ namespace Banner
 		
 		private int _SaveACID;
 		
-		private EntityRef<PayType> _PayType;
-		
 		private EntityRef<Product> _Product;
+		
+		private EntityRef<PayType> _PayType;
 		
     #region 擴充性方法定義
     partial void OnLoaded();
@@ -9081,8 +9081,8 @@ namespace Banner
 		
 		public M_Product_PayType()
 		{
-			this._PayType = default(EntityRef<PayType>);
 			this._Product = default(EntityRef<Product>);
+			this._PayType = default(EntityRef<PayType>);
 			OnCreated();
 		}
 		
@@ -9234,40 +9234,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_M_Product_PayType", Storage="_PayType", ThisKey="PTID", OtherKey="PTID", IsForeignKey=true)]
-		public PayType PayType
-		{
-			get
-			{
-				return this._PayType.Entity;
-			}
-			set
-			{
-				PayType previousValue = this._PayType.Entity;
-				if (((previousValue != value) 
-							|| (this._PayType.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._PayType.Entity = null;
-						previousValue.M_Product_PayType.Remove(this);
-					}
-					this._PayType.Entity = value;
-					if ((value != null))
-					{
-						value.M_Product_PayType.Add(this);
-						this._PTID = value.PTID;
-					}
-					else
-					{
-						this._PTID = default(int);
-					}
-					this.SendPropertyChanged("PayType");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_M_Product_PayType", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
 		public Product Product
 		{
@@ -9298,6 +9264,40 @@ namespace Banner
 						this._PID = default(int);
 					}
 					this.SendPropertyChanged("Product");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_M_Product_PayType", Storage="_PayType", ThisKey="PTID", OtherKey="PTID", IsForeignKey=true)]
+		public PayType PayType
+		{
+			get
+			{
+				return this._PayType.Entity;
+			}
+			set
+			{
+				PayType previousValue = this._PayType.Entity;
+				if (((previousValue != value) 
+							|| (this._PayType.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._PayType.Entity = null;
+						previousValue.M_Product_PayType.Remove(this);
+					}
+					this._PayType.Entity = value;
+					if ((value != null))
+					{
+						value.M_Product_PayType.Add(this);
+						this._PTID = value.PTID;
+					}
+					else
+					{
+						this._PTID = default(int);
+					}
+					this.SendPropertyChanged("PayType");
 				}
 			}
 		}
@@ -13593,9 +13593,9 @@ namespace Banner
 		
 		private EntitySet<M_OI2_Account> _M_OI2_Account;
 		
-		private EntitySet<PayType> _PayType;
-		
 		private EntitySet<Product> _Product;
+		
+		private EntitySet<PayType> _PayType;
 		
 		private EntityRef<Account> _Account;
 		
@@ -13637,8 +13637,8 @@ namespace Banner
 		{
 			this._M_OI_Account = new EntitySet<M_OI_Account>(new Action<M_OI_Account>(this.attach_M_OI_Account), new Action<M_OI_Account>(this.detach_M_OI_Account));
 			this._M_OI2_Account = new EntitySet<M_OI2_Account>(new Action<M_OI2_Account>(this.attach_M_OI2_Account), new Action<M_OI2_Account>(this.detach_M_OI2_Account));
-			this._PayType = new EntitySet<PayType>(new Action<PayType>(this.attach_PayType), new Action<PayType>(this.detach_PayType));
 			this._Product = new EntitySet<Product>(new Action<Product>(this.attach_Product), new Action<Product>(this.detach_Product));
+			this._PayType = new EntitySet<PayType>(new Action<PayType>(this.attach_PayType), new Action<PayType>(this.detach_PayType));
 			this._Account = default(EntityRef<Account>);
 			this._Organize = default(EntityRef<Organize>);
 			OnCreated();
@@ -13938,19 +13938,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_PayType", Storage="_PayType", ThisKey="OIID", OtherKey="OIID")]
-		public EntitySet<PayType> PayType
-		{
-			get
-			{
-				return this._PayType;
-			}
-			set
-			{
-				this._PayType.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Product", Storage="_Product", ThisKey="OIID", OtherKey="OIID")]
 		public EntitySet<Product> Product
 		{
@@ -13961,6 +13948,19 @@ namespace Banner
 			set
 			{
 				this._Product.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_PayType", Storage="_PayType", ThisKey="OIID", OtherKey="OIID")]
+		public EntitySet<PayType> PayType
+		{
+			get
+			{
+				return this._PayType;
+			}
+			set
+			{
+				this._PayType.Assign(value);
 			}
 		}
 		
@@ -14076,18 +14076,6 @@ namespace Banner
 			entity.OrganizeInfo = null;
 		}
 		
-		private void attach_PayType(PayType entity)
-		{
-			this.SendPropertyChanging();
-			entity.OrganizeInfo = this;
-		}
-		
-		private void detach_PayType(PayType entity)
-		{
-			this.SendPropertyChanging();
-			entity.OrganizeInfo = null;
-		}
-		
 		private void attach_Product(Product entity)
 		{
 			this.SendPropertyChanging();
@@ -14099,620 +14087,17 @@ namespace Banner
 			this.SendPropertyChanging();
 			entity.OrganizeInfo = null;
 		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.PayType")]
-	public partial class PayType : INotifyPropertyChanging, INotifyPropertyChanged
-	{
 		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _PTID;
-		
-		private int _OIID;
-		
-		private int _PayType1;
-		
-		private string _Title;
-		
-		private string _Note;
-		
-		private string _TargetURL;
-		
-		private string _BackURL;
-		
-		private string _MerchantID;
-		
-		private string _HashKey;
-		
-		private string _HashIV;
-		
-		private string _PayKey1;
-		
-		private string _PayKey2;
-		
-		private string _PayKey3;
-		
-		private string _PayKey4;
-		
-		private string _PayKey5;
-		
-		private bool _ActiveFlag;
-		
-		private bool _DeleteFlag;
-		
-		private System.DateTime _CreDate;
-		
-		private System.DateTime _UpdDate;
-		
-		private int _SaveACID;
-		
-		private EntitySet<M_Product_PayType> _M_Product_PayType;
-		
-		private EntitySet<Order_Paid> _Order_Paid;
-		
-		private EntityRef<OrganizeInfo> _OrganizeInfo;
-		
-    #region 擴充性方法定義
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnPTIDChanging(int value);
-    partial void OnPTIDChanged();
-    partial void OnOIIDChanging(int value);
-    partial void OnOIIDChanged();
-    partial void OnPayType1Changing(int value);
-    partial void OnPayType1Changed();
-    partial void OnTitleChanging(string value);
-    partial void OnTitleChanged();
-    partial void OnNoteChanging(string value);
-    partial void OnNoteChanged();
-    partial void OnTargetURLChanging(string value);
-    partial void OnTargetURLChanged();
-    partial void OnBackURLChanging(string value);
-    partial void OnBackURLChanged();
-    partial void OnMerchantIDChanging(string value);
-    partial void OnMerchantIDChanged();
-    partial void OnHashKeyChanging(string value);
-    partial void OnHashKeyChanged();
-    partial void OnHashIVChanging(string value);
-    partial void OnHashIVChanged();
-    partial void OnPayKey1Changing(string value);
-    partial void OnPayKey1Changed();
-    partial void OnPayKey2Changing(string value);
-    partial void OnPayKey2Changed();
-    partial void OnPayKey3Changing(string value);
-    partial void OnPayKey3Changed();
-    partial void OnPayKey4Changing(string value);
-    partial void OnPayKey4Changed();
-    partial void OnPayKey5Changing(string value);
-    partial void OnPayKey5Changed();
-    partial void OnActiveFlagChanging(bool value);
-    partial void OnActiveFlagChanged();
-    partial void OnDeleteFlagChanging(bool value);
-    partial void OnDeleteFlagChanged();
-    partial void OnCreDateChanging(System.DateTime value);
-    partial void OnCreDateChanged();
-    partial void OnUpdDateChanging(System.DateTime value);
-    partial void OnUpdDateChanged();
-    partial void OnSaveACIDChanging(int value);
-    partial void OnSaveACIDChanged();
-    #endregion
-		
-		public PayType()
-		{
-			this._M_Product_PayType = new EntitySet<M_Product_PayType>(new Action<M_Product_PayType>(this.attach_M_Product_PayType), new Action<M_Product_PayType>(this.detach_M_Product_PayType));
-			this._Order_Paid = new EntitySet<Order_Paid>(new Action<Order_Paid>(this.attach_Order_Paid), new Action<Order_Paid>(this.detach_Order_Paid));
-			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PTID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int PTID
-		{
-			get
-			{
-				return this._PTID;
-			}
-			set
-			{
-				if ((this._PTID != value))
-				{
-					this.OnPTIDChanging(value);
-					this.SendPropertyChanging();
-					this._PTID = value;
-					this.SendPropertyChanged("PTID");
-					this.OnPTIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int NOT NULL")]
-		public int OIID
-		{
-			get
-			{
-				return this._OIID;
-			}
-			set
-			{
-				if ((this._OIID != value))
-				{
-					if (this._OrganizeInfo.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnOIIDChanging(value);
-					this.SendPropertyChanging();
-					this._OIID = value;
-					this.SendPropertyChanged("OIID");
-					this.OnOIIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="PayType", Storage="_PayType1", DbType="Int NOT NULL")]
-		public int PayType1
-		{
-			get
-			{
-				return this._PayType1;
-			}
-			set
-			{
-				if ((this._PayType1 != value))
-				{
-					this.OnPayType1Changing(value);
-					this.SendPropertyChanging();
-					this._PayType1 = value;
-					this.SendPropertyChanged("PayType1");
-					this.OnPayType1Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
-		public string Title
-		{
-			get
-			{
-				return this._Title;
-			}
-			set
-			{
-				if ((this._Title != value))
-				{
-					this.OnTitleChanging(value);
-					this.SendPropertyChanging();
-					this._Title = value;
-					this.SendPropertyChanged("Title");
-					this.OnTitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Note", DbType="NVarChar(MAX)")]
-		public string Note
-		{
-			get
-			{
-				return this._Note;
-			}
-			set
-			{
-				if ((this._Note != value))
-				{
-					this.OnNoteChanging(value);
-					this.SendPropertyChanging();
-					this._Note = value;
-					this.SendPropertyChanged("Note");
-					this.OnNoteChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetURL", DbType="VarChar(200)")]
-		public string TargetURL
-		{
-			get
-			{
-				return this._TargetURL;
-			}
-			set
-			{
-				if ((this._TargetURL != value))
-				{
-					this.OnTargetURLChanging(value);
-					this.SendPropertyChanging();
-					this._TargetURL = value;
-					this.SendPropertyChanged("TargetURL");
-					this.OnTargetURLChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BackURL", DbType="VarChar(200)")]
-		public string BackURL
-		{
-			get
-			{
-				return this._BackURL;
-			}
-			set
-			{
-				if ((this._BackURL != value))
-				{
-					this.OnBackURLChanging(value);
-					this.SendPropertyChanging();
-					this._BackURL = value;
-					this.SendPropertyChanged("BackURL");
-					this.OnBackURLChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MerchantID", DbType="NChar(10)")]
-		public string MerchantID
-		{
-			get
-			{
-				return this._MerchantID;
-			}
-			set
-			{
-				if ((this._MerchantID != value))
-				{
-					this.OnMerchantIDChanging(value);
-					this.SendPropertyChanging();
-					this._MerchantID = value;
-					this.SendPropertyChanged("MerchantID");
-					this.OnMerchantIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HashKey", DbType="VarChar(100)")]
-		public string HashKey
-		{
-			get
-			{
-				return this._HashKey;
-			}
-			set
-			{
-				if ((this._HashKey != value))
-				{
-					this.OnHashKeyChanging(value);
-					this.SendPropertyChanging();
-					this._HashKey = value;
-					this.SendPropertyChanged("HashKey");
-					this.OnHashKeyChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HashIV", DbType="VarChar(100)")]
-		public string HashIV
-		{
-			get
-			{
-				return this._HashIV;
-			}
-			set
-			{
-				if ((this._HashIV != value))
-				{
-					this.OnHashIVChanging(value);
-					this.SendPropertyChanging();
-					this._HashIV = value;
-					this.SendPropertyChanged("HashIV");
-					this.OnHashIVChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey1", DbType="VarChar(100)")]
-		public string PayKey1
-		{
-			get
-			{
-				return this._PayKey1;
-			}
-			set
-			{
-				if ((this._PayKey1 != value))
-				{
-					this.OnPayKey1Changing(value);
-					this.SendPropertyChanging();
-					this._PayKey1 = value;
-					this.SendPropertyChanged("PayKey1");
-					this.OnPayKey1Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey2", DbType="VarChar(100)")]
-		public string PayKey2
-		{
-			get
-			{
-				return this._PayKey2;
-			}
-			set
-			{
-				if ((this._PayKey2 != value))
-				{
-					this.OnPayKey2Changing(value);
-					this.SendPropertyChanging();
-					this._PayKey2 = value;
-					this.SendPropertyChanged("PayKey2");
-					this.OnPayKey2Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey3", DbType="VarChar(100)")]
-		public string PayKey3
-		{
-			get
-			{
-				return this._PayKey3;
-			}
-			set
-			{
-				if ((this._PayKey3 != value))
-				{
-					this.OnPayKey3Changing(value);
-					this.SendPropertyChanging();
-					this._PayKey3 = value;
-					this.SendPropertyChanged("PayKey3");
-					this.OnPayKey3Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey4", DbType="VarChar(100)")]
-		public string PayKey4
-		{
-			get
-			{
-				return this._PayKey4;
-			}
-			set
-			{
-				if ((this._PayKey4 != value))
-				{
-					this.OnPayKey4Changing(value);
-					this.SendPropertyChanging();
-					this._PayKey4 = value;
-					this.SendPropertyChanged("PayKey4");
-					this.OnPayKey4Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey5", DbType="VarChar(100)")]
-		public string PayKey5
-		{
-			get
-			{
-				return this._PayKey5;
-			}
-			set
-			{
-				if ((this._PayKey5 != value))
-				{
-					this.OnPayKey5Changing(value);
-					this.SendPropertyChanging();
-					this._PayKey5 = value;
-					this.SendPropertyChanged("PayKey5");
-					this.OnPayKey5Changed();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
-		public bool ActiveFlag
-		{
-			get
-			{
-				return this._ActiveFlag;
-			}
-			set
-			{
-				if ((this._ActiveFlag != value))
-				{
-					this.OnActiveFlagChanging(value);
-					this.SendPropertyChanging();
-					this._ActiveFlag = value;
-					this.SendPropertyChanged("ActiveFlag");
-					this.OnActiveFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
-		public bool DeleteFlag
-		{
-			get
-			{
-				return this._DeleteFlag;
-			}
-			set
-			{
-				if ((this._DeleteFlag != value))
-				{
-					this.OnDeleteFlagChanging(value);
-					this.SendPropertyChanging();
-					this._DeleteFlag = value;
-					this.SendPropertyChanged("DeleteFlag");
-					this.OnDeleteFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
-		public System.DateTime CreDate
-		{
-			get
-			{
-				return this._CreDate;
-			}
-			set
-			{
-				if ((this._CreDate != value))
-				{
-					this.OnCreDateChanging(value);
-					this.SendPropertyChanging();
-					this._CreDate = value;
-					this.SendPropertyChanged("CreDate");
-					this.OnCreDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
-		public System.DateTime UpdDate
-		{
-			get
-			{
-				return this._UpdDate;
-			}
-			set
-			{
-				if ((this._UpdDate != value))
-				{
-					this.OnUpdDateChanging(value);
-					this.SendPropertyChanging();
-					this._UpdDate = value;
-					this.SendPropertyChanged("UpdDate");
-					this.OnUpdDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
-		public int SaveACID
-		{
-			get
-			{
-				return this._SaveACID;
-			}
-			set
-			{
-				if ((this._SaveACID != value))
-				{
-					this.OnSaveACIDChanging(value);
-					this.SendPropertyChanging();
-					this._SaveACID = value;
-					this.SendPropertyChanged("SaveACID");
-					this.OnSaveACIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_M_Product_PayType", Storage="_M_Product_PayType", ThisKey="PTID", OtherKey="PTID")]
-		public EntitySet<M_Product_PayType> M_Product_PayType
-		{
-			get
-			{
-				return this._M_Product_PayType;
-			}
-			set
-			{
-				this._M_Product_PayType.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_Order_Paid", Storage="_Order_Paid", ThisKey="PTID", OtherKey="PTID")]
-		public EntitySet<Order_Paid> Order_Paid
-		{
-			get
-			{
-				return this._Order_Paid;
-			}
-			set
-			{
-				this._Order_Paid.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_PayType", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
-		public OrganizeInfo OrganizeInfo
-		{
-			get
-			{
-				return this._OrganizeInfo.Entity;
-			}
-			set
-			{
-				OrganizeInfo previousValue = this._OrganizeInfo.Entity;
-				if (((previousValue != value) 
-							|| (this._OrganizeInfo.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._OrganizeInfo.Entity = null;
-						previousValue.PayType.Remove(this);
-					}
-					this._OrganizeInfo.Entity = value;
-					if ((value != null))
-					{
-						value.PayType.Add(this);
-						this._OIID = value.OIID;
-					}
-					else
-					{
-						this._OIID = default(int);
-					}
-					this.SendPropertyChanged("OrganizeInfo");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_M_Product_PayType(M_Product_PayType entity)
+		private void attach_PayType(PayType entity)
 		{
 			this.SendPropertyChanging();
-			entity.PayType = this;
+			entity.OrganizeInfo = this;
 		}
 		
-		private void detach_M_Product_PayType(M_Product_PayType entity)
+		private void detach_PayType(PayType entity)
 		{
 			this.SendPropertyChanging();
-			entity.PayType = null;
-		}
-		
-		private void attach_Order_Paid(Order_Paid entity)
-		{
-			this.SendPropertyChanging();
-			entity.PayType = this;
-		}
-		
-		private void detach_Order_Paid(Order_Paid entity)
-		{
-			this.SendPropertyChanging();
-			entity.PayType = null;
+			entity.OrganizeInfo = null;
 		}
 	}
 	
@@ -18518,6 +17903,621 @@ namespace Banner
 					this._OID_1 = value;
 				}
 			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.PayType")]
+	public partial class PayType : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _PTID;
+		
+		private int _OIID;
+		
+		private int _PayTypeID;
+		
+		private string _Title;
+		
+		private string _Note;
+		
+		private string _TargetURL;
+		
+		private string _BackURL;
+		
+		private string _MerchantID;
+		
+		private string _HashKey;
+		
+		private string _HashIV;
+		
+		private string _PayKey1;
+		
+		private string _PayKey2;
+		
+		private string _PayKey3;
+		
+		private string _PayKey4;
+		
+		private string _PayKey5;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntitySet<M_Product_PayType> _M_Product_PayType;
+		
+		private EntitySet<Order_Paid> _Order_Paid;
+		
+		private EntityRef<OrganizeInfo> _OrganizeInfo;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnPTIDChanging(int value);
+    partial void OnPTIDChanged();
+    partial void OnOIIDChanging(int value);
+    partial void OnOIIDChanged();
+    partial void OnPayTypeIDChanging(int value);
+    partial void OnPayTypeIDChanged();
+    partial void OnTitleChanging(string value);
+    partial void OnTitleChanged();
+    partial void OnNoteChanging(string value);
+    partial void OnNoteChanged();
+    partial void OnTargetURLChanging(string value);
+    partial void OnTargetURLChanged();
+    partial void OnBackURLChanging(string value);
+    partial void OnBackURLChanged();
+    partial void OnMerchantIDChanging(string value);
+    partial void OnMerchantIDChanged();
+    partial void OnHashKeyChanging(string value);
+    partial void OnHashKeyChanged();
+    partial void OnHashIVChanging(string value);
+    partial void OnHashIVChanged();
+    partial void OnPayKey1Changing(string value);
+    partial void OnPayKey1Changed();
+    partial void OnPayKey2Changing(string value);
+    partial void OnPayKey2Changed();
+    partial void OnPayKey3Changing(string value);
+    partial void OnPayKey3Changed();
+    partial void OnPayKey4Changing(string value);
+    partial void OnPayKey4Changed();
+    partial void OnPayKey5Changing(string value);
+    partial void OnPayKey5Changed();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public PayType()
+		{
+			this._M_Product_PayType = new EntitySet<M_Product_PayType>(new Action<M_Product_PayType>(this.attach_M_Product_PayType), new Action<M_Product_PayType>(this.detach_M_Product_PayType));
+			this._Order_Paid = new EntitySet<Order_Paid>(new Action<Order_Paid>(this.attach_Order_Paid), new Action<Order_Paid>(this.detach_Order_Paid));
+			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PTID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int PTID
+		{
+			get
+			{
+				return this._PTID;
+			}
+			set
+			{
+				if ((this._PTID != value))
+				{
+					this.OnPTIDChanging(value);
+					this.SendPropertyChanging();
+					this._PTID = value;
+					this.SendPropertyChanged("PTID");
+					this.OnPTIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int NOT NULL")]
+		public int OIID
+		{
+			get
+			{
+				return this._OIID;
+			}
+			set
+			{
+				if ((this._OIID != value))
+				{
+					if (this._OrganizeInfo.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOIIDChanging(value);
+					this.SendPropertyChanging();
+					this._OIID = value;
+					this.SendPropertyChanged("OIID");
+					this.OnOIIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayTypeID", DbType="Int NOT NULL")]
+		public int PayTypeID
+		{
+			get
+			{
+				return this._PayTypeID;
+			}
+			set
+			{
+				if ((this._PayTypeID != value))
+				{
+					this.OnPayTypeIDChanging(value);
+					this.SendPropertyChanging();
+					this._PayTypeID = value;
+					this.SendPropertyChanged("PayTypeID");
+					this.OnPayTypeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
+		public string Title
+		{
+			get
+			{
+				return this._Title;
+			}
+			set
+			{
+				if ((this._Title != value))
+				{
+					this.OnTitleChanging(value);
+					this.SendPropertyChanging();
+					this._Title = value;
+					this.SendPropertyChanged("Title");
+					this.OnTitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Note", DbType="NVarChar(MAX)")]
+		public string Note
+		{
+			get
+			{
+				return this._Note;
+			}
+			set
+			{
+				if ((this._Note != value))
+				{
+					this.OnNoteChanging(value);
+					this.SendPropertyChanging();
+					this._Note = value;
+					this.SendPropertyChanged("Note");
+					this.OnNoteChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetURL", DbType="VarChar(200)")]
+		public string TargetURL
+		{
+			get
+			{
+				return this._TargetURL;
+			}
+			set
+			{
+				if ((this._TargetURL != value))
+				{
+					this.OnTargetURLChanging(value);
+					this.SendPropertyChanging();
+					this._TargetURL = value;
+					this.SendPropertyChanged("TargetURL");
+					this.OnTargetURLChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BackURL", DbType="VarChar(200)")]
+		public string BackURL
+		{
+			get
+			{
+				return this._BackURL;
+			}
+			set
+			{
+				if ((this._BackURL != value))
+				{
+					this.OnBackURLChanging(value);
+					this.SendPropertyChanging();
+					this._BackURL = value;
+					this.SendPropertyChanged("BackURL");
+					this.OnBackURLChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MerchantID", DbType="VarChar(100)")]
+		public string MerchantID
+		{
+			get
+			{
+				return this._MerchantID;
+			}
+			set
+			{
+				if ((this._MerchantID != value))
+				{
+					this.OnMerchantIDChanging(value);
+					this.SendPropertyChanging();
+					this._MerchantID = value;
+					this.SendPropertyChanged("MerchantID");
+					this.OnMerchantIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HashKey", DbType="VarChar(100)")]
+		public string HashKey
+		{
+			get
+			{
+				return this._HashKey;
+			}
+			set
+			{
+				if ((this._HashKey != value))
+				{
+					this.OnHashKeyChanging(value);
+					this.SendPropertyChanging();
+					this._HashKey = value;
+					this.SendPropertyChanged("HashKey");
+					this.OnHashKeyChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HashIV", DbType="VarChar(100)")]
+		public string HashIV
+		{
+			get
+			{
+				return this._HashIV;
+			}
+			set
+			{
+				if ((this._HashIV != value))
+				{
+					this.OnHashIVChanging(value);
+					this.SendPropertyChanging();
+					this._HashIV = value;
+					this.SendPropertyChanged("HashIV");
+					this.OnHashIVChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey1", DbType="VarChar(100)")]
+		public string PayKey1
+		{
+			get
+			{
+				return this._PayKey1;
+			}
+			set
+			{
+				if ((this._PayKey1 != value))
+				{
+					this.OnPayKey1Changing(value);
+					this.SendPropertyChanging();
+					this._PayKey1 = value;
+					this.SendPropertyChanged("PayKey1");
+					this.OnPayKey1Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey2", DbType="VarChar(100)")]
+		public string PayKey2
+		{
+			get
+			{
+				return this._PayKey2;
+			}
+			set
+			{
+				if ((this._PayKey2 != value))
+				{
+					this.OnPayKey2Changing(value);
+					this.SendPropertyChanging();
+					this._PayKey2 = value;
+					this.SendPropertyChanged("PayKey2");
+					this.OnPayKey2Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey3", DbType="VarChar(100)")]
+		public string PayKey3
+		{
+			get
+			{
+				return this._PayKey3;
+			}
+			set
+			{
+				if ((this._PayKey3 != value))
+				{
+					this.OnPayKey3Changing(value);
+					this.SendPropertyChanging();
+					this._PayKey3 = value;
+					this.SendPropertyChanged("PayKey3");
+					this.OnPayKey3Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey4", DbType="VarChar(100)")]
+		public string PayKey4
+		{
+			get
+			{
+				return this._PayKey4;
+			}
+			set
+			{
+				if ((this._PayKey4 != value))
+				{
+					this.OnPayKey4Changing(value);
+					this.SendPropertyChanging();
+					this._PayKey4 = value;
+					this.SendPropertyChanged("PayKey4");
+					this.OnPayKey4Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey5", DbType="VarChar(100)")]
+		public string PayKey5
+		{
+			get
+			{
+				return this._PayKey5;
+			}
+			set
+			{
+				if ((this._PayKey5 != value))
+				{
+					this.OnPayKey5Changing(value);
+					this.SendPropertyChanging();
+					this._PayKey5 = value;
+					this.SendPropertyChanged("PayKey5");
+					this.OnPayKey5Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_M_Product_PayType", Storage="_M_Product_PayType", ThisKey="PTID", OtherKey="PTID")]
+		public EntitySet<M_Product_PayType> M_Product_PayType
+		{
+			get
+			{
+				return this._M_Product_PayType;
+			}
+			set
+			{
+				this._M_Product_PayType.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_Order_Paid", Storage="_Order_Paid", ThisKey="PTID", OtherKey="PTID")]
+		public EntitySet<Order_Paid> Order_Paid
+		{
+			get
+			{
+				return this._Order_Paid;
+			}
+			set
+			{
+				this._Order_Paid.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_PayType", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
+		public OrganizeInfo OrganizeInfo
+		{
+			get
+			{
+				return this._OrganizeInfo.Entity;
+			}
+			set
+			{
+				OrganizeInfo previousValue = this._OrganizeInfo.Entity;
+				if (((previousValue != value) 
+							|| (this._OrganizeInfo.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._OrganizeInfo.Entity = null;
+						previousValue.PayType.Remove(this);
+					}
+					this._OrganizeInfo.Entity = value;
+					if ((value != null))
+					{
+						value.PayType.Add(this);
+						this._OIID = value.OIID;
+					}
+					else
+					{
+						this._OIID = default(int);
+					}
+					this.SendPropertyChanged("OrganizeInfo");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_M_Product_PayType(M_Product_PayType entity)
+		{
+			this.SendPropertyChanging();
+			entity.PayType = this;
+		}
+		
+		private void detach_M_Product_PayType(M_Product_PayType entity)
+		{
+			this.SendPropertyChanging();
+			entity.PayType = null;
+		}
+		
+		private void attach_Order_Paid(Order_Paid entity)
+		{
+			this.SendPropertyChanging();
+			entity.PayType = this;
+		}
+		
+		private void detach_Order_Paid(Order_Paid entity)
+		{
+			this.SendPropertyChanging();
+			entity.PayType = null;
 		}
 	}
 	

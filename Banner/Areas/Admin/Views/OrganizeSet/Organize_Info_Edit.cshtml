@@ -82,6 +82,122 @@
                                             </div>
                                         </div>
                                     }
+                                    @if (Model.OI.OID == 1)
+                                    {
+                                        <div class="form-group">
+                                            <label>付款模式設定</label>
+                                            <nav>
+                                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                                    <button class="nav-link active" id="nav-0-tab" data-bs-toggle="tab" data-bs-target="#nav-0" type="button" role="tab" aria-controls="nav-0" aria-selected="true">現金</button>
+                                                    @if (Model.OI.OIID == 1)
+                                                    {
+                                                        <button class="nav-link" id="nav-1-tab" data-bs-toggle="tab" data-bs-target="#nav-1" type="button" role="tab" aria-controls="nav-1" aria-selected="false">藍星-信用卡</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="nav-link" id="nav-1-tab" data-bs-toggle="tab" data-bs-target="#nav-1" type="button" role="tab" aria-controls="nav-1" aria-selected="false" disabled>藍星-信用卡</button>
+                                                    }
+                                                    <button class="nav-link" id="nav-2-tab" data-bs-toggle="tab" data-bs-target="#nav-2" type="button" role="tab" aria-controls="nav-2" aria-selected="false" disabled>藍星-ATM</button>
+                                                    <button class="nav-link" id="nav-3-tab" data-bs-toggle="tab" data-bs-target="#nav-3" type="button" role="tab" aria-controls="nav-3" aria-selected="false" disabled>PayPel</button>
+                                                    <button class="nav-link" id="nav-4-tab" data-bs-toggle="tab" data-bs-target="#nav-4" type="button" role="tab" aria-controls="nav-4" aria-selected="false" disabled>支付寶</button>
+                                                    <!--disabled-->
+                                                </div>
+                                            </nav>
+                                            <div class="tab-content" id="nav-tabContent">
+                                                <div class="tab-pane fade show active" id="nav-0" role="tabpanel" aria-labelledby="nav-0-tab" tabindex="0">
+                                                    @{
+                                                        var PL = Model.PTList.First(q => q.PayTypeID == 0);
+                                                        var ddl = Model.PList.First(q => q.Value == "0");
+                                                    }
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            @Html.CheckBox("cbox_PayType_0", ddl.Selected, new { @id = "cbox_PayType_0", @class = "form-check-input" })
+                                                            @Html.Label("啟用現金交易", new { @class = "form-check-label", @for = "cbox_PayType_0" })
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="tab-pane fade" id="nav-1" role="tabpanel" aria-labelledby="nav-1-tab" tabindex="1">
+                                                    @{
+                                                        PL = Model.PTList.First(q => q.PayTypeID == 1);
+                                                        ddl = Model.PList.First(q => q.Value == "1");
+                                                    }
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            @Html.CheckBox("cbox_PayType_1", ddl.Selected, new { @id = "cbox_PayType_1", @class = "form-check-input" })
+                                                            @Html.Label("啟用信用卡交易", new { @class = "form-check-label", @for = "cbox_PayType_1" })
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label>商店名稱</label>
+                                                            @Html.TextBox("txb_PayType_Title", PL.Title, new { @class = "form-control form-control-lg input-underline" })
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label>商店代號</label>
+                                                            @Html.TextBox("txb_PayType_MerchantID", PL.MerchantID, new { @class = "form-control form-control-lg input-underline" })
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label>加密金鑰</label>
+                                                            @Html.TextBox("txb_PayType_HashKey", PL.HashKey, new { @class = "form-control form-control-lg input-underline" })
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label>加密參數</label>
+                                                            @Html.TextBox("txb_PayType_HashIV", PL.HashIV, new { @class = "form-control form-control-lg input-underline" })
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label>送出網址</label>
+                                                            @Html.TextBox("txb_PayType_TargetURL", PL.TargetURL, new { @class = "form-control form-control-lg input-underline",type="url" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="nav-2" role="tabpanel" aria-labelledby="nav-2-tab" tabindex="2">
+                                                    @{
+                                                        PL = Model.PTList.First(q => q.PayTypeID == 2);
+                                                        ddl = Model.PList.First(q => q.Value == "2");
+                                                    }
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            @Html.CheckBox("cbox_PayType_2", ddl.Selected, new { @id = "cbox_PayType_2", @class = "form-check-input" })
+                                                            @Html.Label("啟用ATM交易", new { @class = "form-check-label", @for = "cbox_PayType_2" })
+                                                        </div>
+                                                        <div class="col-12">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="nav-3" role="tabpanel" aria-labelledby="nav-3-tab" tabindex="3">
+                                                    @{
+                                                        PL = Model.PTList.First(q => q.PayTypeID == 3);
+                                                        ddl = Model.PList.First(q => q.Value == "3");
+                                                    }
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            @Html.CheckBox("cbox_PayType_3", ddl.Selected, new { @id = "cbox_PayType_3", @class = "form-check-input" })
+                                                            @Html.Label("啟用PayPel交易", new { @class = "form-check-label", @for = "cbox_PayType_3" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="nav-4" role="tabpanel" aria-labelledby="nav-4-tab" tabindex="4">
+                                                    @{
+                                                        PL = Model.PTList.First(q => q.PayTypeID == 4);
+                                                        ddl = Model.PList.First(q => q.Value == "4");
+                                                    }
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            @Html.CheckBox("cbox_PayType_4", ddl.Selected, new { @id = "cbox_PayType_4", @class = "form-check-input" })
+                                                            @Html.Label("啟用支付寶交易", new { @class = "form-check-label", @for = "cbox_PayType_4" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                    }
+                                    else
+                                    {
+
+                                    }
+
+
                                     <div class="form-group">
                                         <label>啟用狀態</label>
                                         <div class="row">
@@ -132,6 +248,6 @@
         {
             <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-submit btn-lg btn-round"><i class="fa-solid fa-floppy-disk"></i>儲存</a>
         }
-<a href="/Admin/OrganizeSet/Organize_Info_List/@Model.OI.Organize.ItemID/@Model.OI.OID/0" class="btn btn-outline-primary btn-lg btn-round"><i class="fa-solid fa-xmark"></i>返回列表</a>
+        <a href="/Admin/OrganizeSet/Organize_Info_List/@Model.OI.Organize.ItemID/@Model.OI.OID/0" class="btn btn-outline-primary btn-lg btn-round"><i class="fa-solid fa-xmark"></i>返回列表</a>
     }
 </div>

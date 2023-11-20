@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
@@ -74,6 +75,61 @@ namespace Banner.Areas.Admin.Controllers
             public Organize O = new Organize();
             public List<SelectListItem> OList = new List<SelectListItem>();
             public int NewParentID = 0;
+
+        }
+        //初始化或取得組織資料
+        private cOrganize_Map_Edit ReSetOrganize(string ItemID, int ID, FormCollection FC)
+        {
+            cOrganize_Map_Edit cME = new cOrganize_Map_Edit();
+            if (ID > 0)
+            {
+                cME.O = DC.Organize.FirstOrDefault(q => q.ItemID == ItemID && q.OID == ID && !q.DeleteFlag);
+                if (cME.O == null)
+                    SetAlert("查無資料,請重新操作", 2, "/Admin/OrganizeSet/Organize_Map_List/" + ItemID + "/0");
+                else
+                {
+                    cME.OList = new List<SelectListItem>();
+                    var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == ItemID).ToList();
+                    var O = Os.FirstOrDefault(q => q.ParentID == 0);
+                    if (O != null)
+                    {
+                        do
+                        {
+                            cME.OList.Add(new SelectListItem { Text = O.Title, Value = O.OID.ToString(), Selected = (cME.O.ParentID == O.OID) });
+                            O = Os.FirstOrDefault(q => q.ParentID == O.OID);
+                            if (O == null || O.OID == 8)//排除小組~讓小組一定在最下面
+                                break;
+                        } while (true);
+                    }
+                }
+            }
+            else
+            {
+                cME.O = new Organize() { ItemID = ItemID, ActiveFlag = true, DeleteFlag = false };
+                cME.OList = new List<SelectListItem>();
+                var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == ItemID).ToList();
+                var O = Os.FirstOrDefault(q => q.ParentID == 0);
+                if (O != null)
+                {
+                    do
+                    {
+                        cME.OList.Add(new SelectListItem { Text = O.Title, Value = O.OID.ToString(), Selected = O.ParentID == 0 });
+                        O = Os.FirstOrDefault(q => q.ParentID == O.OID);
+                        if (O == null || O.OID == 8)//排除小組~讓小組一定在最下面
+                            break;
+                    } while (true);
+                }
+            }
+            cME.O.SaveACID = ACID;
+            if (FC != null)
+            {
+                cME.O.Title = FC.Get("txb_Title");
+                cME.O.JobTitle = FC.Get("txb_JobTitle");
+                cME.NewParentID = Convert.ToInt32(FC.Get("ddl_Parent"));
+                cME.O.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
+                cME.O.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
+            }
+            return cME;
         }
         public ActionResult Organize_Map_Edit(string ItemID, int ID)
         {
@@ -181,60 +237,7 @@ namespace Banner.Areas.Admin.Controllers
 
             return View(cOE);
         }
-        //初始化或取得組織資料
-        private cOrganize_Map_Edit ReSetOrganize(string ItemID, int ID, FormCollection FC)
-        {
-            cOrganize_Map_Edit cME = new cOrganize_Map_Edit();
-            if (ID > 0)
-            {
-                cME.O = DC.Organize.FirstOrDefault(q => q.ItemID == ItemID && q.OID == ID && !q.DeleteFlag);
-                if (cME.O == null)
-                    SetAlert("查無資料,請重新操作", 2, "/Admin/OrganizeSet/Organize_Map_List/" + ItemID + "/0");
-                else
-                {
-                    cME.OList = new List<SelectListItem>();
-                    var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == ItemID).ToList();
-                    var O = Os.FirstOrDefault(q => q.ParentID == 0);
-                    if (O != null)
-                    {
-                        do
-                        {
-                            cME.OList.Add(new SelectListItem { Text = O.Title, Value = O.OID.ToString(), Selected = (cME.O.ParentID == O.OID) });
-                            O = Os.FirstOrDefault(q => q.ParentID == O.OID);
-                            if (O == null || O.OID == 8)//排除小組~讓小組一定在最下面
-                                break;
-                        } while (true);
-                    }
-                }
-            }
-            else
-            {
-                cME.O = new Organize() { ItemID = ItemID, ActiveFlag = true, DeleteFlag = false };
-                cME.OList = new List<SelectListItem>();
-                var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == ItemID).ToList();
-                var O = Os.FirstOrDefault(q => q.ParentID == 0);
-                if (O != null)
-                {
-                    do
-                    {
-                        cME.OList.Add(new SelectListItem { Text = O.Title, Value = O.OID.ToString(), Selected = O.ParentID == 0 });
-                        O = Os.FirstOrDefault(q => q.ParentID == O.OID);
-                        if (O == null || O.OID == 8)//排除小組~讓小組一定在最下面
-                            break;
-                    } while (true);
-                }
-            }
-            cME.O.SaveACID = ACID;
-            if (FC != null)
-            {
-                cME.O.Title = FC.Get("txb_Title");
-                cME.O.JobTitle = FC.Get("txb_JobTitle");
-                cME.NewParentID = Convert.ToInt32(FC.Get("ddl_Parent"));
-                cME.O.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
-                cME.O.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
-            }
-            return cME;
-        }
+
         #endregion
         #region 牧養組織與職分管理-匯出
         public ActionResult Organize_Map_Print(string ItemID)
@@ -321,7 +324,7 @@ namespace Banner.Areas.Admin.Controllers
 
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
-            
+
             cOrganize_Info_List cOL = new cOrganize_Info_List();
             cOL.sAddURL = "/Admin/OrganizeSet/Organize_Info_Edit/" + ItemID + "/" + OID + "/" + OIID + "/0";
             cOL.OID = OID;
@@ -508,6 +511,8 @@ namespace Banner.Areas.Admin.Controllers
             public string sUPOIList = "";
             public string C_str = "";
             public string L_str = "";
+            public List<SelectListItem> PList = new List<SelectListItem>();
+            public List<PayType> PTList = new List<PayType>();
         }
         public class OIListSelect
         {
@@ -588,6 +593,24 @@ namespace Banner.Areas.Admin.Controllers
                     }
                 }
 
+                if(OID==1)
+                {
+                    foreach(var PT in cIE.PTList)
+                    {
+                        if(PT.PTID == 0)
+                        {
+                            PT.OIID = cIE.OI.OIID;
+                            DC.PayType.InsertOnSubmit(PT);
+                            DC.SubmitChanges();
+                        }
+                        else
+                        {
+                            PT.UpdDate = DT;
+                            PT.SaveACID = ACID;
+                            DC.SubmitChanges();
+                        }
+                    }
+                }
 
 
                 PID = cIE.OI.ParentID;
@@ -600,6 +623,13 @@ namespace Banner.Areas.Admin.Controllers
         {
 
             cOrganize_Info_Edit cIE = new cOrganize_Info_Edit();
+
+            #region 物件初始化
+
+            for (int i = 0; i < sPayType.Length; i++)
+                cIE.PList.Add(new SelectListItem { Text = sPayType[i], Value = i.ToString() });
+
+            #endregion
             if (OIID > 0)//更新
             {
                 cIE.OI = DC.OrganizeInfo.FirstOrDefault(q => q.OID == OID && q.OIID == OIID && !q.DeleteFlag);
@@ -695,7 +725,45 @@ namespace Banner.Areas.Admin.Controllers
                         cIE.L = new Location { ZID = 10, Address = "" };
                     }
                     #endregion
-
+                    #region 付款方式
+                    var PLs = DC.PayType.Where(q => q.OIID == OIID && !q.DeleteFlag).ToList();
+                    if (PLs.Count() == 0)
+                    {
+                        for (int i = 0; i < sPayType.Length; i++)
+                        {
+                            PayType PT = new PayType
+                            {
+                                OrganizeInfo = cIE.OI,
+                                PayTypeID = i,
+                                Title = "",
+                                Note = "",
+                                TargetURL = "",
+                                BackURL = "",
+                                MerchantID = "",
+                                HashKey = "",
+                                HashIV = "",
+                                PayKey1 = "",
+                                PayKey2 = "",
+                                PayKey3 = "",
+                                PayKey4 = "",
+                                PayKey5 = "",
+                                ActiveFlag = false,
+                                DeleteFlag = false,
+                                CreDate = DT,
+                                UpdDate = DT,
+                            };
+                            cIE.PTList.Add(PT);
+                        }
+                    }
+                    else
+                        cIE.PTList = PLs;
+                    for (int i = 0; i < sPayType.Length; i++)
+                    {
+                        var PL = PLs.FirstOrDefault(q => q.PayTypeID == i);
+                        if (PL != null)
+                            cIE.PList.First(q => q.Value == i.ToString()).Selected = PL.ActiveFlag;
+                    }
+                    #endregion
                 }
             }
             else//新增
@@ -735,6 +803,33 @@ namespace Banner.Areas.Admin.Controllers
                     cIE.C = new Contect { ZID = 10, ContectType = 0, ContectValue = "" };
                     cIE.L = new Location { ZID = 10, Address = "" };
                     #endregion
+                    #region 付款方式
+                    for (int i = 0; i < sPayType.Length; i++)
+                    {
+                        PayType PT = new PayType
+                        {
+                            OrganizeInfo = cIE.OI,
+                            PayTypeID = i,
+                            Title = "",
+                            Note = "",
+                            TargetURL = "",
+                            BackURL = "",
+                            MerchantID = "",
+                            HashKey = "",
+                            HashIV = "",
+                            PayKey1 = "",
+                            PayKey2 = "",
+                            PayKey3 = "",
+                            PayKey4 = "",
+                            PayKey5 = "",
+                            ActiveFlag = false,
+                            DeleteFlag = false,
+                            CreDate = DT,
+                            UpdDate = DT,
+                        };
+                        cIE.PTList.Add(PT);
+                    }
+                    #endregion
                 }
             }
             cIE.OI.SaveACID = ACID;
@@ -773,6 +868,29 @@ namespace Banner.Areas.Admin.Controllers
                     }
 
                 }
+                for (int i = 0; i < sPayType.Length; i++)
+                {
+                    var PL = cIE.PTList.FirstOrDefault(q => q.PayTypeID == i);
+                    if(PL!=null)
+                    {
+                        PL.ActiveFlag = GetViewCheckBox(FC.Get("cbox_PayType_" + i));
+                        switch (i)
+                        {
+
+                            case 1://信用卡
+                                {
+                                    PL.Title = FC.Get("txb_PayType_Title");
+                                    PL.MerchantID = FC.Get("txb_PayType_MerchantID");
+                                    PL.HashKey = FC.Get("txb_PayType_HashKey");
+                                    PL.HashIV = FC.Get("txb_PayType_HashIV");
+                                    PL.TargetURL = FC.Get("txb_PayType_TargetURL");
+                                }
+                                break;
+                        }
+                    }
+                   
+                }
+
 
             }
 
@@ -947,13 +1065,13 @@ namespace Banner.Areas.Admin.Controllers
 
             }
 
-            
-            for(int j=0;j< YCt;j++)
+
+            for (int j = 0; j < YCt; j++)
             {
                 ALS = new ArrayList();
                 for (int i = 0; i < XCt; i++)
                 {
-                    if(T[i, j]!=null)
+                    if (T[i, j] != null)
                     {
                         ALS.Add(T[i, j].Title);
                         if (!string.IsNullOrEmpty(T[i, j].ACName))

@@ -50,7 +50,23 @@ namespace Banner
         public string DateFormat = "yyyy-MM-dd";
         public string DateTimeFormat = "yyyy-MM-dd HH:mm";
         public string CompanyTitle = "【全球旌旗資訊網】";
+
+
+        //測試用
+
         public string sDomanName = "";
+        public string sNewebPagURL = "https://ccore.newebpay.com/MPG/period";//藍星金流網址
+        public string sMerchantID = "";//商店代號
+        public string sHashKey = "";
+        public string sHashIV = "";
+
+        //正式用
+        /*public string sDomanName = "";
+        public string sNewebPagURL = "https://core.newebpay.com/MPG/period";//藍星金流網址
+        public string sMerchantID = "";//商店代號
+        public string sHashKey = "";
+        public string sHashIV = "";*/
+
         public bool bUsedNewName = true;
         public bool[] bGroup = new bool[] { false, false, false, false, false, false }; //權限
         public static List<SelectListItem> ddl_EducationTypes = new List<SelectListItem> {
@@ -101,6 +117,7 @@ namespace Banner
         public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
         public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)" };
         public string[] sCourseType = new string[] { "不限制", "實體", "線上" };
+        public string[] sPayType = new string[] { "現金", "藍新-信用卡", "藍新-ATM", "PayPel", "支付寶"};
         public string Error = "";
         public int iChildAge = 12;
         public int ACID = 0;
@@ -2875,6 +2892,45 @@ namespace Banner
                 iReturn[1] = P.Price_Basic;
             }
             return iReturn;
+        }
+        #endregion
+
+        #region 金流
+        public void PaidOrder()
+        {
+            //付款方式(0:現金/1:藍星-信用卡/2:藍星-ATM/3:PayPel/4:支付寶
+            int PayType = 1;
+            switch(PayType)
+            {
+
+                case 0://現金
+                    {
+
+                    }
+                    break;
+                case 1://藍星-信用卡
+                    {
+
+                    }
+                    break;
+                case 2://藍星-ATM
+                    {
+
+                    }
+                    break;
+                case 3://PayPel
+                    {
+
+                    }
+                    break;
+                case 4://支付寶
+                    {
+
+                    }
+                    break;
+            }
+
+
         }
         #endregion
     }
