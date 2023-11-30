@@ -72,9 +72,33 @@ namespace Banner.Areas.Admin.Controllers
                 Ns = Ns.Where(q => q.ActiveFlag == (c.ActiveType == 1));
             DateTime DT_ = DateTime.Now;
             if (DateTime.TryParse(c.SDate, out DT_))
-                Ns = Ns.Where(q => q.SDate.Date >= DT_.Date);
+            {
+                var PC_Gs = from q in
+                            (from q in DC.Product_ClassTime.Where(q => q.ClassDate.Date >= DT_.Date)
+                             join p in DC.Product_Class.Where(q=>!q.DeleteFlag)
+                             on q.PCID equals p.PCID
+                             select p)
+                            group q by new { q.PID } into g
+                            select new { g.Key.PID };
+                Ns = from q in Ns
+                     join p in PC_Gs
+                     on q.PID equals p.PID
+                     select q;
+            }
             if (DateTime.TryParse(c.EDate, out DT_))
-                Ns = Ns.Where(q => q.EDate.Date <= DT_.Date);
+            {
+                var PC_Gs = from q in
+                            (from q in DC.Product_ClassTime.Where(q => q.ClassDate.Date <= DT_.Date)
+                             join p in DC.Product_Class.Where(q => !q.DeleteFlag)
+                             on q.PCID equals p.PCID
+                             select p)
+                            group q by new { q.PID } into g
+                            select new { g.Key.PID };
+                Ns = from q in Ns
+                     join p in PC_Gs
+                     on q.PID equals p.PID
+                     select q;
+            }
 
             //旌旗權限檢視門檻設置
             var OI2s = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
@@ -99,7 +123,6 @@ namespace Banner.Areas.Admin.Controllers
             TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "課程分類" });
             TopTitles.Add(new cTableCell { Title = "課程名稱" });
-            TopTitles.Add(new cTableCell { Title = "臨櫃報名日期" });
             TopTitles.Add(new cTableCell { Title = "線上報名日期" });
             TopTitles.Add(new cTableCell { Title = "開課日期" });
             TopTitles.Add(new cTableCell { Title = "原價" });
@@ -119,9 +142,27 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/Product_Edit/" + N_.PID, Target = "_self", Value = "編輯" });//編輯
                 cTR.Cs.Add(new cTableCell { Value = "【" + N_.Course.Course_Category.Code + "】" + N_.Course.Course_Category.Title });//課程分類
                 cTR.Cs.Add(new cTableCell { Value = N_.Course.Title + " " + N_.SubTitle });//課程名稱
-                cTR.Cs.Add(new cTableCell { Value = (N_.SDate_Signup_OnSite.ToString(DateFormat) + "<br/>↕<br/>" + N_.EDate_Signup_OnSite.ToString(DateFormat)) });//臨櫃報名日期
-                cTR.Cs.Add(new cTableCell { Value = (N_.SDate_Signup_OnLine.ToString(DateFormat) + "<br/>↕<br/>" + N_.EDate_Signup_OnLine.ToString(DateFormat)) });//線上報名日期
-                cTR.Cs.Add(new cTableCell { Value = (N_.SDate.ToString(DateFormat) + (N_.SDate == N_.EDate ? "" : "<br/>↕<br/>" + N_.EDate.ToString(DateFormat))) });//開課日期
+                cTR.Cs.Add(new cTableCell { Value = (N_.SDate_Signup.ToString(DateFormat) + "<br/>↕<br/>" + N_.EDate_Signup.ToString(DateFormat)) });//線上報名日期
+                var PCTs = from q in DC.Product_Class.Where(q => q.PID == N_.PID && !q.DeleteFlag)
+                           join p in DC.Product_ClassTime
+                           on q.PCID equals p.PCID
+                           select p;
+                if (PCTs.Count() > 0)//開課日期
+                {
+                    DateTime SDate = PCTs.Min(q => q.ClassDate);
+                    DateTime EDate = PCTs.Max(q => q.ClassDate);
+                    if (SDate.Date != EDate.Date)
+                        cTR.Cs.Add(new cTableCell { Value = SDate.ToString(DateFormat) + "<br/>↕<br/>" + EDate.ToString(DateFormat) });
+                    else
+                    {
+                        TimeSpan STime = PCTs.Where(q => q.ClassDate.Date == SDate).Min(q => q.STime);
+                        TimeSpan ETime = PCTs.Where(q => q.ClassDate.Date == SDate).Max(q => q.ETime);
+                        cTR.Cs.Add(new cTableCell { Value = SDate.ToString(DateFormat) + "<br/>" + STime.ToString(@"hh\:mm") + "~" + ETime.ToString(@"hh\:mm") });
+                    }
+                }
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "尚未設定" });
+
                 cTR.Cs.Add(new cTableCell { Value = N_.Price_Basic.ToString() });//原價
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_List?PID=" + N_.PID, Target = "_self", Value = "開班管理" });//班別
                 //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductAllowAccount_List/" + N_.PID, Target = "_self", Value = "指定名單" });//限定會員
@@ -279,7 +320,7 @@ namespace Banner.Areas.Admin.Controllers
                 N.P = new Product
                 {
                     CID = 0,
-                    OIID = OI.OIID,
+                    OrganizeInfo = OI,
                     Title = "",
                     SubTitle = "",
                     ProductType = 0,
@@ -291,12 +332,9 @@ namespace Banner.Areas.Admin.Controllers
                     ImgURL = "",
                     Price_Basic = 0,
                     Price_Early = 0,
-                    SDate = DT,
-                    EDate = DT,
-                    SDate_Signup_OnSite = DT,
-                    EDate_Signup_OnSite = DT,
-                    SDate_Signup_OnLine = DT,
-                    EDate_Signup_OnLine = DT,
+
+                    SDate_Signup = DT,
+                    EDate_Signup = DT,
                     SDate_Early = DT,
                     EDate_Early = DT,
                     ShowFlag = false,
@@ -427,7 +465,7 @@ namespace Banner.Areas.Admin.Controllers
                         foreach (var PT in PTs)
                             N.PTSL.ddlList.First(q => q.Value == PT.PayTypeID.ToString()).Disabled = !PT.ActiveFlag;
                     else
-                        N.PTSL.ddlList.ForEach(q => q.Disabled = true);  
+                        N.PTSL.ddlList.ForEach(q => q.Disabled = true);
                 }
 
                 //付款方式
@@ -440,7 +478,7 @@ namespace Banner.Areas.Admin.Controllers
             #region 前端資料帶入
             if (FC != null)
             {
-                
+
                 if (!string.IsNullOrEmpty(FC.Get("rbl_OI")))
                 {
                     var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID.ToString() == FC.Get("rbl_OI"));
@@ -462,18 +500,12 @@ namespace Banner.Areas.Admin.Controllers
                 N.P.EchelonNo = Convert.ToInt32(FC.Get("ddl_EchelonNo"));
                 N.P.Price_Basic = Convert.ToInt32(FC.Get("txb_Price_Basic"));
                 N.P.Price_Early = Convert.ToInt32(FC.Get("txb_Price_Early"));
-                if (!string.IsNullOrEmpty(FC.Get("txb_SDate")))
-                    N.P.SDate = Convert.ToDateTime(FC.Get("txb_SDate"));
-                if (!string.IsNullOrEmpty(FC.Get("txb_EDate")))
-                    N.P.EDate = Convert.ToDateTime(FC.Get("txb_EDate"));
-                if (!string.IsNullOrEmpty(FC.Get("txb_SDate_Signup_OnSite")))
-                    N.P.SDate_Signup_OnSite = Convert.ToDateTime(FC.Get("txb_SDate_Signup_OnSite"));
-                if (!string.IsNullOrEmpty(FC.Get("txb_EDate_Signup_OnSite")))
-                    N.P.EDate_Signup_OnSite = Convert.ToDateTime(FC.Get("txb_EDate_Signup_OnSite"));
-                if (!string.IsNullOrEmpty(FC.Get("txb_SDate_Signup_OnLine")))
-                    N.P.SDate_Signup_OnLine = Convert.ToDateTime(FC.Get("txb_SDate_Signup_OnLine"));
+                
+                
+                if (!string.IsNullOrEmpty(FC.Get("txb_SDate_Signup")))
+                    N.P.SDate_Signup = Convert.ToDateTime(FC.Get("txb_SDate_Signup"));
                 if (!string.IsNullOrEmpty(FC.Get("txb_EDate_Signup_OnLine")))
-                    N.P.EDate_Signup_OnLine = Convert.ToDateTime(FC.Get("txb_EDate_Signup_OnLine"));
+                    N.P.EDate_Signup = Convert.ToDateTime(FC.Get("txb_EDate_Signup_OnLine"));
                 if (!string.IsNullOrEmpty(FC.Get("txb_SDate_Early")))
                     N.P.SDate_Early = Convert.ToDateTime(FC.Get("txb_SDate_Early"));
                 if (!string.IsNullOrEmpty(FC.Get("txb_EDate_Early")))
@@ -644,12 +676,11 @@ namespace Banner.Areas.Admin.Controllers
             if (N.P.Price_Basic < N.P.Price_Early)
                 Error += "課程原價應低於早鳥價<br/>";
 
-            if (N.P.EDate_Early != N.P.CreDate && N.P.EDate_Early.Date > N.P.EDate.Date)
-                Error += "早鳥結束日應在開課結束日之前<br/>";
-            if (N.P.EDate_Signup_OnSite != N.P.CreDate && N.P.EDate_Signup_OnSite > N.P.EDate.Date)
-                Error += "臨櫃報名結束日應在開課結束日之前<br/>";
-            if (N.P.EDate_Signup_OnLine != N.P.CreDate && N.P.EDate_Signup_OnLine.Date > N.P.EDate.Date)
-                Error += "線上報名結束日應在開課結束日之前<br/>";
+            if (N.P.EDate_Early != N.P.CreDate && N.P.EDate_Early.Date > N.P.EDate_Signup.Date)
+                Error += "早鳥結束日應在線上報名結束日之前<br/>";
+
+            if (N.P.SDate_Signup != N.P.CreDate && N.P.EDate_Signup.Date > N.P.SDate_Early.Date)
+                Error += "線上報名起始日應在線上報名結束日之前<br/>";
 
 
             #endregion
@@ -725,17 +756,19 @@ namespace Banner.Areas.Admin.Controllers
         {
             public int PID = 0;
             public string sKey = "";
+            public string sP_Title = "";
             public cTableList cTL = new cTableList();
         }
         public cProductClass_List GetProductClass_List(int PID, FormCollection FC)
         {
             cProductClass_List N = new cProductClass_List();
             N.PID = PID;
+            var P = DC.Product.FirstOrDefault(q => q.PID == PID);
+            if (P != null)
+                N.sP_Title = P.Title + P.SubTitle;
             N.sKey = FC != null ? FC.Get("txb_Key") : "";
             N.cTL.Rs = new List<cTableRow>();
-            var Ns = DC.Product_Class.Where(q => q.PID > 0);
-            if (PID > 0)
-                Ns = DC.Product_Class.Where(q => q.PID == PID);
+            var Ns = DC.Product_Class.Where(q => q.PID == PID && !q.DeleteFlag);
 
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
@@ -744,11 +777,11 @@ namespace Banner.Areas.Admin.Controllers
             TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "課程名稱" });
             TopTitles.Add(new cTableCell { Title = "班級名稱" });
-            TopTitles.Add(new cTableCell { Title = "星期" });
-            TopTitles.Add(new cTableCell { Title = "時段" });
+            TopTitles.Add(new cTableCell { Title = "開班日設定" });
             TopTitles.Add(new cTableCell { Title = "人數" });
             TopTitles.Add(new cTableCell { Title = "地點" });
             TopTitles.Add(new cTableCell { Title = "講師" });
+            TopTitles.Add(new cTableCell { Title = "刪除" });
 
             N.cTL.Rs.Add(SetTableRowTitle(TopTitles));
             N.cTL.TotalCt = Ns.Count();
@@ -761,11 +794,8 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_Edit/" + N_.PCID + "?PID=" + N_.PID, Target = "_self", Value = "編輯" });//編輯
                 cTR.Cs.Add(new cTableCell { Value = N_.Product.Title });//課程名稱
                 cTR.Cs.Add(new cTableCell { Value = N_.Title });//班級名稱
-                if (N_.LoopFlag)
-                    cTR.Cs.Add(new cTableCell { Value = sWeeks[N_.WeeklyNo] });//星期
-                else
-                    cTR.Cs.Add(new cTableCell { Value = N_.TargetDate.ToString(DateFormat) });//單日
-                cTR.Cs.Add(new cTableCell { Value = N_.STime.ToString() + "~" + N_.ETime.ToString() });//時段
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClassDate_List/0?PID=" + N_.PID + "&PCID=" + N_.PCID, Value = "開班日管理" });//開班日設定"
+
                 cTR.Cs.Add(new cTableCell { Value = N_.PeopleCt.ToString() });//人數
 
                 string sLocation = string.IsNullOrEmpty(N_.LocationName) ? "" : N_.LocationName;
@@ -782,6 +812,7 @@ namespace Banner.Areas.Admin.Controllers
                            on q.TID equals p.TID
                            select p).FirstOrDefault();
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClassTeacher_List/" + N_.PCID + "?PID=" + N_.PID, Target = "_self", Value = (MPT != null ? MPT.Title : "設定講師") });//編輯
+                cTR.Cs.Add(new cTableCell { Type = "deletebutton", URL = "DataDelete('Product_Class', " + N_.PCID + ")",CSS= "btn btn-outline-danger", Value = "刪除" });//刪除
                 N.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
 
@@ -806,35 +837,29 @@ namespace Banner.Areas.Admin.Controllers
         public class cProductClass_Edit
         {
             public Product_Class PC = new Product_Class();
-            public ListSelect LS_Week = new ListSelect();
             public int ProductType = 0;
         }
         public cProductClass_Edit GetProductClass_Edit(int PID, int ID, FormCollection FC)
         {
             cProductClass_Edit N = new cProductClass_Edit();
             #region 物件初始化
-            N.LS_Week.Title = "週期選擇";
-            for (int i = 0; i < sWeeks.Length; i++)
-                N.LS_Week.ddlList.Add(new SelectListItem { Text = sWeeks[i], Value = i.ToString(), Selected = i == 0 });
+
             #endregion
             #region 載入資料
-            var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == ID && q.PID == PID);
+            var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == ID && q.PID == PID && !q.DeleteFlag);
             if (PC == null)
             {
                 N.PC = new Product_Class
                 {
                     PID = PID,
                     Title = "",
-                    LoopFlag = true,
-                    TargetDate = DT,
-                    WeeklyNo = 0,
-                    STime = new TimeSpan(9, 0, 0),
-                    ETime = new TimeSpan(12, 0, 0),
+
                     PeopleCt = 0,
                     PhoneNo = "",
                     LocationName = "",
                     Address = "",
                     MeetURL = "",
+                    GraduateDate = DT,
                     CreDate = DT,
                     UpdDate = DT,
                     SaveACID = 1
@@ -843,8 +868,6 @@ namespace Banner.Areas.Admin.Controllers
             else
             {
                 N.PC = PC;
-                N.LS_Week.ddlList.ForEach(q => q.Selected = false);
-                N.LS_Week.ddlList.First(q => q.Value == PC.WeeklyNo.ToString()).Selected = true;
             }
             var P = DC.Product.FirstOrDefault(q => q.PID == PID);
             if (P == null)
@@ -860,15 +883,12 @@ namespace Banner.Areas.Admin.Controllers
             if (FC != null)
             {
                 N.PC.Title = FC.Get("txb_Title");
-                N.PC.LoopFlag = GetViewCheckBox(FC.Get("cbox_LoopFlag"));
-                N.PC.TargetDate = Convert.ToDateTime(FC.Get("txb_TargetDate"));
-                N.PC.WeeklyNo = Convert.ToInt32(FC.Get("ddl_Week"));
-                N.PC.STime = TimeSpan.Parse(FC.Get("txb_STime"));
-                N.PC.ETime = TimeSpan.Parse(FC.Get("txb_ETime"));
                 N.PC.PeopleCt = Convert.ToInt32(FC.Get("txb_PeopleCt"));
                 N.PC.PhoneNo = FC.Get("txb_PhoneNo");
                 N.PC.LocationName = FC.Get("txb_LocationName");
-
+                DateTime DT_ = DateTime.Now;
+                DateTime.TryParse(FC.Get("txb_GraduateDate"), out DT_);
+                N.PC.GraduateDate = DT_;
                 if (N.ProductType == 0 || N.ProductType == 1)
                     N.PC.Address = FC.Get("txb_Address");
                 else
@@ -880,7 +900,18 @@ namespace Banner.Areas.Admin.Controllers
                     N.PC.MeetURL = "";
             }
             #endregion
+            #region 檢查
+            if (N.PC.PCID > 0)
+            {
+                if (N.PC.Product_ClassTime.Count() > 0)
+                {
+                    DateTime MaxClassDate = N.PC.Product_ClassTime.Max(q => q.ClassDate);
+                    if (MaxClassDate.Date > N.PC.GraduateDate.Date)
+                        Error += "您設定的結業日應大於目前課程的最後上課日:" + MaxClassDate.ToString(DateFormat);
+                }
+            }
 
+            #endregion
             return N;
         }
         [HttpGet]
@@ -900,17 +931,227 @@ namespace Banner.Areas.Admin.Controllers
             int PID = GetQueryStringInInt("PID");
             ChangeTitle(ID == 0);
             var N = GetProductClass_Edit(PID, ID, FC);
-            if (N.PC.PCID == 0)
+            if (Error != "")
+                SetAlert(Error, 2);
+            else
             {
-                DC.Product_Class.InsertOnSubmit(N.PC);
+                if (N.PC.PCID == 0)
+                {
+                    DC.Product_Class.InsertOnSubmit(N.PC);
+                }
+                DC.SubmitChanges();
+                SetAlert("存檔完成", 1, "/Admin/StoreSet/ProductClass_List?PID=" + PID);
+
             }
-            DC.SubmitChanges();
-            SetAlert("存檔完成", 1, "/Admin/StoreSet/ProductClass_List?PID=" + PID);
 
             return View(N);
         }
         #endregion
 
+        #region 上架課程-班別-開課日期列表
+        public class cProductClassDate_List
+        {
+            public int PID = 0;
+            public int PCID = 0;
+            public cTableList cTL = new cTableList();
+        }
+        public cProductClassDate_List GetProductClassDate_List(int PID, int PCID, FormCollection FC)
+        {
+            cProductClassDate_List N = new cProductClassDate_List();
+            N.PID = PID;
+            N.PCID = PCID;
+            N.cTL.Rs = new List<cTableRow>();
+            var Ns = DC.Product_ClassTime.Where(q => q.PCID == PCID);
+
+
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "日期" });
+            TopTitles.Add(new cTableCell { Title = "起始時間" });
+            TopTitles.Add(new cTableCell { Title = "結束時間" });
+
+            N.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            N.cTL.TotalCt = Ns.Count();
+            N.cTL.MaxNum = GetMaxNum(N.cTL.TotalCt, N.cTL.NumCut);
+            Ns = Ns.OrderBy(q => q.ClassDate).Skip((iNowPage - 1) * N.cTL.NumCut).Take(N.cTL.NumCut);
+
+            foreach (var N_ in Ns)
+            {
+                cTableRow cTR = new cTableRow();
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClassDate_Edit/" + N_.PCTID + "?PID=" + PID + "&PCID=" + N_.PCID, Target = "_self", Value = "編輯" });//編輯
+                cTR.Cs.Add(new cTableCell { Value = N_.ClassDate.ToString(DateFormat) });//日期
+                cTR.Cs.Add(new cTableCell { Value = N_.STime.ToString(@"hh\:mm") });//起始時間
+                cTR.Cs.Add(new cTableCell { Value = N_.ETime.ToString(@"hh\:mm") });//結束時間
+                N.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+
+            return N;
+        }
+        [HttpGet]
+        public ActionResult ProductClassDate_List()
+        {
+            GetViewBag();
+            return View(GetProductClassDate_List(GetQueryStringInInt("PID"), GetQueryStringInInt("PCID"), null));
+        }
+        [HttpPost]
+        public ActionResult ProductClassDate_List(FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetProductClassDate_List(GetQueryStringInInt("PID"), GetQueryStringInInt("PCID"), null));
+        }
+        #endregion
+        #region 上架課程-班別-開課日期新增/修改
+
+        public class cProductClassDate_Edit
+        {
+            public int PID = 0;
+            public int PCID = 0;
+            public Product_Class PC = new Product_Class();
+            public Product_ClassTime PCT = new Product_ClassTime();
+        }
+        public cProductClassDate_Edit GetProductClassDate_Edit(int PID, int PCID, int ID, FormCollection FC)
+        {
+            cProductClassDate_Edit N = new cProductClassDate_Edit();
+            #region 物件初始化
+            N.PID = PID;
+            N.PCID = PCID;
+            #endregion
+            #region 載入資料
+            var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == PCID && !q.DeleteFlag);
+            if (PC == null)
+                SetAlert("此班級不存在...", 2, "/Admin/StoreSet/Product_List");
+            else
+            {
+                N.PC = PC;
+                var PCT = DC.Product_ClassTime.FirstOrDefault(q => q.PCTID == ID && q.PCID == PCID);
+                if (PCT == null)
+                {
+                    N.PCT = new Product_ClassTime
+                    {
+                        PCID = PCID,
+                        ClassDate = DT,
+                        STime = new TimeSpan(9, 0, 0),
+                        ETime = new TimeSpan(12, 0, 0)
+
+                    };
+                }
+                else
+                {
+                    N.PCT = PCT;
+                }
+            }
+
+            #endregion
+            #region 前端載入
+            if (FC != null)
+                if (FC.Keys.Count == 0)
+                    FC = null;
+            if (FC != null)
+            {
+                N.PCT.ClassDate = Convert.ToDateTime(FC.Get("txb_ClassDate"));
+                N.PCT.STime = TimeSpan.Parse(FC.Get("txb_STime"));
+                N.PCT.ETime = TimeSpan.Parse(FC.Get("txb_ETime"));
+            }
+            #endregion
+            #region 檢查
+
+            if (N.PCT.ClassDate.Date > N.PC.GraduateDate.Date)
+                Error += "您設定的結業日" + N.PC.GraduateDate.ToString(DateFormat) + "應大於上課日期";
+
+            #endregion
+            return N;
+        }
+        [HttpGet]
+        public ActionResult ProductClassDate_Edit(int ID)
+        {
+            GetViewBag();
+            CheckVCookie();
+            ChangeTitle(ID == 0);
+            return View(GetProductClassDate_Edit(GetQueryStringInInt("PID"), GetQueryStringInInt("PCID"), ID, null));
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ProductClassDate_Edit(int ID, FormCollection FC)
+        {
+            GetViewBag();
+            ChangeTitle(ID == 0);
+            var N = GetProductClassDate_Edit(GetQueryStringInInt("PID"), GetQueryStringInInt("PCID"), ID, FC);
+            if (Error != "")
+                SetAlert(Error,2);
+            else
+            {
+                if (N.PCT.PCTID == 0)
+                {
+                    DC.Product_ClassTime.InsertOnSubmit(N.PCT);
+                }
+                DC.SubmitChanges();
+                SetAlert("存檔完成", 1, "/Admin/StoreSet/ProductClassDate_List?PID=" + N.PID + "&PCID=" + N.PCID);
+            }
+
+            return View(N);
+        }
+        #endregion
+        #region 上課課程-班別-批次新增日期
+        [HttpGet]
+        public string CreateClassDate()
+        {
+            string sReturn = "";
+            string sSDate = GetQueryStringInString("SDate");
+            string sSTime = GetQueryStringInString("STime");
+            string sETime = GetQueryStringInString("ETime");
+
+            DateTime SDate = DateTime.Now;
+            TimeSpan STime = new TimeSpan();
+            TimeSpan ETime = new TimeSpan();
+            int PCID = GetQueryStringInInt("PCID");
+            int DaySpan = GetQueryStringInInt("DaySpan");
+            int No = GetQueryStringInInt("No");
+            if (!DateTime.TryParse(sSDate, out SDate))
+                sReturn = "起始日期格式錯誤,請輸入日期";
+            if (!TimeSpan.TryParse(sSTime, out STime))
+                sReturn = "起始時間格式錯誤,請輸入時與分";
+            if (!TimeSpan.TryParse(sETime, out ETime))
+                sReturn = "結束時間格式錯誤,請輸入時與分";
+
+            if (DaySpan <= 0)
+                sReturn = "相隔週期請重新輸入";
+            if (No <= 0)
+                sReturn = "上課堂數請重新輸入";
+            if (sReturn == "")
+            {
+                var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == PCID && !q.DeleteFlag);
+                if (PC != null)
+                {
+                    DateTime Max_Date = SDate.AddDays(DaySpan * No);
+                    if (PC.GraduateDate.Date < Max_Date.Date)
+                        Error += "您設定的結業日" + PC.GraduateDate.ToString(DateFormat) + "預期將小於最後上課日:" + Max_Date.ToString(DateFormat) + ",請修改本班級結業日或批次數值以符合規則";
+                    else
+                    {
+                        List<Product_ClassTime> PCTs = new List<Product_ClassTime>();
+                        for (int i = 0; i < No; i++)
+                        {
+                            PCTs.Add(new Product_ClassTime
+                            {
+                                Product_Class = PC,
+                                ClassDate = SDate.AddDays(i * DaySpan),
+                                STime = STime,
+                                ETime = ETime
+                            });
+                        }
+                        DC.Product_ClassTime.InsertAllOnSubmit(PCTs);
+                        DC.SubmitChanges();
+                    }
+
+                }
+                else
+                    sReturn = "缺少上課資料...無法新增";
+            }
+            return sReturn == "" ? "OK" : sReturn;
+        }
+        #endregion
         #region 上課課程-班別講師設定
         public cTeacher_List ProductClassTeacher_List(int ID, int PID, FormCollection FC)
         {

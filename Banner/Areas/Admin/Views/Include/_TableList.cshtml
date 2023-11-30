@@ -106,6 +106,15 @@
                                                 }
                                                 break;
 
+                                            case "deletebutton"://button
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs.Count> C.SortNo ? Model.Rs[0].Cs[C.SortNo].Title : "")</span>
+                                                        <a href="javascript:;" class="@C.CSS" onclick="@C.URL">@C.Value</a>
+                                                    </td>
+                                                }
+                                                break;
+
                                             case "Media"://Media
                                                 {
                                                     <td>

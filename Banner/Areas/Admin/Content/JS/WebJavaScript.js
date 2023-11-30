@@ -248,6 +248,19 @@ function ChangeActive(TargetControl,TableName, ID) {
     })
     
 }
+//資料刪除
+function DataDelete(TableName, ID) {
+    $.ajax({
+        url: '/Admin/Home/DataDelete?TableName=' + TableName + '&ID=' + ID,
+        method: 'GET',
+        dataType: 'text',
+        success: function (res) {
+            location.reload();
+        },
+        error: function (err) { console.log(err) },
+    })
+
+}
 //變更講師
 function ChangeTeacher(TargetControl, TID, PCID) {
     $.ajax({

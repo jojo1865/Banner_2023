@@ -10,8 +10,7 @@
             <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
             @if (Model != null)
             {
-                //string TimeFormat = "HH:mm";
-                string DateFormat = "yyyy-MM-dd";
+
                 <form method="post" id="form1" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
 
@@ -19,60 +18,11 @@
                         <div class="form-card-group">
                             <div id="personal-info" class="header-container">
                                 <div class="header-left-border"></div>
-                                <div class="header">班級設定設定</div>
+                                <div class="header">班級設定</div>
                             </div>
                             <div class="form-group">
                                 <label>班級名稱<span>*</span></label>
                                 @Html.TextBox("txb_Title", Model.PC.Title, new { @class = "form-control form-control-lg input-underline" })
-                            </div>
-                            <div class="form-group">
-                                <label>上課週期<span>*</span></label>
-                                <div class="row">
-                                    <div class="col-auto">
-                                        <div class="form-check form-check-inline">
-                                            @Html.RadioButton("cbox_LoopFlag", true, Model.PC.LoopFlag, new { @id = "cbox_LoopFlag1", @class = "form-check-input", @onchange = "ShowLoop(1);" })
-                                            @Html.Label("每周", new { @class = "form-check-label", @for = "cbox_LoopFlag1" })
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="form-check form-check-inline">
-                                            @Html.RadioButton("cbox_LoopFlag", false, !Model.PC.LoopFlag, new { @id = "cbox_LoopFlag2", @class = "form-check-input", @onchange = "ShowLoop(0);" })
-                                            @Html.Label("只有一天", new { @class = "form-check-label", @for = "cbox_LoopFlag2" })
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @{ 
-                                string d_Loop0 = "none";
-                                string d_Loop1 = "none";
-                                if(Model.PC.LoopFlag)
-                                {
-                                    d_Loop1 = "block";
-                                }
-                                else
-                                {
-                                    d_Loop0 = "block";
-                                }
-                            }
-                            <div class="form-group" style="display:@(d_Loop0)" id="div_Loop_0">
-                                <label>上課日期<span>*</span></label>
-                                @Html.TextBox("txb_TargetDate", Model.PC.TargetDate.ToString(DateFormat), new { @class = "form-control form-control-lg input-underline", type = "date" })
-                            </div>
-                            <div class="form-group" style="display:@(d_Loop1)" id="div_Loop_1_1">
-                                <label>週期選擇<span>*</span></label>
-                                @Html.DropDownList("ddl_Week", Model.LS_Week.ddlList, new { @class = "form-select form-control-lg" })
-                            </div>
-                            <div class="form-group" style="display:@(d_Loop1)" id="div_Loop_1_2">
-                                <label>上課時間<span>*</span></label>
-                                <div class="row">
-                                    <div class="col-auto">
-                                        @Html.TextBox("txb_STime", Model.PC.STime, new { @class = "form-control form-control-lg input-underline", @type = "time" })
-                                    </div>
-                                    <div class="col-auto">~</div>
-                                    <div class="col-auto">
-                                        @Html.TextBox("txb_ETime", Model.PC.ETime, new { @class = "form-control form-control-lg input-underline", @type = "time" })
-                                    </div>
-                                </div>
                             </div>
                             <div class="form-group">
                                 <label>人數限制<span>(0表示不限制)</span></label>
@@ -86,10 +36,10 @@
                                 <label>電話</label>
                                 @Html.TextBox("txb_PhoneNo", Model.PC.PhoneNo, new { @class = "form-control form-control-lg input-underline" })
                             </div>
-                            @{ 
+                            @{
                                 string s_Address = "none";
                                 string s_Meet = "none";
-                                switch(Model.ProductType)
+                                switch (Model.ProductType)
                                 {
                                     default:
                                         s_Address = "block";
@@ -102,7 +52,7 @@
                                         s_Meet = "block";
                                         break;
                                 }
-                                            }
+                            }
                             <div class="form-group" style="display:@(s_Address)">
                                 <label>班級地址</label>
                                 @Html.TextBox("txb_Address", Model.PC.Address, new { @class = "form-control form-control-lg input-underline" })
@@ -110,6 +60,10 @@
                             <div class="form-group" style="display:@(s_Meet)">
                                 <label>線上網址</label>
                                 @Html.TextBox("txb_MeetURL", Model.PC.MeetURL, new { @class = "form-control form-control-lg input-underline" })
+                            </div>
+                            <div class="form-group">
+                                <label>結業日</label>
+                                @Html.TextBox("txb_GraduateDate", Model.PC.GraduateDate.ToString("yyyy-MM-dd"), new { @class = "form-control form-control-lg input-underline",Type="date" })
                             </div>
                         </div>
                     </div>

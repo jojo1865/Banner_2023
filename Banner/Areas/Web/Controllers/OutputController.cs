@@ -51,8 +51,8 @@ namespace Banner.Areas.Web.Controllers
             else if (ValidateCode != GetSession("VNum"))
                 Error += "驗證碼輸入錯誤</br>";
 
-            if (sReturn == "")
-                Error += "Token驗證成功但無返回網址</br>";
+            //if (sReturn == "")
+            //    Error += "Token驗證成功但無返回網址</br>";
             if (Error != "")
                 SetAlert(Error, 2);
             else

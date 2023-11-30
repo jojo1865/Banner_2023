@@ -105,6 +105,9 @@ namespace Banner
     partial void InsertM_OI2_Account(M_OI2_Account instance);
     partial void UpdateM_OI2_Account(M_OI2_Account instance);
     partial void DeleteM_OI2_Account(M_OI2_Account instance);
+    partial void InsertM_OS_Account(M_OS_Account instance);
+    partial void UpdateM_OS_Account(M_OS_Account instance);
+    partial void DeleteM_OS_Account(M_OS_Account instance);
     partial void InsertM_Product_PayType(M_Product_PayType instance);
     partial void UpdateM_Product_PayType(M_Product_PayType instance);
     partial void DeleteM_Product_PayType(M_Product_PayType instance);
@@ -147,12 +150,18 @@ namespace Banner
     partial void InsertOrganizeInfo(OrganizeInfo instance);
     partial void UpdateOrganizeInfo(OrganizeInfo instance);
     partial void DeleteOrganizeInfo(OrganizeInfo instance);
-    partial void InsertProduct(Product instance);
-    partial void UpdateProduct(Product instance);
-    partial void DeleteProduct(Product instance);
-    partial void InsertProduct_Class(Product_Class instance);
-    partial void UpdateProduct_Class(Product_Class instance);
-    partial void DeleteProduct_Class(Product_Class instance);
+    partial void InsertOrganizeStaff(OrganizeStaff instance);
+    partial void UpdateOrganizeStaff(OrganizeStaff instance);
+    partial void DeleteOrganizeStaff(OrganizeStaff instance);
+    partial void InsertOrganizeStaff_Category(OrganizeStaff_Category instance);
+    partial void UpdateOrganizeStaff_Category(OrganizeStaff_Category instance);
+    partial void DeleteOrganizeStaff_Category(OrganizeStaff_Category instance);
+    partial void InsertPayType(PayType instance);
+    partial void UpdatePayType(PayType instance);
+    partial void DeletePayType(PayType instance);
+    partial void InsertProduct_ClassTime(Product_ClassTime instance);
+    partial void UpdateProduct_ClassTime(Product_ClassTime instance);
+    partial void DeleteProduct_ClassTime(Product_ClassTime instance);
     partial void InsertProduct_File(Product_File instance);
     partial void UpdateProduct_File(Product_File instance);
     partial void DeleteProduct_File(Product_File instance);
@@ -168,9 +177,12 @@ namespace Banner
     partial void InsertToken_Check(Token_Check instance);
     partial void UpdateToken_Check(Token_Check instance);
     partial void DeleteToken_Check(Token_Check instance);
-    partial void InsertPayType(PayType instance);
-    partial void UpdatePayType(PayType instance);
-    partial void DeletePayType(PayType instance);
+    partial void InsertProduct(Product instance);
+    partial void UpdateProduct(Product instance);
+    partial void DeleteProduct(Product instance);
+    partial void InsertProduct_Class(Product_Class instance);
+    partial void UpdateProduct_Class(Product_Class instance);
+    partial void DeleteProduct_Class(Product_Class instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -397,6 +409,14 @@ namespace Banner
 			}
 		}
 		
+		public System.Data.Linq.Table<M_OS_Account> M_OS_Account
+		{
+			get
+			{
+				return this.GetTable<M_OS_Account>();
+			}
+		}
+		
 		public System.Data.Linq.Table<M_Product_PayType> M_Product_PayType
 		{
 			get
@@ -509,19 +529,35 @@ namespace Banner
 			}
 		}
 		
-		public System.Data.Linq.Table<Product> Product
+		public System.Data.Linq.Table<OrganizeStaff> OrganizeStaff
 		{
 			get
 			{
-				return this.GetTable<Product>();
+				return this.GetTable<OrganizeStaff>();
 			}
 		}
 		
-		public System.Data.Linq.Table<Product_Class> Product_Class
+		public System.Data.Linq.Table<OrganizeStaff_Category> OrganizeStaff_Category
 		{
 			get
 			{
-				return this.GetTable<Product_Class>();
+				return this.GetTable<OrganizeStaff_Category>();
+			}
+		}
+		
+		public System.Data.Linq.Table<PayType> PayType
+		{
+			get
+			{
+				return this.GetTable<PayType>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Product_ClassTime> Product_ClassTime
+		{
+			get
+			{
+				return this.GetTable<Product_ClassTime>();
 			}
 		}
 		
@@ -581,11 +617,19 @@ namespace Banner
 			}
 		}
 		
-		public System.Data.Linq.Table<PayType> PayType
+		public System.Data.Linq.Table<Product> Product
 		{
 			get
 			{
-				return this.GetTable<PayType>();
+				return this.GetTable<Product>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Product_Class> Product_Class
+		{
+			get
+			{
+				return this.GetTable<Product_Class>();
 			}
 		}
 		
@@ -684,6 +728,8 @@ namespace Banner
 		
 		private EntitySet<M_OI2_Account> _M_OI2_Account;
 		
+		private EntitySet<M_OS_Account> _M_OS_Account;
+		
 		private EntitySet<M_Rool_Account> _M_Rool_Account;
 		
 		private EntitySet<Order_Header> _Order_Header;
@@ -760,6 +806,7 @@ namespace Banner
 			this._M_O_Account = new EntitySet<M_O_Account>(new Action<M_O_Account>(this.attach_M_O_Account), new Action<M_O_Account>(this.detach_M_O_Account));
 			this._M_OI_Account = new EntitySet<M_OI_Account>(new Action<M_OI_Account>(this.attach_M_OI_Account), new Action<M_OI_Account>(this.detach_M_OI_Account));
 			this._M_OI2_Account = new EntitySet<M_OI2_Account>(new Action<M_OI2_Account>(this.attach_M_OI2_Account), new Action<M_OI2_Account>(this.detach_M_OI2_Account));
+			this._M_OS_Account = new EntitySet<M_OS_Account>(new Action<M_OS_Account>(this.attach_M_OS_Account), new Action<M_OS_Account>(this.detach_M_OS_Account));
 			this._M_Rool_Account = new EntitySet<M_Rool_Account>(new Action<M_Rool_Account>(this.attach_M_Rool_Account), new Action<M_Rool_Account>(this.detach_M_Rool_Account));
 			this._Order_Header = new EntitySet<Order_Header>(new Action<Order_Header>(this.attach_Order_Header), new Action<Order_Header>(this.detach_Order_Header));
 			this._OrganizeInfo = new EntitySet<OrganizeInfo>(new Action<OrganizeInfo>(this.attach_OrganizeInfo), new Action<OrganizeInfo>(this.detach_OrganizeInfo));
@@ -1422,6 +1469,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_OS_Account", Storage="_M_OS_Account", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<M_OS_Account> M_OS_Account
+		{
+			get
+			{
+				return this._M_OS_Account;
+			}
+			set
+			{
+				this._M_OS_Account.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_Rool_Account", Storage="_M_Rool_Account", ThisKey="ACID", OtherKey="ACID")]
 		public EntitySet<M_Rool_Account> M_Rool_Account
 		{
@@ -1620,6 +1680,18 @@ namespace Banner
 		}
 		
 		private void detach_M_OI2_Account(M_OI2_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_M_OS_Account(M_OS_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_M_OS_Account(M_OS_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -9035,6 +9107,390 @@ namespace Banner
 		}
 	}
 	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.M_OS_Account")]
+	public partial class M_OS_Account : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _MID;
+		
+		private int _OSID;
+		
+		private int _ACID;
+		
+		private bool _LeaderFlag;
+		
+		private System.DateTime _JoinDate;
+		
+		private System.DateTime _LeaveDate;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<OrganizeStaff> _OrganizeStaff;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnMIDChanging(int value);
+    partial void OnMIDChanged();
+    partial void OnOSIDChanging(int value);
+    partial void OnOSIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnLeaderFlagChanging(bool value);
+    partial void OnLeaderFlagChanged();
+    partial void OnJoinDateChanging(System.DateTime value);
+    partial void OnJoinDateChanged();
+    partial void OnLeaveDateChanging(System.DateTime value);
+    partial void OnLeaveDateChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public M_OS_Account()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._OrganizeStaff = default(EntityRef<OrganizeStaff>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int MID
+		{
+			get
+			{
+				return this._MID;
+			}
+			set
+			{
+				if ((this._MID != value))
+				{
+					this.OnMIDChanging(value);
+					this.SendPropertyChanging();
+					this._MID = value;
+					this.SendPropertyChanged("MID");
+					this.OnMIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OSID", DbType="Int NOT NULL")]
+		public int OSID
+		{
+			get
+			{
+				return this._OSID;
+			}
+			set
+			{
+				if ((this._OSID != value))
+				{
+					if (this._OrganizeStaff.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOSIDChanging(value);
+					this.SendPropertyChanging();
+					this._OSID = value;
+					this.SendPropertyChanged("OSID");
+					this.OnOSIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LeaderFlag", DbType="Bit NOT NULL")]
+		public bool LeaderFlag
+		{
+			get
+			{
+				return this._LeaderFlag;
+			}
+			set
+			{
+				if ((this._LeaderFlag != value))
+				{
+					this.OnLeaderFlagChanging(value);
+					this.SendPropertyChanging();
+					this._LeaderFlag = value;
+					this.SendPropertyChanged("LeaderFlag");
+					this.OnLeaderFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JoinDate", DbType="DateTime NOT NULL")]
+		public System.DateTime JoinDate
+		{
+			get
+			{
+				return this._JoinDate;
+			}
+			set
+			{
+				if ((this._JoinDate != value))
+				{
+					this.OnJoinDateChanging(value);
+					this.SendPropertyChanging();
+					this._JoinDate = value;
+					this.SendPropertyChanged("JoinDate");
+					this.OnJoinDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LeaveDate", DbType="DateTime NOT NULL")]
+		public System.DateTime LeaveDate
+		{
+			get
+			{
+				return this._LeaveDate;
+			}
+			set
+			{
+				if ((this._LeaveDate != value))
+				{
+					this.OnLeaveDateChanging(value);
+					this.SendPropertyChanging();
+					this._LeaveDate = value;
+					this.SendPropertyChanged("LeaveDate");
+					this.OnLeaveDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_OS_Account", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.M_OS_Account.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.M_OS_Account.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeStaff_M_OS_Account", Storage="_OrganizeStaff", ThisKey="OSID", OtherKey="OSID", IsForeignKey=true)]
+		public OrganizeStaff OrganizeStaff
+		{
+			get
+			{
+				return this._OrganizeStaff.Entity;
+			}
+			set
+			{
+				OrganizeStaff previousValue = this._OrganizeStaff.Entity;
+				if (((previousValue != value) 
+							|| (this._OrganizeStaff.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._OrganizeStaff.Entity = null;
+						previousValue.M_OS_Account.Remove(this);
+					}
+					this._OrganizeStaff.Entity = value;
+					if ((value != null))
+					{
+						value.M_OS_Account.Add(this);
+						this._OSID = value.OSID;
+					}
+					else
+					{
+						this._OSID = default(int);
+					}
+					this.SendPropertyChanged("OrganizeStaff");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.M_Product_PayType")]
 	public partial class M_Product_PayType : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -9055,9 +9511,9 @@ namespace Banner
 		
 		private int _SaveACID;
 		
-		private EntityRef<Product> _Product;
-		
 		private EntityRef<PayType> _PayType;
+		
+		private EntityRef<Product> _Product;
 		
     #region 擴充性方法定義
     partial void OnLoaded();
@@ -9081,8 +9537,8 @@ namespace Banner
 		
 		public M_Product_PayType()
 		{
-			this._Product = default(EntityRef<Product>);
 			this._PayType = default(EntityRef<PayType>);
+			this._Product = default(EntityRef<Product>);
 			OnCreated();
 		}
 		
@@ -9234,40 +9690,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_M_Product_PayType", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
-		public Product Product
-		{
-			get
-			{
-				return this._Product.Entity;
-			}
-			set
-			{
-				Product previousValue = this._Product.Entity;
-				if (((previousValue != value) 
-							|| (this._Product.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Product.Entity = null;
-						previousValue.M_Product_PayType.Remove(this);
-					}
-					this._Product.Entity = value;
-					if ((value != null))
-					{
-						value.M_Product_PayType.Add(this);
-						this._PID = value.PID;
-					}
-					else
-					{
-						this._PID = default(int);
-					}
-					this.SendPropertyChanged("Product");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_M_Product_PayType", Storage="_PayType", ThisKey="PTID", OtherKey="PTID", IsForeignKey=true)]
 		public PayType PayType
 		{
@@ -9298,6 +9720,40 @@ namespace Banner
 						this._PTID = default(int);
 					}
 					this.SendPropertyChanged("PayType");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_M_Product_PayType", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
+		public Product Product
+		{
+			get
+			{
+				return this._Product.Entity;
+			}
+			set
+			{
+				Product previousValue = this._Product.Entity;
+				if (((previousValue != value) 
+							|| (this._Product.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Product.Entity = null;
+						previousValue.M_Product_PayType.Remove(this);
+					}
+					this._Product.Entity = value;
+					if ((value != null))
+					{
+						value.M_Product_PayType.Add(this);
+						this._PID = value.PID;
+					}
+					else
+					{
+						this._PID = default(int);
+					}
+					this.SendPropertyChanged("Product");
 				}
 			}
 		}
@@ -12849,6 +13305,8 @@ namespace Banner
 		
 		private EntityRef<Product> _Product;
 		
+		private EntityRef<Product_Class> _Product_Class;
+		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -12883,6 +13341,7 @@ namespace Banner
 		{
 			this._Order_Header = default(EntityRef<Order_Header>);
 			this._Product = default(EntityRef<Product>);
+			this._Product_Class = default(EntityRef<Product_Class>);
 			OnCreated();
 		}
 		
@@ -12965,6 +13424,10 @@ namespace Banner
 			{
 				if ((this._PCID != value))
 				{
+					if (this._Product_Class.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
 					this.OnPCIDChanging(value);
 					this.SendPropertyChanging();
 					this._PCID = value;
@@ -13198,6 +13661,40 @@ namespace Banner
 						this._PID = default(int);
 					}
 					this.SendPropertyChanged("Product");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Order_Product", Storage="_Product_Class", ThisKey="PCID", OtherKey="PCID", IsForeignKey=true)]
+		public Product_Class Product_Class
+		{
+			get
+			{
+				return this._Product_Class.Entity;
+			}
+			set
+			{
+				Product_Class previousValue = this._Product_Class.Entity;
+				if (((previousValue != value) 
+							|| (this._Product_Class.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Product_Class.Entity = null;
+						previousValue.Order_Product.Remove(this);
+					}
+					this._Product_Class.Entity = value;
+					if ((value != null))
+					{
+						value.Order_Product.Add(this);
+						this._PCID = value.PCID;
+					}
+					else
+					{
+						this._PCID = default(int);
+					}
+					this.SendPropertyChanged("Product_Class");
 				}
 			}
 		}
@@ -13593,9 +14090,11 @@ namespace Banner
 		
 		private EntitySet<M_OI2_Account> _M_OI2_Account;
 		
-		private EntitySet<Product> _Product;
+		private EntitySet<OrganizeStaff> _OrganizeStaff;
 		
 		private EntitySet<PayType> _PayType;
+		
+		private EntitySet<Product> _Product;
 		
 		private EntityRef<Account> _Account;
 		
@@ -13637,8 +14136,9 @@ namespace Banner
 		{
 			this._M_OI_Account = new EntitySet<M_OI_Account>(new Action<M_OI_Account>(this.attach_M_OI_Account), new Action<M_OI_Account>(this.detach_M_OI_Account));
 			this._M_OI2_Account = new EntitySet<M_OI2_Account>(new Action<M_OI2_Account>(this.attach_M_OI2_Account), new Action<M_OI2_Account>(this.detach_M_OI2_Account));
-			this._Product = new EntitySet<Product>(new Action<Product>(this.attach_Product), new Action<Product>(this.detach_Product));
+			this._OrganizeStaff = new EntitySet<OrganizeStaff>(new Action<OrganizeStaff>(this.attach_OrganizeStaff), new Action<OrganizeStaff>(this.detach_OrganizeStaff));
 			this._PayType = new EntitySet<PayType>(new Action<PayType>(this.attach_PayType), new Action<PayType>(this.detach_PayType));
+			this._Product = new EntitySet<Product>(new Action<Product>(this.attach_Product), new Action<Product>(this.detach_Product));
 			this._Account = default(EntityRef<Account>);
 			this._Organize = default(EntityRef<Organize>);
 			OnCreated();
@@ -13938,16 +14438,16 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Product", Storage="_Product", ThisKey="OIID", OtherKey="OIID")]
-		public EntitySet<Product> Product
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_OrganizeStaff", Storage="_OrganizeStaff", ThisKey="OIID", OtherKey="OIID")]
+		public EntitySet<OrganizeStaff> OrganizeStaff
 		{
 			get
 			{
-				return this._Product;
+				return this._OrganizeStaff;
 			}
 			set
 			{
-				this._Product.Assign(value);
+				this._OrganizeStaff.Assign(value);
 			}
 		}
 		
@@ -13961,6 +14461,19 @@ namespace Banner
 			set
 			{
 				this._PayType.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Product", Storage="_Product", ThisKey="OIID", OtherKey="OIID")]
+		public EntitySet<Product> Product
+		{
+			get
+			{
+				return this._Product;
+			}
+			set
+			{
+				this._Product.Assign(value);
 			}
 		}
 		
@@ -14076,13 +14589,13 @@ namespace Banner
 			entity.OrganizeInfo = null;
 		}
 		
-		private void attach_Product(Product entity)
+		private void attach_OrganizeStaff(OrganizeStaff entity)
 		{
 			this.SendPropertyChanging();
 			entity.OrganizeInfo = this;
 		}
 		
-		private void detach_Product(Product entity)
+		private void detach_OrganizeStaff(OrganizeStaff entity)
 		{
 			this.SendPropertyChanging();
 			entity.OrganizeInfo = null;
@@ -14099,59 +14612,35 @@ namespace Banner
 			this.SendPropertyChanging();
 			entity.OrganizeInfo = null;
 		}
+		
+		private void attach_Product(Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo = this;
+		}
+		
+		private void detach_Product(Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo = null;
+		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Product")]
-	public partial class Product : INotifyPropertyChanging, INotifyPropertyChanged
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.OrganizeStaff")]
+	public partial class OrganizeStaff : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
 		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
 		
-		private int _PID;
-		
-		private int _CID;
+		private int _OSID;
 		
 		private int _OIID;
 		
+		private int _OSCID;
+		
 		private string _Title;
 		
-		private string _SubTitle;
-		
-		private int _ProductType;
-		
-		private string _ProductInfo;
-		
-		private string _TargetInfo;
-		
-		private string _GraduationInfo;
-		
-		private int _YearNo;
-		
-		private int _EchelonNo;
-		
-		private string _ImgURL;
-		
-		private int _Price_Basic;
-		
-		private int _Price_Early;
-		
-		private System.DateTime _SDate;
-		
-		private System.DateTime _EDate;
-		
-		private System.DateTime _SDate_Signup_OnSite;
-		
-		private System.DateTime _EDate_Signup_OnSite;
-		
-		private System.DateTime _SDate_Signup_OnLine;
-		
-		private System.DateTime _EDate_Signup_OnLine;
-		
-		private System.DateTime _SDate_Early;
-		
-		private System.DateTime _EDate_Early;
-		
-		private bool _ShowFlag;
+		private bool _LeadersFlag;
 		
 		private bool _ActiveFlag;
 		
@@ -14163,74 +14652,26 @@ namespace Banner
 		
 		private int _SaveACID;
 		
-		private EntitySet<Coupon_Header> _Coupon_Header;
-		
-		private EntitySet<M_Product_PayType> _M_Product_PayType;
-		
-		private EntitySet<M_Product_Teacher> _M_Product_Teacher;
-		
-		private EntitySet<Order_Product> _Order_Product;
-		
-		private EntitySet<Product_Class> _Product_Class;
-		
-		private EntitySet<Product_File> _Product_File;
-		
-		private EntitySet<Product_Rool> _Product_Rool;
-		
-		private EntityRef<Course> _Course;
+		private EntitySet<M_OS_Account> _M_OS_Account;
 		
 		private EntityRef<OrganizeInfo> _OrganizeInfo;
+		
+		private EntityRef<OrganizeStaff_Category> _OrganizeStaff_Category;
 		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
     partial void OnCreated();
-    partial void OnPIDChanging(int value);
-    partial void OnPIDChanged();
-    partial void OnCIDChanging(int value);
-    partial void OnCIDChanged();
+    partial void OnOSIDChanging(int value);
+    partial void OnOSIDChanged();
     partial void OnOIIDChanging(int value);
     partial void OnOIIDChanged();
+    partial void OnOSCIDChanging(int value);
+    partial void OnOSCIDChanged();
     partial void OnTitleChanging(string value);
     partial void OnTitleChanged();
-    partial void OnSubTitleChanging(string value);
-    partial void OnSubTitleChanged();
-    partial void OnProductTypeChanging(int value);
-    partial void OnProductTypeChanged();
-    partial void OnProductInfoChanging(string value);
-    partial void OnProductInfoChanged();
-    partial void OnTargetInfoChanging(string value);
-    partial void OnTargetInfoChanged();
-    partial void OnGraduationInfoChanging(string value);
-    partial void OnGraduationInfoChanged();
-    partial void OnYearNoChanging(int value);
-    partial void OnYearNoChanged();
-    partial void OnEchelonNoChanging(int value);
-    partial void OnEchelonNoChanged();
-    partial void OnImgURLChanging(string value);
-    partial void OnImgURLChanged();
-    partial void OnPrice_BasicChanging(int value);
-    partial void OnPrice_BasicChanged();
-    partial void OnPrice_EarlyChanging(int value);
-    partial void OnPrice_EarlyChanged();
-    partial void OnSDateChanging(System.DateTime value);
-    partial void OnSDateChanged();
-    partial void OnEDateChanging(System.DateTime value);
-    partial void OnEDateChanged();
-    partial void OnSDate_Signup_OnSiteChanging(System.DateTime value);
-    partial void OnSDate_Signup_OnSiteChanged();
-    partial void OnEDate_Signup_OnSiteChanging(System.DateTime value);
-    partial void OnEDate_Signup_OnSiteChanged();
-    partial void OnSDate_Signup_OnLineChanging(System.DateTime value);
-    partial void OnSDate_Signup_OnLineChanged();
-    partial void OnEDate_Signup_OnLineChanging(System.DateTime value);
-    partial void OnEDate_Signup_OnLineChanged();
-    partial void OnSDate_EarlyChanging(System.DateTime value);
-    partial void OnSDate_EarlyChanged();
-    partial void OnEDate_EarlyChanging(System.DateTime value);
-    partial void OnEDate_EarlyChanged();
-    partial void OnShowFlagChanging(bool value);
-    partial void OnShowFlagChanged();
+    partial void OnLeadersFlagChanging(bool value);
+    partial void OnLeadersFlagChanged();
     partial void OnActiveFlagChanging(bool value);
     partial void OnActiveFlagChanged();
     partial void OnDeleteFlagChanging(bool value);
@@ -14243,60 +14684,30 @@ namespace Banner
     partial void OnSaveACIDChanged();
     #endregion
 		
-		public Product()
+		public OrganizeStaff()
 		{
-			this._Coupon_Header = new EntitySet<Coupon_Header>(new Action<Coupon_Header>(this.attach_Coupon_Header), new Action<Coupon_Header>(this.detach_Coupon_Header));
-			this._M_Product_PayType = new EntitySet<M_Product_PayType>(new Action<M_Product_PayType>(this.attach_M_Product_PayType), new Action<M_Product_PayType>(this.detach_M_Product_PayType));
-			this._M_Product_Teacher = new EntitySet<M_Product_Teacher>(new Action<M_Product_Teacher>(this.attach_M_Product_Teacher), new Action<M_Product_Teacher>(this.detach_M_Product_Teacher));
-			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
-			this._Product_Class = new EntitySet<Product_Class>(new Action<Product_Class>(this.attach_Product_Class), new Action<Product_Class>(this.detach_Product_Class));
-			this._Product_File = new EntitySet<Product_File>(new Action<Product_File>(this.attach_Product_File), new Action<Product_File>(this.detach_Product_File));
-			this._Product_Rool = new EntitySet<Product_Rool>(new Action<Product_Rool>(this.attach_Product_Rool), new Action<Product_Rool>(this.detach_Product_Rool));
-			this._Course = default(EntityRef<Course>);
+			this._M_OS_Account = new EntitySet<M_OS_Account>(new Action<M_OS_Account>(this.attach_M_OS_Account), new Action<M_OS_Account>(this.detach_M_OS_Account));
 			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
+			this._OrganizeStaff_Category = default(EntityRef<OrganizeStaff_Category>);
 			OnCreated();
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int PID
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OSID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int OSID
 		{
 			get
 			{
-				return this._PID;
+				return this._OSID;
 			}
 			set
 			{
-				if ((this._PID != value))
+				if ((this._OSID != value))
 				{
-					this.OnPIDChanging(value);
+					this.OnOSIDChanging(value);
 					this.SendPropertyChanging();
-					this._PID = value;
-					this.SendPropertyChanged("PID");
-					this.OnPIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CID", DbType="Int NOT NULL")]
-		public int CID
-		{
-			get
-			{
-				return this._CID;
-			}
-			set
-			{
-				if ((this._CID != value))
-				{
-					if (this._Course.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnCIDChanging(value);
-					this.SendPropertyChanging();
-					this._CID = value;
-					this.SendPropertyChanged("CID");
-					this.OnCIDChanged();
+					this._OSID = value;
+					this.SendPropertyChanged("OSID");
+					this.OnOSIDChanged();
 				}
 			}
 		}
@@ -14325,7 +14736,31 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OSCID", DbType="Int NOT NULL")]
+		public int OSCID
+		{
+			get
+			{
+				return this._OSCID;
+			}
+			set
+			{
+				if ((this._OSCID != value))
+				{
+					if (this._OrganizeStaff_Category.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOSCIDChanging(value);
+					this.SendPropertyChanging();
+					this._OSCID = value;
+					this.SendPropertyChanged("OSCID");
+					this.OnOSCIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(20)")]
 		public string Title
 		{
 			get
@@ -14345,382 +14780,22 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SubTitle", DbType="NVarChar(50)")]
-		public string SubTitle
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LeadersFlag", DbType="Bit NOT NULL")]
+		public bool LeadersFlag
 		{
 			get
 			{
-				return this._SubTitle;
+				return this._LeadersFlag;
 			}
 			set
 			{
-				if ((this._SubTitle != value))
+				if ((this._LeadersFlag != value))
 				{
-					this.OnSubTitleChanging(value);
+					this.OnLeadersFlagChanging(value);
 					this.SendPropertyChanging();
-					this._SubTitle = value;
-					this.SendPropertyChanged("SubTitle");
-					this.OnSubTitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ProductType", DbType="Int NOT NULL")]
-		public int ProductType
-		{
-			get
-			{
-				return this._ProductType;
-			}
-			set
-			{
-				if ((this._ProductType != value))
-				{
-					this.OnProductTypeChanging(value);
-					this.SendPropertyChanging();
-					this._ProductType = value;
-					this.SendPropertyChanged("ProductType");
-					this.OnProductTypeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ProductInfo", DbType="NVarChar(MAX)")]
-		public string ProductInfo
-		{
-			get
-			{
-				return this._ProductInfo;
-			}
-			set
-			{
-				if ((this._ProductInfo != value))
-				{
-					this.OnProductInfoChanging(value);
-					this.SendPropertyChanging();
-					this._ProductInfo = value;
-					this.SendPropertyChanged("ProductInfo");
-					this.OnProductInfoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetInfo", DbType="NVarChar(MAX)")]
-		public string TargetInfo
-		{
-			get
-			{
-				return this._TargetInfo;
-			}
-			set
-			{
-				if ((this._TargetInfo != value))
-				{
-					this.OnTargetInfoChanging(value);
-					this.SendPropertyChanging();
-					this._TargetInfo = value;
-					this.SendPropertyChanged("TargetInfo");
-					this.OnTargetInfoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GraduationInfo", DbType="NVarChar(MAX)")]
-		public string GraduationInfo
-		{
-			get
-			{
-				return this._GraduationInfo;
-			}
-			set
-			{
-				if ((this._GraduationInfo != value))
-				{
-					this.OnGraduationInfoChanging(value);
-					this.SendPropertyChanging();
-					this._GraduationInfo = value;
-					this.SendPropertyChanged("GraduationInfo");
-					this.OnGraduationInfoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_YearNo", DbType="Int NOT NULL")]
-		public int YearNo
-		{
-			get
-			{
-				return this._YearNo;
-			}
-			set
-			{
-				if ((this._YearNo != value))
-				{
-					this.OnYearNoChanging(value);
-					this.SendPropertyChanging();
-					this._YearNo = value;
-					this.SendPropertyChanged("YearNo");
-					this.OnYearNoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EchelonNo", DbType="Int NOT NULL")]
-		public int EchelonNo
-		{
-			get
-			{
-				return this._EchelonNo;
-			}
-			set
-			{
-				if ((this._EchelonNo != value))
-				{
-					this.OnEchelonNoChanging(value);
-					this.SendPropertyChanging();
-					this._EchelonNo = value;
-					this.SendPropertyChanged("EchelonNo");
-					this.OnEchelonNoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ImgURL", DbType="NVarChar(300)")]
-		public string ImgURL
-		{
-			get
-			{
-				return this._ImgURL;
-			}
-			set
-			{
-				if ((this._ImgURL != value))
-				{
-					this.OnImgURLChanging(value);
-					this.SendPropertyChanging();
-					this._ImgURL = value;
-					this.SendPropertyChanged("ImgURL");
-					this.OnImgURLChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Basic", DbType="Int NOT NULL")]
-		public int Price_Basic
-		{
-			get
-			{
-				return this._Price_Basic;
-			}
-			set
-			{
-				if ((this._Price_Basic != value))
-				{
-					this.OnPrice_BasicChanging(value);
-					this.SendPropertyChanging();
-					this._Price_Basic = value;
-					this.SendPropertyChanged("Price_Basic");
-					this.OnPrice_BasicChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Early", DbType="Int NOT NULL")]
-		public int Price_Early
-		{
-			get
-			{
-				return this._Price_Early;
-			}
-			set
-			{
-				if ((this._Price_Early != value))
-				{
-					this.OnPrice_EarlyChanging(value);
-					this.SendPropertyChanging();
-					this._Price_Early = value;
-					this.SendPropertyChanged("Price_Early");
-					this.OnPrice_EarlyChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SDate", DbType="DateTime NOT NULL")]
-		public System.DateTime SDate
-		{
-			get
-			{
-				return this._SDate;
-			}
-			set
-			{
-				if ((this._SDate != value))
-				{
-					this.OnSDateChanging(value);
-					this.SendPropertyChanging();
-					this._SDate = value;
-					this.SendPropertyChanged("SDate");
-					this.OnSDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EDate", DbType="DateTime NOT NULL")]
-		public System.DateTime EDate
-		{
-			get
-			{
-				return this._EDate;
-			}
-			set
-			{
-				if ((this._EDate != value))
-				{
-					this.OnEDateChanging(value);
-					this.SendPropertyChanging();
-					this._EDate = value;
-					this.SendPropertyChanged("EDate");
-					this.OnEDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SDate_Signup_OnSite", DbType="DateTime NOT NULL")]
-		public System.DateTime SDate_Signup_OnSite
-		{
-			get
-			{
-				return this._SDate_Signup_OnSite;
-			}
-			set
-			{
-				if ((this._SDate_Signup_OnSite != value))
-				{
-					this.OnSDate_Signup_OnSiteChanging(value);
-					this.SendPropertyChanging();
-					this._SDate_Signup_OnSite = value;
-					this.SendPropertyChanged("SDate_Signup_OnSite");
-					this.OnSDate_Signup_OnSiteChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EDate_Signup_OnSite", DbType="DateTime NOT NULL")]
-		public System.DateTime EDate_Signup_OnSite
-		{
-			get
-			{
-				return this._EDate_Signup_OnSite;
-			}
-			set
-			{
-				if ((this._EDate_Signup_OnSite != value))
-				{
-					this.OnEDate_Signup_OnSiteChanging(value);
-					this.SendPropertyChanging();
-					this._EDate_Signup_OnSite = value;
-					this.SendPropertyChanged("EDate_Signup_OnSite");
-					this.OnEDate_Signup_OnSiteChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SDate_Signup_OnLine", DbType="DateTime NOT NULL")]
-		public System.DateTime SDate_Signup_OnLine
-		{
-			get
-			{
-				return this._SDate_Signup_OnLine;
-			}
-			set
-			{
-				if ((this._SDate_Signup_OnLine != value))
-				{
-					this.OnSDate_Signup_OnLineChanging(value);
-					this.SendPropertyChanging();
-					this._SDate_Signup_OnLine = value;
-					this.SendPropertyChanged("SDate_Signup_OnLine");
-					this.OnSDate_Signup_OnLineChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EDate_Signup_OnLine", DbType="DateTime NOT NULL")]
-		public System.DateTime EDate_Signup_OnLine
-		{
-			get
-			{
-				return this._EDate_Signup_OnLine;
-			}
-			set
-			{
-				if ((this._EDate_Signup_OnLine != value))
-				{
-					this.OnEDate_Signup_OnLineChanging(value);
-					this.SendPropertyChanging();
-					this._EDate_Signup_OnLine = value;
-					this.SendPropertyChanged("EDate_Signup_OnLine");
-					this.OnEDate_Signup_OnLineChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SDate_Early", DbType="DateTime NOT NULL")]
-		public System.DateTime SDate_Early
-		{
-			get
-			{
-				return this._SDate_Early;
-			}
-			set
-			{
-				if ((this._SDate_Early != value))
-				{
-					this.OnSDate_EarlyChanging(value);
-					this.SendPropertyChanging();
-					this._SDate_Early = value;
-					this.SendPropertyChanged("SDate_Early");
-					this.OnSDate_EarlyChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EDate_Early", DbType="DateTime NOT NULL")]
-		public System.DateTime EDate_Early
-		{
-			get
-			{
-				return this._EDate_Early;
-			}
-			set
-			{
-				if ((this._EDate_Early != value))
-				{
-					this.OnEDate_EarlyChanging(value);
-					this.SendPropertyChanging();
-					this._EDate_Early = value;
-					this.SendPropertyChanged("EDate_Early");
-					this.OnEDate_EarlyChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ShowFlag", DbType="Bit NOT NULL")]
-		public bool ShowFlag
-		{
-			get
-			{
-				return this._ShowFlag;
-			}
-			set
-			{
-				if ((this._ShowFlag != value))
-				{
-					this.OnShowFlagChanging(value);
-					this.SendPropertyChanging();
-					this._ShowFlag = value;
-					this.SendPropertyChanged("ShowFlag");
-					this.OnShowFlagChanged();
+					this._LeadersFlag = value;
+					this.SendPropertyChanged("LeadersFlag");
+					this.OnLeadersFlagChanged();
 				}
 			}
 		}
@@ -14825,132 +14900,20 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Coupon_Header", Storage="_Coupon_Header", ThisKey="PID", OtherKey="PID")]
-		public EntitySet<Coupon_Header> Coupon_Header
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeStaff_M_OS_Account", Storage="_M_OS_Account", ThisKey="OSID", OtherKey="OSID")]
+		public EntitySet<M_OS_Account> M_OS_Account
 		{
 			get
 			{
-				return this._Coupon_Header;
+				return this._M_OS_Account;
 			}
 			set
 			{
-				this._Coupon_Header.Assign(value);
+				this._M_OS_Account.Assign(value);
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_M_Product_PayType", Storage="_M_Product_PayType", ThisKey="PID", OtherKey="PID")]
-		public EntitySet<M_Product_PayType> M_Product_PayType
-		{
-			get
-			{
-				return this._M_Product_PayType;
-			}
-			set
-			{
-				this._M_Product_PayType.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_M_Product_Teacher", Storage="_M_Product_Teacher", ThisKey="PID", OtherKey="PID")]
-		public EntitySet<M_Product_Teacher> M_Product_Teacher
-		{
-			get
-			{
-				return this._M_Product_Teacher;
-			}
-			set
-			{
-				this._M_Product_Teacher.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Order_Product", Storage="_Order_Product", ThisKey="PID", OtherKey="PID")]
-		public EntitySet<Order_Product> Order_Product
-		{
-			get
-			{
-				return this._Order_Product;
-			}
-			set
-			{
-				this._Order_Product.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Product_Class", Storage="_Product_Class", ThisKey="PID", OtherKey="PID")]
-		public EntitySet<Product_Class> Product_Class
-		{
-			get
-			{
-				return this._Product_Class;
-			}
-			set
-			{
-				this._Product_Class.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Product_File", Storage="_Product_File", ThisKey="PID", OtherKey="PID")]
-		public EntitySet<Product_File> Product_File
-		{
-			get
-			{
-				return this._Product_File;
-			}
-			set
-			{
-				this._Product_File.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Product_Rool", Storage="_Product_Rool", ThisKey="PID", OtherKey="PID")]
-		public EntitySet<Product_Rool> Product_Rool
-		{
-			get
-			{
-				return this._Product_Rool;
-			}
-			set
-			{
-				this._Product_Rool.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Product", Storage="_Course", ThisKey="CID", OtherKey="CID", IsForeignKey=true)]
-		public Course Course
-		{
-			get
-			{
-				return this._Course.Entity;
-			}
-			set
-			{
-				Course previousValue = this._Course.Entity;
-				if (((previousValue != value) 
-							|| (this._Course.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Course.Entity = null;
-						previousValue.Product.Remove(this);
-					}
-					this._Course.Entity = value;
-					if ((value != null))
-					{
-						value.Product.Add(this);
-						this._CID = value.CID;
-					}
-					else
-					{
-						this._CID = default(int);
-					}
-					this.SendPropertyChanged("Course");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Product", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_OrganizeStaff", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
 		public OrganizeInfo OrganizeInfo
 		{
 			get
@@ -14967,12 +14930,12 @@ namespace Banner
 					if ((previousValue != null))
 					{
 						this._OrganizeInfo.Entity = null;
-						previousValue.Product.Remove(this);
+						previousValue.OrganizeStaff.Remove(this);
 					}
 					this._OrganizeInfo.Entity = value;
 					if ((value != null))
 					{
-						value.Product.Add(this);
+						value.OrganizeStaff.Add(this);
 						this._OIID = value.OIID;
 					}
 					else
@@ -14980,6 +14943,40 @@ namespace Banner
 						this._OIID = default(int);
 					}
 					this.SendPropertyChanged("OrganizeInfo");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeStaff_Category_OrganizeStaff", Storage="_OrganizeStaff_Category", ThisKey="OSCID", OtherKey="OSCID", IsForeignKey=true)]
+		public OrganizeStaff_Category OrganizeStaff_Category
+		{
+			get
+			{
+				return this._OrganizeStaff_Category.Entity;
+			}
+			set
+			{
+				OrganizeStaff_Category previousValue = this._OrganizeStaff_Category.Entity;
+				if (((previousValue != value) 
+							|| (this._OrganizeStaff_Category.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._OrganizeStaff_Category.Entity = null;
+						previousValue.OrganizeStaff.Remove(this);
+					}
+					this._OrganizeStaff_Category.Entity = value;
+					if ((value != null))
+					{
+						value.OrganizeStaff.Add(this);
+						this._OSCID = value.OSCID;
+					}
+					else
+					{
+						this._OSCID = default(int);
+					}
+					this.SendPropertyChanged("OrganizeStaff_Category");
 				}
 			}
 		}
@@ -15004,122 +15001,32 @@ namespace Banner
 			}
 		}
 		
-		private void attach_Coupon_Header(Coupon_Header entity)
+		private void attach_M_OS_Account(M_OS_Account entity)
 		{
 			this.SendPropertyChanging();
-			entity.Product = this;
+			entity.OrganizeStaff = this;
 		}
 		
-		private void detach_Coupon_Header(Coupon_Header entity)
+		private void detach_M_OS_Account(M_OS_Account entity)
 		{
 			this.SendPropertyChanging();
-			entity.Product = null;
-		}
-		
-		private void attach_M_Product_PayType(M_Product_PayType entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = this;
-		}
-		
-		private void detach_M_Product_PayType(M_Product_PayType entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = null;
-		}
-		
-		private void attach_M_Product_Teacher(M_Product_Teacher entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = this;
-		}
-		
-		private void detach_M_Product_Teacher(M_Product_Teacher entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = null;
-		}
-		
-		private void attach_Order_Product(Order_Product entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = this;
-		}
-		
-		private void detach_Order_Product(Order_Product entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = null;
-		}
-		
-		private void attach_Product_Class(Product_Class entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = this;
-		}
-		
-		private void detach_Product_Class(Product_Class entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = null;
-		}
-		
-		private void attach_Product_File(Product_File entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = this;
-		}
-		
-		private void detach_Product_File(Product_File entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = null;
-		}
-		
-		private void attach_Product_Rool(Product_Rool entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = this;
-		}
-		
-		private void detach_Product_Rool(Product_Rool entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = null;
+			entity.OrganizeStaff = null;
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Product_Class")]
-	public partial class Product_Class : INotifyPropertyChanging, INotifyPropertyChanged
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.OrganizeStaff_Category")]
+	public partial class OrganizeStaff_Category : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
 		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
 		
-		private int _PCID;
-		
-		private int _PID;
+		private int _OSCID;
 		
 		private string _Title;
 		
-		private bool _LoopFlag;
+		private bool _ActiveFlag;
 		
-		private System.DateTime _TargetDate;
-		
-		private int _WeeklyNo;
-		
-		private System.TimeSpan _STime;
-		
-		private System.TimeSpan _ETime;
-		
-		private int _PeopleCt;
-		
-		private string _PhoneNo;
-		
-		private string _LocationName;
-		
-		private string _Address;
-		
-		private string _MeetURL;
+		private bool _DeleteFlag;
 		
 		private System.DateTime _CreDate;
 		
@@ -15127,40 +15034,20 @@ namespace Banner
 		
 		private int _SaveACID;
 		
-		private EntitySet<M_Product_Teacher> _M_Product_Teacher;
-		
-		private EntityRef<Product> _Product;
+		private EntitySet<OrganizeStaff> _OrganizeStaff;
 		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
     partial void OnCreated();
-    partial void OnPCIDChanging(int value);
-    partial void OnPCIDChanged();
-    partial void OnPIDChanging(int value);
-    partial void OnPIDChanged();
+    partial void OnOSCIDChanging(int value);
+    partial void OnOSCIDChanged();
     partial void OnTitleChanging(string value);
     partial void OnTitleChanged();
-    partial void OnLoopFlagChanging(bool value);
-    partial void OnLoopFlagChanged();
-    partial void OnTargetDateChanging(System.DateTime value);
-    partial void OnTargetDateChanged();
-    partial void OnWeeklyNoChanging(int value);
-    partial void OnWeeklyNoChanged();
-    partial void OnSTimeChanging(System.TimeSpan value);
-    partial void OnSTimeChanged();
-    partial void OnETimeChanging(System.TimeSpan value);
-    partial void OnETimeChanged();
-    partial void OnPeopleCtChanging(int value);
-    partial void OnPeopleCtChanged();
-    partial void OnPhoneNoChanging(string value);
-    partial void OnPhoneNoChanged();
-    partial void OnLocationNameChanging(string value);
-    partial void OnLocationNameChanged();
-    partial void OnAddressChanging(string value);
-    partial void OnAddressChanged();
-    partial void OnMeetURLChanging(string value);
-    partial void OnMeetURLChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
     partial void OnCreDateChanging(System.DateTime value);
     partial void OnCreDateChanged();
     partial void OnUpdDateChanging(System.DateTime value);
@@ -15169,58 +15056,33 @@ namespace Banner
     partial void OnSaveACIDChanged();
     #endregion
 		
-		public Product_Class()
+		public OrganizeStaff_Category()
 		{
-			this._M_Product_Teacher = new EntitySet<M_Product_Teacher>(new Action<M_Product_Teacher>(this.attach_M_Product_Teacher), new Action<M_Product_Teacher>(this.detach_M_Product_Teacher));
-			this._Product = default(EntityRef<Product>);
+			this._OrganizeStaff = new EntitySet<OrganizeStaff>(new Action<OrganizeStaff>(this.attach_OrganizeStaff), new Action<OrganizeStaff>(this.detach_OrganizeStaff));
 			OnCreated();
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PCID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int PCID
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OSCID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int OSCID
 		{
 			get
 			{
-				return this._PCID;
+				return this._OSCID;
 			}
 			set
 			{
-				if ((this._PCID != value))
+				if ((this._OSCID != value))
 				{
-					this.OnPCIDChanging(value);
+					this.OnOSCIDChanging(value);
 					this.SendPropertyChanging();
-					this._PCID = value;
-					this.SendPropertyChanged("PCID");
-					this.OnPCIDChanged();
+					this._OSCID = value;
+					this.SendPropertyChanged("OSCID");
+					this.OnOSCIDChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PID", DbType="Int NOT NULL")]
-		public int PID
-		{
-			get
-			{
-				return this._PID;
-			}
-			set
-			{
-				if ((this._PID != value))
-				{
-					if (this._Product.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnPIDChanging(value);
-					this.SendPropertyChanging();
-					this._PID = value;
-					this.SendPropertyChanged("PID");
-					this.OnPIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(20)")]
 		public string Title
 		{
 			get
@@ -15240,202 +15102,42 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LoopFlag", DbType="Bit NOT NULL")]
-		public bool LoopFlag
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
 		{
 			get
 			{
-				return this._LoopFlag;
+				return this._ActiveFlag;
 			}
 			set
 			{
-				if ((this._LoopFlag != value))
+				if ((this._ActiveFlag != value))
 				{
-					this.OnLoopFlagChanging(value);
+					this.OnActiveFlagChanging(value);
 					this.SendPropertyChanging();
-					this._LoopFlag = value;
-					this.SendPropertyChanged("LoopFlag");
-					this.OnLoopFlagChanged();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetDate", DbType="Date NOT NULL")]
-		public System.DateTime TargetDate
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
 		{
 			get
 			{
-				return this._TargetDate;
+				return this._DeleteFlag;
 			}
 			set
 			{
-				if ((this._TargetDate != value))
+				if ((this._DeleteFlag != value))
 				{
-					this.OnTargetDateChanging(value);
+					this.OnDeleteFlagChanging(value);
 					this.SendPropertyChanging();
-					this._TargetDate = value;
-					this.SendPropertyChanged("TargetDate");
-					this.OnTargetDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_WeeklyNo", DbType="Int NOT NULL")]
-		public int WeeklyNo
-		{
-			get
-			{
-				return this._WeeklyNo;
-			}
-			set
-			{
-				if ((this._WeeklyNo != value))
-				{
-					this.OnWeeklyNoChanging(value);
-					this.SendPropertyChanging();
-					this._WeeklyNo = value;
-					this.SendPropertyChanged("WeeklyNo");
-					this.OnWeeklyNoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_STime", DbType="Time NOT NULL")]
-		public System.TimeSpan STime
-		{
-			get
-			{
-				return this._STime;
-			}
-			set
-			{
-				if ((this._STime != value))
-				{
-					this.OnSTimeChanging(value);
-					this.SendPropertyChanging();
-					this._STime = value;
-					this.SendPropertyChanged("STime");
-					this.OnSTimeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ETime", DbType="Time NOT NULL")]
-		public System.TimeSpan ETime
-		{
-			get
-			{
-				return this._ETime;
-			}
-			set
-			{
-				if ((this._ETime != value))
-				{
-					this.OnETimeChanging(value);
-					this.SendPropertyChanging();
-					this._ETime = value;
-					this.SendPropertyChanged("ETime");
-					this.OnETimeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PeopleCt", DbType="Int NOT NULL")]
-		public int PeopleCt
-		{
-			get
-			{
-				return this._PeopleCt;
-			}
-			set
-			{
-				if ((this._PeopleCt != value))
-				{
-					this.OnPeopleCtChanging(value);
-					this.SendPropertyChanging();
-					this._PeopleCt = value;
-					this.SendPropertyChanged("PeopleCt");
-					this.OnPeopleCtChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PhoneNo", DbType="VarChar(100)")]
-		public string PhoneNo
-		{
-			get
-			{
-				return this._PhoneNo;
-			}
-			set
-			{
-				if ((this._PhoneNo != value))
-				{
-					this.OnPhoneNoChanging(value);
-					this.SendPropertyChanging();
-					this._PhoneNo = value;
-					this.SendPropertyChanged("PhoneNo");
-					this.OnPhoneNoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LocationName", DbType="NVarChar(100)")]
-		public string LocationName
-		{
-			get
-			{
-				return this._LocationName;
-			}
-			set
-			{
-				if ((this._LocationName != value))
-				{
-					this.OnLocationNameChanging(value);
-					this.SendPropertyChanging();
-					this._LocationName = value;
-					this.SendPropertyChanged("LocationName");
-					this.OnLocationNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Address", DbType="NVarChar(300)")]
-		public string Address
-		{
-			get
-			{
-				return this._Address;
-			}
-			set
-			{
-				if ((this._Address != value))
-				{
-					this.OnAddressChanging(value);
-					this.SendPropertyChanging();
-					this._Address = value;
-					this.SendPropertyChanged("Address");
-					this.OnAddressChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MeetURL", DbType="NVarChar(300)")]
-		public string MeetURL
-		{
-			get
-			{
-				return this._MeetURL;
-			}
-			set
-			{
-				if ((this._MeetURL != value))
-				{
-					this.OnMeetURLChanging(value);
-					this.SendPropertyChanging();
-					this._MeetURL = value;
-					this.SendPropertyChanged("MeetURL");
-					this.OnMeetURLChanged();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
 				}
 			}
 		}
@@ -15500,49 +15202,642 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_M_Product_Teacher", Storage="_M_Product_Teacher", ThisKey="PCID", OtherKey="PCID")]
-		public EntitySet<M_Product_Teacher> M_Product_Teacher
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeStaff_Category_OrganizeStaff", Storage="_OrganizeStaff", ThisKey="OSCID", OtherKey="OSCID")]
+		public EntitySet<OrganizeStaff> OrganizeStaff
 		{
 			get
 			{
-				return this._M_Product_Teacher;
+				return this._OrganizeStaff;
 			}
 			set
 			{
-				this._M_Product_Teacher.Assign(value);
+				this._OrganizeStaff.Assign(value);
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Product_Class", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
-		public Product Product
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_OrganizeStaff(OrganizeStaff entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeStaff_Category = this;
+		}
+		
+		private void detach_OrganizeStaff(OrganizeStaff entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeStaff_Category = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.PayType")]
+	public partial class PayType : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _PTID;
+		
+		private int _OIID;
+		
+		private int _PayTypeID;
+		
+		private string _Title;
+		
+		private string _Note;
+		
+		private string _TargetURL;
+		
+		private string _BackURL;
+		
+		private string _MerchantID;
+		
+		private string _HashKey;
+		
+		private string _HashIV;
+		
+		private string _PayKey1;
+		
+		private string _PayKey2;
+		
+		private string _PayKey3;
+		
+		private string _PayKey4;
+		
+		private string _PayKey5;
+		
+		private int _EndPayDay;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntitySet<M_Product_PayType> _M_Product_PayType;
+		
+		private EntitySet<Order_Paid> _Order_Paid;
+		
+		private EntityRef<OrganizeInfo> _OrganizeInfo;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnPTIDChanging(int value);
+    partial void OnPTIDChanged();
+    partial void OnOIIDChanging(int value);
+    partial void OnOIIDChanged();
+    partial void OnPayTypeIDChanging(int value);
+    partial void OnPayTypeIDChanged();
+    partial void OnTitleChanging(string value);
+    partial void OnTitleChanged();
+    partial void OnNoteChanging(string value);
+    partial void OnNoteChanged();
+    partial void OnTargetURLChanging(string value);
+    partial void OnTargetURLChanged();
+    partial void OnBackURLChanging(string value);
+    partial void OnBackURLChanged();
+    partial void OnMerchantIDChanging(string value);
+    partial void OnMerchantIDChanged();
+    partial void OnHashKeyChanging(string value);
+    partial void OnHashKeyChanged();
+    partial void OnHashIVChanging(string value);
+    partial void OnHashIVChanged();
+    partial void OnPayKey1Changing(string value);
+    partial void OnPayKey1Changed();
+    partial void OnPayKey2Changing(string value);
+    partial void OnPayKey2Changed();
+    partial void OnPayKey3Changing(string value);
+    partial void OnPayKey3Changed();
+    partial void OnPayKey4Changing(string value);
+    partial void OnPayKey4Changed();
+    partial void OnPayKey5Changing(string value);
+    partial void OnPayKey5Changed();
+    partial void OnEndPayDayChanging(int value);
+    partial void OnEndPayDayChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public PayType()
+		{
+			this._M_Product_PayType = new EntitySet<M_Product_PayType>(new Action<M_Product_PayType>(this.attach_M_Product_PayType), new Action<M_Product_PayType>(this.detach_M_Product_PayType));
+			this._Order_Paid = new EntitySet<Order_Paid>(new Action<Order_Paid>(this.attach_Order_Paid), new Action<Order_Paid>(this.detach_Order_Paid));
+			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PTID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int PTID
 		{
 			get
 			{
-				return this._Product.Entity;
+				return this._PTID;
 			}
 			set
 			{
-				Product previousValue = this._Product.Entity;
+				if ((this._PTID != value))
+				{
+					this.OnPTIDChanging(value);
+					this.SendPropertyChanging();
+					this._PTID = value;
+					this.SendPropertyChanged("PTID");
+					this.OnPTIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int NOT NULL")]
+		public int OIID
+		{
+			get
+			{
+				return this._OIID;
+			}
+			set
+			{
+				if ((this._OIID != value))
+				{
+					if (this._OrganizeInfo.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOIIDChanging(value);
+					this.SendPropertyChanging();
+					this._OIID = value;
+					this.SendPropertyChanged("OIID");
+					this.OnOIIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayTypeID", DbType="Int NOT NULL")]
+		public int PayTypeID
+		{
+			get
+			{
+				return this._PayTypeID;
+			}
+			set
+			{
+				if ((this._PayTypeID != value))
+				{
+					this.OnPayTypeIDChanging(value);
+					this.SendPropertyChanging();
+					this._PayTypeID = value;
+					this.SendPropertyChanged("PayTypeID");
+					this.OnPayTypeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
+		public string Title
+		{
+			get
+			{
+				return this._Title;
+			}
+			set
+			{
+				if ((this._Title != value))
+				{
+					this.OnTitleChanging(value);
+					this.SendPropertyChanging();
+					this._Title = value;
+					this.SendPropertyChanged("Title");
+					this.OnTitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Note", DbType="NVarChar(MAX)")]
+		public string Note
+		{
+			get
+			{
+				return this._Note;
+			}
+			set
+			{
+				if ((this._Note != value))
+				{
+					this.OnNoteChanging(value);
+					this.SendPropertyChanging();
+					this._Note = value;
+					this.SendPropertyChanged("Note");
+					this.OnNoteChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetURL", DbType="VarChar(200)")]
+		public string TargetURL
+		{
+			get
+			{
+				return this._TargetURL;
+			}
+			set
+			{
+				if ((this._TargetURL != value))
+				{
+					this.OnTargetURLChanging(value);
+					this.SendPropertyChanging();
+					this._TargetURL = value;
+					this.SendPropertyChanged("TargetURL");
+					this.OnTargetURLChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BackURL", DbType="VarChar(200)")]
+		public string BackURL
+		{
+			get
+			{
+				return this._BackURL;
+			}
+			set
+			{
+				if ((this._BackURL != value))
+				{
+					this.OnBackURLChanging(value);
+					this.SendPropertyChanging();
+					this._BackURL = value;
+					this.SendPropertyChanged("BackURL");
+					this.OnBackURLChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MerchantID", DbType="VarChar(100)")]
+		public string MerchantID
+		{
+			get
+			{
+				return this._MerchantID;
+			}
+			set
+			{
+				if ((this._MerchantID != value))
+				{
+					this.OnMerchantIDChanging(value);
+					this.SendPropertyChanging();
+					this._MerchantID = value;
+					this.SendPropertyChanged("MerchantID");
+					this.OnMerchantIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HashKey", DbType="VarChar(100)")]
+		public string HashKey
+		{
+			get
+			{
+				return this._HashKey;
+			}
+			set
+			{
+				if ((this._HashKey != value))
+				{
+					this.OnHashKeyChanging(value);
+					this.SendPropertyChanging();
+					this._HashKey = value;
+					this.SendPropertyChanged("HashKey");
+					this.OnHashKeyChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HashIV", DbType="VarChar(100)")]
+		public string HashIV
+		{
+			get
+			{
+				return this._HashIV;
+			}
+			set
+			{
+				if ((this._HashIV != value))
+				{
+					this.OnHashIVChanging(value);
+					this.SendPropertyChanging();
+					this._HashIV = value;
+					this.SendPropertyChanged("HashIV");
+					this.OnHashIVChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey1", DbType="VarChar(100)")]
+		public string PayKey1
+		{
+			get
+			{
+				return this._PayKey1;
+			}
+			set
+			{
+				if ((this._PayKey1 != value))
+				{
+					this.OnPayKey1Changing(value);
+					this.SendPropertyChanging();
+					this._PayKey1 = value;
+					this.SendPropertyChanged("PayKey1");
+					this.OnPayKey1Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey2", DbType="VarChar(100)")]
+		public string PayKey2
+		{
+			get
+			{
+				return this._PayKey2;
+			}
+			set
+			{
+				if ((this._PayKey2 != value))
+				{
+					this.OnPayKey2Changing(value);
+					this.SendPropertyChanging();
+					this._PayKey2 = value;
+					this.SendPropertyChanged("PayKey2");
+					this.OnPayKey2Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey3", DbType="VarChar(100)")]
+		public string PayKey3
+		{
+			get
+			{
+				return this._PayKey3;
+			}
+			set
+			{
+				if ((this._PayKey3 != value))
+				{
+					this.OnPayKey3Changing(value);
+					this.SendPropertyChanging();
+					this._PayKey3 = value;
+					this.SendPropertyChanged("PayKey3");
+					this.OnPayKey3Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey4", DbType="VarChar(100)")]
+		public string PayKey4
+		{
+			get
+			{
+				return this._PayKey4;
+			}
+			set
+			{
+				if ((this._PayKey4 != value))
+				{
+					this.OnPayKey4Changing(value);
+					this.SendPropertyChanging();
+					this._PayKey4 = value;
+					this.SendPropertyChanged("PayKey4");
+					this.OnPayKey4Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey5", DbType="VarChar(100)")]
+		public string PayKey5
+		{
+			get
+			{
+				return this._PayKey5;
+			}
+			set
+			{
+				if ((this._PayKey5 != value))
+				{
+					this.OnPayKey5Changing(value);
+					this.SendPropertyChanging();
+					this._PayKey5 = value;
+					this.SendPropertyChanged("PayKey5");
+					this.OnPayKey5Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EndPayDay", DbType="Int NOT NULL")]
+		public int EndPayDay
+		{
+			get
+			{
+				return this._EndPayDay;
+			}
+			set
+			{
+				if ((this._EndPayDay != value))
+				{
+					this.OnEndPayDayChanging(value);
+					this.SendPropertyChanging();
+					this._EndPayDay = value;
+					this.SendPropertyChanged("EndPayDay");
+					this.OnEndPayDayChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_M_Product_PayType", Storage="_M_Product_PayType", ThisKey="PTID", OtherKey="PTID")]
+		public EntitySet<M_Product_PayType> M_Product_PayType
+		{
+			get
+			{
+				return this._M_Product_PayType;
+			}
+			set
+			{
+				this._M_Product_PayType.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_Order_Paid", Storage="_Order_Paid", ThisKey="PTID", OtherKey="PTID")]
+		public EntitySet<Order_Paid> Order_Paid
+		{
+			get
+			{
+				return this._Order_Paid;
+			}
+			set
+			{
+				this._Order_Paid.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_PayType", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
+		public OrganizeInfo OrganizeInfo
+		{
+			get
+			{
+				return this._OrganizeInfo.Entity;
+			}
+			set
+			{
+				OrganizeInfo previousValue = this._OrganizeInfo.Entity;
 				if (((previousValue != value) 
-							|| (this._Product.HasLoadedOrAssignedValue == false)))
+							|| (this._OrganizeInfo.HasLoadedOrAssignedValue == false)))
 				{
 					this.SendPropertyChanging();
 					if ((previousValue != null))
 					{
-						this._Product.Entity = null;
-						previousValue.Product_Class.Remove(this);
+						this._OrganizeInfo.Entity = null;
+						previousValue.PayType.Remove(this);
 					}
-					this._Product.Entity = value;
+					this._OrganizeInfo.Entity = value;
 					if ((value != null))
 					{
-						value.Product_Class.Add(this);
-						this._PID = value.PID;
+						value.PayType.Add(this);
+						this._OIID = value.OIID;
 					}
 					else
 					{
-						this._PID = default(int);
+						this._OIID = default(int);
 					}
-					this.SendPropertyChanged("Product");
+					this.SendPropertyChanged("OrganizeInfo");
 				}
 			}
 		}
@@ -15567,16 +15862,227 @@ namespace Banner
 			}
 		}
 		
-		private void attach_M_Product_Teacher(M_Product_Teacher entity)
+		private void attach_M_Product_PayType(M_Product_PayType entity)
 		{
 			this.SendPropertyChanging();
-			entity.Product_Class = this;
+			entity.PayType = this;
 		}
 		
-		private void detach_M_Product_Teacher(M_Product_Teacher entity)
+		private void detach_M_Product_PayType(M_Product_PayType entity)
 		{
 			this.SendPropertyChanging();
-			entity.Product_Class = null;
+			entity.PayType = null;
+		}
+		
+		private void attach_Order_Paid(Order_Paid entity)
+		{
+			this.SendPropertyChanging();
+			entity.PayType = this;
+		}
+		
+		private void detach_Order_Paid(Order_Paid entity)
+		{
+			this.SendPropertyChanging();
+			entity.PayType = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Product_ClassTime")]
+	public partial class Product_ClassTime : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _PCTID;
+		
+		private int _PCID;
+		
+		private System.DateTime _ClassDate;
+		
+		private System.TimeSpan _STime;
+		
+		private System.TimeSpan _ETime;
+		
+		private EntityRef<Product_Class> _Product_Class;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnPCTIDChanging(int value);
+    partial void OnPCTIDChanged();
+    partial void OnPCIDChanging(int value);
+    partial void OnPCIDChanged();
+    partial void OnClassDateChanging(System.DateTime value);
+    partial void OnClassDateChanged();
+    partial void OnSTimeChanging(System.TimeSpan value);
+    partial void OnSTimeChanged();
+    partial void OnETimeChanging(System.TimeSpan value);
+    partial void OnETimeChanged();
+    #endregion
+		
+		public Product_ClassTime()
+		{
+			this._Product_Class = default(EntityRef<Product_Class>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PCTID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int PCTID
+		{
+			get
+			{
+				return this._PCTID;
+			}
+			set
+			{
+				if ((this._PCTID != value))
+				{
+					this.OnPCTIDChanging(value);
+					this.SendPropertyChanging();
+					this._PCTID = value;
+					this.SendPropertyChanged("PCTID");
+					this.OnPCTIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PCID", DbType="Int NOT NULL")]
+		public int PCID
+		{
+			get
+			{
+				return this._PCID;
+			}
+			set
+			{
+				if ((this._PCID != value))
+				{
+					if (this._Product_Class.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnPCIDChanging(value);
+					this.SendPropertyChanging();
+					this._PCID = value;
+					this.SendPropertyChanged("PCID");
+					this.OnPCIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ClassDate", DbType="Date NOT NULL")]
+		public System.DateTime ClassDate
+		{
+			get
+			{
+				return this._ClassDate;
+			}
+			set
+			{
+				if ((this._ClassDate != value))
+				{
+					this.OnClassDateChanging(value);
+					this.SendPropertyChanging();
+					this._ClassDate = value;
+					this.SendPropertyChanged("ClassDate");
+					this.OnClassDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_STime", DbType="Time NOT NULL")]
+		public System.TimeSpan STime
+		{
+			get
+			{
+				return this._STime;
+			}
+			set
+			{
+				if ((this._STime != value))
+				{
+					this.OnSTimeChanging(value);
+					this.SendPropertyChanging();
+					this._STime = value;
+					this.SendPropertyChanged("STime");
+					this.OnSTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ETime", DbType="Time NOT NULL")]
+		public System.TimeSpan ETime
+		{
+			get
+			{
+				return this._ETime;
+			}
+			set
+			{
+				if ((this._ETime != value))
+				{
+					this.OnETimeChanging(value);
+					this.SendPropertyChanging();
+					this._ETime = value;
+					this.SendPropertyChanged("ETime");
+					this.OnETimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Product_ClassTime", Storage="_Product_Class", ThisKey="PCID", OtherKey="PCID", IsForeignKey=true)]
+		public Product_Class Product_Class
+		{
+			get
+			{
+				return this._Product_Class.Entity;
+			}
+			set
+			{
+				Product_Class previousValue = this._Product_Class.Entity;
+				if (((previousValue != value) 
+							|| (this._Product_Class.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Product_Class.Entity = null;
+						previousValue.Product_ClassTime.Remove(this);
+					}
+					this._Product_Class.Entity = value;
+					if ((value != null))
+					{
+						value.Product_ClassTime.Add(this);
+						this._PCID = value.PCID;
+					}
+					else
+					{
+						this._PCID = default(int);
+					}
+					this.SendPropertyChanged("Product_Class");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 	
@@ -17906,41 +18412,49 @@ namespace Banner
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.PayType")]
-	public partial class PayType : INotifyPropertyChanging, INotifyPropertyChanged
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Product")]
+	public partial class Product : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
 		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
 		
-		private int _PTID;
+		private int _PID;
+		
+		private int _CID;
 		
 		private int _OIID;
 		
-		private int _PayTypeID;
-		
 		private string _Title;
 		
-		private string _Note;
+		private string _SubTitle;
 		
-		private string _TargetURL;
+		private int _ProductType;
 		
-		private string _BackURL;
+		private string _ProductInfo;
 		
-		private string _MerchantID;
+		private string _TargetInfo;
 		
-		private string _HashKey;
+		private string _GraduationInfo;
 		
-		private string _HashIV;
+		private int _YearNo;
 		
-		private string _PayKey1;
+		private int _EchelonNo;
 		
-		private string _PayKey2;
+		private string _ImgURL;
 		
-		private string _PayKey3;
+		private int _Price_Basic;
 		
-		private string _PayKey4;
+		private int _Price_Early;
 		
-		private string _PayKey5;
+		private System.DateTime _SDate_Signup;
+		
+		private System.DateTime _EDate_Signup;
+		
+		private System.DateTime _SDate_Early;
+		
+		private System.DateTime _EDate_Early;
+		
+		private bool _ShowFlag;
 		
 		private bool _ActiveFlag;
 		
@@ -17952,9 +18466,21 @@ namespace Banner
 		
 		private int _SaveACID;
 		
+		private EntitySet<Coupon_Header> _Coupon_Header;
+		
 		private EntitySet<M_Product_PayType> _M_Product_PayType;
 		
-		private EntitySet<Order_Paid> _Order_Paid;
+		private EntitySet<M_Product_Teacher> _M_Product_Teacher;
+		
+		private EntitySet<Order_Product> _Order_Product;
+		
+		private EntitySet<Product_File> _Product_File;
+		
+		private EntitySet<Product_Rool> _Product_Rool;
+		
+		private EntitySet<Product_Class> _Product_Class;
+		
+		private EntityRef<Course> _Course;
 		
 		private EntityRef<OrganizeInfo> _OrganizeInfo;
 		
@@ -17962,36 +18488,44 @@ namespace Banner
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
     partial void OnCreated();
-    partial void OnPTIDChanging(int value);
-    partial void OnPTIDChanged();
+    partial void OnPIDChanging(int value);
+    partial void OnPIDChanged();
+    partial void OnCIDChanging(int value);
+    partial void OnCIDChanged();
     partial void OnOIIDChanging(int value);
     partial void OnOIIDChanged();
-    partial void OnPayTypeIDChanging(int value);
-    partial void OnPayTypeIDChanged();
     partial void OnTitleChanging(string value);
     partial void OnTitleChanged();
-    partial void OnNoteChanging(string value);
-    partial void OnNoteChanged();
-    partial void OnTargetURLChanging(string value);
-    partial void OnTargetURLChanged();
-    partial void OnBackURLChanging(string value);
-    partial void OnBackURLChanged();
-    partial void OnMerchantIDChanging(string value);
-    partial void OnMerchantIDChanged();
-    partial void OnHashKeyChanging(string value);
-    partial void OnHashKeyChanged();
-    partial void OnHashIVChanging(string value);
-    partial void OnHashIVChanged();
-    partial void OnPayKey1Changing(string value);
-    partial void OnPayKey1Changed();
-    partial void OnPayKey2Changing(string value);
-    partial void OnPayKey2Changed();
-    partial void OnPayKey3Changing(string value);
-    partial void OnPayKey3Changed();
-    partial void OnPayKey4Changing(string value);
-    partial void OnPayKey4Changed();
-    partial void OnPayKey5Changing(string value);
-    partial void OnPayKey5Changed();
+    partial void OnSubTitleChanging(string value);
+    partial void OnSubTitleChanged();
+    partial void OnProductTypeChanging(int value);
+    partial void OnProductTypeChanged();
+    partial void OnProductInfoChanging(string value);
+    partial void OnProductInfoChanged();
+    partial void OnTargetInfoChanging(string value);
+    partial void OnTargetInfoChanged();
+    partial void OnGraduationInfoChanging(string value);
+    partial void OnGraduationInfoChanged();
+    partial void OnYearNoChanging(int value);
+    partial void OnYearNoChanged();
+    partial void OnEchelonNoChanging(int value);
+    partial void OnEchelonNoChanged();
+    partial void OnImgURLChanging(string value);
+    partial void OnImgURLChanged();
+    partial void OnPrice_BasicChanging(int value);
+    partial void OnPrice_BasicChanged();
+    partial void OnPrice_EarlyChanging(int value);
+    partial void OnPrice_EarlyChanged();
+    partial void OnSDate_SignupChanging(System.DateTime value);
+    partial void OnSDate_SignupChanged();
+    partial void OnEDate_SignupChanging(System.DateTime value);
+    partial void OnEDate_SignupChanged();
+    partial void OnSDate_EarlyChanging(System.DateTime value);
+    partial void OnSDate_EarlyChanged();
+    partial void OnEDate_EarlyChanging(System.DateTime value);
+    partial void OnEDate_EarlyChanged();
+    partial void OnShowFlagChanging(bool value);
+    partial void OnShowFlagChanged();
     partial void OnActiveFlagChanging(bool value);
     partial void OnActiveFlagChanged();
     partial void OnDeleteFlagChanging(bool value);
@@ -18004,30 +18538,60 @@ namespace Banner
     partial void OnSaveACIDChanged();
     #endregion
 		
-		public PayType()
+		public Product()
 		{
+			this._Coupon_Header = new EntitySet<Coupon_Header>(new Action<Coupon_Header>(this.attach_Coupon_Header), new Action<Coupon_Header>(this.detach_Coupon_Header));
 			this._M_Product_PayType = new EntitySet<M_Product_PayType>(new Action<M_Product_PayType>(this.attach_M_Product_PayType), new Action<M_Product_PayType>(this.detach_M_Product_PayType));
-			this._Order_Paid = new EntitySet<Order_Paid>(new Action<Order_Paid>(this.attach_Order_Paid), new Action<Order_Paid>(this.detach_Order_Paid));
+			this._M_Product_Teacher = new EntitySet<M_Product_Teacher>(new Action<M_Product_Teacher>(this.attach_M_Product_Teacher), new Action<M_Product_Teacher>(this.detach_M_Product_Teacher));
+			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
+			this._Product_File = new EntitySet<Product_File>(new Action<Product_File>(this.attach_Product_File), new Action<Product_File>(this.detach_Product_File));
+			this._Product_Rool = new EntitySet<Product_Rool>(new Action<Product_Rool>(this.attach_Product_Rool), new Action<Product_Rool>(this.detach_Product_Rool));
+			this._Product_Class = new EntitySet<Product_Class>(new Action<Product_Class>(this.attach_Product_Class), new Action<Product_Class>(this.detach_Product_Class));
+			this._Course = default(EntityRef<Course>);
 			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
 			OnCreated();
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PTID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int PTID
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int PID
 		{
 			get
 			{
-				return this._PTID;
+				return this._PID;
 			}
 			set
 			{
-				if ((this._PTID != value))
+				if ((this._PID != value))
 				{
-					this.OnPTIDChanging(value);
+					this.OnPIDChanging(value);
 					this.SendPropertyChanging();
-					this._PTID = value;
-					this.SendPropertyChanged("PTID");
-					this.OnPTIDChanged();
+					this._PID = value;
+					this.SendPropertyChanged("PID");
+					this.OnPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CID", DbType="Int NOT NULL")]
+		public int CID
+		{
+			get
+			{
+				return this._CID;
+			}
+			set
+			{
+				if ((this._CID != value))
+				{
+					if (this._Course.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnCIDChanging(value);
+					this.SendPropertyChanging();
+					this._CID = value;
+					this.SendPropertyChanged("CID");
+					this.OnCIDChanged();
 				}
 			}
 		}
@@ -18056,26 +18620,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayTypeID", DbType="Int NOT NULL")]
-		public int PayTypeID
-		{
-			get
-			{
-				return this._PayTypeID;
-			}
-			set
-			{
-				if ((this._PayTypeID != value))
-				{
-					this.OnPayTypeIDChanging(value);
-					this.SendPropertyChanging();
-					this._PayTypeID = value;
-					this.SendPropertyChanged("PayTypeID");
-					this.OnPayTypeIDChanged();
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
 		public string Title
 		{
@@ -18096,222 +18640,302 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Note", DbType="NVarChar(MAX)")]
-		public string Note
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SubTitle", DbType="NVarChar(50)")]
+		public string SubTitle
 		{
 			get
 			{
-				return this._Note;
+				return this._SubTitle;
 			}
 			set
 			{
-				if ((this._Note != value))
+				if ((this._SubTitle != value))
 				{
-					this.OnNoteChanging(value);
+					this.OnSubTitleChanging(value);
 					this.SendPropertyChanging();
-					this._Note = value;
-					this.SendPropertyChanged("Note");
-					this.OnNoteChanged();
+					this._SubTitle = value;
+					this.SendPropertyChanged("SubTitle");
+					this.OnSubTitleChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetURL", DbType="VarChar(200)")]
-		public string TargetURL
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ProductType", DbType="Int NOT NULL")]
+		public int ProductType
 		{
 			get
 			{
-				return this._TargetURL;
+				return this._ProductType;
 			}
 			set
 			{
-				if ((this._TargetURL != value))
+				if ((this._ProductType != value))
 				{
-					this.OnTargetURLChanging(value);
+					this.OnProductTypeChanging(value);
 					this.SendPropertyChanging();
-					this._TargetURL = value;
-					this.SendPropertyChanged("TargetURL");
-					this.OnTargetURLChanged();
+					this._ProductType = value;
+					this.SendPropertyChanged("ProductType");
+					this.OnProductTypeChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BackURL", DbType="VarChar(200)")]
-		public string BackURL
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ProductInfo", DbType="NVarChar(MAX)")]
+		public string ProductInfo
 		{
 			get
 			{
-				return this._BackURL;
+				return this._ProductInfo;
 			}
 			set
 			{
-				if ((this._BackURL != value))
+				if ((this._ProductInfo != value))
 				{
-					this.OnBackURLChanging(value);
+					this.OnProductInfoChanging(value);
 					this.SendPropertyChanging();
-					this._BackURL = value;
-					this.SendPropertyChanged("BackURL");
-					this.OnBackURLChanged();
+					this._ProductInfo = value;
+					this.SendPropertyChanged("ProductInfo");
+					this.OnProductInfoChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MerchantID", DbType="VarChar(100)")]
-		public string MerchantID
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetInfo", DbType="NVarChar(MAX)")]
+		public string TargetInfo
 		{
 			get
 			{
-				return this._MerchantID;
+				return this._TargetInfo;
 			}
 			set
 			{
-				if ((this._MerchantID != value))
+				if ((this._TargetInfo != value))
 				{
-					this.OnMerchantIDChanging(value);
+					this.OnTargetInfoChanging(value);
 					this.SendPropertyChanging();
-					this._MerchantID = value;
-					this.SendPropertyChanged("MerchantID");
-					this.OnMerchantIDChanged();
+					this._TargetInfo = value;
+					this.SendPropertyChanged("TargetInfo");
+					this.OnTargetInfoChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HashKey", DbType="VarChar(100)")]
-		public string HashKey
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GraduationInfo", DbType="NVarChar(MAX)")]
+		public string GraduationInfo
 		{
 			get
 			{
-				return this._HashKey;
+				return this._GraduationInfo;
 			}
 			set
 			{
-				if ((this._HashKey != value))
+				if ((this._GraduationInfo != value))
 				{
-					this.OnHashKeyChanging(value);
+					this.OnGraduationInfoChanging(value);
 					this.SendPropertyChanging();
-					this._HashKey = value;
-					this.SendPropertyChanged("HashKey");
-					this.OnHashKeyChanged();
+					this._GraduationInfo = value;
+					this.SendPropertyChanged("GraduationInfo");
+					this.OnGraduationInfoChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_HashIV", DbType="VarChar(100)")]
-		public string HashIV
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_YearNo", DbType="Int NOT NULL")]
+		public int YearNo
 		{
 			get
 			{
-				return this._HashIV;
+				return this._YearNo;
 			}
 			set
 			{
-				if ((this._HashIV != value))
+				if ((this._YearNo != value))
 				{
-					this.OnHashIVChanging(value);
+					this.OnYearNoChanging(value);
 					this.SendPropertyChanging();
-					this._HashIV = value;
-					this.SendPropertyChanged("HashIV");
-					this.OnHashIVChanged();
+					this._YearNo = value;
+					this.SendPropertyChanged("YearNo");
+					this.OnYearNoChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey1", DbType="VarChar(100)")]
-		public string PayKey1
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EchelonNo", DbType="Int NOT NULL")]
+		public int EchelonNo
 		{
 			get
 			{
-				return this._PayKey1;
+				return this._EchelonNo;
 			}
 			set
 			{
-				if ((this._PayKey1 != value))
+				if ((this._EchelonNo != value))
 				{
-					this.OnPayKey1Changing(value);
+					this.OnEchelonNoChanging(value);
 					this.SendPropertyChanging();
-					this._PayKey1 = value;
-					this.SendPropertyChanged("PayKey1");
-					this.OnPayKey1Changed();
+					this._EchelonNo = value;
+					this.SendPropertyChanged("EchelonNo");
+					this.OnEchelonNoChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey2", DbType="VarChar(100)")]
-		public string PayKey2
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ImgURL", DbType="NVarChar(300)")]
+		public string ImgURL
 		{
 			get
 			{
-				return this._PayKey2;
+				return this._ImgURL;
 			}
 			set
 			{
-				if ((this._PayKey2 != value))
+				if ((this._ImgURL != value))
 				{
-					this.OnPayKey2Changing(value);
+					this.OnImgURLChanging(value);
 					this.SendPropertyChanging();
-					this._PayKey2 = value;
-					this.SendPropertyChanged("PayKey2");
-					this.OnPayKey2Changed();
+					this._ImgURL = value;
+					this.SendPropertyChanged("ImgURL");
+					this.OnImgURLChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey3", DbType="VarChar(100)")]
-		public string PayKey3
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Basic", DbType="Int NOT NULL")]
+		public int Price_Basic
 		{
 			get
 			{
-				return this._PayKey3;
+				return this._Price_Basic;
 			}
 			set
 			{
-				if ((this._PayKey3 != value))
+				if ((this._Price_Basic != value))
 				{
-					this.OnPayKey3Changing(value);
+					this.OnPrice_BasicChanging(value);
 					this.SendPropertyChanging();
-					this._PayKey3 = value;
-					this.SendPropertyChanged("PayKey3");
-					this.OnPayKey3Changed();
+					this._Price_Basic = value;
+					this.SendPropertyChanged("Price_Basic");
+					this.OnPrice_BasicChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey4", DbType="VarChar(100)")]
-		public string PayKey4
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Early", DbType="Int NOT NULL")]
+		public int Price_Early
 		{
 			get
 			{
-				return this._PayKey4;
+				return this._Price_Early;
 			}
 			set
 			{
-				if ((this._PayKey4 != value))
+				if ((this._Price_Early != value))
 				{
-					this.OnPayKey4Changing(value);
+					this.OnPrice_EarlyChanging(value);
 					this.SendPropertyChanging();
-					this._PayKey4 = value;
-					this.SendPropertyChanged("PayKey4");
-					this.OnPayKey4Changed();
+					this._Price_Early = value;
+					this.SendPropertyChanged("Price_Early");
+					this.OnPrice_EarlyChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PayKey5", DbType="VarChar(100)")]
-		public string PayKey5
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SDate_Signup", DbType="DateTime NOT NULL")]
+		public System.DateTime SDate_Signup
 		{
 			get
 			{
-				return this._PayKey5;
+				return this._SDate_Signup;
 			}
 			set
 			{
-				if ((this._PayKey5 != value))
+				if ((this._SDate_Signup != value))
 				{
-					this.OnPayKey5Changing(value);
+					this.OnSDate_SignupChanging(value);
 					this.SendPropertyChanging();
-					this._PayKey5 = value;
-					this.SendPropertyChanged("PayKey5");
-					this.OnPayKey5Changed();
+					this._SDate_Signup = value;
+					this.SendPropertyChanged("SDate_Signup");
+					this.OnSDate_SignupChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EDate_Signup", DbType="DateTime NOT NULL")]
+		public System.DateTime EDate_Signup
+		{
+			get
+			{
+				return this._EDate_Signup;
+			}
+			set
+			{
+				if ((this._EDate_Signup != value))
+				{
+					this.OnEDate_SignupChanging(value);
+					this.SendPropertyChanging();
+					this._EDate_Signup = value;
+					this.SendPropertyChanged("EDate_Signup");
+					this.OnEDate_SignupChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SDate_Early", DbType="DateTime NOT NULL")]
+		public System.DateTime SDate_Early
+		{
+			get
+			{
+				return this._SDate_Early;
+			}
+			set
+			{
+				if ((this._SDate_Early != value))
+				{
+					this.OnSDate_EarlyChanging(value);
+					this.SendPropertyChanging();
+					this._SDate_Early = value;
+					this.SendPropertyChanged("SDate_Early");
+					this.OnSDate_EarlyChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EDate_Early", DbType="DateTime NOT NULL")]
+		public System.DateTime EDate_Early
+		{
+			get
+			{
+				return this._EDate_Early;
+			}
+			set
+			{
+				if ((this._EDate_Early != value))
+				{
+					this.OnEDate_EarlyChanging(value);
+					this.SendPropertyChanging();
+					this._EDate_Early = value;
+					this.SendPropertyChanged("EDate_Early");
+					this.OnEDate_EarlyChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ShowFlag", DbType="Bit NOT NULL")]
+		public bool ShowFlag
+		{
+			get
+			{
+				return this._ShowFlag;
+			}
+			set
+			{
+				if ((this._ShowFlag != value))
+				{
+					this.OnShowFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ShowFlag = value;
+					this.SendPropertyChanged("ShowFlag");
+					this.OnShowFlagChanged();
 				}
 			}
 		}
@@ -18416,7 +19040,20 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_M_Product_PayType", Storage="_M_Product_PayType", ThisKey="PTID", OtherKey="PTID")]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Coupon_Header", Storage="_Coupon_Header", ThisKey="PID", OtherKey="PID")]
+		public EntitySet<Coupon_Header> Coupon_Header
+		{
+			get
+			{
+				return this._Coupon_Header;
+			}
+			set
+			{
+				this._Coupon_Header.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_M_Product_PayType", Storage="_M_Product_PayType", ThisKey="PID", OtherKey="PID")]
 		public EntitySet<M_Product_PayType> M_Product_PayType
 		{
 			get
@@ -18429,20 +19066,106 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="PayType_Order_Paid", Storage="_Order_Paid", ThisKey="PTID", OtherKey="PTID")]
-		public EntitySet<Order_Paid> Order_Paid
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_M_Product_Teacher", Storage="_M_Product_Teacher", ThisKey="PID", OtherKey="PID")]
+		public EntitySet<M_Product_Teacher> M_Product_Teacher
 		{
 			get
 			{
-				return this._Order_Paid;
+				return this._M_Product_Teacher;
 			}
 			set
 			{
-				this._Order_Paid.Assign(value);
+				this._M_Product_Teacher.Assign(value);
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_PayType", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Order_Product", Storage="_Order_Product", ThisKey="PID", OtherKey="PID")]
+		public EntitySet<Order_Product> Order_Product
+		{
+			get
+			{
+				return this._Order_Product;
+			}
+			set
+			{
+				this._Order_Product.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Product_File", Storage="_Product_File", ThisKey="PID", OtherKey="PID")]
+		public EntitySet<Product_File> Product_File
+		{
+			get
+			{
+				return this._Product_File;
+			}
+			set
+			{
+				this._Product_File.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Product_Rool", Storage="_Product_Rool", ThisKey="PID", OtherKey="PID")]
+		public EntitySet<Product_Rool> Product_Rool
+		{
+			get
+			{
+				return this._Product_Rool;
+			}
+			set
+			{
+				this._Product_Rool.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Product_Class", Storage="_Product_Class", ThisKey="PID", OtherKey="PID")]
+		public EntitySet<Product_Class> Product_Class
+		{
+			get
+			{
+				return this._Product_Class;
+			}
+			set
+			{
+				this._Product_Class.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Course_Product", Storage="_Course", ThisKey="CID", OtherKey="CID", IsForeignKey=true)]
+		public Course Course
+		{
+			get
+			{
+				return this._Course.Entity;
+			}
+			set
+			{
+				Course previousValue = this._Course.Entity;
+				if (((previousValue != value) 
+							|| (this._Course.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Course.Entity = null;
+						previousValue.Product.Remove(this);
+					}
+					this._Course.Entity = value;
+					if ((value != null))
+					{
+						value.Product.Add(this);
+						this._CID = value.CID;
+					}
+					else
+					{
+						this._CID = default(int);
+					}
+					this.SendPropertyChanged("Course");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Product", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
 		public OrganizeInfo OrganizeInfo
 		{
 			get
@@ -18459,12 +19182,12 @@ namespace Banner
 					if ((previousValue != null))
 					{
 						this._OrganizeInfo.Entity = null;
-						previousValue.PayType.Remove(this);
+						previousValue.Product.Remove(this);
 					}
 					this._OrganizeInfo.Entity = value;
 					if ((value != null))
 					{
-						value.PayType.Add(this);
+						value.Product.Add(this);
 						this._OIID = value.OIID;
 					}
 					else
@@ -18496,28 +19219,587 @@ namespace Banner
 			}
 		}
 		
+		private void attach_Coupon_Header(Coupon_Header entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = this;
+		}
+		
+		private void detach_Coupon_Header(Coupon_Header entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = null;
+		}
+		
 		private void attach_M_Product_PayType(M_Product_PayType entity)
 		{
 			this.SendPropertyChanging();
-			entity.PayType = this;
+			entity.Product = this;
 		}
 		
 		private void detach_M_Product_PayType(M_Product_PayType entity)
 		{
 			this.SendPropertyChanging();
-			entity.PayType = null;
+			entity.Product = null;
 		}
 		
-		private void attach_Order_Paid(Order_Paid entity)
+		private void attach_M_Product_Teacher(M_Product_Teacher entity)
 		{
 			this.SendPropertyChanging();
-			entity.PayType = this;
+			entity.Product = this;
 		}
 		
-		private void detach_Order_Paid(Order_Paid entity)
+		private void detach_M_Product_Teacher(M_Product_Teacher entity)
 		{
 			this.SendPropertyChanging();
-			entity.PayType = null;
+			entity.Product = null;
+		}
+		
+		private void attach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = this;
+		}
+		
+		private void detach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = null;
+		}
+		
+		private void attach_Product_File(Product_File entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = this;
+		}
+		
+		private void detach_Product_File(Product_File entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = null;
+		}
+		
+		private void attach_Product_Rool(Product_Rool entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = this;
+		}
+		
+		private void detach_Product_Rool(Product_Rool entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = null;
+		}
+		
+		private void attach_Product_Class(Product_Class entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = this;
+		}
+		
+		private void detach_Product_Class(Product_Class entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Product_Class")]
+	public partial class Product_Class : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _PCID;
+		
+		private int _PID;
+		
+		private string _Title;
+		
+		private int _PeopleCt;
+		
+		private string _PhoneNo;
+		
+		private string _LocationName;
+		
+		private string _Address;
+		
+		private string _MeetURL;
+		
+		private System.DateTime _GraduateDate;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntitySet<M_Product_Teacher> _M_Product_Teacher;
+		
+		private EntitySet<Order_Product> _Order_Product;
+		
+		private EntitySet<Product_ClassTime> _Product_ClassTime;
+		
+		private EntityRef<Product> _Product;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnPCIDChanging(int value);
+    partial void OnPCIDChanged();
+    partial void OnPIDChanging(int value);
+    partial void OnPIDChanged();
+    partial void OnTitleChanging(string value);
+    partial void OnTitleChanged();
+    partial void OnPeopleCtChanging(int value);
+    partial void OnPeopleCtChanged();
+    partial void OnPhoneNoChanging(string value);
+    partial void OnPhoneNoChanged();
+    partial void OnLocationNameChanging(string value);
+    partial void OnLocationNameChanged();
+    partial void OnAddressChanging(string value);
+    partial void OnAddressChanged();
+    partial void OnMeetURLChanging(string value);
+    partial void OnMeetURLChanged();
+    partial void OnGraduateDateChanging(System.DateTime value);
+    partial void OnGraduateDateChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Product_Class()
+		{
+			this._M_Product_Teacher = new EntitySet<M_Product_Teacher>(new Action<M_Product_Teacher>(this.attach_M_Product_Teacher), new Action<M_Product_Teacher>(this.detach_M_Product_Teacher));
+			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
+			this._Product_ClassTime = new EntitySet<Product_ClassTime>(new Action<Product_ClassTime>(this.attach_Product_ClassTime), new Action<Product_ClassTime>(this.detach_Product_ClassTime));
+			this._Product = default(EntityRef<Product>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PCID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int PCID
+		{
+			get
+			{
+				return this._PCID;
+			}
+			set
+			{
+				if ((this._PCID != value))
+				{
+					this.OnPCIDChanging(value);
+					this.SendPropertyChanging();
+					this._PCID = value;
+					this.SendPropertyChanged("PCID");
+					this.OnPCIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PID", DbType="Int NOT NULL")]
+		public int PID
+		{
+			get
+			{
+				return this._PID;
+			}
+			set
+			{
+				if ((this._PID != value))
+				{
+					if (this._Product.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnPIDChanging(value);
+					this.SendPropertyChanging();
+					this._PID = value;
+					this.SendPropertyChanged("PID");
+					this.OnPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
+		public string Title
+		{
+			get
+			{
+				return this._Title;
+			}
+			set
+			{
+				if ((this._Title != value))
+				{
+					this.OnTitleChanging(value);
+					this.SendPropertyChanging();
+					this._Title = value;
+					this.SendPropertyChanged("Title");
+					this.OnTitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PeopleCt", DbType="Int NOT NULL")]
+		public int PeopleCt
+		{
+			get
+			{
+				return this._PeopleCt;
+			}
+			set
+			{
+				if ((this._PeopleCt != value))
+				{
+					this.OnPeopleCtChanging(value);
+					this.SendPropertyChanging();
+					this._PeopleCt = value;
+					this.SendPropertyChanged("PeopleCt");
+					this.OnPeopleCtChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PhoneNo", DbType="VarChar(100)")]
+		public string PhoneNo
+		{
+			get
+			{
+				return this._PhoneNo;
+			}
+			set
+			{
+				if ((this._PhoneNo != value))
+				{
+					this.OnPhoneNoChanging(value);
+					this.SendPropertyChanging();
+					this._PhoneNo = value;
+					this.SendPropertyChanged("PhoneNo");
+					this.OnPhoneNoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LocationName", DbType="NVarChar(100)")]
+		public string LocationName
+		{
+			get
+			{
+				return this._LocationName;
+			}
+			set
+			{
+				if ((this._LocationName != value))
+				{
+					this.OnLocationNameChanging(value);
+					this.SendPropertyChanging();
+					this._LocationName = value;
+					this.SendPropertyChanged("LocationName");
+					this.OnLocationNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Address", DbType="NVarChar(300)")]
+		public string Address
+		{
+			get
+			{
+				return this._Address;
+			}
+			set
+			{
+				if ((this._Address != value))
+				{
+					this.OnAddressChanging(value);
+					this.SendPropertyChanging();
+					this._Address = value;
+					this.SendPropertyChanged("Address");
+					this.OnAddressChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MeetURL", DbType="NVarChar(300)")]
+		public string MeetURL
+		{
+			get
+			{
+				return this._MeetURL;
+			}
+			set
+			{
+				if ((this._MeetURL != value))
+				{
+					this.OnMeetURLChanging(value);
+					this.SendPropertyChanging();
+					this._MeetURL = value;
+					this.SendPropertyChanged("MeetURL");
+					this.OnMeetURLChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GraduateDate", DbType="DateTime NOT NULL")]
+		public System.DateTime GraduateDate
+		{
+			get
+			{
+				return this._GraduateDate;
+			}
+			set
+			{
+				if ((this._GraduateDate != value))
+				{
+					this.OnGraduateDateChanging(value);
+					this.SendPropertyChanging();
+					this._GraduateDate = value;
+					this.SendPropertyChanged("GraduateDate");
+					this.OnGraduateDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_M_Product_Teacher", Storage="_M_Product_Teacher", ThisKey="PCID", OtherKey="PCID")]
+		public EntitySet<M_Product_Teacher> M_Product_Teacher
+		{
+			get
+			{
+				return this._M_Product_Teacher;
+			}
+			set
+			{
+				this._M_Product_Teacher.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Order_Product", Storage="_Order_Product", ThisKey="PCID", OtherKey="PCID")]
+		public EntitySet<Order_Product> Order_Product
+		{
+			get
+			{
+				return this._Order_Product;
+			}
+			set
+			{
+				this._Order_Product.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Product_ClassTime", Storage="_Product_ClassTime", ThisKey="PCID", OtherKey="PCID")]
+		public EntitySet<Product_ClassTime> Product_ClassTime
+		{
+			get
+			{
+				return this._Product_ClassTime;
+			}
+			set
+			{
+				this._Product_ClassTime.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Product_Class", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
+		public Product Product
+		{
+			get
+			{
+				return this._Product.Entity;
+			}
+			set
+			{
+				Product previousValue = this._Product.Entity;
+				if (((previousValue != value) 
+							|| (this._Product.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Product.Entity = null;
+						previousValue.Product_Class.Remove(this);
+					}
+					this._Product.Entity = value;
+					if ((value != null))
+					{
+						value.Product_Class.Add(this);
+						this._PID = value.PID;
+					}
+					else
+					{
+						this._PID = default(int);
+					}
+					this.SendPropertyChanged("Product");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_M_Product_Teacher(M_Product_Teacher entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_Class = this;
+		}
+		
+		private void detach_M_Product_Teacher(M_Product_Teacher entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_Class = null;
+		}
+		
+		private void attach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_Class = this;
+		}
+		
+		private void detach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_Class = null;
+		}
+		
+		private void attach_Product_ClassTime(Product_ClassTime entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_Class = this;
+		}
+		
+		private void detach_Product_ClassTime(Product_ClassTime entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_Class = null;
 		}
 	}
 	

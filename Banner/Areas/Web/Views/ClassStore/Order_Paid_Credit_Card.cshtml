@@ -1,14 +1,21 @@
-﻿
+﻿@model Banner.Areas.Web.Controllers.ClassStoreController.cOrder_Paid_Credit_Card
 @{
     ViewBag.Title = "Order_Paid_Credit_Card";
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
 }
+@if (Model != null)
+{
+    <form method="post" id="form_Paid" action="@Model.NewebPagURL">
+        <input name="MerchantID" value="@Model.MerchantID" />
+        <input name="TradeInfo" value="@Model.TradeInfo" />
+        <input name="TradeSha" value="@Model.TradeSha" />
+        <input name="Version" value="2.0" />
+        <input name="EncryptType" value="1" />
+        <button type="submit" id="but_Send">Submit</button>
+    </form>
+    <script>
+        document.getElementById("but_Send").click();
+    </script>
+}
 
-<form method="post" id="form_Paid" action="https://ccore.newebpay.com/MPG/mpg_gateway">
-    <input name="MerchantID" value="" />
-    <input name="TradeInfo" value="" />
-    <input name="TradeSha" value="" />
-    <input name="Version" value="2.0" />
-    <input name="EncryptType" value="1" />
-</form>
 

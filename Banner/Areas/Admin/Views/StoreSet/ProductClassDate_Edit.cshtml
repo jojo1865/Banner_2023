@@ -1,0 +1,65 @@
+﻿@model Banner.Areas.Admin.Controllers.StoreSetController.cProductClassDate_Edit
+@{
+    ViewBag.Title = "ProductClass_Edit";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="form-container-list">
+        <div class="form-container">
+            <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
+            @if (Model != null)
+            {
+
+                string DateFormat = "yyyy-MM-dd";
+                <form method="post" id="form1" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-body mt-4">
+                        <div class="form-card-group">
+                            <div id="personal-info" class="header-container">
+                                <div class="header-left-border"></div>
+                                <div class="header">開班時間設定</div>
+                            </div>
+                            <div class="form-group">
+                                <label>班級名稱</label>
+                                @Html.Label(Model.PC.Title, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                            </div>
+                            <div class="form-group">
+                                <label>上課日期<span>*</span></label>
+                                @Html.TextBox("txb_ClassDate", Model.PCT.ClassDate.ToString(DateFormat), new { @class = "form-control form-control-lg input-underline", type = "date" })
+                            </div>
+                            <div class="form-group">
+                                <label>上課時間<span>*</span></label>
+                                <div class="row">
+                                    <div class="col-auto">
+                                        @Html.TextBox("txb_STime", Model.PCT.STime, new { @class = "form-control form-control-lg input-underline", @type = "time" })
+                                    </div>
+                                    <div class="col-auto">~</div>
+                                    <div class="col-auto">
+                                        @Html.TextBox("txb_ETime", Model.PCT.ETime, new { @class = "form-control form-control-lg input-underline", @type = "time" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            }
+        </div>
+    </div>
+</div>
+<div class="action-bar">
+    @if (Model != null)
+    {
+        if ((((bool[])ViewBag._Power)[1] && Model.PC.PCID == 0) || (((bool[])ViewBag._Power)[2] && Model.PC.PCID > 0))
+        {
+            <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-submit btn-lg btn-round btn-submit">
+                <i class="fa-solid fa-floppy-disk"></i>儲存
+            </a>
+        }
+        <a href="/Admin/StoreSet/ProductClassDate_List?PID=@(Model.PC.PID)&PCID=@(Model.PC.PCID)" class="btn btn-outline-primary btn-lg btn-round">
+            <i class="fa-solid fa-xmark"></i>取消
+        </a>
+    }
+</div>

@@ -1,0 +1,85 @@
+﻿@model Banner.Areas.Admin.Controllers.StoreSetController.cProductClassDate_List
+@{
+    ViewBag.Title = "ProductClass_List";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        <form method="post" id="form1">
+            @if (Model != null)
+            {
+
+                <div class="table-container">
+                    @if (((bool[])ViewBag._Power)[1])
+                    {
+                        <div class="table-func-container mb-4">
+                            <div class="row">
+                                <div class="col-auto">
+                                    開始日期：<input type="date" id="txb_SDate" class="form-control" style="width:150px;" />
+                                </div>
+                                <div class="col-auto">
+                                    時間：
+                                    <div class="row">
+                                        <div class="col-auto"><input type="time" id="txb_STime" class="form-control" style="width:160px;" /></div>
+                                        <div class="col-auto">~</div>
+                                        <div class="col-auto"><input type="time" id="txb_ETime" class="form-control" style="width:160px;" /></div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">相隔週期(天)：<input type="number" id="txb_DaySpan" class="form-control" style="width:80px;" /></div>
+                                <div class="col-auto">上課堂數(堂)：<input type="number" id="txb_No" class="form-control" style="width:80px;" /></div>
+                            </div>
+
+                        </div>
+
+                        <div class="table-func-container mb-4">
+                            <input type="hidden" id="txb_PCID" value="@Model.PCID" />
+                            <a class="btn btn-primary btn-lg btn-round" href="javascript:;" onclick="CreateClass();">
+                                <i class="fa-solid fa-circle-plus"></i>批次新增
+                            </a>
+                            <a class="btn btn-primary btn-lg btn-round" href="/Admin/StoreSet/ProductClassDate_Edit/0?PID=@(Model.PID)&PCID=@(Model.PCID)">
+                                <i class="fa-solid fa-circle-plus"></i>新增一筆
+                            </a>
+                        </div>
+                    }
+
+                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                </div>
+                <a href="/Admin/StoreSet/ProductClass_List?PID=@(Model.PID)" class="btn btn-outline-primary btn-lg btn-round">
+                    <i class="fa-solid fa-xmark"></i>返回班級
+                </a>
+            }
+
+        </form>
+    </div>
+</div>
+<script>
+    function CreateClass() {
+        var txb_SDate = document.getElementById("txb_SDate");
+        var txb_STime = document.getElementById("txb_STime");
+        var txb_ETime = document.getElementById("txb_ETime");
+        var txb_DaySpan = document.getElementById("txb_DaySpan");
+        var txb_No = document.getElementById("txb_No");
+        var txb_PCID = document.getElementById("txb_PCID");
+        $.ajax({
+            url: '/Admin/StoreSet/CreateClassDate?PCID=' + txb_PCID.value +'&SDate=' + txb_SDate.value + '&STime=' + txb_STime.value + '&ETime=' + txb_ETime.value + '&DaySpan=' + txb_DaySpan.value + '&No=' + txb_No.value,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                if (res == 'OK') {
+                    alert('新增完成');
+                    location.reload();
+                }
+                else {
+                    alert(res);
+                }
+            },
+            error: function (err) { console.log(err) },
+        })
+
+    }
+</script>

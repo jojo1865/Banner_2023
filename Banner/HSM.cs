@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
+using System.Web.Helpers;
 
 namespace Banner
 {
@@ -120,6 +122,8 @@ namespace Banner
             byte[] crypto = sha256.ComputeHash(source);//進行SHA256加密
             return Convert.ToBase64String(crypto);//把加密後的字串從Byte[]轉為字串
         }
+        
+
         /// <summary>
         /// SHA-384加密
         /// </summary>

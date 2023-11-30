@@ -87,25 +87,23 @@
     if (TempData["rurl"].ToString() != "")
     {
         <script>
-    $.ajax({
-        url: '@(TempData["rurl"].ToString())',
-        method: 'POST',
-        data: '@(TempData["json"].ToString())',
-        dataType: 'json',
-        success: function (res) {
-            window.close();
-        },
-        error: function (err) { console.log(err) },
-    })
+        $.ajax({
+            url: '@(TempData["rurl"].ToString())',
+            method: 'POST',
+            data: '@(TempData["json"].ToString())',
+            dataType: 'json',
+            success: function (res) {
+                window.close();
+            },
+            error: function (err) { console.log(err) },
+        })
         </script>
     }
     else
     {
-        TempData["msg"] = "沒有回傳網址...無法傳送資料";
+        //TempData["msg"] = "沒有回傳網址...無法傳送資料";
+        TempData["msg"] = TempData["json"];
     }
 }
-else
-{
-    TempData["msg"] = "沒有回傳資料";
-}
+
 

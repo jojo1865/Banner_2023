@@ -51,21 +51,22 @@ namespace Banner
         public string DateTimeFormat = "yyyy-MM-dd HH:mm";
         public string CompanyTitle = "【全球旌旗資訊網】";
 
+        public string sDomanName = "https://web-banner.viuto-aiot.com";
 
         //測試用
 
-        public string sDomanName = "";
+        public string sStoreTitle = "台中市基督教旌旗協會";
         public string sNewebPagURL = "https://ccore.newebpay.com/MPG/period";//藍星金流網址
-        public string sMerchantID = "";//商店代號
-        public string sHashKey = "";
-        public string sHashIV = "";
+        public string sMerchantID = "MS3359938901";//商店代號
+        public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
+        public string sHashIV = "PBV4pP9DpA9oBzvC";
 
         //正式用
-        /*public string sDomanName = "";
+        /*public string sDomanName = "台中市基督教旌旗協會";
         public string sNewebPagURL = "https://core.newebpay.com/MPG/period";//藍星金流網址
-        public string sMerchantID = "";//商店代號
-        public string sHashKey = "";
-        public string sHashIV = "";*/
+        public string sMerchantID = "MS3359938901";//商店代號
+        public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
+        public string sHashIV = "PBV4pP9DpA9oBzvC";*/
 
         public bool bUsedNewName = true;
         public bool[] bGroup = new bool[] { false, false, false, false, false, false }; //權限
@@ -117,7 +118,7 @@ namespace Banner
         public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
         public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)" };
         public string[] sCourseType = new string[] { "不限制", "實體", "線上" };
-        public string[] sPayType = new string[] { "現金", "藍新-信用卡", "藍新-ATM", "PayPel", "支付寶"};
+        public string[] sPayType = new string[] { "現金", "藍新-信用卡", "藍新-ATM", "PayPel", "支付寶" };
         public string Error = "";
         public int iChildAge = 12;
         public int ACID = 0;
@@ -299,8 +300,8 @@ namespace Banner
             long l = 0;
             if (Request.QueryString[sTitle] != null)
             {
-                try { l = Convert.ToInt64(Request.QueryString[sTitle].ToString()); }
-                catch { l = 0; }
+                if (!long.TryParse(Request.QueryString[sTitle].ToString(), out l))
+                    l = 0;
             }
             return l;
         }
@@ -310,8 +311,8 @@ namespace Banner
             int i = 0;
             if (Request.QueryString[sTitle] != null)
             {
-                try { i = Convert.ToInt32(Request.QueryString[sTitle].ToString()); }
-                catch { i = 0; }
+                if (!int.TryParse(Request.QueryString[sTitle].ToString(), out i))
+                    i = 0;
             }
             return i;
         }
@@ -2900,7 +2901,7 @@ namespace Banner
         {
             //付款方式(0:現金/1:藍星-信用卡/2:藍星-ATM/3:PayPel/4:支付寶
             int PayType = 1;
-            switch(PayType)
+            switch (PayType)
             {
 
                 case 0://現金

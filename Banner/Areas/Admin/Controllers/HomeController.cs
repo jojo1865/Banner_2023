@@ -49,10 +49,10 @@ namespace Banner.Areas.Admin.Controllers
                     LogInAC(1);
                     SetBrowserData("UserName", "系統管理者");
                 }
-                Response.Redirect("/Admin/Home/Index");
+                SetAlert("", 1, "/Admin/Home/Index");
             }
             else if (Request.Url.Host == "web-banner.viuto-aiot.com")
-                Response.Redirect("/Web/Home/Index");
+                SetAlert("", 1, "/Web/Home/Index");
             TempData["login"] = "";
             TempData["pw"] = "";
             return View();
@@ -515,6 +515,50 @@ namespace Banner.Areas.Admin.Controllers
             return Msg;
         }
         #endregion
+        #region 更新刪除狀態
+        public string DataDelete(string TableName, int ID)
+        {
+            string Msg = "";
+            ACID = GetACID();
+            switch (TableName)
+            {
+                case "Product_Class":
+                    {
+                        var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == ID);
+                        if (PC != null)
+                        {
+                            if (DC.Order_Product.Any(q => q.Order_Header.Order_Type > 0 && q.PCID == ID))
+                                Msg = "此班級已有訂單,不能刪除";
+
+                            if (Msg == "")
+                            {
+                                PC.ActiveFlag = false;
+                                PC.DeleteFlag = true;
+                                PC.UpdDate = DT;
+                                PC.SaveACID = ACID;
+                                DC.SubmitChanges();
+
+                                var OPs = DC.Order_Product.Where(q => q.PCID == PC.PCID);
+                                if (OPs.Count() > 0)
+                                {
+                                    DC.Order_Product.DeleteAllOnSubmit(OPs);
+                                    DC.SubmitChanges();
+                                }
+
+                                Msg = "OK";
+                            }
+                        }
+                        else
+                            Msg = "查無此班級";
+                    }
+                    break;
+
+
+
+            }
+            return Msg;
+        }
+        #endregion
         #region 更新講師
         public string ChangeTeacher(int TID, int PCID)
         {
@@ -667,16 +711,16 @@ namespace Banner.Areas.Admin.Controllers
         {
             string sPayType = "";
             var OI = (from q in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == OIID)
-                     join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 1)
-                     on q.ParentID equals p.OIID
-                     select p).FirstOrDefault();
-            if(OI!=null)
+                      join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 1)
+                      on q.ParentID equals p.OIID
+                      select p).FirstOrDefault();
+            if (OI != null)
             {
-                var PTs = DC.PayType.Where(q => q.OIID == OI.OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q=>q.PayTypeID);
-                foreach(var PT in PTs)
+                var PTs = DC.PayType.Where(q => q.OIID == OI.OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.PayTypeID);
+                foreach (var PT in PTs)
                     sPayType += (sPayType == "" ? "" : ",") + PT.PayTypeID;
             }
-            
+
             return sPayType;
         }
         #endregion

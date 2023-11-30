@@ -58,20 +58,9 @@ namespace Banner.Areas.Web.Controllers
 
             //即將結束報名課程
             List<c_TempProduct> c_TP = new List<c_TempProduct>();
-            //找臨櫃
-            Ps_ = Ps.Where(q => (q.EDate_Signup_OnSite > q.CreDate && q.EDate_Signup_OnSite > DT.Date)
-            ).OrderBy(q => (DT.Date - q.EDate_Signup_OnSite)).Take(12);
-            foreach (var P_ in Ps_)
-            {
-                c_TP.Add(new c_TempProduct
-                {
-                    P = P_,
-                    iDay = (DT.Date - P_.EDate_Signup_OnSite).Days
-                });
-            }
+            
             //找線上
-            Ps_ = Ps.Where(q => (q.EDate_Signup_OnLine > q.CreDate && q.EDate_Signup_OnLine > DT.Date)
-            ).OrderBy(q => (DT.Date - q.EDate_Signup_OnLine)).Take(12);
+            Ps_ = Ps.Where(q => (q.EDate_Signup > q.CreDate && q.EDate_Signup > DT.Date)).OrderBy(q => (DT.Date - q.EDate_Signup)).Take(12);
             foreach (var P_ in Ps_)
             {
                 if (!c_TP.Any(q => q.P.PID == P_.PID))//排除重複
@@ -79,7 +68,7 @@ namespace Banner.Areas.Web.Controllers
                     c_TP.Add(new c_TempProduct
                     {
                         P = P_,
-                        iDay = (DT.Date - P_.EDate_Signup_OnLine).Days
+                        iDay = (DT.Date - P_.EDate_Signup).Days
                     });
                 }
             }
@@ -124,20 +113,10 @@ namespace Banner.Areas.Web.Controllers
                 case 3://更多即將結束報名課程
                     {
                         List<c_TempProduct> c_TP = new List<c_TempProduct>();
-                        //找臨櫃
-                        var Ps_ = Ns.Where(q => (q.EDate_Signup_OnSite > q.CreDate && q.EDate_Signup_OnSite > DT.Date)
-                        ).OrderBy(q => (DT.Date - q.EDate_Signup_OnSite)).Take(25);
-                        foreach (var P_ in Ps_)
-                        {
-                            c_TP.Add(new c_TempProduct
-                            {
-                                P = P_,
-                                iDay = (DT.Date - P_.EDate_Signup_OnSite).Days
-                            });
-                        }
+
                         //找線上
-                        Ps_ = Ns.Where(q => (q.EDate_Signup_OnLine > q.CreDate && q.EDate_Signup_OnLine > DT.Date)
-                        ).OrderBy(q => (DT.Date - q.EDate_Signup_OnLine)).Take(25);
+                        var Ps_ = Ns.Where(q => (q.EDate_Signup > q.CreDate && q.EDate_Signup > DT.Date)
+                        ).OrderBy(q => (DT.Date - q.EDate_Signup)).Take(25);
                         foreach (var P_ in Ps_)
                         {
                             if (!c_TP.Any(q => q.P.PID == P_.PID))//排除重複
@@ -145,7 +124,7 @@ namespace Banner.Areas.Web.Controllers
                                 c_TP.Add(new c_TempProduct
                                 {
                                     P = P_,
-                                    iDay = (DT.Date - P_.EDate_Signup_OnLine).Days
+                                    iDay = (DT.Date - P_.EDate_Signup).Days
                                 });
                             }
                         }
@@ -214,33 +193,41 @@ namespace Banner.Areas.Web.Controllers
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "班級名稱" });
             TopTitles.Add(new cTableCell { Title = "上課日期" });
-            TopTitles.Add(new cTableCell { Title = "上課時間" });
             TopTitles.Add(new cTableCell { Title = "上課地點" });
             TopTitles.Add(new cTableCell { Title = "人數限制" });
             c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
 
-            var PCs = DC.Product_Class.Where(q => q.PID == ID).OrderBy(q => q.LoopFlag).ThenBy(q => q.WeeklyNo);
+
+            var PCs = DC.Product_Class.Where(q => q.PID == ID).OrderBy(q => q.Product_ClassTime.Min(p => p.ClassDate));
             foreach (var PC in PCs)
             {
                 cTableRow cTR = new cTableRow();
 
                 cTR.Cs.Add(new cTableCell { Value = PC.Title });//班級名稱
                 string ClassDate = "";
-                if (PC.LoopFlag)
+                if (PC.Product_ClassTime.Any())
                 {
-                    if (PC.WeeklyNo > 0)
-                        ClassDate = "每周" + sWeeks[PC.WeeklyNo].Replace("星期", "");
+                    var PCT_Min = PC.Product_ClassTime.Min(q => q.ClassDate);
+                    var PCT_Max = PC.Product_ClassTime.Max(q => q.ClassDate);
+                    if (PCT_Min.Date != PCT_Max)
+                        ClassDate = PCT_Min.ToString(DateFormat) + "~" + PCT_Max.ToString(DateFormat);
                     else
-                        ClassDate = "每周(未確定日期)";
+                    {
+                        var PCT = PC.Product_ClassTime.First();
+                        ClassDate = PCT.ClassDate.ToString(DateFormat) + " " + PCT.STime.ToString("HH:mm") + "~" + PCT.ETime.ToString("HH:mm");
+                    }
                 }
                 else
-                    ClassDate = PC.TargetDate.ToString(DateFormat);
+                    ClassDate = "尚無開課日期";
                 cTR.Cs.Add(new cTableCell { Value = ClassDate });//上課日期
-                cTR.Cs.Add(new cTableCell { Value = PC.STime.Hours + ":" + PC.STime.Minutes + "~" + PC.ETime.Hours + ":" + PC.ETime.Minutes });//上課時間
                 cTR.Cs.Add(new cTableCell { Value = PC.LocationName });//上課地點
                 cTR.Cs.Add(new cTableCell { Value = (PC.PeopleCt == 0 ? "不限制" : "限" + PC.PeopleCt + "人") });//人數限制
                 c.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
+
+
+
+
             #endregion
             #region 取得規則
             foreach (var PR in DC.Product_Rool.Where(q => q.PID == ID).OrderBy(q => q.TargetType))
@@ -306,6 +293,13 @@ namespace Banner.Areas.Web.Controllers
         public class cOrder_Step1
         {
             public int OHID = 0;
+
+            public List<cOICroup> cOIs = new List<cOICroup>();
+        }
+        public class cOICroup
+        {
+            public int OIID = 0;
+            public string OITitle = "";
             public List<cPayType> cPTs = new List<cPayType>();
         }
         public class cPayType
@@ -333,11 +327,21 @@ namespace Banner.Areas.Web.Controllers
             cOrder_Step1 c = new cOrder_Step1();
             ACID = GetACID();
             #region 資料庫導入
-            c.cPTs = new List<cPayType>();
-            for (int i = 0; i < sPayType.Length; i++)
+            c.cOIs = new List<cOICroup>();
+            var OIs = DC.OrganizeInfo.Where(q => q.OID == 1 && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OIID);
+            foreach (var OI in OIs)
             {
-                c.cPTs.Add(new cPayType { PayID = i, PayTitle = sPayType[i], cPs = new List<cProduct>() });
+                cOICroup cOIG = new cOICroup();
+                cOIG.OIID = OI.OIID;
+                cOIG.OITitle = OI.Title;
+                cOIG.cPTs = new List<cPayType>();
+                for (int i = 0; i < sPayType.Length; i++)
+                {
+                    cOIG.cPTs.Add(new cPayType { PayID = i, PayTitle = sPayType[i], cPs = new List<cProduct>() });
+                }
+                c.cOIs.Add(cOIG);
             }
+
             var OPs = DC.Order_Product.Where(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag).OrderBy(q => q.OPID);
             foreach (var OP in OPs)
             {
@@ -373,10 +377,14 @@ namespace Banner.Areas.Web.Controllers
                     #region 課程文字
                     //A班：2023/9/14 09:00-12:00 | 台北台中高雄宜蘭
                     SL.Text = PC.Title + "：";
-                    if (PC.LoopFlag)
-                        SL.Text += "每周" + sWeeks[PC.WeeklyNo];
+
+                    if (PC.Product_ClassTime.Any())
+                    {
+                        var PCT = PC.Product_ClassTime.OrderBy(q => q.ClassDate).First();
+                        SL.Text += PCT.ClassDate.ToString(DateFormat) + " " + PCT.STime.ToString("HH:mm");
+                    }
                     else
-                        SL.Text = PC.TargetDate.ToString(DateFormat);
+                        SL.Text += "班級時間未定";
                     if (string.IsNullOrEmpty(PC.LocationName) && string.IsNullOrEmpty(PC.Address)) { }
                     else if (string.IsNullOrEmpty(PC.LocationName) && !string.IsNullOrEmpty(PC.Address))
                         SL.Text += " | " + PC.Address;
@@ -413,22 +421,25 @@ namespace Banner.Areas.Web.Controllers
                     }
 
                 }
-
-                for(int i=0;i< c.cPTs.Count;i++)
+                for (int j = 0; j < c.cOIs.Count; j++)
                 {
-                    var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OID == 1 && q.OIID == OP.Product.OrganizeInfo.ParentID);
-                    if(OI!=null)
+                    for (int i = 0; i < c.cOIs[j].cPTs.Count; i++)
                     {
-                        var PTs = DC.PayType.Where(q => q.OIID == OI.OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.PayTypeID);
-                        foreach(var PT in PTs)
+                        var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OID == 1 && q.OIID == OP.Product.OrganizeInfo.ParentID);
+                        if (OI != null)
                         {
-                            if(PT.PayTypeID == c.cPTs[i].PayID)
+                            var PTs = DC.PayType.Where(q => q.OIID == OI.OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.PayTypeID);
+                            foreach (var PT in PTs)
                             {
-                                c.cPTs[i].cPs.Add(cP);
+                                if (PT.PayTypeID == c.cOIs[j].cPTs[i].PayID && c.cOIs[j].OIID == OI.OIID)
+                                {
+                                    c.cOIs[j].cPTs[i].cPs.Add(cP);
+                                }
                             }
                         }
                     }
                 }
+
             }
             #endregion
 
@@ -491,16 +502,10 @@ namespace Banner.Areas.Web.Controllers
 
         public class cOrder_Paid_Credit_Card
         {
+            public string NewebPagURL = "";
             public string MerchantID = "";
-            public string TradeInfo = "";//將交易資料參數（下方列表中參數）透過商店Key及IV進行AES 加密
-            public string TradeSha = "";//將交易資料經過上述AES加密過的字串，透過商店Key及IV進行SHA256 加密
-            public string Version = "2.0";
-
-            /*設定加密模式
-            1 = 加密模式AES/GCM
-            0或者未有此參數=
-            原加密模式AES/CBC/PKCS7Padding*/
-            public int EncryptType = 1;
+            public string TradeInfo = "";
+            public string TradeSha = "";
         }
         //正式用
         public cOrder_Paid_Credit_Card GetOrder_Paid_Credit_Card(int OHID)
@@ -560,37 +565,37 @@ namespace Banner.Areas.Web.Controllers
             string str = "";
             str += "MerchantID=" + sMerchantID;//MerchantID 商店代號 String(15)
             str += "&RespondType=JSON";//RespondType 回傳格式 String(6)
-            str += "&TimeStamp="+DT.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString();//TimeStamp 時間戳記 String(50)
+            str += "&TimeStamp=" + DT.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString();//TimeStamp 時間戳記 String(50)
             str += "&Version=2.0";//Version 串接程式版本 String(5)
             str += "&LangType=zh-tw";//LangType 語系 String(5)
             str += "&MerchantOrderNo=" + GetRand(1000);//MerchantOrderNo 商店訂單編號 String(30)
-            str += "&Amt=10";//Amt 訂單金額 int(10)
+            str += "&Amt=100";//Amt 訂單金額 int(10)
             str += "&temDesc=測試商品";//temDesc 商品資訊
             str += "&TradeLimit=600";//TradeLimit 交易有效時間  Int(3)
             str += "&ExpireDate=" + DT.AddDays(2).ToString("yyyyMMdd");//ExpireDate 繳費有效期限 String(10)
-            str += "&ReturnURL="+sDomanName + "/Web/Order_End/" + OHID;//ReturnURL 支付完成返回商店網址 String(200)
-            str += "&NotifyURL=" + sDomanName + "/Web/Order_Paid/" + OHID;//NotifyURL 支付通知網址 String(200)
-            str += "&CustomerURL=" + sDomanName + "/Web/Order_GetNo/" + OHID;//CustomerURL 商店取號網址 String(200)
-                                                                             //4.2.3 回應參數-取號完成
-                                                                             //適用交易類別：超商代碼、超商條碼、超商取貨付款、ATM
-            str += "&ClientBackURL=";//ClientBackURL 返回商店網址 String(200)
+            str += "&ReturnURL=" + sDomanName + "/Web/ClassStore/Order_Back_Credit_Card/" + OHID;//ReturnURL 支付完成返回商店網址 String(200)
+            str += "&NotifyURL=" + sDomanName + "/Web/ClassStore/Order_Back_Credit_Card/" + OHID;//NotifyURL 支付通知網址 String(200)
+            str += "&CustomerURL=" + sDomanName + "/Web/ClassStore/Order_GetNo/" + OHID;//CustomerURL 商店取號網址 String(200)
+                                                                                        //4.2.3 回應參數-取號完成
+                                                                                        //適用交易類別：超商代碼、超商條碼、超商取貨付款、ATM
+            str += "&ClientBackURL=" + sDomanName + "/Web/ClassStore/Order_Back_Credit_Card/" + OHID;//ClientBackURL 返回商店網址 String(200)
             str += "&Email=minto.momoko.jojo1865@gmail.com";//Email 付款人電子信箱 String(50)
             str += "&EmailModify=1";//EmailModify 付款人電子信箱是否開放修改 Int(1) 1=可修改 0=不可修改
             str += "&LoginType=0";//LoginType 藍新金流會員 0 = 不須登入藍新金流會員
-            str += "&OrderComment=";//OrderComment 商店備註 String(300)
+            str += "&OrderComment=無";//OrderComment 商店備註 String(300)
 
             str += "&CREDIT=1";//CREDIT 信用卡一次付清啟用 Int(1)
             str += "&ANDROIDPAY=0";//ANDROIDPAY Google Pay 啟用 Int(1)
             str += "&SAMSUNGPAY=0";//SAMSUNGPAY Samsung Pay 啟用 Int(1)
             str += "&LINEPAY=0";//LINEPAY LINE Pay 啟用 Int(1)
-            str += "&ImageUrl=";//ImageUrl 產品圖檔連結網址 String(200)
+            str += "&ImageUrl=" + sDomanName + "/Content/Image/CourseCategory_1.jpg";//ImageUrl 產品圖檔連結網址 String(200)
             str += "&InstFlag=0";//InstFlag 信用卡分期付款啟用 String(18)
             str += "&CreditRed=0";//CreditRed 信用卡紅利啟用 Int(1)
             str += "&UNIONPAY=1";//UNIONPAY 信用卡銀聯卡啟用 Int(1)
             str += "&CREDITAE=1";//CREDITAE 信用卡美國運通卡啟用 Int(1)
             str += "&WEBATM=0";//WEBATM WEBATM啟用 Int(1)
             str += "&VACC=0";//VACC ATM轉帳啟用 Int(1)
-            str += "&BankType=";//BankType 金融機構 String(26)
+            str += "&BankType=BOT";//BankType 金融機構 String(26)//先選台銀
             str += "&CVS=0";//CVS 超商代碼繳費啟用 Int(1)
             str += "&BARCODE=0";//BARCODE 超商條碼繳費啟用 Int(1)
             str += "&ESUNWALLET=0";//ESUNWALLET 玉山Wallet Int(1)
@@ -600,15 +605,29 @@ namespace Banner.Areas.Web.Controllers
             str += "&EZPAY=0";//EZPAY 簡單付電子錢包 Int(1)
             str += "&EZPWECHAT=0";//EZPWECHAT 簡單付微信支付 Int(1)
             str += "&EZPALIPAY=0";//EZPALIPAY 簡單付支付寶 Int(1)
-            str += "&LgsType=";//LgsType 物流型態 String(3)
+            str += "&LgsType=B2C";//LgsType 物流型態 String(3)
+
+            c.NewebPagURL = sNewebPagURL;
+            c.MerchantID = sMerchantID;
+            c.TradeInfo = HSM.EncryptAESHex(str, sHashKey, sHashIV);
+            string str1 = "HashKey=" + sHashKey + "&" + c.TradeInfo + "&HashIV=" + sHashIV;
+            c.TradeSha = HSM.EncryptSHA256(str1).ToUpper();
+
 
             return c;
         }
         [HttpGet]
-        public ActionResult Order_Paid_Credit_Card(int OHID)
+        public ActionResult Order_Paid_Credit_Card(int ID)
         {
             GetViewBag();
-            return View(GetOrderTest_Paid_Credit_Card(OHID));
+            return View(GetOrderTest_Paid_Credit_Card(ID));
+        }
+        #endregion
+        #region 信用卡返回
+        public ActionResult Order_Back_Credit_Card(int ID)
+        {
+            GetViewBag();
+            return View();
         }
         #endregion
     }

@@ -23,13 +23,20 @@ namespace Banner.Controllers
             sMerchantID = "MS127874575";//商店代號
             sHashKey = "Fs5cX1TGqYM2PpdbE14a9H83YQSQF5jn";
             sHashIV = "C6AcmfqJILwgnhIP";
-            ViewBag._Return1 = HSM.EncryptAESHex(str, sHashKey, sHashIV);
+            string Data1 = HSM.EncryptAESHex(str, sHashKey, sHashIV);
+
+            ViewBag._Return1 = Data1;
+            string Data2 = "HashKey=" + sHashKey + "&" + Data1 + "&HashIV=" + sHashIV;
+            ViewBag._Return2 = Data2;
+            ViewBag._Return3 = HSM.EncryptSHA256(Data2).ToUpper();
+
+
 
             //解密測試
             str = "cc65583f1cfef54e661efa4264cafff0c673276e4868b0ea033d2e5f1074cb4990c4628005cf542419b0ba41e5b7ce583c3a643f59d83f14afd52f5e566d6b24cbc49eb8fc33f811bbde0f11f1ec97e2e97295af49aa4721f06d7412db6165a1283d83bfe032af8e3cb97ef85335040d3e7046a25d4e225894884fe702377e490eac11cf738618206602d77f64fe48f70bb61edf5af00f609726416e82e31d956a48ec06f013bf88c51d761f399910b486235af6bb2638ee3f094b00b4489d81d7d2f275ee696df207cccd5afd1ab386a079ca64c4455b3b8e1bf1ca6d2427d05cb80413f37edbd3d8d7671c46de4a93e1d947e605479f2eadb8d1fed532e26dc40f27669f6fce2510d706adff56e8a9ba078ef81e90710ae3ede94c70fe5d9bfa271864058c61d754772336ddfb429205bc7fd87fddf16c8220615bcdfd058ae67590a256f28766e936e1a48c50b6aa10158829402a8f40f7516238bdee3a81fcb37d37f6e397743336abb33a632aa53272ccf9b216216480443fd3e5d3632bd7e170fec1a1522c506e805f7abb671e2974675120a91d24fb8556aafd03667a63c9ee39072c264d2cccbaa2014f55f09050687a0fb47faef94a523eeba7a7fa42e38efdc41c0d80c6cc6a734041d94c072afed6b569bf18c200adce53a433aafd8e7100f2eafd52d2abb18d2e7d6377ce0f8ed520f0840cbb0e3b8eaf2d4989f76ffe97973f0af0c636c20a17e3ec484042f883f0e7b618a1d24ce87f3738a122f33a05fea44b264c81d3a0acc92908334f380f6184e6c3a72300e9f59e76cd";
             //sHashKey = "AAAvw3YlqoEk6G4HqRKDAYpHKZWxBBB";
             //sHashIV = "AAAC1FplieBBBP";
-            ViewBag._Return2 = HSM.DecryptAESHex(str, sHashKey, sHashIV);
+            //ViewBag._Return2 = HSM.DecryptAESHex(str, sHashKey, sHashIV);
             //str = "f79eac33c4f3245d58f17b544c5d38b09457a6d77e77bae6f10fcc7236fe153ccef1a80001c0746afc063a7570f80ad970d8a32c72332c9ec5547410188007876bdca2bafa52d07d31b6b183f2204d6e4feee6d245e286ab198cf95422ad5843c7696fc943cbb65979ad207607d4b5d97dac4a90ccd5e7a37adb7d7062e838be09d94e8c5dfa145c048e17feabe58c2e310792f0f50f5af32961ffb07ff6649ae1021ad558242551de5f09316e3182e198775e5d1ad5b66a70be290004de750fa85d86b0c2f087b40005d89e048be2ab6fd83f1c522494c093426a10a1f73fe4";
             //ViewBag._Return2 = HSM.Des_AES256(HSM.HexStr2ASCII(str.ToUpper()), sHashKey, sHashIV);
 

@@ -640,6 +640,9 @@ namespace Banner.Areas.Web.Controllers
                       on q.Coupon_Header.OID equals p.OrganizeInfo.OID
                       select q).FirstOrDefault();
             int[] iPrice = GetPrice(ACID, P);
+
+            var PCTs = DC.Product_ClassTime.Where(q => q.Product_Class.ActiveFlag && !q.Product_Class.DeleteFlag && q.Product_Class.PID == P.PID);
+
             cProductCard c = new cProductCard
             {
                 PID = P.PID,
@@ -650,8 +653,8 @@ namespace Banner.Areas.Web.Controllers
                 Price_Basic = P.Price_Basic,
                 Price_Type = iPrice[0],
                 Price_New = iPrice[1],
-                SDate = P.SDate,
-                EDate = P.EDate,
+                SDate = PCTs.Count() > 0 ? PCTs.Min(q => q.ClassDate) : P.CreDate,
+                EDate = PCTs.Count() > 0 ? PCTs.Max(q => q.ClassDate) : P.CreDate,
                 TargetInfo = P.TargetInfo,
             };
 

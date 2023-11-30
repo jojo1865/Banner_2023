@@ -131,14 +131,12 @@ namespace Banner.Areas.Admin.Controllers
             List<cMenu> Ms = new List<cMenu>();
             string sURL = GetShortURL();
             string sID = Request.Url.Segments[Request.Url.Segments.Length - 1];
-            try
-            {
-                int i = Convert.ToInt32(sID);
-            }
-            catch
-            {
+            int i = 0;
+            if (int.TryParse(sID, out i))
+                sID = i.ToString();
+            else
                 sID = "0";
-            }
+            
             if (sURL.Contains("_Edit"))
             {
                 cMenu cM = new cMenu();

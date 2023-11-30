@@ -160,18 +160,7 @@
                                 </div>
 
                             </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-lg-6 col-12">
-                                        <label>開課起始日<span>*</span></label>
-                                        @Html.TextBox("txb_SDate", (Model.P.SDate != Model.P.CreDate ? Model.P.SDate.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
-                                    </div>
-                                    <div class="col-lg-6 col-12">
-                                        <label>開課結束日<span>*</span></label>
-                                        @Html.TextBox("txb_EDate", (Model.P.EDate != Model.P.CreDate ? Model.P.EDate.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
-                                    </div>
-                                </div>
-                            </div>
+                            
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-lg-6 col-12">
@@ -184,27 +173,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-lg-6 col-12">
-                                        <label>臨櫃報名起始日</label>
-                                        @Html.TextBox("txb_SDate_Signup_OnSite", (Model.P.SDate_Signup_OnSite != Model.P.CreDate ? Model.P.SDate_Signup_OnSite.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
-                                    </div>
-                                    <div class="col-lg-6 col-12">
-                                        <label>臨櫃報名結束日</label>
-                                        @Html.TextBox("txb_EDate_Signup_OnSite", (Model.P.EDate_Signup_OnSite != Model.P.CreDate ? Model.P.EDate_Signup_OnSite.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
-                                    </div>
-                                </div>
-                            </div>
+                            
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-lg-6 col-12">
                                         <label>線上報名起始日</label>
-                                        @Html.TextBox("txb_SDate_Signup_OnLine", (Model.P.SDate_Signup_OnLine != Model.P.CreDate ? Model.P.SDate_Signup_OnLine.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_SDate_Signup", (Model.P.SDate_Signup != Model.P.CreDate ? Model.P.SDate_Signup.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                     <div class="col-lg-6 col-12">
                                         <label>線上報名結束日</label>
-                                        @Html.TextBox("txb_EDate_Signup_OnLine", (Model.P.EDate_Signup_OnLine != Model.P.CreDate ? Model.P.EDate_Signup_OnLine.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
+                                        @Html.TextBox("txb_EDate_Signup", (Model.P.EDate_Signup != Model.P.CreDate ? Model.P.EDate_Signup.ToString(DateFormat) : ""), new { @class = "form-control form-control-lg input-underline", @type = "date" })
                                     </div>
                                 </div>
                             </div>

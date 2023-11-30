@@ -40,15 +40,18 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Login()
         {
             GetViewBag();
-            /*if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
+            if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
             {
                 if (GetACID() <= 0)
                 {
-                    LogInAC(1);
-                    SetBrowserData("UserName", "系統管理者");
+                    /*LogInAC(1);
+                    SetBrowserData("UserName", "系統管理員");
+                    */
+                    LogInAC(443);
+                    SetBrowserData("UserName", "江晨旭");
                 }
                 Response.Redirect("/Web/Home/Index");
-            }*/
+            }
             TempData["login"] = "";
             TempData["pw"] = "";
             return View();
@@ -497,10 +500,12 @@ namespace Banner.Areas.Web.Controllers
                                 foreach (var PC_N in PC_Ns)
                                 {
                                     var OP_G = OP_Gs.FirstOrDefault(q => q.PCID == PC_N.PCID);
-                                    if (OP_G == null)
-                                        PCID = OP_G.PCID;
-                                    else if (PC_N.PeopleCt < OP_G.Ct)
-                                        PCID = OP_G.PCID;
+                                    if (OP_G != null)//有限制
+                                    {
+                                        if (PC_N.PeopleCt < OP_G.Ct)
+                                            PCID = OP_G.PCID;
+                                    }
+                                   
                                     if (PCID > 0)
                                         break;
                                 }
@@ -527,9 +532,9 @@ namespace Banner.Areas.Web.Controllers
                 if (Error == "")
                 {
                     //有線上報名日期
-                    if (P.SDate_Signup_OnLine.Date >= P.CreDate.Date && P.SDate_Signup_OnLine.Date > DT.Date)
+                    if (P.SDate_Signup.Date >= P.CreDate.Date && P.SDate_Signup.Date > DT.Date)
                         Error += "本課程尚未開始線上報名<br/>";
-                    else if (P.EDate_Signup_OnLine.Date >= P.CreDate.Date && P.EDate_Signup_OnLine.Date < DT.Date)
+                    else if (P.EDate_Signup.Date >= P.CreDate.Date && P.EDate_Signup.Date < DT.Date)
                         Error += "本課程已結束線上報名<br/>";
                     else
                     {

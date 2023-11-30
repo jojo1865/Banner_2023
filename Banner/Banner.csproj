@@ -699,6 +699,10 @@
     <Content Include="Areas\Admin\Views\SystemSet\Token_Edit.cshtml" />
     <Content Include="Areas\Web\Views\Output\Login.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Order_Paid_Credit_Card.cshtml" />
+    <Content Include="Areas\Web\Views\ClassStore\Order_Step2.cshtml" />
+    <Content Include="Areas\Web\Views\ClassStore\Order_Back_Credit_Card.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\ProductClassDate_List.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\ProductClassDate_Edit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
