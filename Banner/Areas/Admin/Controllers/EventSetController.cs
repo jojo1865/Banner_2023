@@ -71,7 +71,6 @@ namespace Banner.Areas.Admin.Controllers
             c.cTL = new cTableList();
             c.cTL.Title = "";
             c.cTL.NowPage = iNowPage;
-            c.cTL.ItemID = "";
             c.cTL.NumCut = iNumCut;
             c.cTL.Rs = new List<cTableRow>();
 

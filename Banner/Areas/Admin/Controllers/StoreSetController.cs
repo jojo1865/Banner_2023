@@ -57,7 +57,6 @@ namespace Banner.Areas.Admin.Controllers
             c.cTL = new cTableList();
             c.cTL.Title = "";
             c.cTL.NowPage = iNowPage;
-            c.cTL.ItemID = "";
             c.cTL.NumCut = iNumCut;
             c.cTL.Rs = new List<cTableRow>();
 
@@ -291,7 +290,7 @@ namespace Banner.Areas.Admin.Controllers
             //組織
             N.OSL.Title = "";
             N.OSL.SortNo = 0;
-            var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ItemID == "Shepherding").ToList();
+            var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
             var O = Os.FirstOrDefault(q => q.ParentID == 0);
             while (O != null)
             {
@@ -1059,8 +1058,9 @@ namespace Banner.Areas.Admin.Controllers
             #region 檢查
 
             if (N.PCT.ClassDate.Date > N.PC.GraduateDate.Date)
-                Error += "您設定的結業日" + N.PC.GraduateDate.ToString(DateFormat) + "應大於上課日期";
-
+                Error += "您設定的結業日" + N.PC.GraduateDate.ToString(DateFormat) + "應大於上課日期<br/>";
+            if (N.PCT.STime >= N.PCT.ETime)
+                Error += "課程結束時間應晚與開始時間<br/>";
             #endregion
             return N;
         }
@@ -1127,7 +1127,7 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     DateTime Max_Date = SDate.AddDays(DaySpan * No);
                     if (PC.GraduateDate.Date < Max_Date.Date)
-                        Error += "您設定的結業日" + PC.GraduateDate.ToString(DateFormat) + "預期將小於最後上課日:" + Max_Date.ToString(DateFormat) + ",請修改本班級結業日或批次數值以符合規則";
+                        sReturn = "您設定的結業日" + PC.GraduateDate.ToString(DateFormat) + "預期將小於最後上課日:" + Max_Date.ToString(DateFormat) + ",請修改本班級結業日或批次數值以符合規則";
                     else
                     {
                         List<Product_ClassTime> PCTs = new List<Product_ClassTime>();
@@ -1170,7 +1170,6 @@ namespace Banner.Areas.Admin.Controllers
             N.cTL = new cTableList();
             N.cTL.Title = "";
             N.cTL.NowPage = iNowPage;
-            N.cTL.ItemID = "";
             N.cTL.NumCut = iNumCut;
             N.cTL.Rs = new List<cTableRow>();
 
@@ -1278,7 +1277,6 @@ namespace Banner.Areas.Admin.Controllers
             c.cTL = new cTableList();
             c.cTL.Title = "";
             c.cTL.NowPage = iNowPage;
-            c.cTL.ItemID = "";
             c.cTL.NumCut = iNumCut;
             c.cTL.Rs = new List<cTableRow>();
 
@@ -1403,7 +1401,7 @@ namespace Banner.Areas.Admin.Controllers
             else
                 Error += "請先建立商品";
 
-            var Os = DC.Organize.Where(q => q.JobTitle != "" && q.ActiveFlag && !q.DeleteFlag && q.ItemID == "Shepherding");
+            var Os = DC.Organize.Where(q => q.JobTitle != "" && q.ActiveFlag && !q.DeleteFlag);
             c.O_SL.Add(new SelectListItem { Text = "會員", Value = "-1" });
             c.O_SL.Add(new SelectListItem { Text = "會員-兒童", Value = "-2" });
             c.O_SL.Add(new SelectListItem { Text = "自行匯入", Value = "0", Selected = true });
@@ -1666,7 +1664,6 @@ namespace Banner.Areas.Admin.Controllers
             c.cTL = new cTableList();
             c.cTL.Title = "";
             c.cTL.NowPage = iNowPage;
-            c.cTL.ItemID = "";
             c.cTL.NumCut = iNumCut;
             c.cTL.Rs = new List<cTableRow>();
 

@@ -117,7 +117,7 @@ namespace Banner.Controllers
                             R.Status = "OK";
                             R.Name = AC.Name_First + AC.Name_Last;
                             R.Items = new List<cItem2>();
-                            var OIs = DC.OrganizeInfo.Where(q => q.ACID == iACID && q.ActiveFlag && !q.DeleteFlag && q.Organize.ItemID == "Shepherding").OrderBy(q => q.OID).ThenBy(q => q.OIID);
+                            var OIs = DC.OrganizeInfo.Where(q => q.ACID == iACID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OID).ThenBy(q => q.OIID);
                             foreach (var OI in OIs)
                                 R.Items.Add(new cItem2 { Title = OI.Title + OI.Organize.Title, JobTitle = OI.Organize.JobTitle });
 

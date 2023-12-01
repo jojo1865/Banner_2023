@@ -207,6 +207,7 @@
     <Compile Include="Areas\Admin\Controllers\IncludeController.cs" />
     <Compile Include="Areas\Admin\Controllers\MeetingLocationController.cs" />
     <Compile Include="Areas\Admin\Controllers\OrganizeSetController.cs" />
+    <Compile Include="Areas\Admin\Controllers\StaffSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\StoreSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\SystemSetController.cs" />
     <Compile Include="Areas\Web\Controllers\AccountAddController.cs" />
@@ -703,6 +704,8 @@
     <Content Include="Areas\Web\Views\ClassStore\Order_Back_Credit_Card.cshtml" />
     <Content Include="Areas\Admin\Views\StoreSet\ProductClassDate_List.cshtml" />
     <Content Include="Areas\Admin\Views\StoreSet\ProductClassDate_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\StaffSet\Category_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\StaffSet\Category_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

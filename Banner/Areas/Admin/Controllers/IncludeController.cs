@@ -182,7 +182,7 @@ namespace Banner.Areas.Admin.Controllers
             List<SelectListItem> OList = new List<SelectListItem>();
 
             OList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = OID == 0 });
-            var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == "Shepherding").ToList();
+            var Os = DC.Organize.Where(q => !q.DeleteFlag).ToList();
             int PID = 0;
             while (true)
             {

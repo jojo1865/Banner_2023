@@ -29,18 +29,17 @@ namespace Banner.Areas.Admin.Controllers
         }
 
         #region 牧養組織與職分管理-列表
-        public ActionResult Organize_Map_List(string ItemID = "Shepherding")
+        public ActionResult Organize_Map_List()
         {
             GetViewBag();
-            return View(GetMapTable(ItemID));
+            return View(GetMapTable());
         }
         //取得組織與職分的表單
-        private cTableList GetMapTable(string ItemID)
+        private cTableList GetMapTable()
         {
             cTableList cTL = new cTableList();
-            cTL.ItemID = ItemID;
             cTL.Rs = new List<cTableRow>();
-            var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == ItemID).ToList();
+            var Os = DC.Organize.Where(q => !q.DeleteFlag).ToList();
             var O = Os.FirstOrDefault(q => q.ParentID == 0);
             int iSortNo = 0;
             if (O != null)
@@ -55,7 +54,7 @@ namespace Banner.Areas.Admin.Controllers
                     C.Value = O.OID.ToString();
                     C.Title = O.Title + "(" + O.OrganizeInfo.Count() + ")";
                     C.ControlName = O.JobTitle;
-                    C.URL = "/Admin/OrganizeSet/Organize_Map_Edit/" + ItemID + "/" + O.OID;
+                    C.URL = "/Admin/OrganizeSet/Organize_Map_Edit/" + O.OID;
                     C.CSS = O.ActiveFlag ? "td_O_Basic3_Active" : "td_O_Basic3_UnActive";
                     R.Cs.Add(C);
 
@@ -78,18 +77,18 @@ namespace Banner.Areas.Admin.Controllers
 
         }
         //初始化或取得組織資料
-        private cOrganize_Map_Edit ReSetOrganize(string ItemID, int ID, FormCollection FC)
+        private cOrganize_Map_Edit ReSetOrganize(int ID, FormCollection FC)
         {
             cOrganize_Map_Edit cME = new cOrganize_Map_Edit();
             if (ID > 0)
             {
-                cME.O = DC.Organize.FirstOrDefault(q => q.ItemID == ItemID && q.OID == ID && !q.DeleteFlag);
+                cME.O = DC.Organize.FirstOrDefault(q =>  q.OID == ID && !q.DeleteFlag);
                 if (cME.O == null)
-                    SetAlert("查無資料,請重新操作", 2, "/Admin/OrganizeSet/Organize_Map_List/" + ItemID + "/0");
+                    SetAlert("查無資料,請重新操作", 2, "/Admin/OrganizeSet/Organize_Map_List/0");
                 else
                 {
                     cME.OList = new List<SelectListItem>();
-                    var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == ItemID).ToList();
+                    var Os = DC.Organize.Where(q => !q.DeleteFlag).ToList();
                     var O = Os.FirstOrDefault(q => q.ParentID == 0);
                     if (O != null)
                     {
@@ -105,9 +104,9 @@ namespace Banner.Areas.Admin.Controllers
             }
             else
             {
-                cME.O = new Organize() { ItemID = ItemID, ActiveFlag = true, DeleteFlag = false };
+                cME.O = new Organize() { ActiveFlag = true, DeleteFlag = false };
                 cME.OList = new List<SelectListItem>();
-                var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == ItemID).ToList();
+                var Os = DC.Organize.Where(q => !q.DeleteFlag ).ToList();
                 var O = Os.FirstOrDefault(q => q.ParentID == 0);
                 if (O != null)
                 {
@@ -131,19 +130,19 @@ namespace Banner.Areas.Admin.Controllers
             }
             return cME;
         }
-        public ActionResult Organize_Map_Edit(string ItemID, int ID)
+        public ActionResult Organize_Map_Edit(int ID)
         {
             GetViewBag();
             ChangeTitle(ID == 0);
-            return View(ReSetOrganize(ItemID, ID, null));
+            return View(ReSetOrganize(ID, null));
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Organize_Map_Edit(string ItemID, int ID, FormCollection FC)
+        public ActionResult Organize_Map_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
             ChangeTitle(ID == 0);
-            var cOE = ReSetOrganize(ItemID, ID, FC);
+            var cOE = ReSetOrganize(ID, FC);
             if (cOE.O.Title == "")
                 Error += "請輸入組織名稱</br>";
             else if (!cOE.O.ActiveFlag || cOE.O.DeleteFlag)//刪除
@@ -170,7 +169,7 @@ namespace Banner.Areas.Admin.Controllers
                     //抽離的狀況
                     if (cOE.O.ParentID != cOE.NewParentID)
                     {
-                        var OC = DC.Organize.FirstOrDefault(q => q.ParentID == cOE.O.OID && q.ItemID == ItemID && !q.DeleteFlag);
+                        var OC = DC.Organize.FirstOrDefault(q => q.ParentID == cOE.O.OID && !q.DeleteFlag);
                         if (OC != null)
                         {
                             OC.ParentID = cOE.O.ParentID;
@@ -195,7 +194,7 @@ namespace Banner.Areas.Admin.Controllers
 
                 //檢查層級是否會發生衝突
                 //發生於插入的狀況
-                var OP = DC.Organize.FirstOrDefault(q => q.ParentID == cOE.NewParentID && q.ItemID == ItemID && q.OID != cOE.O.OID && !q.DeleteFlag);
+                var OP = DC.Organize.FirstOrDefault(q => q.ParentID == cOE.NewParentID && q.OID != cOE.O.OID && !q.DeleteFlag);
                 if (OP != null)
                 {
                     OP.ParentID = cOE.O.OID;
@@ -231,7 +230,7 @@ namespace Banner.Areas.Admin.Controllers
                     DC.SubmitChanges();
                 }
 
-                SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/OrganizeSet/Organize_Map_List/" + ItemID + "/");
+                SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/OrganizeSet/Organize_Map_List/");
             }
 
 
@@ -240,13 +239,12 @@ namespace Banner.Areas.Admin.Controllers
 
         #endregion
         #region 牧養組織與職分管理-匯出
-        public ActionResult Organize_Map_Print(string ItemID)
+        public ActionResult Organize_Map_Print()
         {
             GetViewBag();
             ArrayList AL = new ArrayList();
             ArrayList ALS = new ArrayList();
             ALS.Add("ID");
-            ALS.Add("組織架構類別");
             ALS.Add("組織名稱");
             ALS.Add("職分名稱");
             ALS.Add("啟用狀態");
@@ -254,7 +252,7 @@ namespace Banner.Areas.Admin.Controllers
             ALS.Add("更新時間");
             ALS.Add("最後更新者");
             AL.Add((string[])ALS.ToArray(typeof(string)));
-            var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == ItemID).ToList();
+            var Os = DC.Organize.Where(q => !q.DeleteFlag).ToList();
             var ACs = (from q in DC.Account.Where(q => !q.DeleteFlag).ToList()
                        join p in Os.GroupBy(q => q.SaveACID)
                        on q.ACID equals p.Key
@@ -267,7 +265,6 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     ALS = new ArrayList();
                     ALS.Add(O.OID.ToString());
-                    ALS.Add(O.ItemID);
                     ALS.Add(O.Title);
                     ALS.Add(O.JobTitle);
                     ALS.Add(O.ActiveFlag ? "啟用中" : "");
@@ -287,7 +284,7 @@ namespace Banner.Areas.Admin.Controllers
             }
 
             WriteExcelFromString("組織與職分管理列表", AL);
-            SetAlert("已完成匯出", 1, "/Admin/OrganizeSet/Organize_Map_List/" + ItemID + "/0");
+            SetAlert("已完成匯出", 1, "/Admin/OrganizeSet/Organize_Map_List/0");
             return View();
         }
         #endregion
@@ -301,7 +298,7 @@ namespace Banner.Areas.Admin.Controllers
             public cTableList cTL = new cTableList();
             public string sAddURL = "";
         }
-        private cOrganize_Info_List GetOrganize_Info_List(string ItemID, int OID, int OIID, FormCollection FC)
+        private cOrganize_Info_List GetOrganize_Info_List(int OID, int OIID, FormCollection FC)
         {
             ACID = GetACID();
             string sKey = "";
@@ -326,15 +323,14 @@ namespace Banner.Areas.Admin.Controllers
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
 
             cOrganize_Info_List cOL = new cOrganize_Info_List();
-            cOL.sAddURL = "/Admin/OrganizeSet/Organize_Info_Edit/" + ItemID + "/" + OID + "/" + OIID + "/0";
+            cOL.sAddURL = "/Admin/OrganizeSet/Organize_Info_Edit/" + OID + "/" + OIID + "/0";
             cOL.OID = OID;
             cOL.OTitle = sKey;
 
             cOL.cTL = new cTableList();
             cOL.cTL.Title = "";
             cOL.cTL.NowPage = iNowPage;
-            cOL.cTL.ItemID = ItemID;
-            cOL.cTL.NowURL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + OID + "/" + OIID;
+            cOL.cTL.NowURL = "/Admin/OrganizeSet/Organize_Info_List/" + OID + "/" + OIID;
             cOL.cTL.NumCut = iNumCut;
             cOL.cTL.Rs = new List<cTableRow>();
 
@@ -426,7 +422,7 @@ namespace Banner.Areas.Admin.Controllers
 
                 var NP = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == N.ParentID);
                 cTableRow cTR = new cTableRow();
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/OrganizeSet/Organize_Info_Edit/" + ItemID + "/" + N.OID + "/" + N.ParentID + "/" + N.OIID, Target = "_self", Value = "編輯" });//
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/OrganizeSet/Organize_Info_Edit/" + N.OID + "/" + N.ParentID + "/" + N.OIID, Target = "_self", Value = "編輯" });//
                 cTR.Cs.Add(new cTableCell { Value = N.OIID.ToString() });//編號(ID)
                 if (ParentTitle != "")
                 {
@@ -440,7 +436,7 @@ namespace Banner.Areas.Admin.Controllers
                         else
                             cTR.Cs.Add(new cTableCell { Value = sTitle });//上層名稱
                         */
-                        cTR.Cs.Add(new cTableCell { Type = "link", URL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + NP.OID + "/" + NP.ParentID, Target = "_self", Value = sTitle });//
+                        cTR.Cs.Add(new cTableCell { Type = "link", URL = "/Admin/OrganizeSet/Organize_Info_List/" + NP.OID + "/" + NP.ParentID, Target = "_self", Value = sTitle });//
                     }
                     else
                         cTR.Cs.Add(new cTableCell { Value = "" });//上層名稱
@@ -452,17 +448,17 @@ namespace Banner.Areas.Admin.Controllers
                     var NextOIs = DC.OrganizeInfo.Where(q => !q.DeleteFlag && q.ParentID == N.OIID && q.OID != NOID).ToList();
 
                     if (RightOIs.Count > 0)//新下層已有資料
-                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + NOID + "/" + N.OIID, Value = RightOIs.Count.ToString() });//下層組織
+                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_List/" + NOID + "/" + N.OIID, Value = RightOIs.Count.ToString() });//下層組織
                     else if (sKey == "")
                         cTR.Cs.Add(new cTableCell { Value = "0" });
                     if (HaveOldNext)
                     {
                         if (NextOIs.Count > 0)//舊下層仍有資料
-                            cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + NextOIs[0].OID + "/" + N.OIID, Value = NextOIs.Count.ToString() });//下層組織
+                            cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_List/" + NextOIs[0].OID + "/" + N.OIID, Value = NextOIs.Count.ToString() });//下層組織
                         else
                             cTR.Cs.Add(new cTableCell { Value = "0" });
                     }
-                    cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "btn_Basic_W", URL = "/Admin/OrganizeSet/Organize_Info_Edit/" + ItemID + "/" + NOID + "/" + N.OIID + "/0", Value = "新增" + NextTitle });
+                    cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "btn_Basic_W", URL = "/Admin/OrganizeSet/Organize_Info_Edit/" + NOID + "/" + N.OIID + "/0", Value = "新增" + NextTitle });
                 }
                 else
                 {
@@ -470,7 +466,7 @@ namespace Banner.Areas.Admin.Controllers
                     if (Ct == 0)//沒有新成員
                         cTR.Cs.Add(new cTableCell { Value = "0" });//等待分發名單中
                     else
-                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_black", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_Account_List/" + ItemID + "/" + N.OID + "/" + N.OIID, Value = "(" + Ct + ")" });//組員數量
+                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_black", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_Account_List/" + N.OID + "/" + N.OIID, Value = "(" + Ct + ")" });//組員數量
                 }
                 if (OID < 3)
                     cTR.Cs.Add(new cTableCell { Value = "" });//職分主管
@@ -488,16 +484,16 @@ namespace Banner.Areas.Admin.Controllers
             return cOL;
         }
         [HttpGet]
-        public ActionResult Organize_Info_List(string ItemID, int OID, int OIID)
+        public ActionResult Organize_Info_List(int OID, int ID)
         {
             GetViewBag();
-            return View(GetOrganize_Info_List(ItemID, OID, OIID, null));
+            return View(GetOrganize_Info_List(OID, ID, null));
         }
         [HttpPost]
-        public ActionResult Organize_Info_List(string ItemID, int OID, int OIID, FormCollection FC)
+        public ActionResult Organize_Info_List(int OID, int ID, FormCollection FC)
         {
             GetViewBag();
-            return View(GetOrganize_Info_List(ItemID, OID, OIID, FC));
+            return View(GetOrganize_Info_List(OID, ID, FC));
         }
         #endregion
         #region 牧養組織與職分-新增/編輯/刪除
@@ -521,19 +517,19 @@ namespace Banner.Areas.Admin.Controllers
             public List<SelectListItem> OIList = new List<SelectListItem>();
         }
 
-        public ActionResult Organize_Info_Edit(string ItemID, int OID, int PID, int OIID)
+        public ActionResult Organize_Info_Edit(int OID, int PID, int OIID)
         {
             GetViewBag();
             ChangeTitle(OIID == 0);
-            return View(ReSetOrganizeInfo(ItemID, OID, PID, OIID, null));
+            return View(ReSetOrganizeInfo(OID, PID, OIID, null));
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Organize_Info_Edit(string ItemID, int OID, int PID, int OIID, FormCollection FC)
+        public ActionResult Organize_Info_Edit(int OID, int PID, int OIID, FormCollection FC)
         {
             GetViewBag();
             ChangeTitle(OIID == 0);
-            cOrganize_Info_Edit cIE = ReSetOrganizeInfo(ItemID, OID, PID, OIID, FC);
+            cOrganize_Info_Edit cIE = ReSetOrganizeInfo(OID, PID, OIID, FC);
 
             if (cIE.OI.Title == "")
                 Error = "請輸入組織名稱";
@@ -614,12 +610,12 @@ namespace Banner.Areas.Admin.Controllers
 
 
                 PID = cIE.OI.ParentID;
-                SetAlert((OIID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + OID + "/" + PID);
+                SetAlert((OIID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/OrganizeSet/Organize_Info_List/" + OID + "/" + PID);
             }
             return View(cIE);
         }
 
-        private cOrganize_Info_Edit ReSetOrganizeInfo(string ItemID, int OID, int PID, int OIID, FormCollection FC)
+        private cOrganize_Info_Edit ReSetOrganizeInfo(int OID, int PID, int OIID, FormCollection FC)
         {
 
             cOrganize_Info_Edit cIE = new cOrganize_Info_Edit();
@@ -634,7 +630,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 cIE.OI = DC.OrganizeInfo.FirstOrDefault(q => q.OID == OID && q.OIID == OIID && !q.DeleteFlag);
                 if (cIE.OI == null)
-                    SetAlert("查無資料,請重新操作", 2, "/Admin/OrganizeSet/Organize_Info_List/" + ItemID + "/" + OID + "/0");
+                    SetAlert("查無資料,請重新操作", 2, "/Admin/OrganizeSet/Organize_Info_List/" + OID + "/0");
                 else
                 {
                     #region 主管列表
@@ -768,9 +764,9 @@ namespace Banner.Areas.Admin.Controllers
             }
             else//新增
             {
-                var O = DC.Organize.FirstOrDefault(q => q.OID == OID && q.ItemID == ItemID && !q.DeleteFlag);
+                var O = DC.Organize.FirstOrDefault(q => q.OID == OID && !q.DeleteFlag);
                 if (O == null)
-                    SetAlert("查無資料,請重新操作", 2, "/Admin/OrganizeSet/Organize_Map_List/" + ItemID + "/0");
+                    SetAlert("查無資料,請重新操作", 2, "/Admin/OrganizeSet/Organize_Map_List/0");
                 else
                 {
                     cIE.OI = new OrganizeInfo();
@@ -901,7 +897,7 @@ namespace Banner.Areas.Admin.Controllers
         #endregion
         #region 牧養組織與職分-成員列表
 
-        private cTableList GetOrganize_Info_Account_List(string ItemID, int OID, int OIID, FormCollection FC)
+        private cTableList GetOrganize_Info_Account_List(int OID, int OIID, FormCollection FC)
         {
             cTableList cTL = new cTableList();
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
@@ -911,8 +907,7 @@ namespace Banner.Areas.Admin.Controllers
             cTL = new cTableList();
             cTL.Title = "";
             cTL.NowPage = iNowPage;
-            cTL.ItemID = ItemID;
-            cTL.NowURL = "/Admin/OrganizeSet/Organize_Info_Account_List/" + ItemID + "/" + OID + "/" + OIID;
+            cTL.NowURL = "/Admin/OrganizeSet/Organize_Info_Account_List/" + OID + "/" + OIID;
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
 
@@ -976,23 +971,23 @@ namespace Banner.Areas.Admin.Controllers
             return cTL;
         }
 
-        public ActionResult Organize_Info_Account_List(string ItemID, int OID, int OIID)
+        public ActionResult Organize_Info_Account_List(int OID, int OIID)
         {
             GetViewBag();
-            return View(GetOrganize_Info_Account_List(ItemID, OID, OIID, null));
+            return View(GetOrganize_Info_Account_List(OID, OIID, null));
         }
         [HttpPost]
-        public ActionResult Organize_Info_Account_List(string ItemID, int OID, int OIID, FormCollection FC)
+        public ActionResult Organize_Info_Account_List(int OID, int OIID, FormCollection FC)
         {
             GetViewBag();
-            return View(GetOrganize_Info_Account_List(ItemID, OID, OIID, FC));
+            return View(GetOrganize_Info_Account_List(OID, OIID, FC));
         }
         #endregion
         #region 牧養組織與職分-匯出全部
         public ActionResult Organize_Info_Print()
         {
             GetViewBag();
-            var Os = DC.Organize.Where(q => !q.DeleteFlag && q.ItemID == "Shepherding");
+            var Os = DC.Organize.Where(q => !q.DeleteFlag);
             var Os_All = Os.ToList();
             var OIs_All = (from q in DC.OrganizeInfo.Where(q => !q.DeleteFlag)
                            join p in Os
@@ -1119,28 +1114,28 @@ namespace Banner.Areas.Admin.Controllers
         /// <summary>
         /// 聚會點
         /// </summary>
-        /// <param name="OIID">目前所在跟目錄的OIID</param>
+        /// <param name="OID">目前所在跟目錄的OIID</param>
         /// <param name="ID">無用</param>
         /// <returns></returns>
-        public ActionResult Meeting_Location_List(int ItemID, int ID)
+        public ActionResult Meeting_Location_List(int OID, int ID)
         {
             GetViewBag();
             cMLL MLL = new cMLL();
             MLL.ThisTitle = "";//隸屬組織
             MLL.ControlName = "ddl_OI2";
             MLL.OIList = new List<SelectListItem>();
-            MLL.OIList.Add(new SelectListItem { Text = "全部選擇", Value = "0", Selected = ItemID == 0 });
+            MLL.OIList.Add(new SelectListItem { Text = "全部選擇", Value = "0", Selected = OID == 0 });
             var POIs = DC.OrganizeInfo.Where(q => q.OID == 1 && !q.DeleteFlag).OrderBy(q => q.OIID);
             foreach (var OI in POIs)
-                MLL.OIList.Add(new SelectListItem { Text = OI.Title, Value = OI.OIID.ToString(), Selected = OI.OIID == ItemID });
+                MLL.OIList.Add(new SelectListItem { Text = OI.Title, Value = OI.OIID.ToString(), Selected = OI.OIID == OID });
 
             cTree T0 = new cTree();
             T0.name = "主日聚會點";
             T0.title = "";
             T0.children = new List<cTree>();
 
-            if (ItemID > 0)
-                POIs = POIs.Where(q => q.OIID == ItemID).OrderBy(q => q.OIID);
+            if (OID > 0)
+                POIs = POIs.Where(q => q.OIID == OID).OrderBy(q => q.OIID);
 
             foreach (var POI in POIs)
             {
@@ -1208,20 +1203,20 @@ namespace Banner.Areas.Admin.Controllers
             public string SH_ControlName = "ddl_SH", SM_ControlName = "ddl_SM", EH_ControlName = "ddl_EH", EM_ControlName = "ddl_EM";
         }
 
-        public ActionResult Meeting_Location_Edit(int ItemID, int ID)
+        public ActionResult Meeting_Location_Edit(int OID, int ID)
         {
             GetViewBag();
             ChangeTitle(ID == 0);
-            return View(ReSetMeetingLocationInfo(ItemID, ID, null));
+            return View(ReSetMeetingLocationInfo(OID, ID, null));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Meeting_Location_Edit(int ItemID, int ID, FormCollection FC)
+        public ActionResult Meeting_Location_Edit(int OID, int ID, FormCollection FC)
         {
             GetViewBag();
             ChangeTitle(ID == 0);
-            cMeeting_Location_Edit cMLE = ReSetMeetingLocationInfo(ItemID, ID, FC);
+            cMeeting_Location_Edit cMLE = ReSetMeetingLocationInfo(OID, ID, FC);
             if (cMLE.cML.Title == "")
                 Error = "請輸入聚會點名稱</br>";
             else if (cMLE.cML.Title.Length > 18)
@@ -1249,7 +1244,7 @@ namespace Banner.Areas.Admin.Controllers
                 cMLE.cMLS.UpdDate = DT;
                 if (ID == 0)
                 {
-                    cMLE.cMLS.OIID = ItemID;
+                    cMLE.cMLS.OIID = OID;
                     cMLE.cMLS.MLID = cMLE.cML.MLID;
                     cMLE.cMLS.DeleteFlag = false;
                     cMLE.cMLS.CreDate = cMLE.cML.UpdDate;
@@ -1498,7 +1493,7 @@ namespace Banner.Areas.Admin.Controllers
         }
         #endregion
         #region 主日聚會點-匯出
-        public ActionResult Meeting_Location_Print(int ItemID, int ID)
+        public ActionResult Meeting_Location_Print(int OID, int ID)
         {
             GetViewBag();
             ArrayList AL = new ArrayList();
@@ -1514,8 +1509,8 @@ namespace Banner.Areas.Admin.Controllers
             ALS.Add("最後更新者");
             AL.Add((string[])ALS.ToArray(typeof(string)));
             var POIs = DC.OrganizeInfo.Where(q => !q.DeleteFlag && q.OID == 1);
-            if (ItemID > 0)
-                POIs = POIs.Where(q => q.OIID == ItemID);
+            if (OID > 0)
+                POIs = POIs.Where(q => q.OIID == OID);
             POIs = POIs.OrderBy(q => q.OIID);
 
             foreach (var POI in POIs)
@@ -1582,7 +1577,7 @@ namespace Banner.Areas.Admin.Controllers
 
 
             WriteExcelFromString("主日聚會點列表", AL);
-            SetAlert("已完成匯出", 1, "/Admin/OrganizeSet/Meeting_Location_List/" + ItemID + "/0");
+            SetAlert("已完成匯出", 1, "/Admin/OrganizeSet/Meeting_Location_List/" + OID + "/0");
             return View();
         }
         #endregion

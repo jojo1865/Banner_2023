@@ -13728,8 +13728,6 @@ namespace Banner
 		
 		private int _OID;
 		
-		private string _ItemID;
-		
 		private int _ParentID;
 		
 		private string _Title;
@@ -13756,8 +13754,6 @@ namespace Banner
     partial void OnCreated();
     partial void OnOIDChanging(int value);
     partial void OnOIDChanged();
-    partial void OnItemIDChanging(string value);
-    partial void OnItemIDChanged();
     partial void OnParentIDChanging(int value);
     partial void OnParentIDChanged();
     partial void OnTitleChanging(string value);
@@ -13799,26 +13795,6 @@ namespace Banner
 					this._OID = value;
 					this.SendPropertyChanged("OID");
 					this.OnOIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ItemID", DbType="VarChar(20)")]
-		public string ItemID
-		{
-			get
-			{
-				return this._ItemID;
-			}
-			set
-			{
-				if ((this._ItemID != value))
-				{
-					this.OnItemIDChanging(value);
-					this.SendPropertyChanging();
-					this._ItemID = value;
-					this.SendPropertyChanged("ItemID");
-					this.OnItemIDChanged();
 				}
 			}
 		}

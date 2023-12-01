@@ -602,7 +602,6 @@
   <Table Name="dbo.Organize" Member="Organize">
     <Type Name="Organize">
       <Column Name="OID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="ItemID" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
       <Column Name="ParentID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="Title" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
       <Column Name="JobTitle" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />

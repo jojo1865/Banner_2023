@@ -43,7 +43,6 @@ namespace Banner.Areas.Admin.Controllers
             N.cTL = new cTableList();
             N.cTL.Title = "";
             N.cTL.NowPage = iNowPage;
-            N.cTL.ItemID = "";
             N.cTL.NumCut = iNumCut;
             N.cTL.Rs = new List<cTableRow>();
 
@@ -215,7 +214,6 @@ namespace Banner.Areas.Admin.Controllers
             N.cTL = new cTableList();
             N.cTL.Title = "";
             N.cTL.NowPage = iNowPage;
-            N.cTL.ItemID = "";
             N.cTL.NumCut = iNumCut;
             N.cTL.Rs = new List<cTableRow>();
 
@@ -320,7 +318,7 @@ namespace Banner.Areas.Admin.Controllers
             CB.CSL_Before = new List<SelectListItem>();
             N.CBs.Add(CB);
             //組織
-            var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ItemID == "Shepherding").ToList();
+            var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
             var O = Os.FirstOrDefault(q => q.ParentID == 0);
             while (O != null)
             {
@@ -622,7 +620,6 @@ namespace Banner.Areas.Admin.Controllers
             N.cTL = new cTableList();
             N.cTL.Title = "";
             N.cTL.NowPage = iNowPage;
-            N.cTL.ItemID = "";
             N.cTL.NumCut = iNumCut;
             N.cTL.Rs = new List<cTableRow>();
 

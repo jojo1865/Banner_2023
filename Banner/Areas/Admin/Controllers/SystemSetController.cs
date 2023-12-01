@@ -70,7 +70,6 @@ namespace Banner.Areas.Admin.Controllers
             cTL = new cTableList();
             cTL.Title = "";
             cTL.NowPage = iNowPage;
-            cTL.ItemID = "";
             cTL.NowURL = "/Admin/SystemSet/BackUser_List";
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
@@ -390,7 +389,6 @@ namespace Banner.Areas.Admin.Controllers
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             ML.cTL.Title = "";
             ML.cTL.NowPage = iNowPage;
-            ML.cTL.ItemID = "";
             ML.cTL.NowURL = "/Admin/SystemSet/Menu_List";
             ML.cTL.NumCut = iNumCut;
             ML.cTL.ShowFloor = false;
@@ -619,7 +617,6 @@ namespace Banner.Areas.Admin.Controllers
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             RL.cTL.Title = "";
             RL.cTL.NowPage = iNowPage;
-            RL.cTL.ItemID = "";
             RL.cTL.NowURL = "/Admin/SystemSet/Rool_List";
             RL.cTL.NumCut = iNumCut;
             RL.cTL.ShowFloor = false;
@@ -898,7 +895,6 @@ namespace Banner.Areas.Admin.Controllers
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             c.cTL.Title = "";
             c.cTL.NowPage = iNowPage;
-            c.cTL.ItemID = "";
             c.cTL.NowURL = "/Admin/SystemSet/Token_List";
             c.cTL.NumCut = iNumCut;
             c.cTL.ShowFloor = false;

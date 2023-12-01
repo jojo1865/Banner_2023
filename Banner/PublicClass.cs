@@ -2697,10 +2697,10 @@ namespace Banner
 
 
         //取得全部組織組織下拉選單
-        public List<ListSelect> GetO(int OIID = 0, string ItemID = "Shepherding")
+        public List<ListSelect> GetO(int OIID = 0)
         {
             List<ListSelect> LSs = new List<ListSelect>();
-            var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ItemID == ItemID).ToList();
+            var Os = DC.Organize.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
             var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList();
             int[] OIIDs = new int[10];
             if (OIID > 0)
@@ -2757,11 +2757,10 @@ namespace Banner
 
         }
         //取得會員或組織的對應名單
-        public IQueryable<M_OI_Account> GetMOIAC(int OID = 0, int OIID = 0, int ACID = 0, string ItemID = "Shepherding")
+        public IQueryable<M_OI_Account> GetMOIAC(int OID = 0, int OIID = 0, int ACID = 0)
         {
             var MAs = DC.M_OI_Account.Where(q => !q.DeleteFlag &&
             q.ActiveFlag &&
-            q.OrganizeInfo.Organize.ItemID == ItemID &&
             !q.OrganizeInfo.DeleteFlag &&
             !q.OrganizeInfo.Organize.DeleteFlag &&
             !q.Account.DeleteFlag &&
@@ -2776,12 +2775,11 @@ namespace Banner
             return MAs;
         }
         //取得會員是哪個旌旗
-        public IQueryable<M_OI2_Account> GetMOI2AC(int OIID = 0, int ACID = 0, string ItemID = "Shepherding")
+        public IQueryable<M_OI2_Account> GetMOI2AC(int OIID = 0, int ACID = 0)
         {
             var MAs = DC.M_OI2_Account.Where(q =>
             !q.DeleteFlag &&
             q.ActiveFlag &&
-            q.OrganizeInfo.Organize.ItemID == ItemID &&
             q.OrganizeInfo.ActiveFlag &&
             !q.OrganizeInfo.DeleteFlag
             );

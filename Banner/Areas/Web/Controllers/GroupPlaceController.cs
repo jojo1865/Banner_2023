@@ -231,7 +231,6 @@ namespace Banner.Areas.Web.Controllers
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             cTL.Title = "小組名單";
             cTL.NowPage = iNowPage;
-            cTL.ItemID = "";
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
             GetID();
@@ -464,7 +463,6 @@ namespace Banner.Areas.Web.Controllers
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             cTL.Title = "小組名單";
             cTL.NowPage = iNowPage;
-            cTL.ItemID = "";
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
             GetID();
@@ -618,7 +616,6 @@ namespace Banner.Areas.Web.Controllers
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             cTL.Title = "小組名單";
             cTL.NowPage = iNowPage;
-            cTL.ItemID = "";
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
             GetID();
@@ -844,7 +841,6 @@ namespace Banner.Areas.Web.Controllers
             c.cTL = new cTableList();
             c.cTL.Title = "";
             c.cTL.NowPage = 1;
-            c.cTL.ItemID = "";
             c.cTL.NumCut = 0;
             c.cTL.Rs = new List<cTableRow>();
             #endregion

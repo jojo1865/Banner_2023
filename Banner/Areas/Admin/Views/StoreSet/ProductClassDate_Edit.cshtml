@@ -10,41 +10,44 @@
             <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
             @if (Model != null)
             {
+                if (Model.PC.Title != null)
+                {
+                    string DateFormat = "yyyy-MM-dd";
+                    <form method="post" id="form1" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
 
-                string DateFormat = "yyyy-MM-dd";
-                <form method="post" id="form1" enctype="multipart/form-data">
-                    @Html.AntiForgeryToken()
-
-                    <div class="form-body mt-4">
-                        <div class="form-card-group">
-                            <div id="personal-info" class="header-container">
-                                <div class="header-left-border"></div>
-                                <div class="header">開班時間設定</div>
-                            </div>
-                            <div class="form-group">
-                                <label>班級名稱</label>
-                                @Html.Label(Model.PC.Title, new { @class = "form-control form-control-lg input-underline lab_gray" })
-                            </div>
-                            <div class="form-group">
-                                <label>上課日期<span>*</span></label>
-                                @Html.TextBox("txb_ClassDate", Model.PCT.ClassDate.ToString(DateFormat), new { @class = "form-control form-control-lg input-underline", type = "date" })
-                            </div>
-                            <div class="form-group">
-                                <label>上課時間<span>*</span></label>
-                                <div class="row">
-                                    <div class="col-auto">
-                                        @Html.TextBox("txb_STime", Model.PCT.STime, new { @class = "form-control form-control-lg input-underline", @type = "time" })
-                                    </div>
-                                    <div class="col-auto">~</div>
-                                    <div class="col-auto">
-                                        @Html.TextBox("txb_ETime", Model.PCT.ETime, new { @class = "form-control form-control-lg input-underline", @type = "time" })
+                        <div class="form-body mt-4">
+                            <div class="form-card-group">
+                                <div id="personal-info" class="header-container">
+                                    <div class="header-left-border"></div>
+                                    <div class="header">開班時間設定</div>
+                                </div>
+                                <div class="form-group">
+                                    <label>班級名稱</label>
+                                    @Html.Label(Model.PC.Title, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                </div>
+                                <div class="form-group">
+                                    <label>上課日期<span>*</span></label>
+                                    @Html.TextBox("txb_ClassDate", Model.PCT.ClassDate.ToString(DateFormat), new { @class = "form-control form-control-lg input-underline", type = "date" })
+                                </div>
+                                <div class="form-group">
+                                    <label>上課時間<span>*</span></label>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            @Html.TextBox("txb_STime", Model.PCT.STime, new { @class = "form-control form-control-lg input-underline", @type = "time" })
+                                        </div>
+                                        <div class="col-auto">~</div>
+                                        <div class="col-auto">
+                                            @Html.TextBox("txb_ETime", Model.PCT.ETime, new { @class = "form-control form-control-lg input-underline", @type = "time" })
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                </form>
+                    </form>
+                }
+
             }
         </div>
     </div>

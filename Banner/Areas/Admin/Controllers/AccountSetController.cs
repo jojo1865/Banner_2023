@@ -105,7 +105,6 @@ namespace Banner.Areas.Admin.Controllers
             ACID = GetACID();
             cTL.Title = "";
             cTL.NowPage = iNowPage;
-            cTL.ItemID = "";
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
 

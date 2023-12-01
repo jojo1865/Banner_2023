@@ -21,21 +21,15 @@ namespace Banner.Areas.Admin
             );
 
             context.MapRoute(
-                "Admin_Item",
-                "Admin/{controller}/{action}/{ItemID}/{ID}",
-                new { controller = "Home", action = "Index", ItemID = UrlParameter.Optional, ID = UrlParameter.Optional }
-            );
-
-            context.MapRoute(
                 "Organize_Info_List",
-                "Admin/{controller}/{action}/{ItemID}/{OID}/{OIID}",
-                new { controller = "OrganizeSet", action = "Organize_Info_List", ItemID = UrlParameter.Optional, OID = UrlParameter.Optional, OIID = UrlParameter.Optional }
+                "Admin/{controller}/{action}/{OID}/{ID}",
+                new { controller = "OrganizeSet", action = "Organize_Info_List", OID = UrlParameter.Optional, ID = UrlParameter.Optional }
             );
 
             context.MapRoute(
                 "Organize_Info_Edit",
-                "Admin/{controller}/{action}/{ItemID}/{OID}/{PID}/{OIID}",
-                new { controller = "OrganizeSet", action = "Organize_Info_Edit", ItemID = UrlParameter.Optional, OID = UrlParameter.Optional, PID = UrlParameter.Optional, OIID = UrlParameter.Optional }
+                "Admin/{controller}/{action}/{OID}/{PID}/{OIID}",
+                new { controller = "OrganizeSet", action = "Organize_Info_Edit",  OID = UrlParameter.Optional, PID = UrlParameter.Optional, OIID = UrlParameter.Optional }
             );
 
             

@@ -1219,7 +1219,6 @@ namespace Banner.Areas.Web.Controllers
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             c.cTL.Title = "";
             c.cTL.NowPage = iNowPage;
-            c.cTL.ItemID = "";
             c.cTL.NumCut = iNumCut;
             c.cTL.Rs = new List<cTableRow>();
             ACID = GetACID();

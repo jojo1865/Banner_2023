@@ -34,7 +34,6 @@ namespace Banner.Models
         public int TotalCt = 0;//全部共多少資料
         public int NowPage = 1;//目前所在頁數
         public string NowURL = "";
-        public string ItemID = "";
         public int CID = 0;
         public int ATID = 0;
         public string Title = "";
