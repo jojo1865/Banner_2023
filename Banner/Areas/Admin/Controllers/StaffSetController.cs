@@ -4,21 +4,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static Banner.Areas.Admin.Controllers.StaffSetController;
 
 namespace Banner.Areas.Admin.Controllers
 {
     public class StaffSetController : PublicClass
     {
         #region 課程-分類-列表
-        public class cStaffCategory
+        public class cCategory_List
         {
             public int ActiveType = -1;
             public string sKey = "";
             public cTableList cTL = new cTableList();
         }
-        public cStaffCategory GetCategory_List(FormCollection FC)
+        public cCategory_List GetCategory_List(FormCollection FC)
         {
-            cStaffCategory N = new cStaffCategory();
+            cCategory_List N = new cCategory_List();
             #region 物件初始化
             #region 前端資料帶入
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");

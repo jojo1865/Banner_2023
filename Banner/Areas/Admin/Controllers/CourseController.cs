@@ -187,27 +187,32 @@ namespace Banner.Areas.Admin.Controllers
             N.SL = new List<SelectListItem>();
             var CCs = DC.Course_Category.Where(q => !q.DeleteFlag).OrderByDescending(q => q.CCID);
             foreach (var CC in CCs)
-                N.SL.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString() });
+                N.SL.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CC.CCID == ID });
 
             #region 前端資料帶入
+            if (FC != null)
+            {
+                ID = Convert.ToInt32(FC.Get("ddl_CC"));
+                if (ID == 0)
+                {
+                    N.SL.ForEach(q => q.Selected = false);
+                    N.SL[0].Selected = true;
+                }
+                else
+                {
+                    N.SL.ForEach(q => q.Selected = false);
+                    if (N.SL.FirstOrDefault(q => q.Value == ID.ToString()) != null)
+                        N.SL.First(q => q.Value == ID.ToString()).Selected = true;
+                    else
+                        N.SL[0].Selected = true;
+                }
+            }
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             N.ActiveType = Convert.ToInt32(FC != null ? FC.Get("rbl_ActiveType") : "-1");
             N.sKey = FC != null ? FC.Get("txb_Key") : "";
-            ID = Convert.ToInt32(FC != null ? FC.Get("ddl_CC") : "0");
-            if (ID == 0)
-            {
-                N.SL.ForEach(q => q.Selected = false);
-                N.SL[0].Selected = true;
-            }
-            else
-            {
-                N.SL.ForEach(q => q.Selected = false);
-                if (N.SL.FirstOrDefault(q => q.Value == ID.ToString()) != null)
-                    N.SL.First(q => q.Value == ID.ToString()).Selected = true;
-                else
-                    N.SL[0].Selected = true;
-            }
+
+
             #endregion
 
 
@@ -339,7 +344,7 @@ namespace Banner.Areas.Admin.Controllers
                     iCCID = CCs[0].CCID;
                     Code = CCs[0].Code;
                 }
-                    
+
                 var Cs = DC.Course.Where(q => q.CCID == iCCID);
                 if (Cs.Count() > 0)
                     Sort = Cs.Count() + 1;

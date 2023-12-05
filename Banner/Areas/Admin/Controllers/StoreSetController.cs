@@ -74,7 +74,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 var PC_Gs = from q in
                             (from q in DC.Product_ClassTime.Where(q => q.ClassDate.Date >= DT_.Date)
-                             join p in DC.Product_Class.Where(q=>!q.DeleteFlag)
+                             join p in DC.Product_Class.Where(q => !q.DeleteFlag)
                              on q.PCID equals p.PCID
                              select p)
                             group q by new { q.PID } into g
@@ -498,13 +498,17 @@ namespace Banner.Areas.Admin.Controllers
 
                 N.P.EchelonNo = Convert.ToInt32(FC.Get("ddl_EchelonNo"));
                 N.P.Price_Basic = Convert.ToInt32(FC.Get("txb_Price_Basic"));
-                N.P.Price_Early = Convert.ToInt32(FC.Get("txb_Price_Early"));
-                
-                
+                int iPrice = 0;
+                if (int.TryParse(FC.Get("txb_Price_Early"), out iPrice))
+                    N.P.Price_Early = iPrice;
+                else
+                    N.P.Price_Early = 0;
+
+
                 if (!string.IsNullOrEmpty(FC.Get("txb_SDate_Signup")))
                     N.P.SDate_Signup = Convert.ToDateTime(FC.Get("txb_SDate_Signup"));
-                if (!string.IsNullOrEmpty(FC.Get("txb_EDate_Signup_OnLine")))
-                    N.P.EDate_Signup = Convert.ToDateTime(FC.Get("txb_EDate_Signup_OnLine"));
+                if (!string.IsNullOrEmpty(FC.Get("txb_EDate_Signup")))
+                    N.P.EDate_Signup = Convert.ToDateTime(FC.Get("txb_EDate_Signup"));
                 if (!string.IsNullOrEmpty(FC.Get("txb_SDate_Early")))
                     N.P.SDate_Early = Convert.ToDateTime(FC.Get("txb_SDate_Early"));
                 if (!string.IsNullOrEmpty(FC.Get("txb_EDate_Early")))
@@ -660,7 +664,7 @@ namespace Banner.Areas.Admin.Controllers
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Product_Edit(int ID, FormCollection FC, HttpPostedFileBase file_upload)
         {
             GetViewBag();
@@ -674,14 +678,23 @@ namespace Banner.Areas.Admin.Controllers
                 Error += "請輸入課程原價<br/>";
             if (N.P.Price_Basic < N.P.Price_Early)
                 Error += "課程原價應低於早鳥價<br/>";
+            if (N.P.SDate_Early != N.P.CreDate && N.P.EDate_Early != N.P.CreDate)
+            {
+                if (N.P.SDate_Early.Date > N.P.EDate_Early.Date)
+                    Error += "早鳥報名起始日應在結束日之前<br/>";
+            }
+            if (N.P.SDate_Signup != N.P.CreDate && N.P.EDate_Signup != N.P.CreDate)
+            {
+                if (N.P.SDate_Signup.Date > N.P.EDate_Signup.Date)
+                    Error += "線上報名起始日應在結束日之前<br/>";
+                else if (N.P.EDate_Early != N.P.CreDate && N.P.EDate_Early.Date > N.P.EDate_Signup.Date)
+                    Error += "早鳥結束日應在線上報名結束日之前<br/>";
+            }
+            else
+                Error += "線上報名起始日 與 結束日 為必填<br/>";
 
-            if (N.P.EDate_Early != N.P.CreDate && N.P.EDate_Early.Date > N.P.EDate_Signup.Date)
-                Error += "早鳥結束日應在線上報名結束日之前<br/>";
-
-            if (N.P.SDate_Signup != N.P.CreDate && N.P.EDate_Signup.Date > N.P.SDate_Early.Date)
+            if (N.P.SDate_Signup != N.P.CreDate && N.P.EDate_Signup.Date < N.P.SDate_Early.Date)
                 Error += "線上報名起始日應在線上報名結束日之前<br/>";
-
-
             #endregion
 
 
@@ -811,7 +824,7 @@ namespace Banner.Areas.Admin.Controllers
                            on q.TID equals p.TID
                            select p).FirstOrDefault();
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClassTeacher_List/" + N_.PCID + "?PID=" + N_.PID, Target = "_self", Value = (MPT != null ? MPT.Title : "設定講師") });//編輯
-                cTR.Cs.Add(new cTableCell { Type = "deletebutton", URL = "DataDelete('Product_Class', " + N_.PCID + ")",CSS= "btn btn-outline-danger", Value = "刪除" });//刪除
+                cTR.Cs.Add(new cTableCell { Type = "deletebutton", URL = "DataDelete('Product_Class', " + N_.PCID + ")", CSS = "btn btn-outline-danger", Value = "刪除" });//刪除
                 N.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
 
@@ -1080,7 +1093,7 @@ namespace Banner.Areas.Admin.Controllers
             ChangeTitle(ID == 0);
             var N = GetProductClassDate_Edit(GetQueryStringInInt("PID"), GetQueryStringInInt("PCID"), ID, FC);
             if (Error != "")
-                SetAlert(Error,2);
+                SetAlert(Error, 2);
             else
             {
                 if (N.PCT.PCTID == 0)

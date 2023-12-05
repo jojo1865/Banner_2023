@@ -17,17 +17,10 @@
                             <div class="form-card">
 
                                 <div class="form-group">
-                                    <label>課程分類代碼</label>
-                                    @Html.TextBox("txb_Code", Model.Code, new { @class = "form-control form-control-lg input-underline" })
-                                </div>
-                                <div class="form-group">
-                                    <label>課程分類名稱<span>*</span></label>
+                                    <label>分類名稱<span>*</span></label>
                                     @Html.TextBox("txb_Title", Model.Title, new { @class = "form-control form-control-lg input-underline" })
                                 </div>
-                                <div class="form-group">
-                                    <label>備註</label>
-                                    @Html.TextArea("txb_Note", Model.Note, new { @class = "form-control form-control-lg" ,@style="hight:100px;"})
-                                </div>
+
                                 <div class="form-group">
                                     <label>啟用狀態</label>
                                     <div class="row">

@@ -157,8 +157,11 @@ namespace Banner
             catch { sACID = ""; }
 
             int ACID = 0;
-            try { ACID = Convert.ToInt32(sACID); }
-            catch { }
+            if (!string.IsNullOrEmpty(sACID))
+            {
+                try { ACID = Convert.ToInt32(sACID); }
+                catch { }
+            }
             return ACID;
         }
         //取得網站暫存資料
