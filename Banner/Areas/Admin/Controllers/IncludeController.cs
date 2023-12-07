@@ -51,8 +51,8 @@ namespace Banner.Areas.Admin.Controllers
                     Ms.Items = GetMenu(Rs.ToList(), sURL, 0);
                 }
             }
-            if(Ms.Items==null)
-                Ms.Items=new List<cMenu>();
+            if (Ms.Items == null)
+                Ms.Items = new List<cMenu>();
             return PartialView(Ms);
         }
         //取得選單可以查的網址
@@ -65,9 +65,9 @@ namespace Banner.Areas.Admin.Controllers
                 sURL = "";
                 if (NewURL.Length >= 4)
                     for (int i = 0; i < 4; i++)
-                        sURL += NewURL[i] + "/";
+                        sURL += NewURL[i] + (NewURL[i].Contains("?") ? "" : "/");
             }
-            return sURL;
+            return sURL.Split('?')[0];
         }
 
         private List<cMenu> GetMenu(List<Rool> Rs, string sURL, int MID)
@@ -132,11 +132,14 @@ namespace Banner.Areas.Admin.Controllers
             string sURL = GetShortURL();
             string sID = Request.Url.Segments[Request.Url.Segments.Length - 1];
             int i = 0;
-            if (int.TryParse(sID, out i))
-                sID = i.ToString();
-            else
-                sID = "0";
-            
+            if (!sID.ToLower().Contains("list") && !sID.ToLower().Contains("edit"))
+            {
+                if (int.TryParse(sID, out i))
+                    sID = i.ToString();
+                else
+                    sID = "0";
+            }
+
             if (sURL.Contains("_Edit"))
             {
                 cMenu cM = new cMenu();
@@ -170,7 +173,7 @@ namespace Banner.Areas.Admin.Controllers
 
                 iSort++;
                 N = DC.Menu.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.MenuType == 0 && q.MID == N.ParentID);
-            };
+            }
 
             return PartialView(Ms);
         }
@@ -494,7 +497,7 @@ namespace Banner.Areas.Admin.Controllers
             return PartialView(SLs);
         }
         #endregion
-        
+
         public PartialViewResult _HeadInclude()
         {
             return PartialView();

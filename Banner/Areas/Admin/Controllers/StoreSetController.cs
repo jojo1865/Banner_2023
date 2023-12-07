@@ -163,7 +163,7 @@ namespace Banner.Areas.Admin.Controllers
                     cTR.Cs.Add(new cTableCell { Value = "尚未設定" });
 
                 cTR.Cs.Add(new cTableCell { Value = N_.Price_Basic.ToString() });//原價
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_List?PID=" + N_.PID, Target = "_self", Value = "開班管理" });//班別
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_List?PID=" + N_.PID, Target = "_self", Value = "班級管理" });//班別
                 //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductAllowAccount_List/" + N_.PID, Target = "_self", Value = "指定名單" });//限定會員
                 cTR.Cs.Add(new cTableCell { Value = N_.ShowFlag ? "顯示" : "隱藏" });//顯示狀態
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "可交易" : "不可交易" });//交易狀態
@@ -974,7 +974,9 @@ namespace Banner.Areas.Admin.Controllers
             N.PCID = PCID;
             N.cTL.Rs = new List<cTableRow>();
             var Ns = DC.Product_ClassTime.Where(q => q.PCID == PCID);
-
+            var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == PCID);
+            if (PC != null)
+                ViewBag._Title += " - " + PC.Product.Title + PC.Product.SubTitle + " " + PC.Title;
 
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
@@ -1177,6 +1179,9 @@ namespace Banner.Areas.Admin.Controllers
             N.sKey = FC != null ? FC.Get("txb_Key") : "";
             N.sGroupKey = FC != null ? FC.Get("txb_GroupKey") : "";
             N.PID = PID;
+            var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == ID);
+            if (PC != null)
+                ViewBag._Title += " - " + PC.Product.Title + PC.Product.SubTitle + " " + PC.Title;
             #endregion
 
 
@@ -1690,7 +1695,23 @@ namespace Banner.Areas.Admin.Controllers
             if (CH == null)
                 Error += "參數錯誤...無法顯示";
             else
+            {
                 c.OID = CH.OID;
+                if (CH.EDateTime <= DT)
+                {
+                    foreach (var N in Ns.Where(q => q.ActiveFlag && q.OHID == 0))
+                    {
+                        N.Note = "到期未使用,自動取消";
+                        N.ActiveFlag = false;
+                        N.UpdDate = DT;
+                        N.SaveACID = 1;
+                        DC.SubmitChanges();
+                    }
+                }
+            }
+
+
+
             //旌旗權限檢視門檻設置
             var OI2s = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
             if (OI2s.Any())

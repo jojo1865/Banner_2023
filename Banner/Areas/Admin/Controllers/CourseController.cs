@@ -244,7 +244,7 @@ namespace Banner.Areas.Admin.Controllers
             N.cTL.Rs.Add(SetTableRowTitle(TopTitles));
             N.cTL.TotalCt = Ns.Count();
             N.cTL.MaxNum = GetMaxNum(N.cTL.TotalCt, N.cTL.NumCut);
-            Ns = Ns.OrderByDescending(q => q.CCID).Skip((iNowPage - 1) * N.cTL.NumCut).Take(N.cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.CID).Skip((iNowPage - 1) * N.cTL.NumCut).Take(N.cTL.NumCut);
 
             foreach (var N_ in Ns)
             {

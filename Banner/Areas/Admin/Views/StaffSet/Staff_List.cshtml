@@ -1,4 +1,4 @@
-﻿@model Banner.Areas.Admin.Controllers.StaffSetController.cCategory_List
+﻿@model Banner.Areas.Admin.Controllers.StaffSetController.cStaff_List
 @{
     ViewBag.Title = "Category_List";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
@@ -13,15 +13,17 @@
         <form method="post" id="form1">
             @if (Model != null)
             {
+
                 <div class="search-form">
                     <div class="search-form-section">
                         <div class="row">
                             <div class="col-lg-6 col-12">
-                                <label>事工團分類名稱</label>
-                                @Html.TextBox("txb_Key", @Model.sKey, new { @class = "form-control form-control-lg input-underline", @placeholder = "分類標題關鍵字" })
+                                <label>事工團分類</label>
+                                @Html.DropDownList("ddl_SC", Model.SL, new { @class = "form-select form-control-lg", @placeholder = "分類標題關鍵字" })
                             </div>
                             <div class="col-lg-6 col-12">
-
+                                <label>事工團名稱</label>
+                                @Html.TextBox("txb_Key", Model.sKey, new { @class = "form-control form-control-lg input-underline", @placeholder = "事工團名稱關鍵字" })
                             </div>
                         </div>
                         <div class="row">
@@ -42,20 +44,21 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="table-container">
                     @if (((bool[])ViewBag._Power)[1])
                     {
                         <div class="table-func-container mb-4">
-                            <a class="btn btn-primary btn-lg btn-round" href="/Admin/StaffSet/Category_Edit/0">
+                            <a class="btn btn-primary btn-lg btn-round" href="/Admin/StaffSet/Staff_Edit/0">
                                 <i class="fa-solid fa-circle-plus"></i>新增
                             </a>
                         </div>
                     }
 
                     @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+
                 </div>
             }
-
         </form>
     </div>
 </div>

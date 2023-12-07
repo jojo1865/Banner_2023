@@ -1,4 +1,50 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="db_Banner" Class="DataClassesDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Table Name="dbo.v_GetAC_O2_OI" Member="v_GetAC_O2_OI">
+    <Type Name="v_GetAC_O2_OI">
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Name_First" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Name_Last" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="OIID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OITitle" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.v_GetAC_OITree" Member="v_GetAC_OITree">
+    <Type Name="v_GetAC_OITree">
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Name_First" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Name_Last" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="OITitle_10" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+      <Column Name="OIID_10" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OID_10" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OITitle_9" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+      <Column Name="OIID_9" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OID_9" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OITitle_8" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+      <Column Name="OIID_8" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OID_8" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OITitle_7" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+      <Column Name="OIID_7" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OID_7" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OITitle_6" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+      <Column Name="OIID_6" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OID_6" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OITitle_5" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+      <Column Name="OIID_5" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OID_5" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OITitle_4" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+      <Column Name="OIID_4" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OID_4" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OITitle_3" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+      <Column Name="OIID_3" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OID_3" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OITitle_2" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+      <Column Name="OIID_2" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OID_2" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OITitle_1" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
+      <Column Name="OIID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="OID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
   <Table Name="dbo.Account" Member="Account">
     <Type Name="Account">
       <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -642,9 +688,7 @@
     <Type Name="OrganizeStaff">
       <Column Name="OSID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="OSCID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
-      <Column Name="LeadersFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="SID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
@@ -652,19 +696,7 @@
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="OrganizeStaff_M_OS_Account" Member="M_OS_Account" ThisKey="OSID" OtherKey="OSID" Type="M_OS_Account" />
       <Association Name="OrganizeInfo_OrganizeStaff" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
-      <Association Name="OrganizeStaff_Category_OrganizeStaff" Member="OrganizeStaff_Category" ThisKey="OSCID" OtherKey="OSCID" Type="OrganizeStaff_Category" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.OrganizeStaff_Category" Member="OrganizeStaff_Category">
-    <Type Name="OrganizeStaff_Category">
-      <Column Name="OSCID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="OrganizeStaff_Category_OrganizeStaff" Member="OrganizeStaff" ThisKey="OSCID" OtherKey="OSCID" Type="OrganizeStaff" />
+      <Association Name="Staff_OrganizeStaff" Member="Staff" ThisKey="SID" OtherKey="SID" Type="Staff" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.PayType" Member="PayType">
@@ -693,6 +725,65 @@
       <Association Name="PayType_M_Product_PayType" Member="M_Product_PayType" ThisKey="PTID" OtherKey="PTID" Type="M_Product_PayType" />
       <Association Name="PayType_Order_Paid" Member="Order_Paid" ThisKey="PTID" OtherKey="PTID" Type="Order_Paid" />
       <Association Name="OrganizeInfo_PayType" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Product" Member="Product">
+    <Type Name="Product">
+      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="SubTitle" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ProductType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ProductInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="TargetInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="GraduationInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="YearNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="EchelonNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ImgURL" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
+      <Column Name="Price_Basic" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Price_Early" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SDate_Signup" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="EDate_Signup" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SDate_Early" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="EDate_Early" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="ShowFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Product_Coupon_Header" Member="Coupon_Header" ThisKey="PID" OtherKey="PID" Type="Coupon_Header" />
+      <Association Name="Product_M_Product_PayType" Member="M_Product_PayType" ThisKey="PID" OtherKey="PID" Type="M_Product_PayType" />
+      <Association Name="Product_M_Product_Teacher" Member="M_Product_Teacher" ThisKey="PID" OtherKey="PID" Type="M_Product_Teacher" />
+      <Association Name="Product_Order_Product" Member="Order_Product" ThisKey="PID" OtherKey="PID" Type="Order_Product" />
+      <Association Name="Product_Product_Class" Member="Product_Class" ThisKey="PID" OtherKey="PID" Type="Product_Class" />
+      <Association Name="Product_Product_File" Member="Product_File" ThisKey="PID" OtherKey="PID" Type="Product_File" />
+      <Association Name="Product_Product_Rool" Member="Product_Rool" ThisKey="PID" OtherKey="PID" Type="Product_Rool" />
+      <Association Name="Course_Product" Member="Course" ThisKey="CID" OtherKey="CID" Type="Course" IsForeignKey="true" />
+      <Association Name="OrganizeInfo_Product" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Product_Class" Member="Product_Class">
+    <Type Name="Product_Class">
+      <Column Name="PCID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="PeopleCt" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PhoneNo" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="LocationName" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="Address" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
+      <Column Name="MeetURL" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
+      <Column Name="GraduateDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Product_Class_M_Product_Teacher" Member="M_Product_Teacher" ThisKey="PCID" OtherKey="PCID" Type="M_Product_Teacher" />
+      <Association Name="Product_Class_Order_Product" Member="Order_Product" ThisKey="PCID" OtherKey="PCID" Type="Order_Product" />
+      <Association Name="Product_Class_Product_ClassTime" Member="Product_ClassTime" ThisKey="PCID" OtherKey="PCID" Type="Product_ClassTime" />
+      <Association Name="Product_Product_Class" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Product_ClassTime" Member="Product_ClassTime">
@@ -750,6 +841,18 @@
       <Association Name="Rool_M_Rool_Menu" Member="M_Rool_Menu" ThisKey="RID" OtherKey="RID" Type="M_Rool_Menu" />
     </Type>
   </Table>
+  <Table Name="dbo.Staff_Category" Member="Staff_Category">
+    <Type Name="Staff_Category">
+      <Column Name="SCID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Staff_Category_Staff" Member="Staff" ThisKey="SCID" OtherKey="SCID" Type="Staff" />
+    </Type>
+  </Table>
   <Table Name="dbo.Teacher" Member="Teacher">
     <Type Name="Teacher">
       <Column Name="TID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -783,109 +886,20 @@
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
     </Type>
   </Table>
-  <Table Name="dbo.v_GetAC_O2_OI" Member="v_GetAC_O2_OI">
-    <Type Name="v_GetAC_O2_OI">
-      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Name_First" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Name_Last" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="OIID" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OITitle" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.v_GetAC_OITree" Member="v_GetAC_OITree">
-    <Type Name="v_GetAC_OITree">
-      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Name_First" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Name_Last" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="OITitle_10" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-      <Column Name="OIID_10" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="OID_10" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="OITitle_9" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-      <Column Name="OIID_9" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OID_9" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OITitle_8" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-      <Column Name="OIID_8" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OID_8" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OITitle_7" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-      <Column Name="OIID_7" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OID_7" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OITitle_6" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-      <Column Name="OIID_6" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OID_6" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OITitle_5" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-      <Column Name="OIID_5" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OID_5" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OITitle_4" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-      <Column Name="OIID_4" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OID_4" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OITitle_3" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-      <Column Name="OIID_3" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OID_3" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OITitle_2" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-      <Column Name="OIID_2" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OID_2" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OITitle_1" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-      <Column Name="OIID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Product" Member="Product">
-    <Type Name="Product">
-      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="SubTitle" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="ProductType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ProductInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="TargetInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="GraduationInfo" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="YearNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="EchelonNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ImgURL" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
-      <Column Name="Price_Basic" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Price_Early" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="SDate_Signup" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="EDate_Signup" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SDate_Early" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="EDate_Early" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="ShowFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+  <Table Name="dbo.Staff" Member="Staff">
+    <Type Name="Staff">
+      <Column Name="SID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="SCID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="LeadersFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ChildrenFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Product_Coupon_Header" Member="Coupon_Header" ThisKey="PID" OtherKey="PID" Type="Coupon_Header" />
-      <Association Name="Product_M_Product_PayType" Member="M_Product_PayType" ThisKey="PID" OtherKey="PID" Type="M_Product_PayType" />
-      <Association Name="Product_M_Product_Teacher" Member="M_Product_Teacher" ThisKey="PID" OtherKey="PID" Type="M_Product_Teacher" />
-      <Association Name="Product_Order_Product" Member="Order_Product" ThisKey="PID" OtherKey="PID" Type="Order_Product" />
-      <Association Name="Product_Product_File" Member="Product_File" ThisKey="PID" OtherKey="PID" Type="Product_File" />
-      <Association Name="Product_Product_Rool" Member="Product_Rool" ThisKey="PID" OtherKey="PID" Type="Product_Rool" />
-      <Association Name="Product_Product_Class" Member="Product_Class" ThisKey="PID" OtherKey="PID" Type="Product_Class" />
-      <Association Name="Course_Product" Member="Course" ThisKey="CID" OtherKey="CID" Type="Course" IsForeignKey="true" />
-      <Association Name="OrganizeInfo_Product" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Product_Class" Member="Product_Class">
-    <Type Name="Product_Class">
-      <Column Name="PCID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="PeopleCt" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="PhoneNo" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="LocationName" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="Address" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
-      <Column Name="MeetURL" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
-      <Column Name="GraduateDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Product_Class_M_Product_Teacher" Member="M_Product_Teacher" ThisKey="PCID" OtherKey="PCID" Type="M_Product_Teacher" />
-      <Association Name="Product_Class_Order_Product" Member="Order_Product" ThisKey="PCID" OtherKey="PCID" Type="Order_Product" />
-      <Association Name="Product_Class_Product_ClassTime" Member="Product_ClassTime" ThisKey="PCID" OtherKey="PCID" Type="Product_ClassTime" />
-      <Association Name="Product_Product_Class" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
+      <Association Name="Staff_OrganizeStaff" Member="OrganizeStaff" ThisKey="SID" OtherKey="SID" Type="OrganizeStaff" />
+      <Association Name="Staff_Category_Staff" Member="Staff_Category" ThisKey="SCID" OtherKey="SCID" Type="Staff_Category" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

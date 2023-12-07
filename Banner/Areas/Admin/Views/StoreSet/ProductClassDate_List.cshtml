@@ -49,9 +49,12 @@
 
                     @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
                 </div>
-                <a href="/Admin/StoreSet/ProductClass_List?PID=@(Model.PID)" class="btn btn-outline-primary btn-lg btn-round">
-                    <i class="fa-solid fa-xmark"></i>返回班級
-                </a>
+                <div class="pt-2">
+                    <a href="/Admin/StoreSet/ProductClass_List?PID=@(Model.PID)" class="btn btn-outline-primary btn-lg btn-round">
+                        <i class="fa-solid fa-arrow-rotate-left"></i>返回班級
+                    </a>
+                </div>
+                
             }
 
         </form>
