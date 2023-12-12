@@ -58,7 +58,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Login(FormCollection FC)
         {
             GetViewBag();
@@ -154,7 +154,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult ForgetPassword(FormCollection FC)
         {
             GetViewBag();
@@ -228,7 +228,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult ForgetAccount(FormCollection FC)
         {
             GetViewBag();
@@ -306,7 +306,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult ChangePassword(FormCollection FC)
         {
             GetViewBag();

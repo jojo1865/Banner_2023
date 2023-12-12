@@ -135,7 +135,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCategory_Edit(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Category_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -171,6 +171,7 @@ namespace Banner.Areas.Admin.Controllers
             #region 物件初始化
             N.SL = new List<SelectListItem>();
             var SCs = DC.Staff_Category.Where(q => !q.DeleteFlag).OrderByDescending(q => q.SCID);
+            N.SL.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
             foreach (var SC in SCs)
                 N.SL.Add(new SelectListItem { Text = SC.Title, Value = SC.SCID.ToString(), Selected = SC.SCID == ID });
 
@@ -359,7 +360,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetStaff_Edit(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Staff_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

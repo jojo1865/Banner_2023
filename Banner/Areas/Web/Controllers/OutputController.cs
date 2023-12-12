@@ -29,7 +29,7 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Login(FormCollection FC)
         {
             GetViewBag();

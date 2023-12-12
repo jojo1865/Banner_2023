@@ -5,7 +5,7 @@
 }
 @if (Model != null)
 {
-    <form method="post" id="form_Paid" action="@Model.NewebPagURL">
+    <form method="post" id="form_Paid" class="d-none" action="@Model.NewebPagURL">
         <input name="MerchantID" value="@Model.MerchantID" />
         <input name="TradeInfo" value="@Model.TradeInfo" />
         <input name="TradeSha" value="@Model.TradeSha" />
@@ -16,6 +16,22 @@
     <script>
         document.getElementById("but_Send").click();
     </script>
+
+
 }
+
+<div class="row">
+    <div class="col-12">
+        @TempData["TradeInfo"].ToString()
+    </div>
+
+    <div class="col-12">
+        <hr />
+    </div>
+    <div class="col-12">
+        @TempData["TradeSha"].ToString()
+    </div>
+</div>
+
 
 

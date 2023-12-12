@@ -1,0 +1,139 @@
+﻿
+@{
+    ViewBag.Title = "Product_Class_BatchAdd";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="form-container-list">
+        <div class="form-container">
+            <div class="form-header visually-hidden">
+                <h5>@ViewBag._Title</h5>
+            </div>
+            <form method="post" id="form1" enctype="multipart/form-data">
+                <div class="form-body">
+                    <div class="form-card-group">
+                        <div id="personal-info" class="header-container">
+                            <div class="header-left-border"></div>
+                            <div class="header">課程上架管理</div>
+                        </div>
+                    </div>
+
+                    <div class="form-body mt-4">
+                        <div class="form-card-group">
+                            <div id="personal-info" class="header-container">
+                                <div class="header-left-border"></div>
+                                <div class="header">開班管理</div>
+                                <a class="ms-2" id="a_add_Class" href="javascript:;" onclick="AddClassRow1();"><i class="fa-solid fa-circle-plus lab_DarkBlue me-2"></i></a>
+                                <input type="hidden" id="txb_AddClassCt" name="txb_AddClassCt" value="0" />
+                            </div>
+                            <div class="form-card">
+                                <div class="form-group" id="div_ClassPlace">
+                                    <div class="row" id="div_Class_1">
+                                        <div class="col-4">
+                                            <label class="form-label"><span class="text-danger">*</span>課堂名稱</label>
+                                            <input class="form-control" />
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="form-label"><span class="text-danger">*</span>上課堂數</label><br />
+                                            <input class="form-control" style="display:unset; width:80px;" type="number" min="0" value="1" />堂
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="form-label"><span class="text-danger">*</span>開課日期</label>
+                                            <input class="form-control" type="date" value="2023-12-01" />
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="form-label"><span class="text-danger">*</span>相隔週期</label><br />
+                                            <input class="form-control" style="display:unset; width:80px;" type="number" min="0" value="0" />天
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="form-label"><span class="text-danger">*</span>上課時間</label><br />
+                                            <input class="form-control" type="time" value="09:00" style="width:150px;display:unset" />～
+                                            <input class="form-control" type="time" value="12:00" style="width: 150px; display: unset" />
+                                        </div>
+
+                                        <div class="col-4">
+                                            <label class="form-label"><span class="text-danger">*</span>連絡電話</label>
+                                            <input class="form-control" />
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="form-label">地標名稱</label>
+                                            <input class="form-control" />
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="form-label"><span class="text-danger">*</span>上課地點</label>
+                                            <input class="form-control" />
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="form-label"><span class="text-danger">*</span>人數限制</label><br />
+                                            <input class="form-control" style="display:unset; width:80px;" type="number" min="0" value="0" />人
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="form-label"><span class="text-danger">*</span>結業準備天數</label>
+                                            <input class="form-control" style="display:unset; width:80px;" type="number" min="0" value="0" />天
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="form-label"><span class="text-danger">*</span>講師選擇</label>
+                                            <div class="dropdown">
+                                                <button class="form-select-lg" type="button" data-toggle="dropdown" id="but_Text_1">
+                                                    請選擇
+                                                </button>
+                                                <input type="hidden" id="txb_Value_1" value="" />
+                                                <ul class="dropdown-menu">
+                                                    <input class="form-control cInput" type="text" placeholder="搜尋...">
+                                                    <li><a href="javascript:;" onclick="SelectTeacher('張先生', '001', 'but_Text_1', 'txb_Value_1')">張先生</a></li>
+                                                    <li><a href="#">CSS</a></li>
+                                                    <li><a href="#">JavaScript</a></li>
+                                                    <li><a href="#">jQuery</a></li>
+                                                    <li><a href="#">Bootstrap</a></li>
+                                                    <li><a href="#">Angular</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <a class="btn btn-success" onclick="" href="javascript:;">複製</a>
+                                            <a class="btn btn-danger" onclick="" href="javascript:;">刪除</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<style>
+    /* Style the input field */
+    .cInput {
+        padding: 20px;
+        margin-top: -6px;
+        border: 0;
+        border-radius: 0;
+        background: #f1f1f1;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $(".cInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $(".dropdown-menu li").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+    function SelectTeacher(Text, Value, TextID, ValueID) {
+        document.getElementById(TextID).innerText = Text;
+        document.getElementById(ValueID).value = Value;
+    }
+</script>

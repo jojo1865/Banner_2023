@@ -316,7 +316,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetEvent_Edit(null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Event_Edit(FormCollection FC)
         {
             GetViewBag();

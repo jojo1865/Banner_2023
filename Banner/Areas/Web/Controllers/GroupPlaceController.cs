@@ -102,7 +102,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Index(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -337,7 +337,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Aldult_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -403,7 +403,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Aldult_Remove(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -563,7 +563,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult New_Remove(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -705,7 +705,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Baptized_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

@@ -186,6 +186,12 @@ namespace Banner
     partial void InsertStaff(Staff instance);
     partial void UpdateStaff(Staff instance);
     partial void DeleteStaff(Staff instance);
+    partial void InsertOrganizeJobType(OrganizeJobType instance);
+    partial void UpdateOrganizeJobType(OrganizeJobType instance);
+    partial void DeleteOrganizeJobType(OrganizeJobType instance);
+    partial void InsertM_OJT_Account(M_OJT_Account instance);
+    partial void UpdateM_OJT_Account(M_OJT_Account instance);
+    partial void DeleteM_OJT_Account(M_OJT_Account instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -641,6 +647,22 @@ namespace Banner
 			get
 			{
 				return this.GetTable<Staff>();
+			}
+		}
+		
+		public System.Data.Linq.Table<OrganizeJobType> OrganizeJobType
+		{
+			get
+			{
+				return this.GetTable<OrganizeJobType>();
+			}
+		}
+		
+		public System.Data.Linq.Table<M_OJT_Account> M_OJT_Account
+		{
+			get
+			{
+				return this.GetTable<M_OJT_Account>();
 			}
 		}
 		
@@ -1449,6 +1471,8 @@ namespace Banner
 		
 		private EntitySet<OrganizeInfo> _OrganizeInfo;
 		
+		private EntitySet<M_OJT_Account> _M_OJT_Account;
+		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -1523,6 +1547,7 @@ namespace Banner
 			this._M_Rool_Account = new EntitySet<M_Rool_Account>(new Action<M_Rool_Account>(this.attach_M_Rool_Account), new Action<M_Rool_Account>(this.detach_M_Rool_Account));
 			this._Order_Header = new EntitySet<Order_Header>(new Action<Order_Header>(this.attach_Order_Header), new Action<Order_Header>(this.detach_Order_Header));
 			this._OrganizeInfo = new EntitySet<OrganizeInfo>(new Action<OrganizeInfo>(this.attach_OrganizeInfo), new Action<OrganizeInfo>(this.detach_OrganizeInfo));
+			this._M_OJT_Account = new EntitySet<M_OJT_Account>(new Action<M_OJT_Account>(this.attach_M_OJT_Account), new Action<M_OJT_Account>(this.detach_M_OJT_Account));
 			OnCreated();
 		}
 		
@@ -2234,6 +2259,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_OJT_Account", Storage="_M_OJT_Account", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<M_OJT_Account> M_OJT_Account
+		{
+			get
+			{
+				return this._M_OJT_Account;
+			}
+			set
+			{
+				this._M_OJT_Account.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -2441,6 +2479,18 @@ namespace Banner
 		}
 		
 		private void detach_OrganizeInfo(OrganizeInfo entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_M_OJT_Account(M_OJT_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_M_OJT_Account(M_OJT_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -14461,6 +14511,8 @@ namespace Banner
 		
 		private EntitySet<OrganizeInfo> _OrganizeInfo;
 		
+		private EntitySet<OrganizeJobType> _OrganizeJobType;
+		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -14489,6 +14541,7 @@ namespace Banner
 		{
 			this._M_O_Account = new EntitySet<M_O_Account>(new Action<M_O_Account>(this.attach_M_O_Account), new Action<M_O_Account>(this.detach_M_O_Account));
 			this._OrganizeInfo = new EntitySet<OrganizeInfo>(new Action<OrganizeInfo>(this.attach_OrganizeInfo), new Action<OrganizeInfo>(this.detach_OrganizeInfo));
+			this._OrganizeJobType = new EntitySet<OrganizeJobType>(new Action<OrganizeJobType>(this.attach_OrganizeJobType), new Action<OrganizeJobType>(this.detach_OrganizeJobType));
 			OnCreated();
 		}
 		
@@ -14698,6 +14751,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Organize_OrganizeJobType", Storage="_OrganizeJobType", ThisKey="OID", OtherKey="OID")]
+		public EntitySet<OrganizeJobType> OrganizeJobType
+		{
+			get
+			{
+				return this._OrganizeJobType;
+			}
+			set
+			{
+				this._OrganizeJobType.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -14737,6 +14803,18 @@ namespace Banner
 		}
 		
 		private void detach_OrganizeInfo(OrganizeInfo entity)
+		{
+			this.SendPropertyChanging();
+			entity.Organize = null;
+		}
+		
+		private void attach_OrganizeJobType(OrganizeJobType entity)
+		{
+			this.SendPropertyChanging();
+			entity.Organize = this;
+		}
+		
+		private void detach_OrganizeJobType(OrganizeJobType entity)
 		{
 			this.SendPropertyChanging();
 			entity.Organize = null;
@@ -14785,6 +14863,8 @@ namespace Banner
 		
 		private EntitySet<Product> _Product;
 		
+		private EntitySet<M_OJT_Account> _M_OJT_Account;
+		
 		private EntityRef<Account> _Account;
 		
 		private EntityRef<Organize> _Organize;
@@ -14828,6 +14908,7 @@ namespace Banner
 			this._OrganizeStaff = new EntitySet<OrganizeStaff>(new Action<OrganizeStaff>(this.attach_OrganizeStaff), new Action<OrganizeStaff>(this.detach_OrganizeStaff));
 			this._PayType = new EntitySet<PayType>(new Action<PayType>(this.attach_PayType), new Action<PayType>(this.detach_PayType));
 			this._Product = new EntitySet<Product>(new Action<Product>(this.attach_Product), new Action<Product>(this.detach_Product));
+			this._M_OJT_Account = new EntitySet<M_OJT_Account>(new Action<M_OJT_Account>(this.attach_M_OJT_Account), new Action<M_OJT_Account>(this.detach_M_OJT_Account));
 			this._Account = default(EntityRef<Account>);
 			this._Organize = default(EntityRef<Organize>);
 			OnCreated();
@@ -15166,6 +15247,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_M_OJT_Account", Storage="_M_OJT_Account", ThisKey="OIID", OtherKey="OIID")]
+		public EntitySet<M_OJT_Account> M_OJT_Account
+		{
+			get
+			{
+				return this._M_OJT_Account;
+			}
+			set
+			{
+				this._M_OJT_Account.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_OrganizeInfo", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
 		public Account Account
 		{
@@ -15309,6 +15403,18 @@ namespace Banner
 		}
 		
 		private void detach_Product(Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo = null;
+		}
+		
+		private void attach_M_OJT_Account(M_OJT_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo = this;
+		}
+		
+		private void detach_M_OJT_Account(M_OJT_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.OrganizeInfo = null;
@@ -20086,6 +20192,730 @@ namespace Banner
 		{
 			this.SendPropertyChanging();
 			entity.Staff = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.OrganizeJobType")]
+	public partial class OrganizeJobType : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _OJTID;
+		
+		private int _OID;
+		
+		private string _Title;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntitySet<M_OJT_Account> _M_OJT_Account;
+		
+		private EntityRef<Organize> _Organize;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnOJTIDChanging(int value);
+    partial void OnOJTIDChanged();
+    partial void OnOIDChanging(int value);
+    partial void OnOIDChanged();
+    partial void OnTitleChanging(string value);
+    partial void OnTitleChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public OrganizeJobType()
+		{
+			this._M_OJT_Account = new EntitySet<M_OJT_Account>(new Action<M_OJT_Account>(this.attach_M_OJT_Account), new Action<M_OJT_Account>(this.detach_M_OJT_Account));
+			this._Organize = default(EntityRef<Organize>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OJTID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int OJTID
+		{
+			get
+			{
+				return this._OJTID;
+			}
+			set
+			{
+				if ((this._OJTID != value))
+				{
+					this.OnOJTIDChanging(value);
+					this.SendPropertyChanging();
+					this._OJTID = value;
+					this.SendPropertyChanged("OJTID");
+					this.OnOJTIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OID", DbType="Int NOT NULL")]
+		public int OID
+		{
+			get
+			{
+				return this._OID;
+			}
+			set
+			{
+				if ((this._OID != value))
+				{
+					if (this._Organize.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOIDChanging(value);
+					this.SendPropertyChanging();
+					this._OID = value;
+					this.SendPropertyChanged("OID");
+					this.OnOIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
+		public string Title
+		{
+			get
+			{
+				return this._Title;
+			}
+			set
+			{
+				if ((this._Title != value))
+				{
+					this.OnTitleChanging(value);
+					this.SendPropertyChanging();
+					this._Title = value;
+					this.SendPropertyChanged("Title");
+					this.OnTitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeJobType_M_OJT_Account", Storage="_M_OJT_Account", ThisKey="OJTID", OtherKey="OJTID")]
+		public EntitySet<M_OJT_Account> M_OJT_Account
+		{
+			get
+			{
+				return this._M_OJT_Account;
+			}
+			set
+			{
+				this._M_OJT_Account.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Organize_OrganizeJobType", Storage="_Organize", ThisKey="OID", OtherKey="OID", IsForeignKey=true)]
+		public Organize Organize
+		{
+			get
+			{
+				return this._Organize.Entity;
+			}
+			set
+			{
+				Organize previousValue = this._Organize.Entity;
+				if (((previousValue != value) 
+							|| (this._Organize.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Organize.Entity = null;
+						previousValue.OrganizeJobType.Remove(this);
+					}
+					this._Organize.Entity = value;
+					if ((value != null))
+					{
+						value.OrganizeJobType.Add(this);
+						this._OID = value.OID;
+					}
+					else
+					{
+						this._OID = default(int);
+					}
+					this.SendPropertyChanged("Organize");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_M_OJT_Account(M_OJT_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeJobType = this;
+		}
+		
+		private void detach_M_OJT_Account(M_OJT_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeJobType = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.M_OJT_Account")]
+	public partial class M_OJT_Account : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _MID;
+		
+		private int _OIID;
+		
+		private int _OJTID;
+		
+		private int _ACID;
+		
+		private System.DateTime _JoinDate;
+		
+		private System.DateTime _LeaveDate;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<OrganizeInfo> _OrganizeInfo;
+		
+		private EntityRef<OrganizeJobType> _OrganizeJobType;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnMIDChanging(int value);
+    partial void OnMIDChanged();
+    partial void OnOIIDChanging(int value);
+    partial void OnOIIDChanged();
+    partial void OnOJTIDChanging(int value);
+    partial void OnOJTIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnJoinDateChanging(System.DateTime value);
+    partial void OnJoinDateChanged();
+    partial void OnLeaveDateChanging(System.DateTime value);
+    partial void OnLeaveDateChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public M_OJT_Account()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
+			this._OrganizeJobType = default(EntityRef<OrganizeJobType>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int MID
+		{
+			get
+			{
+				return this._MID;
+			}
+			set
+			{
+				if ((this._MID != value))
+				{
+					this.OnMIDChanging(value);
+					this.SendPropertyChanging();
+					this._MID = value;
+					this.SendPropertyChanged("MID");
+					this.OnMIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int NOT NULL")]
+		public int OIID
+		{
+			get
+			{
+				return this._OIID;
+			}
+			set
+			{
+				if ((this._OIID != value))
+				{
+					if (this._OrganizeInfo.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOIIDChanging(value);
+					this.SendPropertyChanging();
+					this._OIID = value;
+					this.SendPropertyChanged("OIID");
+					this.OnOIIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OJTID", DbType="Int NOT NULL")]
+		public int OJTID
+		{
+			get
+			{
+				return this._OJTID;
+			}
+			set
+			{
+				if ((this._OJTID != value))
+				{
+					if (this._OrganizeJobType.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOJTIDChanging(value);
+					this.SendPropertyChanging();
+					this._OJTID = value;
+					this.SendPropertyChanged("OJTID");
+					this.OnOJTIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JoinDate", DbType="DateTime NOT NULL")]
+		public System.DateTime JoinDate
+		{
+			get
+			{
+				return this._JoinDate;
+			}
+			set
+			{
+				if ((this._JoinDate != value))
+				{
+					this.OnJoinDateChanging(value);
+					this.SendPropertyChanging();
+					this._JoinDate = value;
+					this.SendPropertyChanged("JoinDate");
+					this.OnJoinDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LeaveDate", DbType="DateTime NOT NULL")]
+		public System.DateTime LeaveDate
+		{
+			get
+			{
+				return this._LeaveDate;
+			}
+			set
+			{
+				if ((this._LeaveDate != value))
+				{
+					this.OnLeaveDateChanging(value);
+					this.SendPropertyChanging();
+					this._LeaveDate = value;
+					this.SendPropertyChanged("LeaveDate");
+					this.OnLeaveDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_OJT_Account", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.M_OJT_Account.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.M_OJT_Account.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_M_OJT_Account", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
+		public OrganizeInfo OrganizeInfo
+		{
+			get
+			{
+				return this._OrganizeInfo.Entity;
+			}
+			set
+			{
+				OrganizeInfo previousValue = this._OrganizeInfo.Entity;
+				if (((previousValue != value) 
+							|| (this._OrganizeInfo.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._OrganizeInfo.Entity = null;
+						previousValue.M_OJT_Account.Remove(this);
+					}
+					this._OrganizeInfo.Entity = value;
+					if ((value != null))
+					{
+						value.M_OJT_Account.Add(this);
+						this._OIID = value.OIID;
+					}
+					else
+					{
+						this._OIID = default(int);
+					}
+					this.SendPropertyChanged("OrganizeInfo");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeJobType_M_OJT_Account", Storage="_OrganizeJobType", ThisKey="OJTID", OtherKey="OJTID", IsForeignKey=true)]
+		public OrganizeJobType OrganizeJobType
+		{
+			get
+			{
+				return this._OrganizeJobType.Entity;
+			}
+			set
+			{
+				OrganizeJobType previousValue = this._OrganizeJobType.Entity;
+				if (((previousValue != value) 
+							|| (this._OrganizeJobType.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._OrganizeJobType.Entity = null;
+						previousValue.M_OJT_Account.Remove(this);
+					}
+					this._OrganizeJobType.Entity = value;
+					if ((value != null))
+					{
+						value.M_OJT_Account.Add(this);
+						this._OJTID = value.OJTID;
+					}
+					else
+					{
+						this._OJTID = default(int);
+					}
+					this.SendPropertyChanged("OrganizeJobType");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 	

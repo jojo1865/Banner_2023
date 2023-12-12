@@ -610,9 +610,11 @@ namespace Banner.Areas.Web.Controllers
             c.NewebPagURL = sNewebPagURL;
             c.MerchantID = sMerchantID;
             c.TradeInfo = HSM.EncryptAESHex(str, sHashKey, sHashIV);
+            TempData["TradeInfo"] = c.TradeInfo;
             string str1 = "HashKey=" + sHashKey + "&" + c.TradeInfo + "&HashIV=" + sHashIV;
             c.TradeSha = HSM.EncryptSHA256(str1).ToUpper();
 
+            TempData["TradeSha"] = c.TradeSha;
 
             return c;
         }

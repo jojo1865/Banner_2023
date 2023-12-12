@@ -106,7 +106,6 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Step1(FormCollection FC)
         {
             GetViewBag();
@@ -370,7 +369,7 @@ namespace Banner.Areas.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Step2(FormCollection FC)
         {
             GetViewBag();
@@ -573,7 +572,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Step3(FormCollection FC)
         {
             GetViewBag();
@@ -846,7 +845,7 @@ namespace Banner.Areas.Web.Controllers
 
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Step4(FormCollection FC)
         {
             GetViewBag();

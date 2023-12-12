@@ -230,7 +230,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetJoinCt_Edit(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult JoinCt_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

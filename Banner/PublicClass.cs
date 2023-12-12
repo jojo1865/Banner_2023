@@ -2278,7 +2278,10 @@ namespace Banner
             ViewBag._Login = "";
             ViewBag._GroupTitle = "小組資訊";
             //http://localhost:1897
-            sDomanName = Request.Url.Scheme + "://" + Request.Url.Host + (Request.Url.Port == 80 || Request.Url.Port == 443 ? "" : ":" + Request.Url.Port);
+            //sDomanName修正成Localhost
+            if (Request.Url.Host.ToLower().Contains("localhost"))
+                sDomanName = Request.Url.Scheme + "://" + Request.Url.Host + (Request.Url.Port == 80 || Request.Url.Port == 443 ? "" : ":" + Request.Url.Port);
+
             string NowURL = Request.Url.AbsolutePath;
             ACID = GetACID();
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);

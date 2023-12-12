@@ -151,7 +151,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCategory_Edit(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Category_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -567,7 +567,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCourse_Edit(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Course_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -727,7 +727,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetTeacher_Edit(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Teacher_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

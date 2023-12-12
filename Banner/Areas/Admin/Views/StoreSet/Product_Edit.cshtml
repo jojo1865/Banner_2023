@@ -202,7 +202,7 @@
                                     {
                                         <a class="ms-2 d-none" id="a_add_Course" href="javascript:;" onclick="AddRow1();"><i class="fa-solid fa-circle-plus lab_DarkBlue me-2"></i></a>
                                     }
-                                    else
+                                    else if (Model.PBs.Any())
                                     {
                                         <a class="ms-2" id="a_add_Course" href="javascript:;" onclick="AddRow1();"><i class="fa-solid fa-circle-plus lab_DarkBlue me-2"></i></a>
                                     }
@@ -393,7 +393,6 @@
                             </div>
                         </div>
                     </div>
-
                 </form>
             }
         </div>

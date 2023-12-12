@@ -708,6 +708,7 @@
     <Content Include="Areas\Admin\Views\StaffSet\Category_List.cshtml" />
     <Content Include="Areas\Admin\Views\StaffSet\Staff_List.cshtml" />
     <Content Include="Areas\Admin\Views\StaffSet\Staff_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\ProductClass_BatchAdd.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -720,7 +721,7 @@
     <Content Include="Scripts\bootstrap.esm.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Files\Down\旌旗系統外部串接文件.docx" />
+    <Content Include="Files\Down\旌旗系統外部串接API操作手冊.pdf" />
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />
     <Content Include="Scripts\jquery-3.7.1.min.js" />

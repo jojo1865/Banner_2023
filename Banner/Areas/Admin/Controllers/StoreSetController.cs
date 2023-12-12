@@ -664,7 +664,7 @@ namespace Banner.Areas.Admin.Controllers
 
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        //
         public ActionResult Product_Edit(int ID, FormCollection FC, HttpPostedFileBase file_upload)
         {
             GetViewBag();
@@ -936,7 +936,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetProductClass_Edit(PID, ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult ProductClass_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1088,7 +1088,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetProductClassDate_Edit(GetQueryStringInInt("PID"), GetQueryStringInInt("PCID"), ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult ProductClassDate_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1832,6 +1832,15 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCoupon_Account_List(ID, FC));
         }
 
+        #endregion
+
+        #region 
+        [HttpGet]
+        public ActionResult ProductClass_BatchAdd(int ID)
+        {
+            GetViewBag();
+            return View();
+        }
         #endregion
     }
 }

@@ -137,7 +137,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(ReSetOrganize(ID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Organize_Map_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -524,7 +524,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(ReSetOrganizeInfo(OID, PID, OIID, null));
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Organize_Info_Edit(int OID, int PID, int OIID, FormCollection FC)
         {
             GetViewBag();
@@ -1211,7 +1211,7 @@ namespace Banner.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult Meeting_Location_Edit(int OID, int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1549,6 +1549,10 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         switch (L.ZipType)
                         {
+                            case "縣市":
+                                ALS.Add(L.Area + L.Address);
+                                break;
+
                             case "鄉鎮市區"://台灣地址
                                 ALS.Add(L.sZipCode + " " + L.County + L.Area + L.Address);
                                 break;
@@ -1559,6 +1563,10 @@ namespace Banner.Areas.Admin.Controllers
 
                             case "網路":
                                 ALS.Add(L.Area + L.Address);
+                                break;
+
+                            default:
+                                ALS.Add(L.Address);
                                 break;
                         }
                     }
