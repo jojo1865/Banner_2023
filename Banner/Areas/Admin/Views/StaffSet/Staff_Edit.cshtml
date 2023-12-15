@@ -39,18 +39,6 @@
                                     @Html.Label("兒童事工團", new { @class = "form-check-label", @for = "cbox_ChildrenFlag" })
                                 </div>
                                 <div class="form-group">
-                                    <label>旌旗設定</label>
-                                    <div class="row">
-                                        @foreach (var SL in Model.OISL)
-                                        {
-                                            <div class="col-auto">
-                                                @Html.CheckBox("cbox_OI_" + SL.Value, SL.Selected, new { @id = "cbox_OI_" + SL.Value, @class = "form-check-input" })
-                                                @Html.Label(SL.Text, new { @class = "form-check-label", @for = "cbox_OI_" + SL.Value })
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                                <div class="form-group">
                                     <label>啟用狀態</label>
                                     <div class="row">
                                         <div class="col-auto">

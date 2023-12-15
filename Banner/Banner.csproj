@@ -709,6 +709,7 @@
     <Content Include="Areas\Admin\Views\StaffSet\Staff_List.cshtml" />
     <Content Include="Areas\Admin\Views\StaffSet\Staff_Edit.cshtml" />
     <Content Include="Areas\Admin\Views\StoreSet\ProductClass_BatchAdd.cshtml" />
+    <Content Include="Areas\Admin\Views\StaffSet\OI_Staff_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

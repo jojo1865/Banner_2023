@@ -1,0 +1,253 @@
+﻿@model Banner.Areas.Admin.Controllers.StaffSetController.cOI_Staff_List
+@{
+    ViewBag.Title = "OI_Staff_List";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        @if (Model != null)
+        {
+            <div class="search-form">
+                <div class="search-form-section">
+                    <div class="row">
+                        <div class="col-lg-3 col-12">
+                            <label>所屬旌旗</label>
+                            @Html.DropDownList("ddl_OI", Model.ddl_OI, new { @class = "form-select form-select-lg" })
+                        </div>
+                        <div class="col-lg-3 col-12">
+                            <label>事工團類別</label>
+                            @Html.DropDownList("ddl_StaffCategory", Model.ddl_Category, new { @class = "form-select form-select-lg", @onchange = "SelectStaff(this.value,'ddl_Staff');" })
+                        </div>
+                        <div class="col-lg-3 col-12">
+                            <label>事工團</label>
+                            <select class="form-select form-select-lg" id="ddl_Staff">
+                                <option value="0">請先選擇類別</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-12">
+                            <div class="col-lg-6 col-12 text-lg-end text-center">
+                                <label>&nbsp;</label>
+                                <a href="javascript:;" onclick="Search(this);" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="card p-2">
+                    <div class="row" id="div_Control">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary btn-lg btn-submit btn-round m-2" data-bs-toggle="modal" data-bs-target="#AddAccount">
+                                新增團員
+                            </button>
+                            <a a href="javascript:;" onclick="" class="btn btn-primary btn-lg btn-submit btn-round m-2">設為主責</a>
+                            <a a href="javascript:;" onclick="" class="btn btn-primary btn-lg btn-submit btn-round m-2">移除團員</a>
+                        </div>
+
+                    </div>
+                    <table class="table_RWDStyle table">
+                        <thead>
+                            <tr class="Bgn">
+                                <th></th>
+                                <th>會員ID</th>
+                                <th>姓名</th>
+                                <th>所屬小組</th>
+                                <th>手機</th>
+                                <th>加入日期</th>
+                                <th>主責</th>
+                                <th>全職同工</th>
+
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_main">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="AddAccount" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title lab_DarkBlue" id="staticBackdropLabel">新增事工團成員</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="but_Close"></button>
+            </div>
+            <div class="modal-body">
+                <b>1.搜尋會員</b><br />
+                所屬旌旗：@Html.DropDownList("ddl_OI_Add", Model.ddl_OI, new { @class = "form-select form-select-lg" })
+                姓名：<input id="txb_Name_Add" class="form-control form-control-lg" placeholder="姓名關鍵字" />
+
+                <button class="btn btn-primary btn-lg btn-submit btn-round m-2" onclick="SearchName(this);"><i class="fa-solid fa-magnifying-glass"></i>查詢</button>
+                <hr />
+                <div style="height:200px; overflow-y:scroll" id="div_Table" class="p-1 div_dark_gray">
+
+                    <table class="table_RWDStyle table">
+                        <thead>
+                            <tr class="Bgn">
+                                <th></th>
+                                <th>會員ID</th>
+                                <th>姓名</th>
+                                <th>所屬小組</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_Add">
+                        </tbody>
+                    </table>
+
+                </div>
+                <b>2.指定事功團</b><br />
+                事工團類別：
+                @Html.DropDownList("ddl_StaffCategory_Add", Model.ddl_Category, new { @class = "form-select form-select-lg", @onchange = "SelectStaff(this.value,'ddl_Staff_Add');" })
+                事工團：
+                <select class="form-select form-select-lg" id="ddl_Staff_Add">
+                    <option value="0">請先選擇類別</option>
+                </select>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-lg btn-submit btn-round m-2" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary btn-lg btn-submit btn-round m-2" onclick="AddAccounts();">送出</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function SelectStaff(CID, TargetID) {
+        var S = document.getElementById(TargetID);
+        S.innerHTML = "";
+        $.ajax({
+            url: '/Admin/StaffSet/GetStaffList?CID=' + CID,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                var r = JSON.parse(res);
+                if (r.length == 0) { S.innerHTML = "<option value='0'>此類別內沒有事工團</option>"; }
+                else {
+                    for (i = 0; i < r.length; i++) {
+                        if (i == 0) { S.innerHTML += "<option value='" + r[i].SID + "' selected>" + r[i].Title + "</option>"; }
+                        else { S.innerHTML += "<option value='" + r[i].SID + "'>" + r[i].Title + "</option>"; }
+                    }
+                }
+
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
+    function Search(a) {
+        var OI = $('#ddl_OI')[0];
+        var S = $('#ddl_Staff')[0];
+        var table = $('#tbody_main')[0];
+        table.innerHTML = "";
+        var div = $('#tbody_main')[0];
+        //$('#tbody_main').addClass('d-none');
+        $.ajax({
+            url: '/Admin/StaffSet/GetStaffAccountList?OIID=' + OI.value + '&SID=' + S.value,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                var r = JSON.parse(res);
+                if (r.length == 0) { table.innerHTML = "<tr><td colspan='8'>本團目前沒有團員</td></tr>"; }
+                else {
+                    for (i = 0; i < r.length; i++) {
+                        table.innerHTML += "<tr>";
+                        table.innerHTML += "<td><input type=\"checkbox\" id=\"cbox_" + r[i].MID + "\" class=\"form-check-input\" /></td>";
+                        table.innerHTML += "<td>" + r[i].ACID + "</td>";
+                        table.innerHTML += "<td>" + r[i].Name + "</td>";
+                        table.innerHTML += "<td>" + r[i].GroupName + "</td>";
+                        table.innerHTML += "<td>" + r[i].Contect + "</td>";
+                        table.innerHTML += "<td>" + r[i].JoinDate + "</td>";
+                        table.innerHTML += "<td>" + r[i].LeaderFlag + "</td>";
+                        table.innerHTML += "<td>" + r[i].BGUserFlag + "</td>";
+                        table.innerHTML += "</tr>";
+                    }
+                }
+                //$("div_Control").classList.remove("d-none");
+            },
+            error: function (err) { console.log(err) },
+        })
+
+    }
+
+    function SearchName(but) {
+        var Name = $("#txb_Name_Add").val();
+        var OI = $("#ddl_OI_Add").val();
+        var table = $('#tbody_Add')[0];
+        table.innerHTML = "";
+        
+        if (Name == "") { alert("請輸入姓名"); }
+        else if (OI == "" || OI == "0") { alert("請選擇旌旗"); }
+        else {
+            but.classList.add("btn-loading");
+            $('#div_Table').addClass('div_dark_gray');
+            $.ajax({
+                url: '/Admin/Home/GetAccountList?OIID=' + OI + '&Name=' + Name,
+                method: 'GET',
+                dataType: 'text',
+                success: function (res) {
+                    var r = JSON.parse(res);
+                    if (r.length == 0) { table.innerHTML = "<tr><td colspan='4'>搜尋沒有結果</td></tr>"; }
+                    else {
+                        for (i = 0; i < r.length; i++) {
+                            var str = "<tr>";
+                            str += "<td><input type=\"checkbox\" id=\"cbox_" + r[i].ACID + "\" name='cbox_AC_Add' class=\"form-check-input\" /></td>";
+                            str += "<td>" + r[i].ACID + "</td>";
+                            str += "<td>" + r[i].Name + "</td>";
+                            str += "<td>" + r[i].GroupName + "</td>";
+                            str += "</tr>";
+
+                            table.innerHTML += str;
+                        }
+                    }
+                    but.classList.remove("btn-loading");
+                    $('#div_Table').removeClass('div_dark_gray');
+                },
+                error: function (err) { console.log(err) },
+            })
+            
+        }
+    }
+
+    function AddAccounts() {
+        var cboxs = document.getElementsByName('cbox_AC_Add');
+        var IDs = "";
+        for (i = 0; i < cboxs.length; i++) {
+            if (cboxs[i].checked) {
+                var sACID = cboxs[i].id.replace('cbox_', '');
+                IDs += (IDs == "" ? "" : ",") + sACID;
+            }
+        }
+        //alert(IDs);
+
+        var OI = $("#ddl_OI_Add").val();
+        var S = $("#ddl_Staff_Add").val();
+        if (IDs == "") { alert("請選擇要加入的團員"); }
+        else if (OI == "" || OI == "0") { alert("請選擇事工團所屬旌旗"); }
+        else if (S == "" || S == "0") { alert("請選擇事工團"); }
+        else {
+
+
+
+            document.getElementById('but_Close').click();
+        }
+    }
+</script>
+<style>
+    .div_dark_gray {
+        background-color: rgba(0, 0, 0, .3);
+        z-index: 2000;
+    }
+
+        .div_dark_gray table {
+            display: none;
+        }
+</style>

@@ -10,17 +10,23 @@
         <input name="TradeInfo" value="@Model.TradeInfo" />
         <input name="TradeSha" value="@Model.TradeSha" />
         <input name="Version" value="2.0" />
-        <input name="EncryptType" value="1" />
         <button type="submit" id="but_Send">Submit</button>
     </form>
     <script>
-        document.getElementById("but_Send").click();
+        /*document.getElementById("but_Send").click();*/
     </script>
 
 
 }
 
 <div class="row">
+    <div class="col-12">
+        @TempData["str"].ToString()
+    </div>
+
+    <div class="col-12">
+        <hr />
+    </div>
     <div class="col-12">
         @TempData["TradeInfo"].ToString()
     </div>

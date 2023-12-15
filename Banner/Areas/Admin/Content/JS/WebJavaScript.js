@@ -91,14 +91,14 @@ function ShowArea(ddl) {
 }
 /*產生按鈕等待圖示 */
 
-const btns = document.querySelectorAll(".btn-submit");
+/*const btns = document.querySelectorAll(".btn-submit");
 btns.forEach((btn) => {
     btn.addEventListener("click", () => {
         btn.disabled = true;
         btn.classList.add("btn-loading");
         console.log('Add loading CSS');
     });
-});
+});*/
 function ClearLoading() {
     btns.forEach((btn) => {
         btn.disabled = false;

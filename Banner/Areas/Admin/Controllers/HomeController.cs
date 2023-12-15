@@ -1,5 +1,7 @@
 ﻿using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
+
 //using OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 using System;
 using System.Collections.Generic;
@@ -724,7 +726,45 @@ namespace Banner.Areas.Admin.Controllers
             return sPayType;
         }
         #endregion
+        #region 搜尋會員姓名
+        public class cAC
+        {
+            public int ACID { get; set; }
+            public string Name { get; set; }
+            public string GroupName { get; set; }
+        }
+        [HttpGet]
+        public string GetAccountList(string Name,int OIID, bool ChildFlag=false)
+        {
+            List<cAC> Ns = new List<cAC>();
+            var ACs = DC.Account.Where(q => q.ActiveFlag && !q.DeleteFlag);
+            if (Name != "")
+                ACs = ACs.Where(q => (q.Name_First + q.Name_Last).Contains(Name));
+            if(OIID>0)
+            {
+                ACs = from q in ACs
+                     join p in GetMOIAC(8, 0, 0)
+                            on q.ACID equals p.ACID
+                     select q;
+            }
+            if (ChildFlag)
+                ACs = ACs.Where(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
+            var Ms_ = (from q in DC.M_OI_Account.Where(q => q.OrganizeInfo.OID == 8)
+                       join p in ACs
+                       on q.ACID equals p.ACID
+                       select q).ToList();
+            foreach (var AC in ACs.OrderBy(q=>q.Name_First).ThenBy(q=>q.Name_Last))
+            {
+                cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "" };
+                var M_ACs = Ms_.Where(q=>q.ACID == AC.ACID);
+                foreach (var M in M_ACs)
+                    N.GroupName += (N.GroupName == "" ? "" : ",") + M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title;
+                Ns.Add(N);
+            }
 
+            return JsonConvert.SerializeObject(Ns);
+        }
+        #endregion
         #region 測試用(檔案上傳)
         [HttpGet]
         public ActionResult Test()

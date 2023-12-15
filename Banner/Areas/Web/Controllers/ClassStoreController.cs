@@ -562,15 +562,16 @@ namespace Banner.Areas.Web.Controllers
         public cOrder_Paid_Credit_Card GetOrderTest_Paid_Credit_Card(int OHID)
         {
             cOrder_Paid_Credit_Card c = new cOrder_Paid_Credit_Card();
+            sDomanName = "https://web-banner.viuto-aiot.com";
             string str = "";
             str += "MerchantID=" + sMerchantID;//MerchantID 商店代號 String(15)
             str += "&RespondType=JSON";//RespondType 回傳格式 String(6)
-            str += "&TimeStamp=" + DT.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString();//TimeStamp 時間戳記 String(50)
+            str += "&TimeStamp=" + DT.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString().Split('.')[0];//TimeStamp 時間戳記 String(50)
             str += "&Version=2.0";//Version 串接程式版本 String(5)
             str += "&LangType=zh-tw";//LangType 語系 String(5)
             str += "&MerchantOrderNo=" + GetRand(1000);//MerchantOrderNo 商店訂單編號 String(30)
             str += "&Amt=100";//Amt 訂單金額 int(10)
-            str += "&temDesc=測試商品";//temDesc 商品資訊
+            str += "&ItemDesc=class";//temDesc 商品資訊
             str += "&TradeLimit=600";//TradeLimit 交易有效時間  Int(3)
             str += "&ExpireDate=" + DT.AddDays(2).ToString("yyyyMMdd");//ExpireDate 繳費有效期限 String(10)
             str += "&ReturnURL=" + sDomanName + "/Web/ClassStore/Order_Back_Credit_Card/" + OHID;//ReturnURL 支付完成返回商店網址 String(200)
@@ -582,7 +583,7 @@ namespace Banner.Areas.Web.Controllers
             str += "&Email=minto.momoko.jojo1865@gmail.com";//Email 付款人電子信箱 String(50)
             str += "&EmailModify=1";//EmailModify 付款人電子信箱是否開放修改 Int(1) 1=可修改 0=不可修改
             str += "&LoginType=0";//LoginType 藍新金流會員 0 = 不須登入藍新金流會員
-            str += "&OrderComment=無";//OrderComment 商店備註 String(300)
+            str += "&OrderComment=";//OrderComment 商店備註 String(300)
 
             str += "&CREDIT=1";//CREDIT 信用卡一次付清啟用 Int(1)
             str += "&ANDROIDPAY=0";//ANDROIDPAY Google Pay 啟用 Int(1)
@@ -606,7 +607,7 @@ namespace Banner.Areas.Web.Controllers
             str += "&EZPWECHAT=0";//EZPWECHAT 簡單付微信支付 Int(1)
             str += "&EZPALIPAY=0";//EZPALIPAY 簡單付支付寶 Int(1)
             str += "&LgsType=B2C";//LgsType 物流型態 String(3)
-
+            TempData["str"] = str;
             c.NewebPagURL = sNewebPagURL;
             c.MerchantID = sMerchantID;
             c.TradeInfo = HSM.EncryptAESHex(str, sHashKey, sHashIV);
