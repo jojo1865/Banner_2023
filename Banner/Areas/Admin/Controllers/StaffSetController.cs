@@ -137,7 +137,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetCategory_Edit(ID, null));
         }
         [HttpPost]
-        
+
         public ActionResult Category_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -343,7 +343,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetStaff_Edit(ID, null));
         }
         [HttpPost]
-        
+
         public ActionResult Staff_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -372,18 +372,23 @@ namespace Banner.Areas.Admin.Controllers
         {
             public List<SelectListItem> ddl_OI = new List<SelectListItem>();
             public List<SelectListItem> ddl_Category = new List<SelectListItem>();
+
         }
         public cOI_Staff_List GetOI_Staff_List()
         {
             cOI_Staff_List c = new cOI_Staff_List();
-            c.ddl_OI.Add(new SelectListItem { Text = "請選擇", Value = "0",Selected=true });
-            c.ddl_OI.AddRange(from q in DC.OrganizeInfo.Where(q => q.OID == 2 && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.Title)
-                              select new SelectListItem { Text = q.Title + q.Organize.Title, Value = q.OIID.ToString() });
+            ACID = GetACID();
+            c.ddl_OI.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
+            if (ACID == 1)
+                c.ddl_OI.AddRange(from q in DC.OrganizeInfo.Where(q => q.OID == 2 && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.Title)
+                                  select new SelectListItem { Text = q.Title + q.Organize.Title, Value = q.OIID.ToString() });
+            else
+                c.ddl_OI.AddRange(from q in DC.M_OI2_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OrganizeInfo.Title)
+                                  select new SelectListItem { Text = q.OrganizeInfo.Title + q.OrganizeInfo.Organize.Title, Value = q.OIID.ToString() });
 
             c.ddl_Category.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
             c.ddl_Category.AddRange(from q in DC.Staff_Category.Where(q => q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.Title)
-                              select new SelectListItem { Text = q.Title , Value = q.SCID.ToString() });
-
+                                    select new SelectListItem { Text = q.Title, Value = q.SCID.ToString() });
 
             return c;
         }
@@ -397,8 +402,8 @@ namespace Banner.Areas.Admin.Controllers
         [HttpGet]
         public string GetStaffList(int CID)
         {
-            var Ns = from q in DC.Staff.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SCID == CID).OrderBy(q => q.Title)
-                     select new { q.Title, q.SID };
+            var Ns = from q in DC.Staff.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SCID == CID).OrderBy(q => q.ChildrenFlag).ThenBy(q => q.Title)
+                     select new { Title = (q.ChildrenFlag ? "[兒童]" : "") + q.Title, q.SID };
 
             return JsonConvert.SerializeObject(Ns);
         }
@@ -409,13 +414,13 @@ namespace Banner.Areas.Admin.Controllers
             public string Name { get; set; }
             public string GroupName { get; set; }
             public string Contect { get; set; }
-            
+
             public string JoinDate { get; set; }
             public string LeaderFlag { get; set; }
             public string BGUserFlag { get; set; }
         }
         [HttpGet]
-        public string GetStaffAccountList(int OIID,int SID)
+        public string GetStaffAccountList(int OIID, int SID)
         {
 
             var Ns = DC.M_Staff_Account.Where(q => !q.DeleteFlag && q.ActiveFlag);
@@ -429,18 +434,20 @@ namespace Banner.Areas.Admin.Controllers
             {
                 cSAL c = new cSAL();
                 c.MID = N.MID;
-                c.ACID =N.ACID;
-                c.Name =N.Account.Name_First+N.Account.Name_Last;
+                c.ACID = N.ACID;
+                c.Name = N.Account.Name_First + N.Account.Name_Last;
                 var Ms = GetMOIAC(8, 0, N.ACID);
 
-                c.GroupName = Ms.Count() > 0 ? string.Join(",", Ms.Select(q => q.OrganizeInfo.Title).ToArray()) : "";
+                c.GroupName = Ms.Count() > 0 ? string.Join(",", Ms.Select(q => q.OrganizeInfo.Title + q.OrganizeInfo.Organize.Title).ToArray()) : "";
                 var C = DC.Contect.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == N.ACID && q.ContectType == 1);
-                c.Contect = C!=null ? C.ContectValue : "--";
+                c.Contect = C != null ? C.ContectValue : "--";
 
                 c.JoinDate = N.JoinDate.ToString(DateFormat);
                 c.LeaderFlag = N.LeaderFlag ? "V" : "";
-                
-                c.BGUserFlag = DC.M_OI2_Account.Any(q=>q.ActiveFlag && !q.DeleteFlag && q.ACID == N.ACID) ? "V" : "";
+
+                c.BGUserFlag = DC.M_OI2_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == N.ACID) ? "V" : "";
+
+                Ns_.Add(c);
             }
 
 

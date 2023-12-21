@@ -46,7 +46,7 @@ namespace Banner.Areas.Admin.Controllers
             if (ACID != 1)//非管理者
             {
                 Ms = from q in Ms
-                     join p in DC.v_GetAC_O2_OI.Where(q => q.ACID == ACID)
+                     join p in DC.M_OI2_Account.Where(q => q.ACID == ACID)
                      on q.OIID equals p.OIID
                      select q;
             }
@@ -93,7 +93,7 @@ namespace Banner.Areas.Admin.Controllers
                               select new { q.OIID };
 
                     var OIs = from q in MLs
-                              join p in DC.v_GetAC_O2_OI.Where(q => q.ACID == ACID)
+                              join p in DC.M_OI2_Account.Where(q => q.ACID == ACID)
                               on q.OIID equals p.OIID
                               select q;
                 }

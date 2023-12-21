@@ -405,8 +405,8 @@
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Account_M_OJT_Account" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
-      <Association Name="OrganizeInfo_M_OJT_Account" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
       <Association Name="OrganizeJobType_M_OJT_Account" Member="OrganizeJobType" ThisKey="OJTID" OtherKey="OJTID" Type="OrganizeJobType" IsForeignKey="true" />
+      <Association Name="OrganizeInfo_M_OJT_Account" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.M_Product_PayType" Member="M_Product_PayType">
@@ -484,8 +484,8 @@
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Account_M_Staff_Account" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
-      <Association Name="OrganizeInfo_M_Staff_Account" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
       <Association Name="Staff_M_Staff_Account" Member="Staff" ThisKey="SID" OtherKey="SID" Type="Staff" IsForeignKey="true" />
+      <Association Name="OrganizeInfo_M_Staff_Account" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Meeting_Location" Member="Meeting_Location">
@@ -632,33 +632,8 @@
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Organize_M_O_Account" Member="M_O_Account" ThisKey="OID" OtherKey="OID" Type="M_O_Account" />
-      <Association Name="Organize_OrganizeInfo" Member="OrganizeInfo" ThisKey="OID" OtherKey="OID" Type="OrganizeInfo" />
       <Association Name="Organize_OrganizeJobType" Member="OrganizeJobType" ThisKey="OID" OtherKey="OID" Type="OrganizeJobType" />
-    </Type>
-  </Table>
-  <Table Name="dbo.OrganizeInfo" Member="OrganizeInfo">
-    <Type Name="OrganizeInfo">
-      <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="OID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ParentID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="BusinessType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="OldID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="OrganizeInfo_M_OI_Account" Member="M_OI_Account" ThisKey="OIID" OtherKey="OIID" Type="M_OI_Account" />
-      <Association Name="OrganizeInfo_M_OI2_Account" Member="M_OI2_Account" ThisKey="OIID" OtherKey="OIID" Type="M_OI2_Account" />
-      <Association Name="OrganizeInfo_M_OJT_Account" Member="M_OJT_Account" ThisKey="OIID" OtherKey="OIID" Type="M_OJT_Account" />
-      <Association Name="OrganizeInfo_M_Staff_Account" Member="M_Staff_Account" ThisKey="OIID" OtherKey="OIID" Type="M_Staff_Account" />
-      <Association Name="OrganizeInfo_PayType" Member="PayType" ThisKey="OIID" OtherKey="OIID" Type="PayType" />
-      <Association Name="OrganizeInfo_Product" Member="Product" ThisKey="OIID" OtherKey="OIID" Type="Product" />
-      <Association Name="Account_OrganizeInfo" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
-      <Association Name="Organize_OrganizeInfo" Member="Organize" ThisKey="OID" OtherKey="OID" Type="Organize" IsForeignKey="true" />
+      <Association Name="Organize_OrganizeInfo" Member="OrganizeInfo" ThisKey="OID" OtherKey="OID" Type="OrganizeInfo" />
     </Type>
   </Table>
   <Table Name="dbo.OrganizeJobType" Member="OrganizeJobType">
@@ -878,15 +853,6 @@
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
     </Type>
   </Table>
-  <Table Name="dbo.v_GetAC_O2_OI" Member="v_GetAC_O2_OI">
-    <Type Name="v_GetAC_O2_OI">
-      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Name_First" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Name_Last" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="OIID" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="OITitle" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.v_GetAC_OITree" Member="v_GetAC_OITree">
     <Type Name="v_GetAC_OITree">
       <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
@@ -922,6 +888,32 @@
       <Column Name="OITitle_1" Type="System.String" DbType="NVarChar(60)" CanBeNull="true" />
       <Column Name="OIID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="OID_1" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.OrganizeInfo" Member="OrganizeInfo">
+    <Type Name="OrganizeInfo">
+      <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="OID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ParentID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OI2_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="BusinessType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OldID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="OrganizeInfo_M_OI_Account" Member="M_OI_Account" ThisKey="OIID" OtherKey="OIID" Type="M_OI_Account" />
+      <Association Name="OrganizeInfo_M_OI2_Account" Member="M_OI2_Account" ThisKey="OIID" OtherKey="OIID" Type="M_OI2_Account" />
+      <Association Name="OrganizeInfo_M_OJT_Account" Member="M_OJT_Account" ThisKey="OIID" OtherKey="OIID" Type="M_OJT_Account" />
+      <Association Name="OrganizeInfo_M_Staff_Account" Member="M_Staff_Account" ThisKey="OIID" OtherKey="OIID" Type="M_Staff_Account" />
+      <Association Name="OrganizeInfo_PayType" Member="PayType" ThisKey="OIID" OtherKey="OIID" Type="PayType" />
+      <Association Name="OrganizeInfo_Product" Member="Product" ThisKey="OIID" OtherKey="OIID" Type="Product" />
+      <Association Name="Account_OrganizeInfo" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
+      <Association Name="Organize_OrganizeInfo" Member="Organize" ThisKey="OID" OtherKey="OID" Type="Organize" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

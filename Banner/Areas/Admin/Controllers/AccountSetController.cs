@@ -117,7 +117,7 @@ namespace Banner.Areas.Admin.Controllers
                         Ns = Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.Birthday != q.CreDate);
                         #region 後台全職同工可檢視旌旗資料判斷
                         {
-                            if(ACID !=1)
+                            if (ACID != 1)
                             {
                                 var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
                                 if (MOI2 == null)//他沒有全部的權限
@@ -132,12 +132,14 @@ namespace Banner.Areas.Admin.Controllers
                                         }
                                         else
                                         {
-                                            var v_ACIDs = from q in DC.v_GetAC_O2_OI
-                                                          join p in DC.M_OI2_Account.Where(q => q.ACID == ACID)
-                                                          on q.OIID equals p.OIID
-                                                          select q;
+                                            var OI8_ACIDs = from q in (from q in DC.M_OI2_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag)
+                                                                       join p in GetMOIAC(8, 0, 0)
+                                                                       on q.OIID equals p.OrganizeInfo.OI2_ID
+                                                                       select p)
+                                                            group q by new { q.ACID } into g
+                                                            select new { g.Key.ACID };
 
-                                            Ns = from q in v_ACIDs
+                                            Ns = from q in OI8_ACIDs
                                                  join p in Ns
                                                  on q.ACID equals p.ACID
                                                  select p;
@@ -238,7 +240,7 @@ namespace Banner.Areas.Admin.Controllers
                 string sSix = FC.Get("rbl_Sex");
                 if (FC.Get("rbl_Sex") != "0")
                     Ns = Ns.Where(q => q.ManFlag == (FC.Get("rbl_Sex") == "1"));
-                if (FC.Get("txb_OTitle") != null)
+                if (!string.IsNullOrEmpty(FC.Get("txb_OTitle")))
                 {
                     string OTitle = FC.Get("txb_OTitle");
                     int OID = 8;
@@ -497,9 +499,11 @@ namespace Banner.Areas.Admin.Controllers
                                 cTR.Cs.Add(new cTableCell { Value = "" });//小組
                             }
                             //去識別
-                            //cTR.Cs.Add(new cTableCell { Value = (N.Name_First + new string('*', N.Name_Last.Length)) });
-                            cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last.Length) });//姓名
-                            
+                            if (!string.IsNullOrEmpty(N.Name_Last))
+                                cTR.Cs.Add(new cTableCell { Value = (N.Name_First + new string('*', N.Name_Last.Length)) });
+                            else
+                                cTR.Cs.Add(new cTableCell { Value = (N.Name_First + (N.ManFlag ? "先生" : "小姐")) });//姓名
+
                             cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
 
                             var B = DC.Baptized.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.BID).FirstOrDefault();
@@ -571,7 +575,7 @@ namespace Banner.Areas.Admin.Controllers
                             //去識別
                             //cTR.Cs.Add(new cTableCell { Value = (N.Name_First + new string('*',N.Name_Last.Length)) });//姓名
                             cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });//姓名
-                            
+
                             cTR.Cs.Add(new cTableCell { Value = N.ManFlag ? "男" : "女" });//性別
                             cTR.Cs.Add(new cTableCell { Value = N.Birthday != N.CreDate ? N.Birthday.ToString(DateFormat) : "" });//生日
                             cTR.Cs.Add(new cTableCell { Value = CellPhone });//手機
@@ -1239,6 +1243,7 @@ namespace Banner.Areas.Admin.Controllers
                     N.AB.BankNo = FC.Get("txb_Bank_BankNo");
                     N.AB.AccountNo = FC.Get("txb_Bank_AccountNo");
                     N.AB.BID = Convert.ToInt32(FC.Get("ddl_Bank_BID"));
+
                     N.Banks.ForEach(q => q.Selected = false);
                     N.Banks.First(q => q.Value == FC.Get("ddl_Bank_BID")).Selected = true;
 
@@ -1317,7 +1322,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GerAccountData(ID, null));
         }
         [HttpPost]
-        
+
         public ActionResult Account_Aldult_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1337,26 +1342,30 @@ namespace Banner.Areas.Admin.Controllers
                 if (N.MLs.FirstOrDefault(q => q.Selected) != null)
                 {
                     int MLID = Convert.ToInt32(N.MLs.First(q => q.Selected).Value);
-                    var ML = DC.M_ML_Account.FirstOrDefault(q => q.MLID == MLID && q.ACID == ID);
-                    if (ML != null)
+                    if (MLID > 0)
                     {
-                        ML.MLID = MLID;
-                        ML.DeleteFlag = false;
-                        ML.UpdDate = DT;
-                        ML.SaveACID = N.AC.SaveACID;
-                        DC.SubmitChanges();
+                        var ML = DC.M_ML_Account.FirstOrDefault(q => q.MLID == MLID && q.ACID == ID);
+                        if (ML != null)
+                        {
+                            ML.MLID = MLID;
+                            ML.DeleteFlag = false;
+                            ML.UpdDate = DT;
+                            ML.SaveACID = N.AC.SaveACID;
+                            DC.SubmitChanges();
+                        }
+                        else
+                        {
+                            ML = new M_ML_Account();
+                            ML.MLID = MLID;
+                            ML.ACID = N.AC.ACID;
+                            ML.DeleteFlag = false;
+                            ML.UpdDate = ML.CreDate = DT;
+                            ML.SaveACID = N.AC.SaveACID;
+                            DC.M_ML_Account.InsertOnSubmit(ML);
+                            DC.SubmitChanges();
+                        }
                     }
-                    else
-                    {
-                        ML = new M_ML_Account();
-                        ML.MLID = MLID;
-                        ML.ACID = N.AC.ACID;
-                        ML.DeleteFlag = false;
-                        ML.UpdDate = ML.CreDate = DT;
-                        ML.SaveACID = N.AC.SaveACID;
-                        DC.M_ML_Account.InsertOnSubmit(ML);
-                        DC.SubmitChanges();
-                    }
+
                 }
                 else
                 {
@@ -1394,6 +1403,8 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 else
                     DC.SubmitChanges();
+
+                SetAlert("完成", 1, "/Admin/AccountSet/Account_Aldult_List/0");
             }
 
             return View(N);
@@ -1471,9 +1482,9 @@ namespace Banner.Areas.Admin.Controllers
                 DC.SubmitChanges();
 
                 var T = DC.Teacher.FirstOrDefault(q => q.ACID == N.ACID);
-                if(T!=null)
+                if (T != null)
                 {
-                    if(N.TeacherFlag)
+                    if (N.TeacherFlag)
                     {
                         T.ActiveFlag = true;
                         T.DeleteFlag = false;
@@ -1487,7 +1498,7 @@ namespace Banner.Areas.Admin.Controllers
                     T.SaveACID = ACID;
                     DC.SubmitChanges();
                 }
-                else if(N.TeacherFlag)
+                else if (N.TeacherFlag)
                 {
                     T = new Teacher
                     {
@@ -1722,7 +1733,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetAccount_New_Edit(ID, null));
         }
         [HttpPost]
-        
+
         public ActionResult Account_New_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1855,7 +1866,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetAccount_Baptized_Edit(ID, null));
         }
         [HttpPost]
-        
+
         public ActionResult Account_Baptized_Edit(int ID, FormCollection FC)
         {
             GetViewBag();

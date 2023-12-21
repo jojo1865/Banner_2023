@@ -621,7 +621,7 @@ namespace Banner.Areas.Web.Controllers
                 {
                     if (ACID != 1)//非管理者
                     {
-                        var OICheck = DC.v_GetAC_O2_OI.Where(q => q.ACID == ACID && q.OIID == P.OIID);
+                        var OICheck = DC.M_OI2_Account.Where(q => q.ACID == ACID && q.OIID == P.OIID);
                         if (OICheck == null)//本課程限制的旌旗與報名者不符
                             Error += "本課程只允許特定旌旗教會下的會友報名<br/>";
                     }

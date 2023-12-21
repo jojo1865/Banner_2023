@@ -32,7 +32,7 @@
                         <div class="col-lg-3 col-12">
                             <div class="col-lg-6 col-12 text-lg-end text-center">
                                 <label>&nbsp;</label>
-                                <a href="javascript:;" onclick="Search(this);" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                                <a href="javascript:;" onclick="Search();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
                             </div>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
                             <button type="button" class="btn btn-primary btn-lg btn-submit btn-round m-2" data-bs-toggle="modal" data-bs-target="#AddAccount">
                                 新增團員
                             </button>
-                            <a a href="javascript:;" onclick="" class="btn btn-primary btn-lg btn-submit btn-round m-2">設為主責</a>
+                            <a a href="javascript:;" onclick="UpdateLeader()" class="btn btn-primary btn-lg btn-submit btn-round m-2">設為主責</a>
                             <a a href="javascript:;" onclick="" class="btn btn-primary btn-lg btn-submit btn-round m-2">移除團員</a>
                         </div>
 
@@ -62,7 +62,6 @@
                                 <th>加入日期</th>
                                 <th>主責</th>
                                 <th>全職同工</th>
-
                             </tr>
                         </thead>
                         <tbody id="tbody_main">
@@ -143,7 +142,7 @@
             error: function (err) { console.log(err) },
         })
     }
-    function Search(a) {
+    function Search() {
         var OI = $('#ddl_OI')[0];
         var S = $('#ddl_Staff')[0];
         var table = $('#tbody_main')[0];
@@ -159,16 +158,18 @@
                 if (r.length == 0) { table.innerHTML = "<tr><td colspan='8'>本團目前沒有團員</td></tr>"; }
                 else {
                     for (i = 0; i < r.length; i++) {
-                        table.innerHTML += "<tr>";
-                        table.innerHTML += "<td><input type=\"checkbox\" id=\"cbox_" + r[i].MID + "\" class=\"form-check-input\" /></td>";
-                        table.innerHTML += "<td>" + r[i].ACID + "</td>";
-                        table.innerHTML += "<td>" + r[i].Name + "</td>";
-                        table.innerHTML += "<td>" + r[i].GroupName + "</td>";
-                        table.innerHTML += "<td>" + r[i].Contect + "</td>";
-                        table.innerHTML += "<td>" + r[i].JoinDate + "</td>";
-                        table.innerHTML += "<td>" + r[i].LeaderFlag + "</td>";
-                        table.innerHTML += "<td>" + r[i].BGUserFlag + "</td>";
-                        table.innerHTML += "</tr>";
+                        var str = "<tr>"
+                        str += "<td><input type=\"checkbox\" id=\"cbox_Staff_" + r[i].MID + "\" name='cbox_Staff' class=\"form-check-input\" /></td>";
+                        str += "<td>" + r[i].ACID + "</td>";
+                        str += "<td>" + r[i].Name + "</td>";
+                        str += "<td>" + r[i].GroupName + "</td>";
+                        str += "<td>" + r[i].Contect + "</td>";
+                        str += "<td>" + r[i].JoinDate + "</td>";
+                        str += "<td>" + r[i].LeaderFlag + "</td>";
+                        str += "<td>" + r[i].BGUserFlag + "</td>";
+                        str += "</tr>";
+
+                        table.innerHTML += str;
                     }
                 }
                 //$("div_Control").classList.remove("d-none");
@@ -183,11 +184,12 @@
         var OI = $("#ddl_OI_Add").val();
         var table = $('#tbody_Add')[0];
         table.innerHTML = "";
-        
+
         if (Name == "") { alert("請輸入姓名"); }
         else if (OI == "" || OI == "0") { alert("請選擇旌旗"); }
         else {
-            but.classList.add("btn-loading");
+            if (but != null) { but.classList.add("btn-loading"); }
+
             $('#div_Table').addClass('div_dark_gray');
             $.ajax({
                 url: '/Admin/Home/GetAccountList?OIID=' + OI + '&Name=' + Name,
@@ -199,7 +201,7 @@
                     else {
                         for (i = 0; i < r.length; i++) {
                             var str = "<tr>";
-                            str += "<td><input type=\"checkbox\" id=\"cbox_" + r[i].ACID + "\" name='cbox_AC_Add' class=\"form-check-input\" /></td>";
+                            str += "<td><input type=\"checkbox\" id=\"cbox_AC_Add_" + r[i].ACID + "\" name='cbox_AC_Add' class=\"form-check-input\" /></td>";
                             str += "<td>" + r[i].ACID + "</td>";
                             str += "<td>" + r[i].Name + "</td>";
                             str += "<td>" + r[i].GroupName + "</td>";
@@ -208,37 +210,81 @@
                             table.innerHTML += str;
                         }
                     }
-                    but.classList.remove("btn-loading");
+                    if (but != null) { but.classList.remove("btn-loading"); }
                     $('#div_Table').removeClass('div_dark_gray');
                 },
                 error: function (err) { console.log(err) },
             })
-            
+
         }
     }
 
     function AddAccounts() {
-        var cboxs = document.getElementsByName('cbox_AC_Add');
-        var IDs = "";
-        for (i = 0; i < cboxs.length; i++) {
-            if (cboxs[i].checked) {
-                var sACID = cboxs[i].id.replace('cbox_', '');
-                IDs += (IDs == "" ? "" : ",") + sACID;
-            }
-        }
-        //alert(IDs);
 
+        var IDs = GetSelect('cbox_AC_Add');
         var OI = $("#ddl_OI_Add").val();
         var S = $("#ddl_Staff_Add").val();
         if (IDs == "") { alert("請選擇要加入的團員"); }
         else if (OI == "" || OI == "0") { alert("請選擇事工團所屬旌旗"); }
         else if (S == "" || S == "0") { alert("請選擇事工團"); }
         else {
+            $.ajax({
+                url: '/Admin/Home/SaveACToTargetGroup?IDs=' + IDs + '&TargetTable=Staff&ID1=' + S + '&ID2=' + OI,
+                method: 'GET',
+                dataType: 'text',
+                success: function (res) {
+                    var r = JSON.parse(res);
+                    if (r.Messages.length == 0) {
+                        Swal.fire({
+                            icon: 'success',
+                            html: '團員編入完成'
+                        });
 
+                        var ddl_SC = $('#ddl_StaffCategory').val();
+
+
+                        var ddl_SC_Add = $('#ddl_StaffCategory_Add').val();
+
+                        var aa = $("#ddl_SC");
+
+
+                        SearchName(null);
+                    }
+                    else {
+                        var str = '';
+                        for (i = 0; i < r.Messages.length; i++) {
+                            str += (str == '' ? '' : '<br/>') + r.Messages[i];
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            html: str
+                        });
+                    }
+                },
+                error: function (err) { console.log(err) },
+            })
 
 
             document.getElementById('but_Close').click();
         }
+    }
+
+    function GetSelect(Name) {
+        var cboxs = document.getElementsByName(Name);
+        var IDs = "";
+        for (i = 0; i < cboxs.length; i++) {
+            if (cboxs[i].checked) {
+                var sACID = cboxs[i].id.replace(Name + '_', '');
+                IDs += (IDs == "" ? "" : ",") + sACID;
+            }
+        }
+        return IDs;
+    }
+
+    function UpdateLeader() {
+        var IDs = GetSelect('cbox_Staff');
+
+
     }
 </script>
 <style>

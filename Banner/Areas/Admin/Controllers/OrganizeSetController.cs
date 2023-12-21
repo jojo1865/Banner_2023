@@ -82,7 +82,7 @@ namespace Banner.Areas.Admin.Controllers
             cOrganize_Map_Edit cME = new cOrganize_Map_Edit();
             if (ID > 0)
             {
-                cME.O = DC.Organize.FirstOrDefault(q =>  q.OID == ID && !q.DeleteFlag);
+                cME.O = DC.Organize.FirstOrDefault(q => q.OID == ID && !q.DeleteFlag);
                 if (cME.O == null)
                     SetAlert("查無資料,請重新操作", 2, "/Admin/OrganizeSet/Organize_Map_List/0");
                 else
@@ -106,7 +106,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 cME.O = new Organize() { ActiveFlag = true, DeleteFlag = false };
                 cME.OList = new List<SelectListItem>();
-                var Os = DC.Organize.Where(q => !q.DeleteFlag ).ToList();
+                var Os = DC.Organize.Where(q => !q.DeleteFlag).ToList();
                 var O = Os.FirstOrDefault(q => q.ParentID == 0);
                 if (O != null)
                 {
@@ -137,7 +137,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(ReSetOrganize(ID, null));
         }
         [HttpPost]
-        
+
         public ActionResult Organize_Map_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -307,7 +307,7 @@ namespace Banner.Areas.Admin.Controllers
                 sKey = FC.Get("txb_OTitle");
                 OID = Convert.ToInt32(FC.Get("ddl_O"));
             }
-            else if (ACID != 1)//非Admin,故須限制使用範圍,初始組織為"旌旗"
+            else if (ACID != 1 && OID < 2)//非Admin,故須限制使用範圍,初始組織為"旌旗"
             {
                 OID = 2;
             }
@@ -466,7 +466,7 @@ namespace Banner.Areas.Admin.Controllers
                     if (Ct == 0)//沒有新成員
                         cTR.Cs.Add(new cTableCell { Value = "0" });//等待分發名單中
                     else
-                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_black", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_Account_List/" + N.OID + "/" + N.OIID, Value = "(" + Ct + ")" });//組員數量
+                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_black", CSS = "", URL = "/Admin/OrganizeSet/Organize_Info_Account_List?OID=" + N.OID + "&OIID=" + N.OIID, Value = "(" + Ct + ")" });//組員數量
                 }
                 if (OID < 3)
                     cTR.Cs.Add(new cTableCell { Value = "" });//職分主管
@@ -524,7 +524,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(ReSetOrganizeInfo(OID, PID, OIID, null));
         }
         [HttpPost]
-        
+
         public ActionResult Organize_Info_Edit(int OID, int PID, int OIID, FormCollection FC)
         {
             GetViewBag();
@@ -589,11 +589,11 @@ namespace Banner.Areas.Admin.Controllers
                     }
                 }
 
-                if(OID==1)
+                if (OID == 1)
                 {
-                    foreach(var PT in cIE.PTList)
+                    foreach (var PT in cIE.PTList)
                     {
-                        if(PT.PTID == 0)
+                        if (PT.PTID == 0)
                         {
                             PT.OIID = cIE.OI.OIID;
                             DC.PayType.InsertOnSubmit(PT);
@@ -774,11 +774,14 @@ namespace Banner.Areas.Admin.Controllers
                     cIE.OI.ParentID = PID;
                     cIE.OI.ActiveFlag = true;
                     cIE.OI.BusinessType = 0;
+                    cIE.OI.OI2_ID = 0;
                     #region 上層--文字版
                     var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == cIE.OI.ParentID);
                     while (OI != null)
                     {
                         cIE.sUPOIList = OI.Title + OI.Organize.Title + (cIE.sUPOIList == "" ? "" : "/" + cIE.sUPOIList);
+                        if(OI.OID == 2)
+                            cIE.OI.OI2_ID = OI.OIID;
                         OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID);
                     }
                     #endregion
@@ -867,7 +870,7 @@ namespace Banner.Areas.Admin.Controllers
                 for (int i = 0; i < sPayType.Length; i++)
                 {
                     var PL = cIE.PTList.FirstOrDefault(q => q.PayTypeID == i);
-                    if(PL!=null)
+                    if (PL != null)
                     {
                         PL.ActiveFlag = GetViewCheckBox(FC.Get("cbox_PayType_" + i));
                         switch (i)
@@ -884,7 +887,7 @@ namespace Banner.Areas.Admin.Controllers
                                 break;
                         }
                     }
-                   
+
                 }
 
 
@@ -1211,7 +1214,7 @@ namespace Banner.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        
+
         public ActionResult Meeting_Location_Edit(int OID, int ID, FormCollection FC)
         {
             GetViewBag();

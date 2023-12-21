@@ -454,8 +454,8 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.ID = N1.MID;
 
                 cTableCell TC = new cTableCell();
-                TC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/Menu_Edit/" + N1.ParentID + "/" + N1.MID, Target = "_self", Value = "編輯" });
-                TC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/Menu_Edit/" + N1.MID + "/0", Target = "_self", Value = "新增下層" });
+                TC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/Menu_Edit?PID=" + N1.ParentID + "&ID=" + N1.MID, Target = "_self", Value = "編輯" });
+                TC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/Menu_Edit?PID=" + N1.MID + "&ID=0", Target = "_self", Value = "新增下層" });
                 cTR.Cs.Add(TC);//
 
                 cTR.Cs.Add(new cTableCell { Value = sMenuType[N1.MenuType] });//類別
@@ -471,7 +471,7 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     cTR = new cTableRow();
                     cTR.ID = N2.MID;
-                    cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/Menu_Edit/" + N2.ParentID + "/" + N2.MID, Target = "_self", Value = "編輯" });//
+                    cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/Menu_Edit?PID=" + N2.ParentID + "&ID=" + N2.MID, Target = "_self", Value = "編輯" });//
                     cTR.Cs.Add(new cTableCell { Value = sMenuType[N2.MenuType] });//類別
                     cTR.Cs.Add(new cTableCell { Value = "|--" + N2.Title, CSS = "ms-3 float-start" });//選單名稱
                     cTR.Cs.Add(new cTableCell { Value = N2.URL });//對應網址
@@ -507,12 +507,10 @@ namespace Banner.Areas.Admin.Controllers
             public string PMenuType = "";
             public List<SelectListItem> TypeList = new List<SelectListItem>();
         }
-        private cMenu_Edit GetMenu_Edit(string ItemID, int ID, FormCollection FC)
+        private cMenu_Edit GetMenu_Edit(int PID, int ID, FormCollection FC)
         {
             cMenu_Edit N = new cMenu_Edit();
             #region 物件初始化
-            int PID = 0;
-            int.TryParse(ItemID, out PID);
             int iMenuType = 0;
             var PM = DC.Menu.FirstOrDefault(q => q.MID == PID);
             if (PM != null)
@@ -556,19 +554,19 @@ namespace Banner.Areas.Admin.Controllers
             return N;
         }
         [HttpGet]
-        public ActionResult Menu_Edit(string ItemID, int ID)
+        public ActionResult Menu_Edit(int PID, int ID)
         {
             GetViewBag();
             ChangeTitle(ID == 0);
-            return View(GetMenu_Edit(ItemID, ID, null));
+            return View(GetMenu_Edit(PID, ID, null));
         }
         [HttpPost]
         
-        public ActionResult Menu_Edit(string ItemID, int ID, FormCollection FC)
+        public ActionResult Menu_Edit(int PID, int ID, FormCollection FC)
         {
             GetViewBag();
             ChangeTitle(ID == 0);
-            var N = GetMenu_Edit(ItemID, ID, FC);
+            var N = GetMenu_Edit(PID, ID, FC);
             Error = "";
             if (N.M.Title == "")
                 Error += "請輸入選單標題";

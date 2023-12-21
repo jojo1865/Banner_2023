@@ -10,7 +10,7 @@
             <div class="form-header"><h5>基本資料</h5></div>
             <div class="form-body">
                 <form method="post" id="form1">
-                    
+
 
                     <div class="form-card-group">
                         <div id="personal-info" class="header-container">
@@ -28,7 +28,7 @@
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label>名<span>*</span></label>
-                                        @Html.TextBox("txb_Name_First", Model.AC.Name_Last, new { @class = "form-control form-control-lg input-underline" })
+                                        @Html.TextBox("txb_Name_Last", Model.AC.Name_Last, new { @class = "form-control form-control-lg input-underline" })
                                     </div>
                                 </div>
                             </div>
@@ -434,6 +434,40 @@
                                     </div>
                                 }
                             }
+                        </div>
+                    </div>
+                    <!--退款費用專用帳戶-->
+                    <div class="form-card-group">
+                        <div id="div_BankData" class="header-container">
+                            <div class="header-left-border"></div>
+                            <div class="header">退款費用專用帳戶</div>
+                        </div>
+                        <div class="form-card">
+                            <div class="row">
+                                <div class="col-12 pt-2">
+                                    <label>戶名</label>
+                                    @Html.TextBox("txb_Bank_Title", Model.AB.Title, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 pt-2">
+                                    <label>銀行代號</label>
+                                    @Html.DropDownList("ddl_Bank_BID", Model.Banks, new { @class = "form-select form-select-lg select-baptism-status" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 pt-2">
+                                    <label>分行代號</label>
+                                    @Html.TextBox("txb_Bank_BankNo", Model.AB.Title, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 pt-2">
+                                    <label>銀行帳戶</label>
+                                    @Html.TextBox("txb_Bank_AccountNo", Model.AB.Title, new { @class = "form-control form-control-lg input-underline" })
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                     <!--其他備註事項-->

@@ -50,6 +50,9 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     LogInAC(1);
                     SetBrowserData("UserName", "系統管理者");
+                    //LogInAC(8197);
+                    //SetBrowserData("UserName", "JOJO");
+
                 }
                 SetAlert("", 1, "/Admin/Home/Index");
             }
@@ -60,7 +63,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        
+
         public ActionResult Login(FormCollection FC)
         {
             GetViewBag();
@@ -156,7 +159,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        
+
         public ActionResult ForgetPassword(FormCollection FC)
         {
             GetViewBag();
@@ -230,7 +233,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        
+
         public ActionResult ForgetAccount(FormCollection FC)
         {
             GetViewBag();
@@ -308,7 +311,7 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        
+
         public ActionResult ChangePassword(FormCollection FC)
         {
             GetViewBag();
@@ -734,35 +737,129 @@ namespace Banner.Areas.Admin.Controllers
             public string GroupName { get; set; }
         }
         [HttpGet]
-        public string GetAccountList(string Name,int OIID, bool ChildFlag=false)
+        public string GetAccountList(string Name, int OIID, bool ChildFlag = false, bool BackendFlag = true)
         {
             List<cAC> Ns = new List<cAC>();
+
             var ACs = DC.Account.Where(q => q.ActiveFlag && !q.DeleteFlag);
             if (Name != "")
                 ACs = ACs.Where(q => (q.Name_First + q.Name_Last).Contains(Name));
-            if(OIID>0)
+            if (OIID > 0)//隸屬哪個旌旗
             {
                 ACs = from q in ACs
-                     join p in GetMOIAC(8, 0, 0)
-                            on q.ACID equals p.ACID
-                     select q;
+                      join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OI2_ID == OIID).GroupBy(q => q.ACID)
+                      on q.ACID equals p.Key
+                      select q;
             }
-            if (ChildFlag)
-                ACs = ACs.Where(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
-            var Ms_ = (from q in DC.M_OI_Account.Where(q => q.OrganizeInfo.OID == 8)
-                       join p in ACs
-                       on q.ACID equals p.ACID
-                       select q).ToList();
-            foreach (var AC in ACs.OrderBy(q=>q.Name_First).ThenBy(q=>q.Name_Last))
+            if (ChildFlag)//小孩就年齡限制12歲(含)以下,不限小組
             {
-                cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "" };
-                var M_ACs = Ms_.Where(q=>q.ACID == AC.ACID);
-                foreach (var M in M_ACs)
-                    N.GroupName += (N.GroupName == "" ? "" : ",") + M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title;
-                Ns.Add(N);
+                ACs = ACs.Where(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
+
+                foreach (var AC in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
+                {
+                    cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "" };
+                    if (!BackendFlag)
+                        N.Name = CutName(N.Name);
+                    Ns.Add(N);
+                }
+            }
+            else//成人至少是會友(有小組)
+            {
+                var Ms_ = (from q in DC.M_OI_Account.Where(q => q.OrganizeInfo.OID == 8)
+                           join p in ACs
+                           on q.ACID equals p.ACID
+                           select q).ToList();
+
+                foreach (var AC in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
+                {
+                    cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "" };
+                    var M_ACs = Ms_.Where(q => q.ACID == AC.ACID);
+                    foreach (var M in M_ACs)
+                        N.GroupName += (N.GroupName == "" ? "" : ",") + M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title;
+
+                    if (!BackendFlag)
+                        N.Name = CutName(N.Name);
+                    if (N.GroupName != "")//沒有小組的就不算
+                        Ns.Add(N);
+                }
             }
 
             return JsonConvert.SerializeObject(Ns);
+        }
+        #endregion
+        #region 將多選的會員ID加入特定團體
+        public class BasicResponse
+        {
+            public List<string> Messages = new List<string>();
+        }
+        [HttpGet]
+        public string SaveACToTargetGroup(string IDs, string TargetTable, int ID1, int ID2)
+        {
+            BasicResponse R = new BasicResponse();
+            ACID = GetACID();
+            string[] sIDs = IDs.Split(',');
+            List<int> ACIDs = new List<int>();
+            for (int i = 0; i < sIDs.Length; i++)
+            {
+                int iACID = 0;
+                if (int.TryParse(sIDs[i], out iACID))
+                    ACIDs.Add(iACID);
+            }
+            if (ACIDs.Count == 0)
+                R.Messages.Add("請選擇會員ID");
+            if (string.IsNullOrEmpty(TargetTable))
+                R.Messages.Add("請輸入要加入的目標");
+            if (ID1 == 0 && ID2 == 0)
+                R.Messages.Add("請輸入要加入的目標ID");
+            if (R.Messages.Count == 0)
+            {
+
+                switch (TargetTable)
+                {
+                    case "Staff"://加入事工團
+                        {
+                            //ID1=Staff->SID
+                            //ID2=OrganizeInfo->OID=2
+
+                            foreach (int iACID in ACIDs)
+                            {
+                                var M = DC.M_Staff_Account.FirstOrDefault(q => q.SID == ID1 && q.OIID == ID2 && q.ACID == iACID);
+                                if (M == null)
+                                {
+                                    M = new M_Staff_Account
+                                    {
+                                        SID = ID1,
+                                        OIID = ID2,
+                                        ACID = iACID,
+                                        LeaderFlag = false,
+                                        JoinDate = DT,
+                                        LeaveDate = DT,
+                                        ActiveFlag = true,
+                                        DeleteFlag = false,
+                                        CreDate = DT,
+                                        UpdDate = DT,
+                                        SaveACID = ACID
+                                    };
+                                    DC.M_Staff_Account.InsertOnSubmit(M);
+                                    DC.SubmitChanges();
+                                }
+                                else
+                                {
+                                    if (M.DeleteFlag || !M.ActiveFlag)
+                                    {
+                                        M.ActiveFlag = true;
+                                        M.DeleteFlag = false;
+                                        M.UpdDate = DT;
+                                        M.SaveACID = ACID;
+                                        DC.SubmitChanges();
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+            return JsonConvert.SerializeObject(R);
         }
         #endregion
         #region 測試用(檔案上傳)
