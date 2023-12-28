@@ -66,22 +66,11 @@
                                     {
                                         <li class="menuitem @(M2.Items.Count>0 && false ? "more" :"")">
                                             @{
-                                                /*if (M2.Items.Count > 0)
-                                                {
-                                                    <a data-bs-toggle="collapse" href="#collapse-submenu-@(M2.MenuID)" class="@(M2.SelectFlag ? "active" :"")">
-                                                        <div class="point"></div>
-                                                        <span class="menuitem-text">@M2.Title</span>
-                                                        <span class="material-icons"> chevron_right </span>
-                                                    </a>
-                                                }
-                                                else*/
-                                                {
-                                                    <a href="@M2.Url" class="@(M2.SelectFlag ? "active" :"")">
-                                                        <div class="point"></div>
-                                                        <span class="menuitem-text">@M2.Title</span>
-                                                        <span class="material-icons"> chevron_right </span>
-                                                    </a>
-                                                }
+                                                <a href="@M2.Url" class="@(M2.SelectFlag ? "active" :"")">
+                                                    <div class="point"></div>
+                                                    <span class="menuitem-text">@M2.Title</span>
+                                                    <span class="material-icons"> chevron_right </span>
+                                                </a>
                                             }
 
                                             @if (M2.Items.Count > 0 && false)

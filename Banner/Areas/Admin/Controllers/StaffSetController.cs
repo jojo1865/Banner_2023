@@ -409,6 +409,13 @@ namespace Banner.Areas.Admin.Controllers
         }
         public class cSAL
         {
+            public int OIID {  get; set; }
+            public string OI2Title {  get; set; }
+            public int SCID { get; set; }
+            public string SCTitle {  get; set; }
+            public int SID { get; set; }
+            public string STitle {  get; set; }
+
             public int MID { get; set; }
             public int ACID { get; set; }
             public string Name { get; set; }
@@ -417,22 +424,31 @@ namespace Banner.Areas.Admin.Controllers
 
             public string JoinDate { get; set; }
             public string LeaderFlag { get; set; }
-            public string BGUserFlag { get; set; }
         }
         [HttpGet]
-        public string GetStaffAccountList(int OIID, int SID)
+        public string GetStaffAccountList(int OIID, int SID)//取得 旌旗+事工團+同工 名單
         {
 
-            var Ns = DC.M_Staff_Account.Where(q => !q.DeleteFlag && q.ActiveFlag);
+            var Ns = from q in DC.M_Staff_Account.Where(q => !q.DeleteFlag && q.ActiveFlag)
+                     join p in DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag).GroupBy(q => q.ACID).Select(q => q.Key)
+                     on q.ACID equals p
+                     select q;
             if (OIID > 0)
                 Ns = Ns.Where(q => q.OIID == OIID);
             if (SID > 0)
                 Ns = Ns.Where(q => q.SID == SID);
 
             List<cSAL> Ns_ = new List<cSAL>();
-            foreach (var N in Ns.OrderByDescending(q => q.LeaderFlag).ThenBy(q => q.Account.Name_First).ThenBy(q => q.Account.Name_Last))
+            foreach (var N in Ns)
             {
                 cSAL c = new cSAL();
+                c.OIID = N.OIID;
+                c.OI2Title = N.OrganizeInfo.Title + N.OrganizeInfo.Organize.Title;
+                c.SCID = N.Staff.SCID;
+                c.SCTitle = N.Staff.Staff_Category.Title;
+                c.SID = N.SID;
+                c.STitle = N.Staff.Title;
+
                 c.MID = N.MID;
                 c.ACID = N.ACID;
                 c.Name = N.Account.Name_First + N.Account.Name_Last;
@@ -445,12 +461,10 @@ namespace Banner.Areas.Admin.Controllers
                 c.JoinDate = N.JoinDate.ToString(DateFormat);
                 c.LeaderFlag = N.LeaderFlag ? "V" : "";
 
-                c.BGUserFlag = DC.M_OI2_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == N.ACID) ? "V" : "";
-
                 Ns_.Add(c);
             }
 
-
+            Ns_ = Ns_.OrderBy(q=>q.OIID).ThenBy(q=>q.SCID).ThenBy(q=>q.SID).ThenByDescending(q => q.LeaderFlag).ToList();
             return JsonConvert.SerializeObject(Ns_);
         }
         #endregion

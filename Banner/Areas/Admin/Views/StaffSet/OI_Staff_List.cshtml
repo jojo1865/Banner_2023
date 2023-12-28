@@ -25,7 +25,7 @@
                         </div>
                         <div class="col-lg-3 col-12">
                             <label>事工團</label>
-                            <select class="form-select form-select-lg" id="ddl_Staff">
+                            <select class="form-select form-select-lg" id="ddl_Staff" name="ddl_Staff">
                                 <option value="0">請先選擇類別</option>
                             </select>
                         </div>
@@ -44,10 +44,11 @@
                     <div class="row" id="div_Control">
                         <div class="col">
                             <button type="button" class="btn btn-primary btn-lg btn-submit btn-round m-2" data-bs-toggle="modal" data-bs-target="#AddAccount">
-                                新增團員
+                                新增同工團員
                             </button>
-                            <a a href="javascript:;" onclick="UpdateLeader()" class="btn btn-primary btn-lg btn-submit btn-round m-2">設為主責</a>
-                            <a a href="javascript:;" onclick="" class="btn btn-primary btn-lg btn-submit btn-round m-2">移除團員</a>
+                            <a a href="javascript:;" onclick="SetLeader()" class="btn btn-primary btn-lg btn-submit btn-round m-2">設為主責</a>
+                            <a a href="javascript:;" onclick="RemoveLeader()" class="btn btn-primary btn-lg btn-submit btn-round m-2">移除主責</a>
+                            <a a href="javascript:;" onclick="RemoveAC()" class="btn btn-primary btn-lg btn-submit btn-round m-2">移除同工團員</a>
                         </div>
 
                     </div>
@@ -55,13 +56,15 @@
                         <thead>
                             <tr class="Bgn">
                                 <th></th>
+                                <th>旌旗</th>
+                                <th>事工團類別</th>
+                                <th>事工團名稱</th>
                                 <th>會員ID</th>
                                 <th>姓名</th>
                                 <th>所屬小組</th>
                                 <th>手機</th>
                                 <th>加入日期</th>
                                 <th>主責</th>
-                                <th>全職同工</th>
                             </tr>
                         </thead>
                         <tbody id="tbody_main">
@@ -78,11 +81,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title lab_DarkBlue" id="staticBackdropLabel">新增事工團成員</h5>
+                <h5 class="modal-title lab_DarkBlue" id="staticBackdropLabel">新增事工團同工</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="but_Close"></button>
             </div>
             <div class="modal-body">
-                <b>1.搜尋會員</b><br />
+                <b>1.搜尋同工會友</b><br />
                 所屬旌旗：@Html.DropDownList("ddl_OI_Add", Model.ddl_OI, new { @class = "form-select form-select-lg" })
                 姓名：<input id="txb_Name_Add" class="form-control form-control-lg" placeholder="姓名關鍵字" />
 
@@ -108,7 +111,7 @@
                 事工團類別：
                 @Html.DropDownList("ddl_StaffCategory_Add", Model.ddl_Category, new { @class = "form-select form-select-lg", @onchange = "SelectStaff(this.value,'ddl_Staff_Add');" })
                 事工團：
-                <select class="form-select form-select-lg" id="ddl_Staff_Add">
+                <select class="form-select form-select-lg" id="ddl_Staff_Add" name="ddl_Staff_Add">
                     <option value="0">請先選擇類別</option>
                 </select>
 
@@ -120,8 +123,18 @@
         </div>
     </div>
 </div>
+<style>
+    .tr_Leader {
+        background-color: lightcyan;
+    }
+
+    .tr_End td{
+        border-top:double 2px #CCC;
+    }
+</style>
 <script>
-    function SelectStaff(CID, TargetID) {
+    //依類別搜尋事工團
+    function SelectStaff(CID, TargetID, callback) {
         var S = document.getElementById(TargetID);
         S.innerHTML = "";
         $.ajax({
@@ -133,22 +146,24 @@
                 if (r.length == 0) { S.innerHTML = "<option value='0'>此類別內沒有事工團</option>"; }
                 else {
                     for (i = 0; i < r.length; i++) {
-                        if (i == 0) { S.innerHTML += "<option value='" + r[i].SID + "' selected>" + r[i].Title + "</option>"; }
+                        if (i == 0) { S.innerHTML += "<option value='" + r[i].SID + "' selected='selected'>" + r[i].Title + "</option>"; }
                         else { S.innerHTML += "<option value='" + r[i].SID + "'>" + r[i].Title + "</option>"; }
                     }
                 }
 
+                if (callback) { callback(); }
             },
             error: function (err) { console.log(err) },
         })
     }
+    //查詢事工團同工名單
     function Search() {
         var OI = $('#ddl_OI')[0];
         var S = $('#ddl_Staff')[0];
         var table = $('#tbody_main')[0];
         table.innerHTML = "";
         var div = $('#tbody_main')[0];
-        //$('#tbody_main').addClass('d-none');
+
         $.ajax({
             url: '/Admin/StaffSet/GetStaffAccountList?OIID=' + OI.value + '&SID=' + S.value,
             method: 'GET',
@@ -157,28 +172,54 @@
                 var r = JSON.parse(res);
                 if (r.length == 0) { table.innerHTML = "<tr><td colspan='8'>本團目前沒有團員</td></tr>"; }
                 else {
+                    var sOITitle = "";
                     for (i = 0; i < r.length; i++) {
-                        var str = "<tr>"
+                        var Color = '';
+                        if (r[i].LeaderFlag) {
+                            Color = ' class="tr_Leader"';
+                        }
+                        if (sOITitle != r[i].OI2Title) {
+                            sOITitle = r[i].OI2Title;
+                            if (i > 0) {
+                                if (Color == '') {
+                                    Color = ' class="tr_End "' ;
+                                }
+                                else {
+                                    Color = ' class="tr_Leader tr_End "';
+                                }
+                            }
+                        }
+                        var str = "<tr " + Color +">"
                         str += "<td><input type=\"checkbox\" id=\"cbox_Staff_" + r[i].MID + "\" name='cbox_Staff' class=\"form-check-input\" /></td>";
+                        str += "<td>" + r[i].OI2Title + "</td>";
+                        str += "<td>" + r[i].SCTitle + "</td>";
+                        str += "<td>" + r[i].STitle + "</td>";
                         str += "<td>" + r[i].ACID + "</td>";
                         str += "<td>" + r[i].Name + "</td>";
                         str += "<td>" + r[i].GroupName + "</td>";
                         str += "<td>" + r[i].Contect + "</td>";
                         str += "<td>" + r[i].JoinDate + "</td>";
                         str += "<td>" + r[i].LeaderFlag + "</td>";
-                        str += "<td>" + r[i].BGUserFlag + "</td>";
                         str += "</tr>";
 
                         table.innerHTML += str;
                     }
                 }
-                //$("div_Control").classList.remove("d-none");
+                //同步旌旗/事工團到新增區
+                $('#ddl_OI_Add').val($('#ddl_OI').val());
+
+                var SCID = $('#ddl_StaffCategory').val();
+                $('#ddl_StaffCategory_Add').val(SCID);
+                SelectStaff(SCID, 'ddl_Staff_Add', () => {
+                    $('#ddl_Staff_Add').val($('#ddl_Staff').val());
+                });
+               
             },
             error: function (err) { console.log(err) },
         })
 
     }
-
+    //搜尋同工
     function SearchName(but) {
         var Name = $("#txb_Name_Add").val();
         var OI = $("#ddl_OI_Add").val();
@@ -189,10 +230,10 @@
         else if (OI == "" || OI == "0") { alert("請選擇旌旗"); }
         else {
             if (but != null) { but.classList.add("btn-loading"); }
-
+            console.log(OI);
             $('#div_Table').addClass('div_dark_gray');
             $.ajax({
-                url: '/Admin/Home/GetAccountList?OIID=' + OI + '&Name=' + Name,
+                url: '/Admin/Home/GetOI2UserList?OIID=' + OI + '&Name=' + Name,
                 method: 'GET',
                 dataType: 'text',
                 success: function (res) {
@@ -212,13 +253,14 @@
                     }
                     if (but != null) { but.classList.remove("btn-loading"); }
                     $('#div_Table').removeClass('div_dark_gray');
+
                 },
                 error: function (err) { console.log(err) },
             })
 
         }
     }
-
+    //新增會員進入事工團
     function AddAccounts() {
 
         var IDs = GetSelect('cbox_AC_Add');
@@ -240,15 +282,15 @@
                             html: '團員編入完成'
                         });
 
-                        var ddl_SC = $('#ddl_StaffCategory').val();
+                        //同步旌旗/事工團到新增區
+                        $('#ddl_OI').val($('#ddl_OI_Add').val());
 
-
-                        var ddl_SC_Add = $('#ddl_StaffCategory_Add').val();
-
-                        var aa = $("#ddl_SC");
-
-
-                        SearchName(null);
+                        var SCID = $('#ddl_StaffCategory_Add').val();
+                        $('#ddl_StaffCategory').val(SCID);
+                        SelectStaff(SCID, 'ddl_Staff', () => {
+                            $('#ddl_Staff').val($('#ddl_Staff_Add').val());
+                            Search();
+                        }); 
                     }
                     else {
                         var str = '';
@@ -264,11 +306,10 @@
                 error: function (err) { console.log(err) },
             })
 
-
             document.getElementById('but_Close').click();
         }
     }
-
+    //選擇名單
     function GetSelect(Name) {
         var cboxs = document.getElementsByName(Name);
         var IDs = "";
@@ -280,11 +321,98 @@
         }
         return IDs;
     }
-
-    function UpdateLeader() {
+    //指派主責
+    function SetLeader() {
         var IDs = GetSelect('cbox_Staff');
+        $.ajax({
+            url: '/Admin/Home/SetLeader?IDs=' + IDs,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                var r = JSON.parse(res);
+                if (r.Messages.length == 0) {
+                    Swal.fire({
+                        icon: 'success',
+                        html: '主責指派完成'
+                    });
 
+                    Search();
+                }
+                else {
+                    var str = '';
+                    for (i = 0; i < r.Messages.length; i++) {
+                        str += (str == '' ? '' : '<br/>') + r.Messages[i];
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        html: str
+                    });
+                }
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
+    //移除主責
+    function RemoveLeader() {
+        var IDs = GetSelect('cbox_Staff');
+        $.ajax({
+            url: '/Admin/Home/RemoveLeader?IDs=' + IDs,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                var r = JSON.parse(res);
+                if (r.Messages.length == 0) {
+                    Swal.fire({
+                        icon: 'success',
+                        html: '主責移除完成'
+                    });
 
+                    Search();
+                }
+                else {
+                    var str = '';
+                    for (i = 0; i < r.Messages.length; i++) {
+                        str += (str == '' ? '' : '<br/>') + r.Messages[i];
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        html: str
+                    });
+                }
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
+    //移除團員
+    function RemoveAC() {
+        var IDs = GetSelect('cbox_Staff');
+        $.ajax({
+            url: '/Admin/Home/RemoveACFromStaff?IDs=' + IDs,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                var r = JSON.parse(res);
+                if (r.Messages.length == 0) {
+                    Swal.fire({
+                        icon: 'success',
+                        html: '團員移除完成'
+                    });
+
+                    Search();
+                }
+                else {
+                    var str = '';
+                    for (i = 0; i < r.Messages.length; i++) {
+                        str += (str == '' ? '' : '<br/>') + r.Messages[i];
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        html: str
+                    });
+                }
+            },
+            error: function (err) { console.log(err) },
+        })
     }
 </script>
 <style>

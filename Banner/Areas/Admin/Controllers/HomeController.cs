@@ -747,7 +747,11 @@ namespace Banner.Areas.Admin.Controllers
             if (OIID > 0)//隸屬哪個旌旗
             {
                 ACs = from q in ACs
-                      join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OI2_ID == OIID).GroupBy(q => q.ACID)
+                      join p in DC.M_OI_Account.Where(q => q.ActiveFlag &&
+                                                  !q.DeleteFlag &&
+                                                  q.OrganizeInfo.ActiveFlag &&
+                                                  !q.OrganizeInfo.DeleteFlag &&
+                                                  q.OrganizeInfo.OI2_ID == OIID).GroupBy(q => q.ACID)
                       on q.ACID equals p.Key
                       select q;
             }
@@ -786,6 +790,49 @@ namespace Banner.Areas.Admin.Controllers
 
             return JsonConvert.SerializeObject(Ns);
         }
+
+        //取得全職同工列表
+        [HttpGet]
+        public string GetOI2UserList(string Name, int OIID)
+        {
+            List<cAC> Ns = new List<cAC>();
+
+            var ACs = DC.Account.Where(q => q.ActiveFlag && !q.DeleteFlag);
+            if (Name != "")
+                ACs = ACs.Where(q => (q.Name_First + q.Name_Last).Contains(Name));
+            if (OIID > 0)//隸屬哪個旌旗
+            {
+                ACs = (from q in DC.M_OI2_Account.Where(q => !q.DeleteFlag && q.ActiveFlag && (q.OIID == OIID || q.OIID == 1)).GroupBy(q => q.ACID).Select(q => q.Key)
+                       join p in ACs
+                       on q equals p.ACID
+                       select p);
+            }
+            else
+            {
+                ACs = (from q in DC.M_OI2_Account.Where(q => !q.DeleteFlag && q.ActiveFlag).GroupBy(q => q.ACID).Select(q => q.Key)
+                       join p in ACs
+                       on q equals p.ACID
+                       select p);
+            }
+
+            var Ms_ = (from q in DC.M_OI_Account.Where(q => q.OrganizeInfo.OID == 8)
+                       join p in ACs
+                       on q.ACID equals p.ACID
+                       select q).ToList();
+
+            foreach (var AC in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
+            {
+                cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "" };
+                var M_ACs = Ms_.Where(q => q.ACID == AC.ACID);
+                foreach (var M in M_ACs)
+                    N.GroupName += (N.GroupName == "" ? "" : ",") + M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title;
+
+                if (N.GroupName != "")//沒有小組的就不算
+                    Ns.Add(N);
+            }
+
+            return JsonConvert.SerializeObject(Ns);
+        }
         #endregion
         #region 將多選的會員ID加入特定團體
         public class BasicResponse
@@ -805,12 +852,13 @@ namespace Banner.Areas.Admin.Controllers
                 if (int.TryParse(sIDs[i], out iACID))
                     ACIDs.Add(iACID);
             }
+
             if (ACIDs.Count == 0)
                 R.Messages.Add("請選擇會員ID");
             if (string.IsNullOrEmpty(TargetTable))
                 R.Messages.Add("請輸入要加入的目標");
-            if (ID1 == 0 && ID2 == 0)
-                R.Messages.Add("請輸入要加入的目標ID");
+
+
             if (R.Messages.Count == 0)
             {
 
@@ -820,41 +868,64 @@ namespace Banner.Areas.Admin.Controllers
                         {
                             //ID1=Staff->SID
                             //ID2=OrganizeInfo->OID=2
-
-                            foreach (int iACID in ACIDs)
+                            var S = DC.Staff.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.SID == ID1);
+                            var ACs = from q in DC.Account.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList()
+                                      join p in ACIDs
+                                      on q.ACID equals p
+                                      select q;
+                            int AC_All_Ct = ACs.Count();
+                            int AC_Child_Ct = ACs.Count(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
+                            int AC_Aldult_Ct = AC_All_Ct - AC_Child_Ct;
+                            if (S == null)
+                                R.Messages.Add("此事工團已被關閉或被移除");
+                            if (AC_All_Ct == 0)
+                                R.Messages.Add("所選的會員均已關閉或刪除");
+                            if (S != null && AC_All_Ct > 0)
                             {
-                                var M = DC.M_Staff_Account.FirstOrDefault(q => q.SID == ID1 && q.OIID == ID2 && q.ACID == iACID);
-                                if (M == null)
+                                //if (S.ChildrenFlag && AC_Child_Ct != AC_All_Ct)
+                                //    R.Messages.Add("本事工團僅限兒童,名單中有成人,請移除後重試");
+                                if (!S.ChildrenFlag && AC_Aldult_Ct != AC_All_Ct)
+                                    R.Messages.Add("本事工團僅限成人,名單中有兒童,請移除後重試");
+                            }
+
+                            if (R.Messages.Count == 0)
+                            {
+                                foreach (int iACID in ACIDs)
                                 {
-                                    M = new M_Staff_Account
+                                    var M = DC.M_Staff_Account.FirstOrDefault(q => q.SID == ID1 && q.OIID == ID2 && q.ACID == iACID);
+                                    if (M == null)
                                     {
-                                        SID = ID1,
-                                        OIID = ID2,
-                                        ACID = iACID,
-                                        LeaderFlag = false,
-                                        JoinDate = DT,
-                                        LeaveDate = DT,
-                                        ActiveFlag = true,
-                                        DeleteFlag = false,
-                                        CreDate = DT,
-                                        UpdDate = DT,
-                                        SaveACID = ACID
-                                    };
-                                    DC.M_Staff_Account.InsertOnSubmit(M);
-                                    DC.SubmitChanges();
-                                }
-                                else
-                                {
-                                    if (M.DeleteFlag || !M.ActiveFlag)
-                                    {
-                                        M.ActiveFlag = true;
-                                        M.DeleteFlag = false;
-                                        M.UpdDate = DT;
-                                        M.SaveACID = ACID;
+                                        M = new M_Staff_Account
+                                        {
+                                            SID = ID1,
+                                            OIID = ID2,
+                                            ACID = iACID,
+                                            LeaderFlag = false,
+                                            JoinDate = DT,
+                                            LeaveDate = DT,
+                                            ActiveFlag = true,
+                                            DeleteFlag = false,
+                                            CreDate = DT,
+                                            UpdDate = DT,
+                                            SaveACID = ACID
+                                        };
+                                        DC.M_Staff_Account.InsertOnSubmit(M);
                                         DC.SubmitChanges();
+                                    }
+                                    else
+                                    {
+                                        if (M.DeleteFlag || !M.ActiveFlag)
+                                        {
+                                            M.ActiveFlag = true;
+                                            M.DeleteFlag = false;
+                                            M.UpdDate = DT;
+                                            M.SaveACID = ACID;
+                                            DC.SubmitChanges();
+                                        }
                                     }
                                 }
                             }
+
                         }
                         break;
                 }
@@ -862,6 +933,172 @@ namespace Banner.Areas.Admin.Controllers
             return JsonConvert.SerializeObject(R);
         }
         #endregion
+        #region 事工團指定主責
+        public string SetLeader(string IDs)
+        {
+            BasicResponse R = new BasicResponse();
+            ACID = GetACID();
+            string[] sIDs = IDs.Split(',');
+            List<int> MIDs = new List<int>();
+            for (int i = 0; i < sIDs.Length; i++)
+            {
+                int iMID = 0;
+                if (int.TryParse(sIDs[i], out iMID))
+                    MIDs.Add(iMID);
+            }
+            var Ms = (from q in DC.M_Staff_Account.Where(q => !q.DeleteFlag).ToList()
+                      join p in MIDs
+                      on q.MID equals p
+                      select q).ToList();
+
+            int SID = 0;
+            if (Ms.Count > 0)
+                SID = Ms[0].SID;
+
+            var S = DC.Staff.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.SID == SID);
+            if (Ms.Count() == 0)
+                R.Messages.Add("請選擇會員ID");
+            else if (S == null)
+                R.Messages.Add("此事工團已被關閉或被移除");
+            else if (!S.LeadersFlag && Ms.Count > 1)
+                R.Messages.Add("此事工團只能指定一位主責");
+
+            if (R.Messages.Count() == 0)
+            {
+                if (!S.LeadersFlag)//限一個主責
+                {
+                    //先通通移除主責權限
+                    foreach (var M in S.M_Staff_Account.Where(q => q.LeaderFlag == true))
+                    {
+                        M.LeaderFlag = false;
+                        M.UpdDate = DT;
+                        M.SaveACID = ACID;
+                        DC.SubmitChanges();
+                    }
+                }
+
+                foreach (var M in Ms)
+                {
+                    if (!M.LeaderFlag)//有被選擇,但目前非主責
+                    {
+                        M.LeaderFlag = true;
+                        M.UpdDate = DT;
+                        M.SaveACID = ACID;
+                        DC.SubmitChanges();
+                    }
+                }
+            }
+            return JsonConvert.SerializeObject(R);
+        }
+        #endregion
+        #region 事工團移除主責
+        public string RemoveLeader(string IDs)
+        {
+            BasicResponse R = new BasicResponse();
+            ACID = GetACID();
+            string[] sIDs = IDs.Split(',');
+            List<int> MIDs = new List<int>();
+            for (int i = 0; i < sIDs.Length; i++)
+            {
+                int iMID = 0;
+                if (int.TryParse(sIDs[i], out iMID))
+                    MIDs.Add(iMID);
+            }
+            var Ms = (from q in DC.M_Staff_Account.Where(q => !q.DeleteFlag).ToList()
+                      join p in MIDs
+                      on q.MID equals p
+                      select q).ToList();
+
+            int SID = 0;
+            if (Ms.Count > 0)
+                SID = Ms[0].SID;
+
+            var S = DC.Staff.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.SID == SID);
+            if (Ms.Count() == 0)
+                R.Messages.Add("請選擇會員ID");
+            else if (S == null)
+                R.Messages.Add("此事工團已被關閉或被移除");
+            else
+            {
+                var Ms_ = S.M_Staff_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.LeaderFlag).ToList();
+                if (Ms_.Count() > 0)//目前已經有主責
+                {
+                    if (S.LeadersFlag)//允許多位主責,檢查移除後是否主責會歸0
+                    {
+                        var MIDs_ = Ms_.Select(q => q.MID).ToList();
+                        var CutMIDs = MIDs_.Except(MIDs);//資料庫中的主責排除移除的主責後是否還有剩下的主責
+                        if (CutMIDs.Count() == 0)
+                            R.Messages.Add("請勿移除全部的主責");
+                    }
+                    else//只能一位主責,檢查移除的是不是就是這個人
+                    {
+                        if (Ms[0].MID == Ms_[0].MID)
+                            R.Messages.Add("請直接指定接班主責,舊主責會同步移除權限");
+                    }
+                }
+            }
+
+            if (R.Messages.Count() == 0)
+            {
+                foreach (var M in Ms.Where(q => q.LeaderFlag))
+                {
+                    M.LeaderFlag = false;
+                    M.UpdDate = DT;
+                    M.SaveACID = ACID;
+                    DC.SubmitChanges();
+                }
+            }
+            return JsonConvert.SerializeObject(R);
+        }
+        #endregion
+        #region 事工團移除團員
+        public string RemoveACFromStaff(string IDs)
+        {
+            BasicResponse R = new BasicResponse();
+            ACID = GetACID();
+            string[] sIDs = IDs.Split(',');
+            List<int> MIDs = new List<int>();
+            for (int i = 0; i < sIDs.Length; i++)
+            {
+                int iMID = 0;
+                if (int.TryParse(sIDs[i], out iMID))
+                    MIDs.Add(iMID);
+            }
+            var Ms = (from q in DC.M_Staff_Account.Where(q => !q.DeleteFlag).ToList()
+                      join p in MIDs
+                      on q.MID equals p
+                      select q).ToList();
+
+            int SID = 0;
+            if (Ms.Count > 0)
+                SID = Ms[0].SID;
+
+            if (Ms.Count() == 0)
+                R.Messages.Add("請選擇會員ID");
+            if (Ms.Count(q => q.LeaderFlag) > 0)
+                R.Messages.Add("所選名單包含主責,請先移除主責權限後再行移除");
+
+            if (R.Messages.Count() == 0)
+            {
+
+                foreach (var MSA in Ms)
+                {
+                    MSA.LeaveDate = DT;
+                    MSA.LeaderFlag = false;
+                    MSA.ActiveFlag = false;
+                    MSA.DeleteFlag = true;
+                    MSA.UpdDate = DT;
+                    MSA.SaveACID = ACID;
+                    DC.SubmitChanges();
+                }
+            }
+
+            return JsonConvert.SerializeObject(R);
+        }
+        #endregion
+
+
+
         #region 測試用(檔案上傳)
         [HttpGet]
         public ActionResult Test()
