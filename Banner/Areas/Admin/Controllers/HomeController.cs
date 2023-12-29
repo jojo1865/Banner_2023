@@ -48,10 +48,10 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (GetACID() <= 0)
                 {
-                    LogInAC(1);
-                    SetBrowserData("UserName", "系統管理者");
-                    //LogInAC(8197);
-                    //SetBrowserData("UserName", "JOJO");
+                    //LogInAC(1);
+                    //SetBrowserData("UserName", "系統管理者");
+                    LogInAC(8197);
+                    SetBrowserData("UserName", "JOJO");
 
                 }
                 SetAlert("", 1, "/Admin/Home/Index");
@@ -744,7 +744,7 @@ namespace Banner.Areas.Admin.Controllers
             var ACs = DC.Account.Where(q => q.ActiveFlag && !q.DeleteFlag);
             if (Name != "")
                 ACs = ACs.Where(q => (q.Name_First + q.Name_Last).Contains(Name));
-            if (OIID > 0)//隸屬哪個旌旗
+            if (OIID > 0 && !ChildFlag)//隸屬哪個旌旗(兒童不查例外)
             {
                 ACs = from q in ACs
                       join p in DC.M_OI_Account.Where(q => q.ActiveFlag &&
@@ -755,6 +755,7 @@ namespace Banner.Areas.Admin.Controllers
                       on q.ACID equals p.Key
                       select q;
             }
+
             if (ChildFlag)//小孩就年齡限制12歲(含)以下,不限小組
             {
                 ACs = ACs.Where(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
@@ -819,7 +820,7 @@ namespace Banner.Areas.Admin.Controllers
                        join p in ACs
                        on q.ACID equals p.ACID
                        select q).ToList();
-
+            var MOI2s = DC.M_OI2_Account.Where(q => !q.DeleteFlag && q.ActiveFlag && q.OIID == 1).ToList();
             foreach (var AC in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
             {
                 cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "" };
@@ -827,7 +828,7 @@ namespace Banner.Areas.Admin.Controllers
                 foreach (var M in M_ACs)
                     N.GroupName += (N.GroupName == "" ? "" : ",") + M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title;
 
-                if (N.GroupName != "")//沒有小組的就不算
+                if (N.GroupName != "" || AC.ACID == 1 || (MOI2s.Any(q=>q.ACID==AC.ACID)))//沒有小組的就不算,但Admin例外,全部旌旗的同工例外
                     Ns.Add(N);
             }
 
@@ -1052,7 +1053,7 @@ namespace Banner.Areas.Admin.Controllers
         }
         #endregion
         #region 事工團移除團員
-        public string RemoveACFromStaff(string IDs)
+        public string RemoveACFromStaff(string IDs,int SID)
         {
             BasicResponse R = new BasicResponse();
             ACID = GetACID();
@@ -1064,14 +1065,10 @@ namespace Banner.Areas.Admin.Controllers
                 if (int.TryParse(sIDs[i], out iMID))
                     MIDs.Add(iMID);
             }
-            var Ms = (from q in DC.M_Staff_Account.Where(q => !q.DeleteFlag).ToList()
+            var Ms = (from q in DC.M_Staff_Account.Where(q => !q.DeleteFlag && q.SID == SID).ToList()
                       join p in MIDs
                       on q.MID equals p
                       select q).ToList();
-
-            int SID = 0;
-            if (Ms.Count > 0)
-                SID = Ms[0].SID;
 
             if (Ms.Count() == 0)
                 R.Messages.Add("請選擇會員ID");
@@ -1080,7 +1077,6 @@ namespace Banner.Areas.Admin.Controllers
 
             if (R.Messages.Count() == 0)
             {
-
                 foreach (var MSA in Ms)
                 {
                     MSA.LeaveDate = DT;
@@ -1096,8 +1092,6 @@ namespace Banner.Areas.Admin.Controllers
             return JsonConvert.SerializeObject(R);
         }
         #endregion
-
-
 
         #region 測試用(檔案上傳)
         [HttpGet]

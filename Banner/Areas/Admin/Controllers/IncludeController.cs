@@ -30,8 +30,13 @@ namespace Banner.Areas.Admin.Controllers
             if (!sURL.Contains("_Info_List"))
                 sURL = sURL.Replace("_Info", "_List");
 
+            int iID = 0;
+            string[] sURLs = Request.RawUrl.Split('/');
+            int.TryParse(sURLs[sURLs.Length - 1], out iID);
+
             if (sURL.EndsWith("/"))
                 sURL = sURL.Remove(sURL.Length - 1);
+            
             cMenu Ms = new cMenu();
             int ACID = GetACID();
             if (ACID <= 0)
@@ -49,10 +54,56 @@ namespace Banner.Areas.Admin.Controllers
                              on q.RID equals p.RID
                              select q;
                     Ms.Items = GetMenu(Rs.ToList(), sURL, 0);
+
+                    //事功團主責補充
+                    if(DC.M_Staff_Account.Any(q=>q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.LeaderFlag))
+                    {
+                        var Menu_2 = Ms.Items.FirstOrDefault(q => q.MenuID == 2);
+                        if (Menu_2 == null)
+                        {
+                            var M = DC.Menu.FirstOrDefault(q => q.MID == 2);
+                            Menu_2 = new cMenu();
+                            Menu_2.MenuID = M.MID;
+                            Menu_2.Title = M.Title;
+                            Menu_2.Url = M.URL;
+                            Menu_2.SortNo = M.SortNo;
+                            Menu_2.ImgUrl = string.IsNullOrEmpty(M.ImgURL) ? "" : M.ImgURL;
+                            Menu_2.Items = new List<cMenu>();
+                        }
+                        var M_Staff = DC.Menu.First(q => q.MID == 60);//事工團主責用的選單
+                        int i = (Menu_2.Items.Count() > 0 ? Menu_2.Items.Max(q => q.SortNo) : 0) + 1;
+                        var Ls = DC.M_Staff_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.LeaderFlag);
+                        foreach (var L in Ls.OrderBy(q => q.OIID).ThenBy(q => q.Staff.SCID).ThenBy(q => q.SID))
+                        {
+                            cMenu cM_ = new cMenu();
+                            cM_.MenuID = M_Staff.MID;
+                            cM_.Title = L.OrganizeInfo.Title + "/" + (L.Staff.ChildrenFlag ? "[兒童]" : "") +L.Staff.Title;
+                            cM_.Url = M_Staff.URL + L.SID;
+                            cM_.SortNo = i++;
+                            cM_.ImgUrl = M_Staff.ImgURL;
+                            cM_.Items = new List<cMenu>();
+
+                            if(sURL == "/Admin/StaffSet/StaffAccount_List" && L.SID == iID)
+                            {
+                                cM_.SelectFlag = true;
+                                Menu_2.SelectFlag = true;
+                            }
+                            else
+                                cM_.SelectFlag = false;
+                                
+                            Menu_2.Items.Add(cM_);
+                        }
+
+                        if (!Menu_2.Items.Any(q => q.Url == "/Admin/StaffSet/OI_Staff_List") && sURL.Contains("OI_Staff_List") && Menu_2.Items.Count > 0)
+                            SetAlert("", 1, Menu_2.Items[0].Url);
+                        Ms.Items.Add(Menu_2);
+                    }
                 }
             }
             if (Ms.Items == null)
                 Ms.Items = new List<cMenu>();
+            else
+                Ms.Items = Ms.Items.OrderBy(q => q.SortNo).ToList();
             return PartialView(Ms);
         }
         //取得選單可以查的網址
@@ -91,6 +142,7 @@ namespace Banner.Areas.Admin.Controllers
             Ns = Ns.OrderBy(q => q.SortNo).ToList();
             if (Ns.Count() > 0)
             {
+                int ACID = GetACID();
                 foreach (var N in Ns)
                 {
                     cMenu cM = new cMenu();
@@ -100,6 +152,7 @@ namespace Banner.Areas.Admin.Controllers
                     cM.SortNo = N.SortNo;
                     cM.ImgUrl = string.IsNullOrEmpty(N.ImgURL) ? "" : N.ImgURL;
                     cM.Items = GetMenu(Rs, sURL, N.MID);
+
                     if (!string.IsNullOrEmpty(N.URL))
                         cM.SelectFlag = N.URL.StartsWith(sURL);
                     else if (cM.Items.Find(q => q.SelectFlag) != null)
