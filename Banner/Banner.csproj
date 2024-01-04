@@ -218,6 +218,7 @@
     <Compile Include="Areas\Web\Controllers\HomeController.cs" />
     <Compile Include="Areas\Web\Controllers\IncludeController.cs" />
     <Compile Include="Areas\Web\Controllers\OutputController.cs" />
+    <Compile Include="Areas\Web\Controllers\StaffPlaceController.cs" />
     <Compile Include="Areas\Web\WebAreaRegistration.cs" />
     <Compile Include="Controllers\API_GetController.cs" />
     <Compile Include="Controllers\StarHomeController.cs" />
@@ -711,6 +712,8 @@
     <Content Include="Areas\Admin\Views\StoreSet\ProductClass_BatchAdd.cshtml" />
     <Content Include="Areas\Admin\Views\StaffSet\OI_Staff_List.cshtml" />
     <Content Include="Areas\Admin\Views\StaffSet\StaffAccount_List.cshtml" />
+    <Content Include="Areas\Web\Views\StaffPlace\Event_List.cshtml" />
+    <Content Include="Areas\Web\Views\StaffPlace\Event_Edit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

@@ -78,7 +78,7 @@ namespace Banner.Areas.Admin.Controllers
                             cMenu cM_ = new cMenu();
                             cM_.MenuID = M_Staff.MID;
                             cM_.Title = L.OrganizeInfo.Title + "/" + (L.Staff.ChildrenFlag ? "[兒童]" : "") +L.Staff.Title;
-                            cM_.Url = M_Staff.URL + L.SID;
+                            cM_.Url = M_Staff.URL + "/" + L.SID;
                             cM_.SortNo = i++;
                             cM_.ImgUrl = M_Staff.ImgURL;
                             cM_.Items = new List<cMenu>();

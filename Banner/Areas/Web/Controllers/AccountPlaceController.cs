@@ -510,7 +510,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GerAccountData(ACID, null));
         }
         [HttpPost]
-        
+
         public ActionResult BasicData(FormCollection FC)
         {
             GetViewBag();
@@ -885,7 +885,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetFamilyData(null));
         }
         [HttpPost]
-        
+
         public ActionResult FamilyData(FormCollection FC)
         {
             GetViewBag();
@@ -1025,7 +1025,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetBankData(null));
         }
         [HttpPost]
-        
+
         public ActionResult BankData(FormCollection FC)
         {
             GetViewBag();
@@ -1096,7 +1096,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetPerformanceData(null));
         }
         [HttpPost]
-        
+
         //[HandleError(ExceptionType = typeof(HttpAntiForgeryException), View = "/Web/Home/CSRF")]
         public ActionResult PerformanceData(FormCollection FC)
         {
@@ -1149,13 +1149,14 @@ namespace Banner.Areas.Web.Controllers
                             SetAlert("小組聚會時間為" + SDT.ToString("HH:mm") + "~" + EDT.ToString("HH:mm") + ",請在這段時間內報到", 3, "/Web/Home/Index");
                         else
                         {
-                            var EJH = DC.Event_Join_Header.FirstOrDefault(q => q.EID == 1 && q.OIID == OI.OIID && q.EventDate == DT.Date);
+                            var EJH = DC.Event_Join_Header.FirstOrDefault(q => q.EID == 1 && q.TargetType == 0 && q.TargetID == OI.OIID && q.EventDate == DT.Date);
                             if (EJH == null)
                             {
                                 EJH = new Event_Join_Header
                                 {
                                     EID = 1,
-                                    OIID = OI.OIID,
+                                    TargetType = 0,
+                                    TargetID = OI.OIID,
                                     EventDate = DT.Date,
                                     Note = "",
                                     CreDate = DT,
@@ -1262,9 +1263,9 @@ namespace Banner.Areas.Web.Controllers
                 }
                 #endregion
 
-                var Hs = from q in DC.Event_Join_Header.Where(q => q.OIID > 0)
+                var Hs = from q in DC.Event_Join_Header.Where(q => q.TargetType==0 && q.TargetID > 0)
                          join p in OIs
-                         on q.OIID equals p.OIID
+                         on q.TargetID equals p.OIID
                          select q;
                 if (c.EDate != "")
                     Hs = Hs.Where(q => q.EventDate.Date <= _edt.Date);
@@ -1283,7 +1284,7 @@ namespace Banner.Areas.Web.Controllers
                 Hs = Hs.OrderByDescending(q => q.EventDate).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
                 foreach (var H in Hs)
                 {
-                    OI = OIs.First(q => q.OIID == H.OIID);
+                    OI = OIs.First(q => q.OIID == H.TargetID);
                     var D = H.Event_Join_Detail.FirstOrDefault(q => q.ACID == ACID);
                     cTableRow cTR = new cTableRow();
                     cTR.Cs.Add(new cTableCell { Value = OI.OrganizeInfo.Title + OI.OrganizeInfo.Organize.Title });//小組名稱

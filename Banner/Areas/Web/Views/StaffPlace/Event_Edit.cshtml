@@ -1,0 +1,78 @@
+﻿
+@{
+    ViewBag.Title = "GroupLeaderIndex";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+    if (Model != null)
+    {
+        <div class="body-container container_phone">
+            <div class="section-container">
+                <nav class="breadcrumb-nav">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                        <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                        <li class="breadcrumb-item"><a href="/Web/StaffPlace/Event_List?SID=@(ViewBag._SID)">活動列表</a></li>
+                        <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                        <li class="breadcrumb-item"><a href="">活動新增/編輯</a></li>
+                    </ol>
+                </nav>
+                <div class="header-container">
+                    <div class="header-left-border"></div>
+                    <h5 class="header">@Html.Raw(ViewBag._GroupTitle) - 活動新增/編輯</h5>
+                </div>
+
+                <div class="container-lg">
+                    <div class="section-card">
+                        <form method="post" id="form1">
+
+                            <div class="form-group">
+                                <label>活動標題</label>
+                                @Html.TextBox("txb_Title", Model.SLIs, new { @class = "form-control form-control-lg input-underlin" })
+                            </div>
+                            <div class="form-group">
+                                <label>活動日期</label>
+                                @Html.TextBox("txb_EventDate", Model.SLIs, new { @class = "form-control form-control-lg input-underlin", type = "date" })
+                            </div>
+                            <div class="form-group">
+                                <label>活動時間</label>
+                                <div class="row">
+                                    <div class="col-lg-auto col-12">
+                                        @Html.TextBox("txb_STime", (Model.MLS.S_hour.ToString().PadLeft(2, '0') + ":" + Model.MLS.S_minute.ToString().PadLeft(2, '0')), new { @class = "form-control form-control-lg input-underlin", type = "time" })
+                                    </div>
+                                    <div class="col-lg-auto col-12">
+                                        至
+                                    </div>
+                                    <div class="col-lg-auto col-12">
+                                        @Html.TextBox("txb_ETime", (Model.MLS.E_hour.ToString().PadLeft(2, '0') + ":" + Model.MLS.E_minute.ToString().PadLeft(2, '0')), new { @class = "form-control form-control-lg input-underlin", type = "time" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>活動方式</label>
+                                @Html.Action("_Location_Meeting", "Include", new { LID = Model.L.LID })
+                            </div>
+                            <div class="form-group">
+                                <label>活動地點</label>
+                                @Html.Action("_Location_Meeting", "Include", new { LID = Model.L.LID })
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>活動電話</label>
+                                @Html.Action("_ContectEdit", "Include", new { C = Model.C })
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="action-bar">
+
+            <div class="btn btn-primary btn-lg btn-round">
+                <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
+            </div>
+
+            <div class="btn btn-outline-primary btn-lg btn-round">
+                <a href="/Web/GroupPlace/Index/@ViewBag._OIID "><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />取消</a>
+            </div>
+        </div>
+    }
+}

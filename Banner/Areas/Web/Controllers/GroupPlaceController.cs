@@ -102,7 +102,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        
+
         public ActionResult Index(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -337,7 +337,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        
+
         public ActionResult Aldult_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -403,7 +403,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        
+
         public ActionResult Aldult_Remove(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -563,7 +563,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        
+
         public ActionResult New_Remove(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -705,7 +705,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        
+
         public ActionResult Baptized_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -854,7 +854,7 @@ namespace Banner.Areas.Web.Controllers
             #endregion
             #region 資料庫帶入
 
-            var Ns = DC.Event_Join_Header.Where(q => q.EID == 2 && q.OIID == OIID);
+            var Ns = DC.Event_Join_Header.Where(q => q.EID == 2 && q.TargetID == OIID && q.TargetType == 0);
             if (c.sDate != "")
             {
                 DateTime dt_ = DT;

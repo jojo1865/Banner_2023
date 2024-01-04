@@ -64,23 +64,47 @@ namespace Banner.Areas.Web.Controllers
             }
             return OIID;
         }
-        public PartialViewResult _TopMenu()
+        /*public int GetSID()
+        {
+            int SID = 0;
+            string[] sPath = Request.Url.Segments;
+            if (sPath[2].ToLower() == "staffplace/")
+            {
+                if (GetBrowserData("SID") != "")
+                    SID = Convert.ToInt32(GetBrowserData("SID"));
+                if (sPath.Length == 5)
+                {
+                    if (sPath[3].ToLower() == "index/" || sPath[3].ToLower().Contains("_list/"))
+                        SID = Convert.ToInt32(sPath[4]);
+                }
+            }
+            return SID;
+        }*/
+        /*public PartialViewResult _TopMenu()
         {
             var Ms = DC.Menu.Where(q => q.ParentID == 0 && q.ActiveFlag && !q.DeleteFlag);
-            int ACID = GetACID();
+            ACID = GetACID();
             var MOIs = GetMOIAC(0, 0, ACID);
-            bool bGroupLeaderFlag = false;
+            bool bGroupLeaderFlag = false;//是否為小組長
             if (MOIs.Count() > 0)//是否已有小組
                 bGroupLeaderFlag = MOIs.Count(q => q.OrganizeInfo.OID == 8 && q.OrganizeInfo.ACID == ACID) > 0;//是否為小組長
 
-            if (bGroupLeaderFlag)
+            //是否有加入事工團
+            var MSAs = DC.M_Staff_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.Staff.ActiveFlag && !q.Staff.DeleteFlag).ToList();
+            bool bStaffFlag = MSAs.Count() > 0;//是否為事工團主責
+
+            if (bStaffFlag && bGroupLeaderFlag)
+                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2 || q.MenuType == 3);
+            else if (bGroupLeaderFlag)//若是小組長
                 Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
+            else if (bStaffFlag)//若是事工團成員
+                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 3);
             else
                 Ms = Ms.Where(q => q.MenuType == 1);
 
             Ms = Ms.OrderBy(q => q.SortNo);
 
-            int OIID = GetOIID();
+
 
             string ThisController = GetThisController();
             string ThisActive = GetThisAction();
@@ -97,52 +121,66 @@ namespace Banner.Areas.Web.Controllers
                     SelectFlag = M.URL.StartsWith(ThisController),
                     Items = new List<cMenu>()
                 };
-                if (M.MenuType == 2)
+                if (M.MenuType != 1)
                 {
-
-
-                    var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8).OrderBy(q => q.OIID);
-                    foreach (var OI in OIs)
+                    if (M.MenuType == 2)//小組長
                     {
-                        cM = new cMenu
+                        int OIID = GetOIID();
+                        var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8).OrderBy(q => q.OIID);
+                        foreach (var OI in OIs)
                         {
-                            MenuID = M.MID,
-                            Title = OI.Title + M.Title,
-                            Url = M.URL + "/" + OI.OIID,
-                            ImgUrl = M.ImgURL,
-                            SortNo = M.SortNo,
-                            SelectFlag = M.URL.StartsWith(ThisController) && OI.OIID == OIID,
-                            Items = new List<cMenu>()
-                        };
-                        cMs.Add(cM);
+                            cM = new cMenu
+                            {
+                                MenuID = M.MID,
+                                Title = OI.Title + M.Title,
+                                Url = M.URL + "/" + OI.OIID,
+                                ImgUrl = M.ImgURL,
+                                SortNo = M.SortNo,
+                                SelectFlag = M.URL.StartsWith(ThisController) && OI.OIID == OIID,
+                                Items = new List<cMenu>()
+                            };
+                            cMs.Add(cM);
+                        }
+                    }
+                    if (M.MenuType == 3)//事工團
+                    {
+
                     }
                 }
                 else
                     cMs.Add(cM);
-
             }
 
             if (ACID == 0)
                 SetAlert("請先登入", 3, "/Web/Home/Login");
             return PartialView(cMs);
-        }
+        }*/
         public PartialViewResult _TopMenu_New1()
         {
             var Ms = DC.Menu.Where(q => q.ParentID == 0 && q.ActiveFlag && !q.DeleteFlag);
-            int ACID = GetACID();
+            ACID = GetACID();
             var MOIs = GetMOIAC(0, 0, ACID);
             bool bGroupLeaderFlag = false;
             if (MOIs.Count() > 0)//是否已有小組
                 bGroupLeaderFlag = MOIs.Count(q => q.OrganizeInfo.OID == 8 && q.OrganizeInfo.ACID == ACID) > 0;//是否為小組長
+            //是否有加入事工團
+            var MSAs = DC.M_Staff_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.Staff.ActiveFlag && !q.Staff.DeleteFlag).ToList();
+            bool bStaffFlag = MSAs.Count() > 0;//是否有加入事工團
 
-            if (bGroupLeaderFlag)
+            //SetAlert(ACID.ToString(), 1);
+            if (bStaffFlag && bGroupLeaderFlag)
+                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2 || q.MenuType == 3);
+            else if (bGroupLeaderFlag)//若是小組長
                 Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
+            else if (bStaffFlag)//若是事工團成員
+                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 3);
             else
                 Ms = Ms.Where(q => q.MenuType == 1);
 
             Ms = Ms.OrderBy(q => q.SortNo);
 
             int OIID = GetOIID();
+            //int SID = GetSID();
 
             string ThisController = GetThisController();
             string ThisActive = GetThisAction();
@@ -173,7 +211,7 @@ namespace Banner.Areas.Web.Controllers
                             ImgUrl = M.ImgURL,
                             SortNo = M.SortNo,
                             SelectFlag = M.URL.StartsWith(ThisController) && OI.OIID == OIID,
-                            Items = GetSubItem(M.MID, bGroupLeaderFlag, OI.OIID)
+                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, OI.OIID, 0)
                         };
                         cM.Items.Add(cM1);
                     }
@@ -181,7 +219,7 @@ namespace Banner.Areas.Web.Controllers
                 }
                 else
                 {
-                    cM.Items = GetSubItem(M.MID, bGroupLeaderFlag, OIID);
+                    cM.Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, OIID, 0);
                     cMs.Add(cM);
                 }
             }
@@ -191,14 +229,20 @@ namespace Banner.Areas.Web.Controllers
             return PartialView(cMs);
         }
 
-        private List<cMenu> GetSubItem(int MID, bool bGroupLeaderFlag, int OIID)
+        private List<cMenu> GetSubItem(int MID, bool bGroupLeaderFlag, bool bStaffFlag, int OIID, int SID)
         {
+            ACID = GetACID();
             string NowShortPath = GetThisAction().Replace("_Edit", "").Replace("_List", "").Replace("_Info", "").Replace("_Remove", "");
             string ThisController = GetThisController();
             List<cMenu> Items = new List<cMenu>();
             var Ms = DC.Menu.Where(q => q.ParentID == MID && q.ActiveFlag && !q.DeleteFlag);
-            if (bGroupLeaderFlag)
+
+            if (bStaffFlag && bGroupLeaderFlag)
+                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2 || q.MenuType == 3);
+            else if (bGroupLeaderFlag)
                 Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
+            else if (bStaffFlag)
+                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 3);
             else
                 Ms = Ms.Where(q => q.MenuType == 1);
 
@@ -207,18 +251,46 @@ namespace Banner.Areas.Web.Controllers
             foreach (var M in Ms)
             {
                 var CM_ = DC.Menu.FirstOrDefault(q => q.ParentID == M.MID && q.URL.StartsWith(NowShortPath));
-                cMenu cM = new cMenu
-                {
-                    MenuID = M.MID,
-                    Title = M.Title,
-                    Url = M.URL + (OIID > 0 ? "/" + OIID : ""),
-                    ImgUrl = M.ImgURL,
-                    SortNo = M.SortNo,
-                    SelectFlag = M.URL.StartsWith(ThisController) || M.URL.StartsWith(NowShortPath) || CM_ != null,
-                    Items = GetSubItem(M.MID, bGroupLeaderFlag, OIID)
-                };
 
-                Items.Add(cM);
+                if (bStaffFlag && M.MID == 61)//主責專區特製
+                {
+                    var Ss = from q in DC.M_Staff_Account.Where(q => q.ACID == ACID && q.LeaderFlag && q.ActiveFlag && !q.DeleteFlag && q.Staff.ActiveFlag && !q.Staff.DeleteFlag)
+                             group q by new { q.Staff.SID, q.Staff.Title, SCTitle = q.Staff.Staff_Category.Title, OTitle = q.OrganizeInfo.Organize.Title, OITitle = q.OrganizeInfo.Title, OIID = q.OIID, OID = q.OrganizeInfo.OID } into g
+                             select g;
+                    int j = 0;
+                    foreach (var S in Ss.OrderBy(q => q.Key.OTitle).ThenBy(q => q.Key.SCTitle))
+                    {
+                        cMenu cM = new cMenu
+                        {
+                            MenuID = 0,
+                            Title = "[" + S.Key.OITitle + S.Key.OTitle + "]" + S.Key.SCTitle + "-" + S.Key.Title,
+                            Url = "",
+                            ImgUrl = "",
+                            SortNo = j++,
+                            SelectFlag = false,
+                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, OIID, S.Key.SID)
+                        };
+                        Items.Add(cM);
+                    }
+                }
+                else
+                {
+                    cMenu cM = new cMenu
+                    {
+                        MenuID = M.MID,
+                        Title = M.Title,
+                        Url = M.URL,
+                        ImgUrl = M.ImgURL,
+                        SortNo = M.SortNo,
+                        SelectFlag = M.URL.StartsWith(ThisController) || M.URL.StartsWith(NowShortPath) || CM_ != null,
+                        Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, OIID, SID)
+                    };
+                    if (OIID > 0)
+                        cM.Url += "/" + OIID;
+                    if (SID > 0)
+                        cM.Url += "?SID=" + SID;
+                    Items.Add(cM);
+                }
             }
 
 

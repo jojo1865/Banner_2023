@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewBag.Title = "Event_List";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container container_phone">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">活動列表</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">@Html.Raw(ViewBag._StaffTitle) - 活動列表</h5>
+        </div>
+        @Html.Action("_GroupTopMenu", "Include")
+        <div class="container-lg">
+            <form method="post" id="form1">
+
+                @Html.Action("_TableList", "Include", new { cTL = Model })
+            </form>
+        </div>
+    </div>
+</div>
+
+
+

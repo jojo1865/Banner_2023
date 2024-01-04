@@ -327,6 +327,13 @@ namespace Banner
                 s = Request.QueryString[sTitle].ToString().Replace("'", "\"");
             return s;
         }
+        public int ChangeStringToInt32(string Input)
+        {
+            int i = 0;
+            if (int.TryParse(Input, out i))
+                return i;
+            else return 0;
+        }
         //檢查Email格式
         public bool CheckEmail(string strIn)
         {
