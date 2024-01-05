@@ -250,6 +250,13 @@ main {
     .container_phone{
         padding:0px;
     }
+
+    .header-nav .header-item:first-child {
+        gap: calc(100% - 50px) !important;
+    }
+    .li_TopMenu_UserData{
+        display:block;
+    }
 }
 
 
@@ -288,6 +295,10 @@ main {
         width: 120px;
         text-align: right;
         font-weight: 600;
+    }
+
+    .li_TopMenu_UserData {
+        display: none;
     }
 }
 /*課程選購首頁-左右調整設定*/

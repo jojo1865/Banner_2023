@@ -765,7 +765,7 @@ namespace Banner.Areas.Web.Controllers
         }
         #endregion
 
-        #region 小組聚會登記
+        #region 小組聚會登記QRCode
         [HttpGet]
         public ActionResult GroupMeet_QRCode(int ID)
         {

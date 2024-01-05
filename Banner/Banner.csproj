@@ -714,6 +714,8 @@
     <Content Include="Areas\Admin\Views\StaffSet\StaffAccount_List.cshtml" />
     <Content Include="Areas\Web\Views\StaffPlace\Event_List.cshtml" />
     <Content Include="Areas\Web\Views\StaffPlace\Event_Edit.cshtml" />
+    <Content Include="Areas\Web\Views\StaffPlace\Event_QRCode.cshtml" />
+    <Content Include="Areas\Web\Views\StaffPlace\MyStaffEvnet_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

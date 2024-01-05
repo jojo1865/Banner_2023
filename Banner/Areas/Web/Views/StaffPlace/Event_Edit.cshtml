@@ -1,11 +1,11 @@
-﻿
+﻿@model Banner.Areas.Web.Controllers.StaffPlaceController.cEvent_Edit
 @{
     ViewBag.Title = "GroupLeaderIndex";
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
     if (Model != null)
     {
         <div class="body-container container_phone">
-            <div class="section-container">
+            <div class="section-container" style="margin-bottom:50px;">
                 <nav class="breadcrumb-nav">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
@@ -17,38 +17,42 @@
                 </nav>
                 <div class="header-container">
                     <div class="header-left-border"></div>
-                    <h5 class="header">@Html.Raw(ViewBag._GroupTitle) - 活動新增/編輯</h5>
+                    <h5 class="header">@Html.Raw(ViewBag._StaffTitle) - 活動新增/編輯</h5>
                 </div>
 
                 <div class="container-lg">
                     <div class="section-card">
-                        <form method="post" id="form1">
+                        <form method="post" id="form1" style="width:100%;">
 
                             <div class="form-group">
                                 <label>活動標題</label>
-                                @Html.TextBox("txb_Title", Model.SLIs, new { @class = "form-control form-control-lg input-underlin" })
+                                @Html.TextBox("txb_Title", Model.Title, new { @class = "form-control form-control-lg input-underlin" })
                             </div>
                             <div class="form-group">
                                 <label>活動日期</label>
-                                @Html.TextBox("txb_EventDate", Model.SLIs, new { @class = "form-control form-control-lg input-underlin", type = "date" })
+                                @Html.TextBox("txb_EventDate", Model.EventDate.ToString("yyyy-MM-dd"), new { @class = "form-control form-control-lg input-underlin", type = "date" })
                             </div>
                             <div class="form-group">
                                 <label>活動時間</label>
                                 <div class="row">
                                     <div class="col-lg-auto col-12">
-                                        @Html.TextBox("txb_STime", (Model.MLS.S_hour.ToString().PadLeft(2, '0') + ":" + Model.MLS.S_minute.ToString().PadLeft(2, '0')), new { @class = "form-control form-control-lg input-underlin", type = "time" })
+                                        @Html.TextBox("txb_STime", $"{Model.STime:hh\\:mm}", new { @class = "form-control form-control-lg input-underlin", type = "time" })
                                     </div>
                                     <div class="col-lg-auto col-12">
                                         至
                                     </div>
                                     <div class="col-lg-auto col-12">
-                                        @Html.TextBox("txb_ETime", (Model.MLS.E_hour.ToString().PadLeft(2, '0') + ":" + Model.MLS.E_minute.ToString().PadLeft(2, '0')), new { @class = "form-control form-control-lg input-underlin", type = "time" })
+                                        @Html.TextBox("txb_ETime", $"{Model.ETime:hh\\:mm}", new { @class = "form-control form-control-lg input-underlin", type = "time" })
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label>活動內容</label>
+                                @Html.TextArea("txb_Info", Model.Info, new { @class = "form-select form-select-lg", @style = "height:100px;" })
+                            </div>
+                            <div class="form-group">
                                 <label>活動方式</label>
-                                @Html.Action("_Location_Meeting", "Include", new { LID = Model.L.LID })
+                                @Html.DropDownList("ddl_MeetType", Model.ddl_EventType, new { @class = "form-select form-select-lg" })
                             </div>
                             <div class="form-group">
                                 <label>活動地點</label>
@@ -58,6 +62,38 @@
                                 <label>活動電話</label>
                                 @Html.Action("_ContectEdit", "Include", new { C = Model.C })
                             </div>
+
+                            <div class="form-group">
+                                <label>啟用狀態</label>
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("cbox_ActiveFlag", true, Model.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
+                                            @Html.Label("啟用", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("cbox_ActiveFlag", false, !Model.ActiveFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
+                                            @Html.Label("停用", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (Model.EHID > 0)
+                            {
+                                <div class="form-group">
+                                    <label>刪除</label>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.CheckBox("cbox_DeleteFlag", Model.DeleteFlag, new { @class = "form-check-input" })
+                                                @Html.Label("更新後刪除", new { @class = "form-check-label" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                         </form>
                     </div>
                 </div>
@@ -65,7 +101,6 @@
             </div>
         </div>
         <div class="action-bar">
-
             <div class="btn btn-primary btn-lg btn-round">
                 <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
             </div>

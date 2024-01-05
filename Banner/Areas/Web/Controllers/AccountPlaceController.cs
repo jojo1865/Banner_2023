@@ -1,8 +1,10 @@
 ﻿using Banner.Models;
+using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Web.Mvc;
 
 namespace Banner.Areas.Web.Controllers
@@ -1263,7 +1265,7 @@ namespace Banner.Areas.Web.Controllers
                 }
                 #endregion
 
-                var Hs = from q in DC.Event_Join_Header.Where(q => q.TargetType==0 && q.TargetID > 0)
+                var Hs = from q in DC.Event_Join_Header.Where(q => q.TargetType == 0 && q.TargetID > 0)
                          join p in OIs
                          on q.TargetID equals p.OIID
                          select q;
@@ -1312,6 +1314,60 @@ namespace Banner.Areas.Web.Controllers
 
             return View(GetGroupMeet_List(FC));
         }
+        #endregion
+        #region 事工團活動報到
+        [HttpGet]
+        public ActionResult StaffEvent_Join(int ID)
+        {
+            GetViewBag();
+            ACID = GetACID();
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+            var EH = DC.Event_Join_Header.FirstOrDefault(q => q.EJHID == ID && !q.Event.DeleteFlag && q.TargetType == 1);
+
+            if (AC == null)
+                SetAlert("請先登入", 2, "/Web/Home/Login");
+            else if (EH == null)
+                SetAlert("缺少事工團活動資訊,無法報到", 2, "/Web/Home/Index");
+            else if (EH.Event.DeleteFlag)
+                SetAlert("該活動已被移除,無法報到", 2, "/Web/Home/Index");
+            else if (!EH.Event.ActiveFlag)
+                SetAlert("該活動未被啟用,無法報到", 2, "/Web/Home/Index");
+            else
+            {
+                var MSA = DC.M_Staff_Account.FirstOrDefault(q => q.SID == EH.TargetID && q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag);
+                if (MSA == null)
+                    SetAlert("您並非該事工團成員,無法報到", 2, "/Web/Home/Index");
+                else if (EH.Event_Join_Detail.Any(q => !q.DeleteFlag && q.ACID == ACID))
+                    SetAlert("您已報到過了,請勿重複報到", 3, "/Web/Home/Index");
+                else if (EH.EventDate.Date != DT.Date)
+                    SetAlert("今天不是活動日,不能報到", 2, "/Web/Home/Index");
+                else
+                {
+                    DateTime STime = Convert.ToDateTime(EH.EventDate.ToString(DateFormat) + " " + GetTimeSpanToString(EH.Event.STime));
+                    DateTime ETime = Convert.ToDateTime(EH.EventDate.ToString(DateFormat) + " " + GetTimeSpanToString(EH.Event.ETime));
+                    if (DT < STime.AddMinutes(-10) || DT > ETime)
+                        SetAlert("本事工團活動可打卡時間為" + STime.AddMinutes(-10).ToString(DateTimeFormat) + " 至 " + ETime.ToString(DateTimeFormat), 2, "/Web/Home/Index");
+                    else
+                    {
+                        Event_Join_Detail EJD = new Event_Join_Detail();
+                        EJD.Event_Join_Header = EH;
+                        EJD.ACID = ACID;
+                        EJD.Name = AC.Name_Last + AC.Name_Last;
+                        EJD.PhoneNo = "";
+                        EJD.DeleteFlag = false;
+                        EJD.JoinDate = DT;
+                        EJD.CreDate = DT;
+                        DC.Event_Join_Detail.InsertOnSubmit(EJD);
+                        DC.SubmitChanges();
+
+                        SetAlert("您已報到完成", 1, "/Web/StaffPlace/MyStaffEvnet_List");
+                    }
+                }
+            }
+
+            return View();
+        }
+
         #endregion
     }
 }

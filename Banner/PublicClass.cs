@@ -828,6 +828,10 @@ namespace Banner
             Times[5] = TS.Seconds;
             return Times;
         }
+        public string GetTimeSpanToString(TimeSpan TS)
+        {
+            return $"{TS:hh\\:mm}";
+        }
         //產生圖形驗證碼
         public string GenerateCheckCode()
         {
