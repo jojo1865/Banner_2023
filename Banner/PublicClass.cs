@@ -50,6 +50,8 @@ namespace Banner
         public string DateFormat = "yyyy-MM-dd";
         public string DateTimeFormat = "yyyy-MM-dd HH:mm";
         public string CompanyTitle = "【全球旌旗資訊網】";
+        public int EventQrCodeSTimeAdd = -30;
+        public int EventQrCodeETimeAdd = 30;
 
         public string sDomanName = "https://web-banner.viuto-aiot.com";
 

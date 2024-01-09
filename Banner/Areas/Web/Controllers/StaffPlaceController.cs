@@ -1,4 +1,5 @@
 ﻿using Banner.Models;
+using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,21 +9,20 @@ namespace Banner.Areas.Web.Controllers
 {
     public class StaffPlaceController : PublicClass
     {
+        #region 取事工團ID
+
         private int SID = 0;
-        private void GetSID(int ID = 0)
+        private void GetSID()
         {
-            if (ID > 0)
-            {
-                SetBrowserData("SID", ID.ToString());
-                SID = ID;
-            }
-            else if (GetBrowserData("SID") != "")
-                SID = Convert.ToInt32(GetBrowserData("SID"));
-            else if (GetQueryStringInInt("SID") > 0)
+            SID = 0;
+            if (GetQueryStringInInt("SID") > 0)
             {
                 SID = GetQueryStringInInt("SID");
                 SetBrowserData("SID", SID.ToString());
             }
+            else if (GetBrowserData("SID") != "")
+                SID = Convert.ToInt32(GetBrowserData("SID"));
+
             ViewBag._StaffTitle = "";
             if (SID == 0)
                 SetAlert("事工團ID查詢失敗", 2, "Web/Home/Index");
@@ -45,6 +45,7 @@ namespace Banner.Areas.Web.Controllers
 
         }
 
+        #endregion
         #region 活動列表
 
         public cTableList GetEvent_List(FormCollection FC)
@@ -63,8 +64,10 @@ namespace Banner.Areas.Web.Controllers
             TopTitles.Add(new cTableCell { Title = "活動類型", WidthPX = 80 });
             TopTitles.Add(new cTableCell { Title = "標題" });
             TopTitles.Add(new cTableCell { Title = "活動日期", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "活動時間", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "活動內容" });
             TopTitles.Add(new cTableCell { Title = "參加人數", WidthPX = 100 });
-            TopTitles.Add(new cTableCell { Title = "備註" });
+            
             cTL.Rs.Add(SetTableRowTitle(TopTitles));
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
 
@@ -72,13 +75,14 @@ namespace Banner.Areas.Web.Controllers
             cTL.TotalCt = Ns.Count();
             cTL.MaxNum = GetMaxNum(cTL.TotalCt, cTL.NumCut);
             Ns = Ns.OrderByDescending(q => q.Event.EventDate).ThenByDescending(q => q.Event.STime).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut);
-
+            int iTotal = DC.M_Staff_Account.Count(q => q.Account.ActiveFlag && !q.Account.DeleteFlag && q.SID == SID && q.ActiveFlag && !q.DeleteFlag);
             foreach (var N in Ns)
             {
                 cTableRow cTR = new cTableRow();
                 //操作
                 cTableCell cTC = new cTableCell();
-                cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/StaffPlace/Event_Edit?SID=" + SID + "&EHID=" + N.EJHID, Target = "_self", Value = "編輯" });
+                if(N.Event.EventDate.Date>=DT.Date)//過期後就不能編輯
+                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/StaffPlace/Event_Edit?SID=" + SID + "&EHID=" + N.EJHID, Target = "_self", Value = "編輯" });
                 cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/StaffPlace/Event_QRCode?SID=" + SID + "&EHID=" + N.EJHID, Target = "_black", Value = "報到QR-Code" });
                 cTR.Cs.Add(cTC);
                 //活動類型
@@ -87,10 +91,13 @@ namespace Banner.Areas.Web.Controllers
                 cTR.Cs.Add(new cTableCell { Value = N.Event.Title });
                 //活動日期
                 cTR.Cs.Add(new cTableCell { Value = N.Event.EventDate.ToString(DateFormat) });
+                //活動時間
+                cTR.Cs.Add(new cTableCell { Value = GetTimeSpanToString(N.Event.STime) + "~" + GetTimeSpanToString(N.Event.ETime) });
+                //活動內容
+                cTR.Cs.Add(new cTableCell { Value = N.Event.EventInfo });
                 //參加人數
-                cTR.Cs.Add(new cTableCell { Type = "link", URL = "/Web/StaffPlace/Join_List?SID=" + SID + "&EHID=" + N.EJHID, Target = "_black", Value = "(" + N.Event_Join_Detail.Count(q => !q.DeleteFlag) + ")" });
-                //備註
-                cTR.Cs.Add(new cTableCell { Value = N.Note });
+                cTR.Cs.Add(new cTableCell { Type = "link", URL = "/Web/StaffPlace/EventJoin_List?SID=" + SID + "&EHID=" + N.EJHID, Target = "_black", Value = N.Event_Join_Detail.Count(q => !q.DeleteFlag) + "/" + iTotal });
+                
                 cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
 
@@ -99,7 +106,6 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult Event_List()
         {
-
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
             return View(GetEvent_List(null));
@@ -115,6 +121,7 @@ namespace Banner.Areas.Web.Controllers
         #region 建立活動
         public class cEvent_Edit
         {
+            public int OIID { get; set; }
             public int EHID { get; set; }
             public string Title { get; set; }
             public string Info { get; set; }
@@ -132,6 +139,7 @@ namespace Banner.Areas.Web.Controllers
         {
             cEvent_Edit N = new cEvent_Edit();
             N.EHID = GetQueryStringInInt("EHID");
+            N.OIID = GetQueryStringInInt("OIID");
             GetSID();
 
             #region 資料庫讀取
@@ -325,6 +333,7 @@ namespace Banner.Areas.Web.Controllers
                     EH.Event = E;
                     EH.TargetType = 1;
                     EH.TargetID = SID;
+                    EH.OIID = N.OIID;
                     EH.EventDate = N.EventDate;
                     EH.Note = "";
                     EH.CreDate = DT;
@@ -406,8 +415,8 @@ namespace Banner.Areas.Web.Controllers
                 {
                     DateTime STime = Convert.ToDateTime(EH.EventDate.ToString(DateFormat) + " " + GetTimeSpanToString(EH.Event.STime));
                     DateTime ETime = Convert.ToDateTime(EH.EventDate.ToString(DateFormat) + " " + GetTimeSpanToString(EH.Event.ETime));
-                    if (DT < STime.AddMinutes(-10) || DT > ETime)
-                        TempData["QRCode_Msg"] = "本事工團活動可打卡時間為" + STime.AddMinutes(-10).ToString(DateTimeFormat) + " 至 " + ETime.ToString(DateTimeFormat);
+                    if (DT < STime.AddMinutes(EventQrCodeSTimeAdd) || DT > ETime.AddMinutes(EventQrCodeETimeAdd))
+                        TempData["QRCode_Msg"] = "本事工團活動可打卡時間為" + STime.AddMinutes(EventQrCodeSTimeAdd).ToString(DateTimeFormat) + " 至 " + ETime.AddMinutes(EventQrCodeETimeAdd).ToString(DateTimeFormat);
                     else
                     {
                         TempData["QRCode_Show"] = true;
@@ -423,6 +432,264 @@ namespace Banner.Areas.Web.Controllers
 
             return View();
         }
+        #endregion
+        #region 活動報名列表
+        public class cGetEventJoin_List
+        {
+            public cTableList cTL = new cTableList();
+        }
+        public cGetEventJoin_List GetEventJoin_List(FormCollection FC)
+        {
+            cGetEventJoin_List c = new cGetEventJoin_List();
+
+            c.cTL.Title = "團員簽到列表";
+            c.cTL.NowPage = 1;
+            c.cTL.NumCut = 0;
+            c.cTL.Rs = new List<cTableRow>();
+            GetSID();
+            int EHID = GetQueryStringInInt("EHID");
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "序號", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "ID", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "姓名" });
+            TopTitles.Add(new cTableCell { Title = "簽到時間", WidthPX = 160 });
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+
+            var Ns = DC.M_Staff_Account.Where(q => !q.DeleteFlag && q.SID == SID);
+            c.cTL.TotalCt = Ns.Count();
+            c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+            //Ns = Ns.OrderBy(q => q.Account.Name_First).ThenBy(q=>q.Account.Name_Last).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut);
+            Ns = Ns.OrderBy(q => q.Account.Name_First).ThenBy(q => q.Account.Name_Last);
+
+            var EDs = DC.Event_Join_Detail.Where(q => q.EJHID == EHID && !q.DeleteFlag).ToList();
+            var EH = DC.Event_Join_Header.FirstOrDefault(q => q.EJHID == EHID);
+            if (EH != null)
+                ViewBag._StaffTitle = ViewBag._StaffTitle + " " + EH.Event.Title;
+            int i = 1;
+            foreach (var N in Ns)
+            {
+                cTableRow cTR = new cTableRow();
+                //序號
+                cTR.Cs.Add(new cTableCell { Value = (i++).ToString() });
+                //ID
+                cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() });
+                //姓名
+                cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });
+                //簽到時間
+                var ED = EDs.FirstOrDefault(q => q.ACID == N.ACID);
+                if (ED == null)
+                    cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "javascript:JoinEvent(" + EHID + "," + N.ACID + ");", Target = "_self", Value = "補打卡" });
+                else if (ED.ACID == ED.SaveACID)//本人打卡
+                    cTR.Cs.Add(new cTableCell { Value = ED.JoinDate.ToString(DateTimeFormat) });
+                else
+                {
+                    cTableCell cT = new cTableCell();
+                    cT.cTCs.Add(new cTableCell { Value = ED.JoinDate.ToString(DateTimeFormat) });
+                    cT.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "javascript:RemoveEvent(" + ED.EJDID + ");", Target = "_self", Value = "移除打卡" });
+                    cTR.Cs.Add(cT);
+                }
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+
+            return c;
+        }
+        public ActionResult EventJoin_List()
+        {
+            GetViewBag();
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+            return View(GetEventJoin_List(null));
+        }
+        [HttpPost]
+        public ActionResult EventJoin_List(FormCollection FC)
+        {
+            GetViewBag();
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+            return View(GetEventJoin_List(FC));
+        }
+        #endregion
+        #region 補打卡API
+        [HttpGet]
+        public string StaffEvent_LeaderJoin(int EHID, int ACID)
+        {
+            int LeaderID = GetACID();
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+            var EH = DC.Event_Join_Header.FirstOrDefault(q => q.EJHID == EHID && !q.Event.DeleteFlag && q.TargetType == 1);
+            string Error = "";
+            if (AC == null)
+                Error += "查無此會員<br/>";
+            else if (EH == null)
+                Error += "缺少事工團活動資訊,無法補打卡<br/>";
+            else if (EH.Event.DeleteFlag)
+                Error += "該活動已被移除,無法補打卡<br/>";
+            else if (!EH.Event.ActiveFlag)
+                Error += "該活動未被啟用,無法補打卡<br/>";
+            else
+            {
+                var MSA = DC.M_Staff_Account.FirstOrDefault(q => q.SID == EH.TargetID && q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag);
+                if (MSA == null)
+                    Error += "此員並非本事工團成員,無法補打卡<br/>";
+                else if (EH.Event_Join_Detail.Any(q => !q.DeleteFlag && q.ACID == ACID))
+                    Error += "此員已打卡過了,請勿重複打卡<br/>";
+                else
+                {
+                    Event_Join_Detail EJD = DC.Event_Join_Detail.FirstOrDefault(q => q.EJHID == EH.EJHID && q.ACID == ACID);
+                    if (EJD == null)
+                    {
+                        EJD = new Event_Join_Detail();
+                        EJD.Event_Join_Header = EH;
+                        EJD.ACID = ACID;
+                        EJD.Name = AC.Name_Last + AC.Name_Last;
+                        EJD.PhoneNo = "";
+                        EJD.DeleteFlag = false;
+                        EJD.JoinDate = DT;
+                        EJD.CreDate = DT;
+                        EJD.UpdDate = DT;
+                        EJD.SaveACID = LeaderID;
+                        DC.Event_Join_Detail.InsertOnSubmit(EJD);
+                        DC.SubmitChanges();
+                    }
+                    else
+                    {
+                        EJD.Name = AC.Name_Last + AC.Name_Last;
+                        EJD.DeleteFlag = false;
+                        EJD.JoinDate = DT;
+                        EJD.UpdDate = DT;
+                        EJD.SaveACID = LeaderID;
+                        DC.SubmitChanges();
+                    }
+                }
+            }
+            return Error;
+        }
+        #endregion
+        #region 移除打卡API
+        [HttpGet]
+        public string StaffEvent_LeaderRemove(int EDID)
+        {
+            int ACID = GetACID();
+            var ED = DC.Event_Join_Detail.FirstOrDefault(q => q.EJDID == EDID);
+            var MACs = DC.M_Staff_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.LeaderFlag);
+            string Error = "";
+
+            if (ED == null)
+                Error += "缺少事工團活動資訊,無法移除打卡<br/>";
+            else if (ED.DeleteFlag)
+                Error += "該打卡紀錄已被移除<br/>";
+            else if (ED.SaveACID == ED.ACID)
+                Error += "本人的打卡紀錄不能被移除<br/>";
+            else if (!MACs.Any(q => q.SID == ED.Event_Join_Header.TargetID && q.OIID == ED.Event_Join_Header.OIID))
+                Error += "您並非本團主責,不能進行移除作業<br/>";
+            else
+            {
+                ED.DeleteFlag = true;
+                ED.UpdDate = DT;
+                ED.SaveACID = ACID;
+                DC.SubmitChanges();
+            }
+            return Error;
+        }
+        #endregion
+        #region 我的事工團活動歷程
+        public class cGetMyStaffEvnet_List
+        {
+            public ListSelect LS = new ListSelect();
+            public string SDate = "";
+            public string EDate = "";
+            public cTableList cTL = new cTableList();
+        }
+        public cGetMyStaffEvnet_List GetMyStaffEvnet_List(FormCollection FC)
+        {
+            cGetMyStaffEvnet_List c = new cGetMyStaffEvnet_List();
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            c.cTL.Title = "事工團活動列表";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
+            ACID = GetACID();
+            #region 物件初始化
+            c.LS = new ListSelect();
+            c.LS.Title = "所屬事工團";
+            c.LS.ControlName = "ddl_StaffTitle";
+            c.LS.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
+            c.LS.ddlList.AddRange(from q in DC.M_Staff_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag).OrderBy(q => q.OIID).ThenBy(q => q.Staff.SCID).ThenBy(q => q.SID)
+                                  select new SelectListItem { Text = "[" + q.OrganizeInfo.Title + q.OrganizeInfo.Organize.Title + "]" + q.Staff.Staff_Category.Title + " " + q.Staff.Title, Value = q.OIID + "," + q.SID });
+
+            #endregion
+
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "活動類型", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "標題" });
+            TopTitles.Add(new cTableCell { Title = "活動日期", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "活動時間", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "活動內容" });
+            TopTitles.Add(new cTableCell { Title = "簽到時間", WidthPX = 160 });
+
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+
+            var Ns = DC.Event_Join_Detail.Where(q => q.ACID == ACID && q.Event_Join_Header.TargetType == 1 && !q.Event_Join_Header.Event.DeleteFlag);
+            #region 篩選
+            if (FC != null)
+            {
+                string IDs = FC.Get("ddl_StaffTitle");
+                string[] sIDs = IDs.Split(',');
+                if (sIDs.Length == 2)
+                {
+                    c.LS.ddlList.ForEach(q => q.Selected = false);
+                    c.LS.ddlList.First(q => q.Value == IDs).Selected = true;
+
+                    Ns = Ns.Where(q => q.Event_Join_Header.OIID.ToString() == sIDs[0] && q.Event_Join_Header.TargetID.ToString() == sIDs[1]);
+                }
+
+                DateTime DT_ = DateTime.Now;
+                if (DateTime.TryParse(FC.Get("txb_SDate"), out DT_))
+                    Ns = Ns.Where(q => q.Event_Join_Header.EventDate.Date >= DT.Date);
+                if (DateTime.TryParse(FC.Get("txb_EDate"), out DT_))
+                    Ns = Ns.Where(q => q.Event_Join_Header.EventDate.Date <= DT.Date);
+            }
+            #endregion
+
+            c.cTL.TotalCt = Ns.Count();
+            c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.Event_Join_Header.Event.EventDate).ThenByDescending(q => q.Event_Join_Header.Event.STime).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
+            foreach (var N in Ns)
+            {
+                cTableRow cTR = new cTableRow();
+                //活動類型
+                cTR.Cs.Add(new cTableCell { Value = sCourseType[N.Event_Join_Header.Event.EventType] });
+                //標題
+                cTR.Cs.Add(new cTableCell { Value = N.Event_Join_Header.Event.Title });
+                //活動日期
+                cTR.Cs.Add(new cTableCell { Value = N.Event_Join_Header.Event.EventDate.ToString(DateFormat) });
+                //活動時間
+                cTR.Cs.Add(new cTableCell { Value = GetTimeSpanToString(N.Event_Join_Header.Event.STime) + "~" + GetTimeSpanToString(N.Event_Join_Header.Event.ETime) });
+                //活動內容
+                cTR.Cs.Add(new cTableCell { Value = N.Event_Join_Header.Event.EventInfo });
+                //簽到時間
+                cTR.Cs.Add(new cTableCell { Value = N.JoinDate.ToString(DateTimeFormat) });
+
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+
+            return c;
+        }
+        [HttpGet]
+        public ActionResult MyStaffEvnet_List()
+        {
+            GetViewBag();
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+            return View(GetMyStaffEvnet_List(null));
+        }
+        [HttpPost]
+        public ActionResult MyStaffEvnet_List(FormCollection FC)
+        {
+            GetViewBag();
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+            return View(GetMyStaffEvnet_List(FC));
+        }
+
         #endregion
     }
 }

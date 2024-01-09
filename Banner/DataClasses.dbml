@@ -271,19 +271,6 @@
       <Association Name="Event_Category_Event" Member="Event" ThisKey="ECID" OtherKey="ECID" Type="Event" />
     </Type>
   </Table>
-  <Table Name="dbo.Event_Join_Detail" Member="Event_Join_Detail">
-    <Type Name="Event_Join_Detail">
-      <Column Name="EJDID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="EJHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="PhoneNo" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="JoinDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Association Name="Event_Join_Header_Event_Join_Detail" Member="Event_Join_Header" ThisKey="EJHID" OtherKey="EJHID" Type="Event_Join_Header" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.Family" Member="Family">
     <Type Name="Family">
       <Column Name="FID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -908,6 +895,7 @@
       <Column Name="EID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="TargetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="TargetID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OIID" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="EventDate" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
       <Column Name="Note" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
@@ -915,6 +903,21 @@
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Event_Join_Header_Event_Join_Detail" Member="Event_Join_Detail" ThisKey="EJHID" OtherKey="EJHID" Type="Event_Join_Detail" />
       <Association Name="Event_Event_Join_Header" Member="Event" ThisKey="EID" OtherKey="EID" Type="Event" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Event_Join_Detail" Member="Event_Join_Detail">
+    <Type Name="Event_Join_Detail">
+      <Column Name="EJDID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="EJHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="PhoneNo" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="JoinDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Event_Join_Header_Event_Join_Detail" Member="Event_Join_Header" ThisKey="EJHID" OtherKey="EJHID" Type="Event_Join_Header" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

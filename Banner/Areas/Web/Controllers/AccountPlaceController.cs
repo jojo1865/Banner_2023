@@ -1169,10 +1169,8 @@ namespace Banner.Areas.Web.Controllers
                                 DC.SubmitChanges();
                             }
 
-                            var EJD = DC.Event_Join_Detail.FirstOrDefault(q => q.EJHID == EJH.EJHID && q.ACID == ACID);
-                            if (EJD != null)
-                                SetAlert("您已報到過了...", 4, "/Web/Home/Index");
-                            else
+                            var EJD = DC.Event_Join_Detail.FirstOrDefault(q => q.EJHID == EJH.EJHID && q.ACID == ACID && !q.DeleteFlag);
+                            if (EJD == null)
                             {
                                 EJD = new Event_Join_Detail
                                 {
@@ -1182,13 +1180,21 @@ namespace Banner.Areas.Web.Controllers
                                     PhoneNo = "",
                                     DeleteFlag = false,
                                     JoinDate = DT,
-                                    CreDate = DT
+                                    CreDate = DT,
+                                    UpdDate = DT,
+                                    SaveACID = ACID
                                 };
                                 DC.Event_Join_Detail.InsertOnSubmit(EJD);
                                 DC.SubmitChanges();
-
-                                SetAlert("您已報到完成", 1, "/Web/AccountPlace/GroupMeet_List");
                             }
+                            else
+                            {
+                                EJD.Name = AC != null ? AC.Name_First + AC.Name_Last : "";
+                                EJD.DeleteFlag = false;
+                                EJD.JoinDate = DT;
+                                DC.SubmitChanges();
+                            }
+                            SetAlert("您已報到完成", 1, "/Web/AccountPlace/GroupMeet_List");
                         }
                     }
                     else
@@ -1349,16 +1355,31 @@ namespace Banner.Areas.Web.Controllers
                         SetAlert("本事工團活動可打卡時間為" + STime.AddMinutes(-10).ToString(DateTimeFormat) + " 至 " + ETime.ToString(DateTimeFormat), 2, "/Web/Home/Index");
                     else
                     {
-                        Event_Join_Detail EJD = new Event_Join_Detail();
-                        EJD.Event_Join_Header = EH;
-                        EJD.ACID = ACID;
-                        EJD.Name = AC.Name_Last + AC.Name_Last;
-                        EJD.PhoneNo = "";
-                        EJD.DeleteFlag = false;
-                        EJD.JoinDate = DT;
-                        EJD.CreDate = DT;
-                        DC.Event_Join_Detail.InsertOnSubmit(EJD);
-                        DC.SubmitChanges();
+                        Event_Join_Detail EJD = DC.Event_Join_Detail.FirstOrDefault(q => q.ACID == ACID);
+                        if(EJD == null)
+                        {
+                            EJD = new Event_Join_Detail();
+                            EJD.Event_Join_Header = EH;
+                            EJD.ACID = ACID;
+                            EJD.Name = AC.Name_Last + AC.Name_Last;
+                            EJD.PhoneNo = "";
+                            EJD.DeleteFlag = false;
+                            EJD.JoinDate = DT;
+                            EJD.CreDate = DT;
+                            EJD.UpdDate = DT;
+                            EJD.SaveACID = ACID;
+                            DC.Event_Join_Detail.InsertOnSubmit(EJD);
+                            DC.SubmitChanges();
+                        }
+                        else
+                        {
+                            EJD.Name = AC.Name_Last + AC.Name_Last;
+                            EJD.DeleteFlag = false;
+                            EJD.JoinDate = DT;
+                            EJD.UpdDate = DT;
+                            EJD.SaveACID = ACID;
+                            DC.SubmitChanges();
+                        }
 
                         SetAlert("您已報到完成", 1, "/Web/StaffPlace/MyStaffEvnet_List");
                     }

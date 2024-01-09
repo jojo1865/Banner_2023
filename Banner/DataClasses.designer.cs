@@ -78,9 +78,6 @@ namespace Banner
     partial void InsertEvent_Category(Event_Category instance);
     partial void UpdateEvent_Category(Event_Category instance);
     partial void DeleteEvent_Category(Event_Category instance);
-    partial void InsertEvent_Join_Detail(Event_Join_Detail instance);
-    partial void UpdateEvent_Join_Detail(Event_Join_Detail instance);
-    partial void DeleteEvent_Join_Detail(Event_Join_Detail instance);
     partial void InsertFamily(Family instance);
     partial void UpdateFamily(Family instance);
     partial void DeleteFamily(Family instance);
@@ -189,6 +186,9 @@ namespace Banner
     partial void InsertEvent_Join_Header(Event_Join_Header instance);
     partial void UpdateEvent_Join_Header(Event_Join_Header instance);
     partial void DeleteEvent_Join_Header(Event_Join_Header instance);
+    partial void InsertEvent_Join_Detail(Event_Join_Detail instance);
+    partial void UpdateEvent_Join_Detail(Event_Join_Detail instance);
+    partial void DeleteEvent_Join_Detail(Event_Join_Detail instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -340,14 +340,6 @@ namespace Banner
 			get
 			{
 				return this.GetTable<Event_Category>();
-			}
-		}
-		
-		public System.Data.Linq.Table<Event_Join_Detail> Event_Join_Detail
-		{
-			get
-			{
-				return this.GetTable<Event_Join_Detail>();
 			}
 		}
 		
@@ -644,6 +636,14 @@ namespace Banner
 			get
 			{
 				return this.GetTable<Event_Join_Header>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Event_Join_Detail> Event_Join_Detail
+		{
+			get
+			{
+				return this.GetTable<Event_Join_Detail>();
 			}
 		}
 		
@@ -6563,277 +6563,6 @@ namespace Banner
 		{
 			this.SendPropertyChanging();
 			entity.Event_Category = null;
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Event_Join_Detail")]
-	public partial class Event_Join_Detail : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _EJDID;
-		
-		private int _EJHID;
-		
-		private int _ACID;
-		
-		private string _Name;
-		
-		private string _PhoneNo;
-		
-		private bool _DeleteFlag;
-		
-		private System.DateTime _JoinDate;
-		
-		private System.DateTime _CreDate;
-		
-		private EntityRef<Event_Join_Header> _Event_Join_Header;
-		
-    #region 擴充性方法定義
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnEJDIDChanging(int value);
-    partial void OnEJDIDChanged();
-    partial void OnEJHIDChanging(int value);
-    partial void OnEJHIDChanged();
-    partial void OnACIDChanging(int value);
-    partial void OnACIDChanged();
-    partial void OnNameChanging(string value);
-    partial void OnNameChanged();
-    partial void OnPhoneNoChanging(string value);
-    partial void OnPhoneNoChanged();
-    partial void OnDeleteFlagChanging(bool value);
-    partial void OnDeleteFlagChanged();
-    partial void OnJoinDateChanging(System.DateTime value);
-    partial void OnJoinDateChanged();
-    partial void OnCreDateChanging(System.DateTime value);
-    partial void OnCreDateChanged();
-    #endregion
-		
-		public Event_Join_Detail()
-		{
-			this._Event_Join_Header = default(EntityRef<Event_Join_Header>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EJDID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int EJDID
-		{
-			get
-			{
-				return this._EJDID;
-			}
-			set
-			{
-				if ((this._EJDID != value))
-				{
-					this.OnEJDIDChanging(value);
-					this.SendPropertyChanging();
-					this._EJDID = value;
-					this.SendPropertyChanged("EJDID");
-					this.OnEJDIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EJHID", DbType="Int NOT NULL")]
-		public int EJHID
-		{
-			get
-			{
-				return this._EJHID;
-			}
-			set
-			{
-				if ((this._EJHID != value))
-				{
-					if (this._Event_Join_Header.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnEJHIDChanging(value);
-					this.SendPropertyChanging();
-					this._EJHID = value;
-					this.SendPropertyChanged("EJHID");
-					this.OnEJHIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
-		public int ACID
-		{
-			get
-			{
-				return this._ACID;
-			}
-			set
-			{
-				if ((this._ACID != value))
-				{
-					this.OnACIDChanging(value);
-					this.SendPropertyChanging();
-					this._ACID = value;
-					this.SendPropertyChanged("ACID");
-					this.OnACIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(100)")]
-		public string Name
-		{
-			get
-			{
-				return this._Name;
-			}
-			set
-			{
-				if ((this._Name != value))
-				{
-					this.OnNameChanging(value);
-					this.SendPropertyChanging();
-					this._Name = value;
-					this.SendPropertyChanged("Name");
-					this.OnNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PhoneNo", DbType="VarChar(50)")]
-		public string PhoneNo
-		{
-			get
-			{
-				return this._PhoneNo;
-			}
-			set
-			{
-				if ((this._PhoneNo != value))
-				{
-					this.OnPhoneNoChanging(value);
-					this.SendPropertyChanging();
-					this._PhoneNo = value;
-					this.SendPropertyChanged("PhoneNo");
-					this.OnPhoneNoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
-		public bool DeleteFlag
-		{
-			get
-			{
-				return this._DeleteFlag;
-			}
-			set
-			{
-				if ((this._DeleteFlag != value))
-				{
-					this.OnDeleteFlagChanging(value);
-					this.SendPropertyChanging();
-					this._DeleteFlag = value;
-					this.SendPropertyChanged("DeleteFlag");
-					this.OnDeleteFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JoinDate", DbType="DateTime NOT NULL")]
-		public System.DateTime JoinDate
-		{
-			get
-			{
-				return this._JoinDate;
-			}
-			set
-			{
-				if ((this._JoinDate != value))
-				{
-					this.OnJoinDateChanging(value);
-					this.SendPropertyChanging();
-					this._JoinDate = value;
-					this.SendPropertyChanged("JoinDate");
-					this.OnJoinDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
-		public System.DateTime CreDate
-		{
-			get
-			{
-				return this._CreDate;
-			}
-			set
-			{
-				if ((this._CreDate != value))
-				{
-					this.OnCreDateChanging(value);
-					this.SendPropertyChanging();
-					this._CreDate = value;
-					this.SendPropertyChanged("CreDate");
-					this.OnCreDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_Join_Header_Event_Join_Detail", Storage="_Event_Join_Header", ThisKey="EJHID", OtherKey="EJHID", IsForeignKey=true)]
-		public Event_Join_Header Event_Join_Header
-		{
-			get
-			{
-				return this._Event_Join_Header.Entity;
-			}
-			set
-			{
-				Event_Join_Header previousValue = this._Event_Join_Header.Entity;
-				if (((previousValue != value) 
-							|| (this._Event_Join_Header.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Event_Join_Header.Entity = null;
-						previousValue.Event_Join_Detail.Remove(this);
-					}
-					this._Event_Join_Header.Entity = value;
-					if ((value != null))
-					{
-						value.Event_Join_Detail.Add(this);
-						this._EJHID = value.EJHID;
-					}
-					else
-					{
-						this._EJHID = default(int);
-					}
-					this.SendPropertyChanged("Event_Join_Header");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
 		}
 	}
 	
@@ -20265,6 +19994,8 @@ namespace Banner
 		
 		private int _TargetID;
 		
+		private System.Nullable<int> _OIID;
+		
 		private System.DateTime _EventDate;
 		
 		private string _Note;
@@ -20291,6 +20022,8 @@ namespace Banner
     partial void OnTargetTypeChanged();
     partial void OnTargetIDChanging(int value);
     partial void OnTargetIDChanged();
+    partial void OnOIIDChanging(System.Nullable<int> value);
+    partial void OnOIIDChanged();
     partial void OnEventDateChanging(System.DateTime value);
     partial void OnEventDateChanged();
     partial void OnNoteChanging(string value);
@@ -20390,6 +20123,26 @@ namespace Banner
 					this._TargetID = value;
 					this.SendPropertyChanged("TargetID");
 					this.OnTargetIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int")]
+		public System.Nullable<int> OIID
+		{
+			get
+			{
+				return this._OIID;
+			}
+			set
+			{
+				if ((this._OIID != value))
+				{
+					this.OnOIIDChanging(value);
+					this.SendPropertyChanging();
+					this._OIID = value;
+					this.SendPropertyChanged("OIID");
+					this.OnOIIDChanged();
 				}
 			}
 		}
@@ -20571,6 +20324,325 @@ namespace Banner
 		{
 			this.SendPropertyChanging();
 			entity.Event_Join_Header = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Event_Join_Detail")]
+	public partial class Event_Join_Detail : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _EJDID;
+		
+		private int _EJHID;
+		
+		private int _ACID;
+		
+		private string _Name;
+		
+		private string _PhoneNo;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _JoinDate;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Event_Join_Header> _Event_Join_Header;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnEJDIDChanging(int value);
+    partial void OnEJDIDChanged();
+    partial void OnEJHIDChanging(int value);
+    partial void OnEJHIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnPhoneNoChanging(string value);
+    partial void OnPhoneNoChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnJoinDateChanging(System.DateTime value);
+    partial void OnJoinDateChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Event_Join_Detail()
+		{
+			this._Event_Join_Header = default(EntityRef<Event_Join_Header>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EJDID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int EJDID
+		{
+			get
+			{
+				return this._EJDID;
+			}
+			set
+			{
+				if ((this._EJDID != value))
+				{
+					this.OnEJDIDChanging(value);
+					this.SendPropertyChanging();
+					this._EJDID = value;
+					this.SendPropertyChanged("EJDID");
+					this.OnEJDIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_EJHID", DbType="Int NOT NULL")]
+		public int EJHID
+		{
+			get
+			{
+				return this._EJHID;
+			}
+			set
+			{
+				if ((this._EJHID != value))
+				{
+					if (this._Event_Join_Header.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnEJHIDChanging(value);
+					this.SendPropertyChanging();
+					this._EJHID = value;
+					this.SendPropertyChanged("EJHID");
+					this.OnEJHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(100)")]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PhoneNo", DbType="VarChar(50)")]
+		public string PhoneNo
+		{
+			get
+			{
+				return this._PhoneNo;
+			}
+			set
+			{
+				if ((this._PhoneNo != value))
+				{
+					this.OnPhoneNoChanging(value);
+					this.SendPropertyChanging();
+					this._PhoneNo = value;
+					this.SendPropertyChanged("PhoneNo");
+					this.OnPhoneNoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JoinDate", DbType="DateTime NOT NULL")]
+		public System.DateTime JoinDate
+		{
+			get
+			{
+				return this._JoinDate;
+			}
+			set
+			{
+				if ((this._JoinDate != value))
+				{
+					this.OnJoinDateChanging(value);
+					this.SendPropertyChanging();
+					this._JoinDate = value;
+					this.SendPropertyChanged("JoinDate");
+					this.OnJoinDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Event_Join_Header_Event_Join_Detail", Storage="_Event_Join_Header", ThisKey="EJHID", OtherKey="EJHID", IsForeignKey=true)]
+		public Event_Join_Header Event_Join_Header
+		{
+			get
+			{
+				return this._Event_Join_Header.Entity;
+			}
+			set
+			{
+				Event_Join_Header previousValue = this._Event_Join_Header.Entity;
+				if (((previousValue != value) 
+							|| (this._Event_Join_Header.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Event_Join_Header.Entity = null;
+						previousValue.Event_Join_Detail.Remove(this);
+					}
+					this._Event_Join_Header.Entity = value;
+					if ((value != null))
+					{
+						value.Event_Join_Detail.Add(this);
+						this._EJHID = value.EJHID;
+					}
+					else
+					{
+						this._EJHID = default(int);
+					}
+					this.SendPropertyChanged("Event_Join_Header");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 	

@@ -12,236 +12,243 @@
                     <div class="text-center div_NoDataMsg">查無資料</div>
                 }
             }
-        <table class="table_RWDStyle table">
-            <thead>
-                @if (Model.Rs != null)
-                {
-                    foreach (var R in Model.Rs.Where(q => q.CSS == "Bgn"))
+            <table class="table_RWDStyle table">
+                <thead>
+                    @if (Model.Rs != null)
                     {
-                        <tr class="@R.CSS">
-                            @foreach (var C in R.Cs)
-                            {
-                                if (C.WidthPX > 0)
+                        foreach (var R in Model.Rs.Where(q => q.CSS == "Bgn"))
+                        {
+                            <tr class="@R.CSS">
+                                @foreach (var C in R.Cs)
                                 {
-                                    <th style="width:@(C.WidthPX + "px")">@C.Title</th>
-                                }
-                                else
-                                {
-                                    <th>@C.Title</th>
-                                }
-                            }
-                        </tr>
-
-                    }
-                }
-            </thead>
-            <tbody>
-                @if (Model.Rs != null)
-                {
-                    foreach (var R in Model.Rs.Where(q => q.CSS != "Bgn"))
-                    {
-                        <tr class="@R.CSS">
-                            @foreach (var C in R.Cs)
-                            {
-                                if (C.cTCs.Count > 0)//若一欄內有多個按鈕功能
-                                {
-                                    <td>
-                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                        @foreach (var C_ in C.cTCs)
-                                        {
-                                            switch (C_.Type)
-                                            {
-                                                case "link"://link
-                                                    {
-                                                        <a href="@C_.URL" target="@C_.Target" class="@C_.CSS">@C_.Value</a>
-                                                    }
-                                                    break;
-                                                case "linkbutton"://linkbutton
-                                                    {
-                                                        <a href="@C_.URL" target="@C_.Target" class="btn btn-primary btn-round btn-sm">@C_.Value</a>
-                                                    }
-                                                    break;
-                                            }
-                                        }
-                                    </td>
-                                }
-                                else
-                                {
-                                    switch (C.Type)
+                                    if (C.WidthPX > 0)
                                     {
-                                        default://string
-                                            {
+                                        <th style="width:@(C.WidthPX + "px")">@C.Title</th>
+                                    }
+                                    else
+                                    {
+                                        <th>@C.Title</th>
+                                    }
+                                }
+                            </tr>
 
-                                                <td style="word-break: break-all;">
-                                                    <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <span class="@C.CSS">@C.Value</span>
-                                                </td>
+                        }
+                    }
+                </thead>
+                <tbody>
+                    @if (Model.Rs != null)
+                    {
+                        foreach (var R in Model.Rs.Where(q => q.CSS != "Bgn"))
+                        {
+                            <tr class="@R.CSS">
+                                @foreach (var C in R.Cs)
+                                {
+                                    if (C.cTCs.Count > 0)//若一欄內有多個按鈕功能
+                                    {
+                                        <td>
+                                            <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                            @foreach (var C_ in C.cTCs)
+                                            {
+                                                switch (C_.Type)
+                                                {
+                                                    case "link"://link
+                                                        {
+                                                            <a href="@C_.URL" target="@C_.Target" class="@C_.CSS">@C_.Value</a>
+                                                        }
+                                                        break;
+
+                                                    case "linkbutton"://linkbutton
+                                                        {
+                                                            <a href="@C_.URL" target="@C_.Target" class="btn btn-primary btn-round btn-sm">@C_.Value</a>
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        {
+                                                            <span>@C_.Value</span>
+                                                        }
+                                                        break;
+                                                }
                                             }
-                                            break;
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        switch (C.Type)
+                                        {
+                                            default://string
+                                                {
 
-                                        case "link"://link
-                                            {
+                                                    <td style="word-break: break-all;">
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <span class="@C.CSS">@C.Value</span>
+                                                    </td>
+                                                }
+                                                break;
+
+                                            case "link"://link
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <a href="@C.URL" target="@C.Target" class="@C.CSS">@C.Value</a>
+                                                    </td>
+                                                }
+                                                break;
+
+                                            case "linkbutton"://linkbutton
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <a href="@C.URL" target="@C.Target" class="btn btn-primary btn-round btn_Basic">@C.Value</a>
+                                                    </td>
+                                                }
+                                                break;
+                                            case "Media"://Media
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <a href="@C.URL" target="@C.Target">
+                                                            <i class="fa-solid fa-play"></i>
+                                                        </a>
+                                                    </td>
+                                                }
+                                                break;
+
+                                            case "img"://img
                                                 <td>
                                                     <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <a href="@C.URL" target="@C.Target" class="@C.CSS">@C.Value</a>
+                                                    <img src="@C.ImgURL" alt="@C.Value" class="@C.CSS" />
                                                 </td>
-                                            }
-                                            break;
+                                                break;
 
-                                        case "linkbutton"://linkbutton
-                                            {
-                                                <td>
-                                                    <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <a href="@C.URL" target="@C.Target" class="btn btn-primary btn-round btn_Basic">@C.Value</a>
-                                                </td>
-                                            }
-                                            break;
-                                        case "Media"://Media
-                                            {
-                                                <td>
-                                                    <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <a href="@C.URL" target="@C.Target">
-                                                        <i class="fa-solid fa-play"></i>
-                                                    </a>
-                                                </td>
-                                            }
-                                            break;
+                                            case "linkimg"://linkimg
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <a href="@C.URL" target="@C.Target">
+                                                            <img src="@C.ImgURL" alt="@C.Value" class="@C.CSS" />
+                                                        </a>
+                                                    </td>
+                                                }
+                                                break;
 
-                                        case "img"://img
-                                            <td>
-                                                <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                <img src="@C.ImgURL" alt="@C.Value" class="@C.CSS" />
-                                            </td>
-                                            break;
+                                            case "area-string"://textarea
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle lab_AreaTitleCell">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <textarea name="@(C.ControlName + R.ID)" disabled="@C.Disabled" class="form-control">@C.Value</textarea>
+                                                    </td>
+                                                }
+                                                break;
 
-                                        case "linkimg"://linkimg
-                                            {
-                                                <td>
-                                                    <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <a href="@C.URL" target="@C.Target">
-                                                        <img src="@C.ImgURL" alt="@C.Value" class="@C.CSS" />
-                                                    </a>
-                                                </td>
-                                            }
-                                            break;
-
-                                        case "area-string"://textarea
-                                            {
-                                                <td>
-                                                    <span class="lab_MobelTitle lab_AreaTitleCell">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <textarea name="@(C.ControlName + R.ID)" disabled="@C.Disabled" class="form-control">@C.Value</textarea>
-                                                </td>
-                                            }
-                                            break;
-
-                                        case "input-string"://input-string
-                                            {
-                                                <td>
-                                                    <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <input name="@(C.ControlName + R.ID)" type="text" disabled="@C.Disabled" class="form-control" value="@C.Value">
-                                                </td>
-                                            }
-                                            break;
+                                            case "input-string"://input-string
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <input name="@(C.ControlName + R.ID)" type="text" disabled="@C.Disabled" class="form-control" value="@C.Value">
+                                                    </td>
+                                                }
+                                                break;
 
 
 
-                                        case "input-number"://input-number
-                                            {
-                                                <td>
-                                                    <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <input name="@(C.ControlName + R.ID)" type="number" disabled="@C.Disabled" class="form-control" value="@C.Value">
-                                                </td>
-                                            }
-                                            break;
+                                            case "input-number"://input-number
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <input name="@(C.ControlName + R.ID)" type="number" disabled="@C.Disabled" class="form-control" value="@C.Value">
+                                                    </td>
+                                                }
+                                                break;
 
-                                        case "checkbox"://checkbox
-                                            {
-                                                <td class="text-lg-center">
-                                                    <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <input id="@(C.ControlName + R.ID)" class="form-check-input" type="checkbox" disabled="@C.Disabled" name="@(C.ControlName + R.ID)" @(C.Value == "True" ? "checked" : "") aria-label="@(C.Title)">
-                                                    <label for="@(C.ControlName + R.ID)">@(C.Title)</label>
-                                                </td>
-                                            }
-                                            break;
+                                            case "checkbox"://checkbox
+                                                {
+                                                    <td class="text-lg-center">
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <input id="@(C.ControlName + R.ID)" class="form-check-input" type="checkbox" disabled="@C.Disabled" name="@(C.ControlName + R.ID)" @(C.Value == "True" ? "checked" : "") aria-label="@(C.Title)">
+                                                        <label for="@(C.ControlName + R.ID)">@(C.Title)</label>
+                                                    </td>
+                                                }
+                                                break;
 
-                                        case "edit"://edit
-                                            {
-                                                <td>
-                                                    <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <a href="@C.URL" target="@C.Target"><i class="fa-solid fa-pen-to-square"></i></a>
-                                                </td>
-                                            }
-                                            break;
+                                            case "edit"://edit
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <a href="@C.URL" target="@C.Target"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                    </td>
+                                                }
+                                                break;
 
-                                        case "delete"://delete
-                                            {
-                                                <td>
-                                                    <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                    <a href="@C.URL"><i class="fa-solid fa-trash"></i></a>
-                                                </td>
-                                            }
-                                            break;
+                                            case "delete"://delete
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <a href="@C.URL"><i class="fa-solid fa-trash"></i></a>
+                                                    </td>
+                                                }
+                                                break;
+
+                                        }
 
                                     }
+
+
+
 
                                 }
-
-
-
-
-                            }
-                        </tr>
+                            </tr>
+                        }
                     }
+                </tbody>
+                @if (Model.NumCut > 0)
+                {
+                    <tfoot>
+                        <tr>
+                            <td colspan="10">
+                                <div class="pagination-container">
+                                    <div class="aux-empty">&nbsp;</div>
+                                    <div class="pagination-button-group">
+                                        @{
+                                            int iMin = (Model.NowPage / Model.NumCut - (Model.NowPage % Model.NumCut == 0 ? 1 : 0)) * Model.NumCut + 1;
+                                            if (iMin <= 0) { iMin = 1; }
+                                            if (Model.NowPage > 1)
+                                            {
+                                                <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(1)">最前頁</a>
+                                                <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.NowPage - 1))">上頁</a>
+                                            }
+                                            <span>
+                                                第
+                                                <span class="current-page">@Model.NowPage</span> /
+                                                <span class="total-page">@Model.MaxNum</span>
+                                                頁，共
+                                                <span class="total">@Model.TotalCt</span>
+                                                筆
+                                            </span>
+                                            if (Model.NowPage < Model.MaxNum)
+                                            {
+                                                <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.NowPage + 1))">下頁</a>
+                                                <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.MaxNum))">最末頁</a>
+                                            }
+                                        }
+                                    </div>
+                                    <div class="pagesize-container">
+                                        <label>每頁筆數</label>
+                                        <select class="form-select form-select-sm" name="ddl_ChangePageCut" onchange="ChangePageCut()">
+                                            @for (int j = 0; j < 5; j++)
+                                            {
+                                                int jCt = 10 * (j + 1);
+                                                <option value="@jCt" @(Model.NumCut == jCt ? "selected" : "")>@jCt</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
                 }
-            </tbody>
-            @if (Model.NumCut > 0)
-            {
-                <tfoot>
-                    <tr>
-                        <td colspan="10">
-                            <div class="pagination-container">
-                                <div class="aux-empty">&nbsp;</div>
-                                <div class="pagination-button-group">
-                                    @{
-                                        int iMin = (Model.NowPage / Model.NumCut - (Model.NowPage % Model.NumCut == 0 ? 1 : 0)) * Model.NumCut + 1;
-                                        if (iMin <= 0) { iMin = 1; }
-                                        if (Model.NowPage > 1)
-                                        {
-                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(1)">最前頁</a>
-                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.NowPage - 1))">上頁</a>
-                                        }
-                                        <span>
-                                            第
-                                            <span class="current-page">@Model.NowPage</span> /
-                                            <span class="total-page">@Model.MaxNum</span>
-                                            頁，共
-                                            <span class="total">@Model.TotalCt</span>
-                                            筆
-                                        </span>
-                                        if (Model.NowPage < Model.MaxNum)
-                                        {
-                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.NowPage + 1))">下頁</a>
-                                            <a class="btn btn-outline-primary btn-sm btn-round" href="#" onclick="ChangePage(@(Model.MaxNum))">最末頁</a>
-                                        }
-                                    }
-                                </div>
-                                <div class="pagesize-container">
-                                    <label>每頁筆數</label>
-                                    <select class="form-select form-select-sm" name="ddl_ChangePageCut" onchange="ChangePageCut()">
-                                        @for (int j = 0; j < 5; j++)
-                                        {
-                                            int jCt = 10 * (j + 1);
-                                            <option value="@jCt" @(Model.NumCut == jCt ? "selected" : "")>@jCt</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tfoot>
-            }
 
-        </table>
+            </table>
         </div>
 
     }

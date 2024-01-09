@@ -1,8 +1,62 @@
-﻿
+﻿@model Banner.Areas.Web.Controllers.StaffPlaceController.cGetMyStaffEvnet_List
 @{
     ViewBag.Title = "MyStaffEvnet_List";
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
 }
 
-<h2>事工團活動歷程</h2>
 
+<div class="body-container container_phone">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">事工團活動歷程</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">事工團活動歷程</h5>
+        </div>
+        @Html.Action("_GroupTopMenu", "Include")
+        <div class="container-lg">
+            <form method="post" id="form1">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-5 col-12">
+                                <label>@Model.LS.Title</label>
+                                @Html.DropDownList(Model.LS.ControlName, Model.LS.ddlList, new { @class = "form-select form-select-lg" })
+                            </div>
+                            <div class="col-lg-5 col-12">
+                                <label>日期區間</label>
+                                <div class="row">
+                                    <div class="col-lg-auto col-12">
+                                        @Html.TextBox("txb_SDate", Model.SDate, new {@class = "form-control form-control-lg",@type="date" })
+                                    </div>
+                                    <div class="col-lg-auto col-12 pt-2 text-center">至</div>
+                                    <div class="col-lg-auto col-12">
+                                        @Html.TextBox("txb_EDate", Model.EDate, new { @class = "form-control form-control-lg", @type = "date" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-1 col-12">
+                                <div class="col-lg-6 col-12 text-lg-end text-center pt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function Search() {
+        document.getElementById("form1").submit ;
+    }
+</script>

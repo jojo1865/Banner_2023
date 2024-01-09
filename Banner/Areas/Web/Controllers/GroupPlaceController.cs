@@ -902,7 +902,9 @@ namespace Banner.Areas.Web.Controllers
                                     PhoneNo = "",
                                     DeleteFlag = false,
                                     JoinDate = DT,
-                                    CreDate = DT
+                                    CreDate = DT,
+                                    UpdDate = DT,
+                                    SaveACID = ACID
                                 };
                                 DC.Event_Join_Detail.InsertOnSubmit(EJD);
                                 DC.SubmitChanges();

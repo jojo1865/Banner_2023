@@ -288,7 +288,7 @@ namespace Banner.Areas.Web.Controllers
                     if (OIID > 0)
                         cM.Url += "/" + OIID;
                     if (SID > 0)
-                        cM.Url += "?SID=" + SID;
+                        cM.Url += "?SID=" + SID + "&OIID="+ OIID;
                     Items.Add(cM);
                 }
             }

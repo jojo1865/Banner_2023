@@ -200,7 +200,7 @@ namespace Banner.Areas.Admin.Controllers
                     OP.ParentID = cOE.O.OID;
                     DC.SubmitChanges();
                 }
-
+                #region 選單角色設定
                 //選單角色設定
                 var R = DC.Rool.FirstOrDefault(q => q.OID == cOE.O.OID);
                 if (R == null)//新增
@@ -229,8 +229,43 @@ namespace Banner.Areas.Admin.Controllers
                     R.UpdDate = DT;
                     DC.SubmitChanges();
                 }
+                #endregion
+                #region 2024/1/9 新增一鍵調整新組織插入後的組織樹調整
+                if (ID == 0)
+                {
+                    //牧區->督區  ==> 牧區->大督區->督區
+                    var OI_Ps = DC.OrganizeInfo.Where(q => q.OID == cOE.O.ParentID);//先找到屬於上一層的冠名組織(OO牧區)
+                    foreach(var OI_P in OI_Ps)
+                    {
+                        //先建立本層的冠名組織,但是使用上一層的資料來用
+                        //(OO大督區)
+                        OrganizeInfo OI = new OrganizeInfo
+                        {
+                            OID = cOE.O.OID,
+                            ParentID = OI_P.OIID,
+                            OI2_ID = OI_P.OI2_ID,
+                            Title = OI_P.Title,
+                            ACID = OI_P.ACID,
+                            Note = OI_P.Note,
+                            BusinessType = OI_P.BusinessType,
+                            ActiveFlag = OI_P.ActiveFlag,
+                            DeleteFlag = OI_P.DeleteFlag,
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = ACID,
+                            OldID = 0
+                        };
+                        DC.OrganizeInfo.InsertOnSubmit(OI);
+                        DC.SubmitChanges();
 
-                SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/OrganizeSet/Organize_Map_List/");
+                        //再來找XX督區
+                        var OI_Cs = DC.OrganizeInfo.Where(q => q.ParentID == OI_P.OIID && q.OID != OI.OID);
+                        OI_Cs.ForEach(q => q.ParentID = OI.OIID);
+                        DC.SubmitChanges();
+                    }
+                }
+                    #endregion
+                    SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/OrganizeSet/Organize_Map_List/");
             }
 
 
