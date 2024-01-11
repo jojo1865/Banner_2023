@@ -98,8 +98,9 @@ namespace Banner.Controllers
                             ActiveFlag = true,
                             DeleteFlag = false,
                             CreDate = DT_.AddDays(-1 * O.OID),
+                            CreUID = 1,
                             UpdDate = DT_.AddDays(-1 * O.OID),
-                            SaveACID = 1
+                            UpdUID = 1
                         };
                         DC.M_O_Account.InsertOnSubmit(M);
                         DC.SubmitChanges();

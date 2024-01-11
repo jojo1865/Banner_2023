@@ -31,11 +31,14 @@
                     <div class="div_UserMenu" id="UserMenu" onmousemove="ShowUserMenu()" onmouseout="CloseUserMenu()" style="display:none;">
                         <div class="div_UserMenuBtn"><a href="/Web/ChildrenAdd/Step1">為12歲以下兒童註冊</a></div>
                         <div class="div_UserMenuBtn mb-2"><a href="/Web/Home/ChangePassword">修改密碼</a></div>
-                        <div class="div_UserMenuBtn mb-2">
-                            <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="btn btn-outline-primary btn-round btn-lg" target="_blank">進入後台</a>
-                        </div>
-                            <div class="div_UserMenuBtn"><a href="javascript:LogoutCheck();">登出</a></div>
-                        </div>
+                        @if (TempData["BackFlag"].ToString() == "1")
+                        {
+                            <div class="div_UserMenuBtn mb-2">
+                                <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="btn btn-outline-primary btn-round btn-lg" target="_blank">進入後台</a>
+                            </div>
+                        }
+                        <div class="div_UserMenuBtn"><a href="javascript:LogoutCheck();">登出</a></div>
+                    </div>
                 </div>
             </div>
         </div>

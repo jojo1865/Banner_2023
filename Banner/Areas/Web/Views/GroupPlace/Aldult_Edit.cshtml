@@ -31,8 +31,6 @@
                 <div class="container-lg">
                     <div class="section-card">
                         <form method="post" id="form1">
-                            
-
                             <div class="form-group">
                                 <label>組員姓名</label>
                                 @Html.Label((Model.Account != null ? Model.Account.Name_First + Model.Account.Name_Last : ""), new { @class = "form-control form-control-lg input-underlin lab_gray" })
@@ -41,7 +39,6 @@
                                 <label>備註</label>
                                 @Html.TextArea("txb_Note", Model.Note, new { @class = "form-control form-control-lg input-underlin", maxlength = "200", @style = "height:250px" })
                             </div>
-
                         </form>
                     </div>
                 </div>

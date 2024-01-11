@@ -3,7 +3,28 @@
     ViewBag.Title = "GroupData_Aldult_List";
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
 }
+<style>
+    .bn-theme .btn-round-nocolor {
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 20px;
+        --bs-btn-padding-y: 10px;
+        --bs-btn-padding-x: 24px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 16px;
+        white-space: nowrap;
+    }
 
+        .bn-theme .btn-round-nocolor.btn-sm {
+            --bs-btn-padding-y: 6px;
+            --bs-btn-padding-x: 24px;
+        }
+</style>
 <div class="body-container container_phone">
     <div class="section-container">
         <nav class="breadcrumb-nav">
@@ -26,4 +47,28 @@
         </div>
     </div>
 </div>
-
+<script>
+    function EditEmtitle(ACID) {
+        $.ajax({
+            url: '/Web/GroupPlace/EditEmtitle?ACID=' + ACID,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                console.log(res);
+                if (res == '') {
+                    Swal.fire({
+                        icon: 'success',
+                        html: '已完成會友卡處理'
+                    });
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        html: res
+                    });
+                }
+            },
+            error: function (err) { console.log(err) },
+        });
+    }
+</script>

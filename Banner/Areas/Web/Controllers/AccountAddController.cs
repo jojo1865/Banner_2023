@@ -147,8 +147,8 @@ namespace Banner.Areas.Web.Controllers
                         DeleteFlag = false,
                         CreDate = DT,
                         UpdDate = DT,
-                        LoginDate=DT,
-                        LogoutDate=DT,
+                        LoginDate = DT,
+                        LogoutDate = DT,
                         SaveACID = 0,
                         OldID = 0
                     };
@@ -296,9 +296,8 @@ namespace Banner.Areas.Web.Controllers
         public string CheckCellPhoneDouble(string Input)
         {
             string output = "";
-            var Con = DC.Contect.FirstOrDefault(q => q.ContectValue == Input && q.ContectType == 1);
-            if (Con != null)
-                output = "此手機號碼已被使用";
+            if (DC.Contect.Count(q => q.ContectValue == Input && q.ContectType == 1) > 5)
+                output = "此手機號碼已超過可登記數量";
             else
                 output = "OK";
             return output;
@@ -306,9 +305,11 @@ namespace Banner.Areas.Web.Controllers
         public string CheckPhoneNoDouble(string Input)
         {
             string output = "";
-            var Con = DC.Contect.FirstOrDefault(q => q.ContectValue == Input && q.ContectType == 0);
-            if (Con != null)
-                output = "此電話號碼已被使用";
+            //var Con = DC.Contect.FirstOrDefault(q => q.ContectValue == Input && q.ContectType == 0);
+            //if (Con != null)
+            //    output = "此電話號碼已被使用";
+            if (DC.Contect.Count(q => q.ContectValue == Input && q.ContectType == 0) > 5)
+                output = "此電話號碼已超過可登記數量";
             else
                 output = "OK";
             return output;
@@ -316,9 +317,8 @@ namespace Banner.Areas.Web.Controllers
         public string CheckEmailDouble(string Input)
         {
             string output = "";
-            var Con = DC.Contect.FirstOrDefault(q => q.ContectValue == Input && q.ContectType == 2);
-            if (Con != null)
-                output = "此Email已被使用";
+            if (DC.Contect.Count(q => q.ContectValue == Input && q.ContectType == 2) > 5)
+                output = "此Email已超過可登記數量";
             else
                 output = "OK";
             return output;
@@ -369,7 +369,7 @@ namespace Banner.Areas.Web.Controllers
         }
 
         [HttpPost]
-        
+
         public ActionResult Step2(FormCollection FC)
         {
             GetViewBag();
@@ -572,7 +572,7 @@ namespace Banner.Areas.Web.Controllers
             return View(N);
         }
         [HttpPost]
-        
+
         public ActionResult Step3(FormCollection FC)
         {
             GetViewBag();
@@ -845,7 +845,7 @@ namespace Banner.Areas.Web.Controllers
 
         }
         [HttpPost]
-        
+
         public ActionResult Step4(FormCollection FC)
         {
             GetViewBag();

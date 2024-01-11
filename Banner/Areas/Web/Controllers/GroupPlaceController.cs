@@ -1,10 +1,12 @@
 ﻿using Banner.Models;
 using Microsoft.Ajax.Utilities;
+using OfficeOpenXml.Drawing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using static Banner.Areas.Admin.Controllers.OrganizeSetController;
@@ -236,7 +238,7 @@ namespace Banner.Areas.Web.Controllers
             GetID();
             var TopTitles = new List<cTableCell>();
 
-            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 200 });
+            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 300 });
             TopTitles.Add(new cTableCell { Title = "職分", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "姓名", WidthPX = 160 });
             TopTitles.Add(new cTableCell { Title = "性別", WidthPX = 50 });
@@ -255,12 +257,20 @@ namespace Banner.Areas.Web.Controllers
                 Ns = Ns.OrderByDescending(q => q.ACID == OI.ACID).ThenByDescending(q => q.CreDate).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut);
                 foreach (var N in Ns)
                 {
+
                     cTableRow cTR = new cTableRow();
                     //操作
                     cTableCell cTC = new cTableCell();
                     if (N.ACID != ACID)//小組長不能移除自己
                         cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Aldult_Remove/" + N.MID, Target = "_self", Value = "移除" });
+                    else if (!DC.M_Rool_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//補案立
+                        EditEmtitle(ACID);
                     cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Aldult_Edit/" + N.MID, Target = "_self", Value = "編輯" });
+                    if(!DC.M_Rool_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//沒被按立
+                        cTC.cTCs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ");", Target = "_self", CSS = "btn btn-success btn-round-nocolor btn-sm", Value = "發卡" });
+                    else
+                        cTC.cTCs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ");", Target = "_self", CSS = "btn btn-danger btn-round-nocolor btn-sm", Value = "收卡" });
+
                     cTR.Cs.Add(cTC);
                     //職分
                     cTR.Cs.Add(new cTableCell { Value = N.ACID == OI.ACID ? OI.Organize.JobTitle : "小組員" });
@@ -290,6 +300,8 @@ namespace Banner.Areas.Web.Controllers
                     cTL.Rs.Add(SetTableCellSortNo(cTR));
                 }
             }
+
+
             return cTL;
         }
         [HttpGet]
@@ -442,14 +454,65 @@ namespace Banner.Areas.Web.Controllers
                     M.SaveACID = ACID;
                     DC.SubmitChanges();
 
-
-
+                    //退會友卡
+                    var MR = DC.M_Rool_Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == N.ACID && q.RID == 2);
+                    if(MR !=null)
+                    {
+                        MR.ActiveFlag = false;
+                        MR.UpdDate = DT;
+                        MR.SaveACID = ACID;
+                        DC.SubmitChanges();
+                    }
                     SetAlert("已將組員移出此小組", 1, "/Web/GroupPlace/Aldult_List/" + M.OIID);
-
                 }
 
             }
             return View(N);
+        }
+        #endregion
+        #region 小組資訊-組員名單管理-小組名單-給或移除會友卡
+        public string EditEmtitle(int ACID)
+        {
+            string Error = "";
+            var M = DC.M_Rool_Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2);
+            if(M!=null)
+            {
+                if (DC.OrganizeInfo.Count(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag) > 1)
+                    Error += "此員在其他組織仍擔任管理人,因此無法退卡<br/>";
+                if(DC.M_Staff_Account.Count(q=>q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) >0)
+                    Error += "此員仍為事工團團員,因此無法退卡<br/>";
+                if (DC.M_O_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
+                    Error += "此員仍被按立中,因此無法退卡<br/>";
+                if (DC.M_OI2_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
+                    Error += "此員仍為全職同工,因此無法退卡<br/>";
+                if(M.Account.BackUsedFlag)
+                    Error += "此員仍具後臺登入身分,因此無法退卡<br/>";
+                if(Error=="")
+                {
+                    M.ActiveFlag = false;
+                    M.LeaveDate = DT;
+                    M.UpdDate = DT;
+                    M.SaveACID = GetACID();
+                    DC.SubmitChanges();
+                }
+            }
+            else
+            {
+                M = new M_Rool_Account();
+                M.ACID = ACID;
+                M.RID = 2;
+                M.JoinDate = DT;
+                M.LeaveDate = DT;
+                M.Note = "";
+                M.ActiveFlag = true;
+                M.DeleteFlag = false;
+                M.CreDate = DT;
+                M.UpdDate = DT;
+                M.SaveACID = GetACID();
+                DC.M_Rool_Account.InsertOnSubmit(M);
+                DC.SubmitChanges();
+            }
+            return Error;
         }
         #endregion
 

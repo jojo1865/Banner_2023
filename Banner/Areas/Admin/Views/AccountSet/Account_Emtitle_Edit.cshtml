@@ -1,0 +1,108 @@
+﻿@model Banner.Areas.Admin.Controllers.AccountSetController.cAccount_Aldult_Edit
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+    string StyleAdd = "";
+}
+
+<div class="main-container">
+    <div class="form-container-list">
+        <div class="form-container">
+            <div class="form-header"><h5>基本資料</h5></div>
+            <div class="form-body">
+                <form method="post" id="form1">
+                    <!--按立-->
+                    <div class="form-card-group" id="div_JobTitleSet">
+                        <div id="#" class="header-container">
+                            <div class="header-left-border"></div>
+                            <div class="header">按立設定</div>
+                        </div>
+                        <div class="form-card">
+                            <div class="row">
+                                <div class="col-12 pt-2 ">
+                                    <label class="form-label">領夜同工：</label>
+                                    @Html.CheckBox("cbox_Job24Flag", Model.bJob24Flag, new { @class = "form-check-input me-2" })
+                                    @Html.Label("設定為領夜同工", new { @class = "form-check-label", @for = "cbox_Job24Flag" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 pt-2">
+                                    <label class="form-label">職分按立</label>
+                                    @{
+                                        for (int i = 0; i < Model.OAs.Count; i++)
+                                        {
+                                            switch (Model.OAs[i].iType)
+                                            {
+                                                case 0://未被按立,不能案立
+                                                    {
+                                                        <p>&nbsp;&nbsp;<b>@(Model.OAs[i].JobTitle)</b>：</p>
+                                                    }
+                                                    break;
+                                                case 1://1:未被按立,可以按立
+                                                    {
+                                                        <p>&nbsp;&nbsp;<b>@(Model.OAs[i].JobTitle)</b>：<a class="btn btn-success" href="javascript:;" onclick="EmtitleAC(@Model.AC.ACID, @Model.OAs[i].OID);">按立</a></p>
+                                                    }
+                                                    break;
+                                                case 2://2:已被按立,不能卸任
+                                                    {
+                                                        <p>&nbsp;&nbsp;<b>@(Model.OAs[i].JobTitle)</b>：@(Model.OAs[i].Note)</p>
+                                                    }
+                                                    break;
+                                                case 3://3:已被按立,可以卸任
+                                                    {
+                                                        <p>&nbsp;&nbsp;<b>@(Model.OAs[i].JobTitle)</b>：@(Model.OAs[i].Note)<a class="btn btn-danger" href="javascript:;" onclick="EmtitleAC(@Model.AC.ACID, @Model.OAs[i].OID);">卸任</a></p>
+                                                    }
+                                                    break;
+                                            }
+
+                                        }
+                                    }
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 pt-2">
+                                    <label class="form-label">牧養歷程記錄</label>
+                                    @foreach (var O in Model.OAHs.OrderByDescending(q => q.TargetDate))
+                                    {
+                                        <p>&nbsp;&nbsp;@(O.Title + " " + O.TargetDate.ToString("yyyy/MM/dd") + " "+O.Note)</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<div class="action-bar">
+        <a href="/Admin/AccountSet/Account_Aldult_List/0" class="btn btn-outline-primary btn-lg btn-round"><i class="fa-solid fa-arrow-rotate-left"></i>返回列表</a>
+</div>
+<script>
+    function EmtitleAC(ACID, OID) {
+        $.ajax({
+            url: '/Admin/AccountSet/EmtitleAccount?ACID=' + ACID + '&OID=' + OID,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                console.log(res);
+                if (res != '') {
+                    Swal.fire({
+                        icon: 'error',
+                        html: res
+                    })
+                }
+                else {
+                    Swal.fire({
+                        icon: 'success',
+                        html: '按立/卸任 完成'
+                    }).then(function () {
+                        document.location.reload();
+                    })
+                }
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
+</script>

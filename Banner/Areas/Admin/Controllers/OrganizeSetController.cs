@@ -670,27 +670,26 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     #region 主管列表
                     cIE.ACList = new List<SelectListItem>();
-                    var OIs__ = new List<OrganizeInfo>();
+                    /*var OIs__ = new List<OrganizeInfo>();
                     GetThisOIsFromTree(ref OIs__, OIID);
                     var ACs = from q in DC.Account.Where(q => !q.DeleteFlag).ToList()
                               join p in OIs__.GroupBy(q => q.ACID)
                               on q.ACID equals p.Key
                               select q;
-                    foreach (var A in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
-                        cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = (A.Name_First + A.Name_Last), Selected = A.ACID == cIE.OI.ACID });
+                    foreach (var A in ACs.OrderBy(q => q.Account.Name_First).ThenBy(q => q.Account.Name_Last))
+                        cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = (A.Account.Name_First + A.Account.Name_Last), Selected = A.ACID == cIE.OI.ACID });
+                    */
+                    var AC0 = DC.Account.First(q => q.ACID == 1);
+                    cIE.ACList.Add(new SelectListItem { Text = "("+AC0.ACID + ")" + AC0.Name_First + AC0.Name_Last, Value = AC0.ACID.ToString(), Selected = AC0.ACID == cIE.OI.ACID });
+                    cIE.ACList.AddRange(from q in DC.M_O_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == OID).OrderBy(q => q.Account.Name_First).ThenBy(q => q.Account.Name_Last)
+                                        select new SelectListItem { Text = "(" + q.ACID + ")" + q.Account.Name_First + q.Account.Name_Last, Value = q.ACID.ToString(), Selected = q.ACID == cIE.OI.ACID });
+
                     if (cIE.ACList.Count > 0)
                     {
                         if (cIE.ACList.FirstOrDefault(q => q.Selected) == null)
                             cIE.ACList[0].Selected = true;
                     }
-                    else
-                    {
-                        var A = DC.Account.FirstOrDefault(q => q.ACID == 1);
-                        if (A != null)
-                            cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = (A.Name_First + A.Name_Last), Selected = true });
-                        else
-                            cIE.ACList.Add(new SelectListItem { Value = "", Text = "此組織內無名單可以選擇", Selected = true });
-                    }
+                    
                     #endregion
                     #region 上層--文字版
                     var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == cIE.OI.ParentID);
@@ -978,7 +977,7 @@ namespace Banner.Areas.Admin.Controllers
             foreach (var N in Ns)
             {
                 cTableRow cTR = new cTableRow();
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_black", Value = "編輯" });//
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_black", Value = "編輯" });//
                 cTR.Cs.Add(new cTableCell { Value = N.MID.ToString() });//成員ID
                 cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() });//會員ID
                 cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });//姓名

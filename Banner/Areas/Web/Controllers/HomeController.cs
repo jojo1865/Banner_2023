@@ -47,10 +47,10 @@ namespace Banner.Areas.Web.Controllers
                     /*LogInAC(1);
                     SetBrowserData("UserName", "系統管理員");
                     */
-                    /*LogInAC(443);
-                    SetBrowserData("UserName", "江晨旭");*/
-                    LogInAC(8197);
-                    SetBrowserData("UserName", "JOJO");
+                    LogInAC(443);
+                    SetBrowserData("UserName", "江晨旭");
+                    /*LogInAC(8197);
+                    SetBrowserData("UserName", "JOJO");*/
                 }
                 Response.Redirect("/Web/Home/Index");
             }
@@ -59,7 +59,7 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
         [HttpPost]
-        
+
         public ActionResult Login(FormCollection FC)
         {
             GetViewBag();
@@ -162,7 +162,7 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
         [HttpPost]
-        
+
         public ActionResult ForgetPassword(FormCollection FC)
         {
             GetViewBag();
@@ -208,7 +208,7 @@ namespace Banner.Areas.Web.Controllers
                             "如需有任何問題，請寫信至itsupport@wwbch.org</br></br>" +
                             "旌旗教會 敬上";
                     SendMail(Con_Mail.ContectValue, AC.Name_First + AC.Name_Last, "【全球旌旗資訊網】忘記密碼通知信", string.Format(MailData, PW.ToString()));
-                    SetAlert("您的新密碼已發送,請查看您的信箱", 1, "/Web/Home/Login");
+                    SetAlert("您的新密碼已發送,請查看您的信箱:" + CutMail(Con_Mail.ContectValue), 1, "/Web/Home/Login");
                 }
                 else
                     SetAlert("此帳號的Email或手機資料有問題,無法查詢密碼", 3);
@@ -225,7 +225,7 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
         [HttpPost]
-        
+
         public ActionResult ForgetAccount(FormCollection FC)
         {
             GetViewBag();
@@ -507,7 +507,7 @@ namespace Banner.Areas.Web.Controllers
                                         if (PC_N.PeopleCt < OP_G.Ct)
                                             PCID = OP_G.PCID;
                                     }
-                                   
+
                                     if (PCID > 0)
                                         break;
                                 }

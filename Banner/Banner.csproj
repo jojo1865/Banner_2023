@@ -406,6 +406,7 @@
     <Content Include="Areas\Web\Content\Img\material-symbols_mail-outline.svg" />
     <Content Include="Areas\Web\Content\Img\meet-check-active.svg" />
     <Content Include="Areas\Web\Content\Img\meet-check.svg" />
+    <Content Include="Areas\Web\Content\Img\MemberCard.png" />
     <Content Include="Areas\Web\Content\Img\message-push.png" />
     <Content Include="Areas\Web\Content\Img\Next.svg" />
     <Content Include="Areas\Web\Content\Img\password.png" />
@@ -717,6 +718,8 @@
     <Content Include="Areas\Web\Views\StaffPlace\Event_QRCode.cshtml" />
     <Content Include="Areas\Web\Views\StaffPlace\MyStaffEvnet_List.cshtml" />
     <Content Include="Areas\Web\Views\StaffPlace\EventJoin_List.cshtml" />
+    <Content Include="Areas\Admin\Views\AccountSet\Account_Emtitle_List.cshtml" />
+    <Content Include="Areas\Admin\Views\AccountSet\Account_Emtitle_Edit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

@@ -35,7 +35,6 @@
       <Association Name="Account_Family" Member="Family" ThisKey="ACID" OtherKey="ACID" Type="Family" />
       <Association Name="Account_JoinGroupWish" Member="JoinGroupWish" ThisKey="ACID" OtherKey="ACID" Type="JoinGroupWish" />
       <Association Name="Account_M_ML_Account" Member="M_ML_Account" ThisKey="ACID" OtherKey="ACID" Type="M_ML_Account" />
-      <Association Name="Account_M_O_Account" Member="M_O_Account" ThisKey="ACID" OtherKey="ACID" Type="M_O_Account" />
       <Association Name="Account_M_OI_Account" Member="M_OI_Account" ThisKey="ACID" OtherKey="ACID" Type="M_OI_Account" />
       <Association Name="Account_M_OI2_Account" Member="M_OI2_Account" ThisKey="ACID" OtherKey="ACID" Type="M_OI2_Account" />
       <Association Name="Account_M_OJT_Account" Member="M_OJT_Account" ThisKey="ACID" OtherKey="ACID" Type="M_OJT_Account" />
@@ -43,6 +42,7 @@
       <Association Name="Account_M_Staff_Account" Member="M_Staff_Account" ThisKey="ACID" OtherKey="ACID" Type="M_Staff_Account" />
       <Association Name="Account_Order_Header" Member="Order_Header" ThisKey="ACID" OtherKey="ACID" Type="Order_Header" />
       <Association Name="Account_OrganizeInfo" Member="OrganizeInfo" ThisKey="ACID" OtherKey="ACID" Type="OrganizeInfo" />
+      <Association Name="Account_M_O_Account" Member="M_O_Account" ThisKey="ACID" OtherKey="ACID" Type="M_O_Account" />
     </Type>
   </Table>
   <Table Name="dbo.ZipCode" Member="ZipCode">
@@ -320,20 +320,6 @@
       <Association Name="Meeting_Location_M_ML_Account" Member="Meeting_Location" ThisKey="MLID" OtherKey="MLID" Type="Meeting_Location" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.M_O_Account" Member="M_O_Account">
-    <Type Name="M_O_Account">
-      <Column Name="MID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="OID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Account_M_O_Account" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
-      <Association Name="Organize_M_O_Account" Member="Organize" ThisKey="OID" OtherKey="OID" Type="Organize" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.M_OI_Account" Member="M_OI_Account">
     <Type Name="M_OI_Account">
       <Column Name="MID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -604,9 +590,9 @@
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Organize_M_O_Account" Member="M_O_Account" ThisKey="OID" OtherKey="OID" Type="M_O_Account" />
       <Association Name="Organize_OrganizeJobType" Member="OrganizeJobType" ThisKey="OID" OtherKey="OID" Type="OrganizeJobType" />
       <Association Name="Organize_OrganizeInfo" Member="OrganizeInfo" ThisKey="OID" OtherKey="OID" Type="OrganizeInfo" />
+      <Association Name="Organize_M_O_Account" Member="M_O_Account" ThisKey="OID" OtherKey="OID" Type="M_O_Account" />
     </Type>
   </Table>
   <Table Name="dbo.OrganizeJobType" Member="OrganizeJobType">
@@ -918,6 +904,21 @@
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Event_Join_Header_Event_Join_Detail" Member="Event_Join_Header" ThisKey="EJHID" OtherKey="EJHID" Type="Event_Join_Header" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.M_O_Account" Member="M_O_Account">
+    <Type Name="M_O_Account">
+      <Column Name="MID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="OID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CreUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdUID" Storage="_UpdACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Account_M_O_Account" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
+      <Association Name="Organize_M_O_Account" Member="Organize" ThisKey="OID" OtherKey="OID" Type="Organize" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

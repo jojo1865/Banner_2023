@@ -14,6 +14,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security.AntiXss;
 using System.Web.UI.WebControls;
+using static Banner.Areas.Admin.Controllers.AccountSetController;
 using static Banner.Areas.Admin.Controllers.OrganizeSetController;
 
 namespace Banner.Areas.Admin.Controllers
@@ -210,6 +211,65 @@ namespace Banner.Areas.Admin.Controllers
                              select p;
                     }
                     break;
+
+                case 5://會友
+                    {
+                        cTL.NowURL = "/Admin/AccountSet/Account_Aldult_List";
+                        Ns = from q in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.Birthday != q.CreDate)
+                             join p in DC.M_Rool_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 2).GroupBy(q => q.ACID).Select(q => q.Key)
+                             on q.ACID equals p
+                             select q;
+
+                        #region 後台全職同工可檢視旌旗資料判斷
+                        {
+                            if (ACID != 1)
+                            {
+                                var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                                if (MOI2 == null)//他沒有全部的權限
+                                {
+                                    MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 2 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                                    if (MOI2 == null)//他沒有看未入組的會員權限=需要依據他的旌旗角色篩選
+                                    {
+                                        MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                                        if (MOI2 == null)//不具備旌旗的權限
+                                        {
+                                            Ns = Ns.Where(q => q.ACID == 0);
+                                        }
+                                        else
+                                        {
+                                            var OI8_ACIDs = from q in (from q in DC.M_OI2_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag)
+                                                                       join p in GetMOIAC(8, 0, 0)
+                                                                       on q.OIID equals p.OrganizeInfo.OI2_ID
+                                                                       select p)
+                                                            group q by new { q.ACID } into g
+                                                            select new { g.Key.ACID };
+
+                                            Ns = from q in OI8_ACIDs
+                                                 join p in Ns
+                                                 on q.ACID equals p.ACID
+                                                 select p;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var M_ACIDs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CreDate != q.JoinDate && q.OIID > 0)
+                                                      group q by new { q.ACID } into g
+                                                      select new { g.Key.ACID };
+                                        var ACIDs = from q in Ns
+                                                    group q by new { q.ACID } into g
+                                                    select new { g.Key.ACID };
+                                        Ns = from q in ACIDs.Except(M_ACIDs)
+                                             join p in Ns
+                                             on q.ACID equals p.ACID
+                                             select p;
+                                    }
+                                }
+                            }
+
+                        }
+                        #endregion
+                    }
+                    break;
             }
 
             if (FC != null)
@@ -269,6 +329,7 @@ namespace Banner.Areas.Admin.Controllers
                 switch (iType)
                 {
                     case 1://成人
+                    case 5://按立會友
                         {
                             if (FC.Get("ddl_Baptized") != "0")
                                 Ns = from q in Ns
@@ -398,6 +459,7 @@ namespace Banner.Areas.Admin.Controllers
             switch (iType)
             {
                 case 1://成人
+                case 5://按立會友
                     TopTitles.Add(new cTableCell { Title = "選擇", WidthPX = 50 });
                     TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
                     TopTitles.Add(new cTableCell { Title = "牧區" });
@@ -454,10 +516,13 @@ namespace Banner.Areas.Admin.Controllers
                 switch (iType)
                 {
                     case 1://成人
+                    case 5://按立會友
                         {
                             cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
-                            //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_black", Value = "編輯" });
+                            if(iType == 1)
                             cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
+                            else
+                            cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Emtitle_Edit/" + N.ACID, Target = "_self", Value = "按立" });//檢視
                             var OI_8 = GetMOIAC(8, 0, N.ACID).FirstOrDefault(q => q.JoinDate != q.CreDate);//確定有入組再列
                             if (OI_8 != null)
                             {
@@ -568,10 +633,13 @@ namespace Banner.Areas.Admin.Controllers
                                         iJoinType = 4;//跟進中(未分發)
                                 }
                             }
+                            else if (N.GroupType == "有意願")
+                                iJoinType = 4;
+        
                             if (iJoinType == 3 || iJoinType == 4)
                                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_New_Edit/" + N.ACID, Target = "_black", Value = "分發" });//操作
                             else
-                                cTR.Cs.Add(new cTableCell { Value = "" });//操作
+                                cTR.Cs.Add(new cTableCell { Value = JoinTitle[iJoinType] });//操作
                             //去識別
                             //cTR.Cs.Add(new cTableCell { Value = (N.Name_First + new string('*',N.Name_Last.Length)) });//姓名
                             cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });//姓名
@@ -684,7 +752,12 @@ namespace Banner.Areas.Admin.Controllers
 
             public bool bBackUsedFlag = false;//是否為後台管理者
             public bool bShowBackUsedAreaFlag = false;//是否顯示後台管理者勾選介面
+
+            public bool bJob24Flag = false;//是否為領夜同工
+            public List<cOAccount> OAs = new List<cOAccount>();//目前按立狀況
+            public List<cOAH> OAHs = new List<cOAH>();//按立歷史
         }
+        //家庭樹
         public class cFamily
         {
             public int ID = 0;
@@ -697,6 +770,7 @@ namespace Banner.Areas.Admin.Controllers
             public int SortNo2 = 0;
             public cContect Con = new cContect();//家庭聯繫方式
         }
+        //聯絡方式
         public class cContect
         {
             public string Title = "";
@@ -707,6 +781,7 @@ namespace Banner.Areas.Admin.Controllers
             public Contect C = new Contect();
             public List<SelectListItem> Zips = new List<SelectListItem>();
         }
+        //期望加入組織選單
         public class cJoinGroupWish
         {
             public bool SelectFalg = false;
@@ -717,9 +792,26 @@ namespace Banner.Areas.Admin.Controllers
             public ListSelect ddl_Weekly = new ListSelect();
             public ListSelect ddl_Time = new ListSelect();
         }
+        //按立
+        public class cOAccount
+        {
+            public int OID = 0;
+            public int SortNo = 0;
+            public string JobTitle = "";
+            public string Note = "";
+            public int iType = 0;//0:未被按立,不能案立/1:未被按立,可以按立/2:已被按立,不能卸任/3:已被按立,可以卸任
+        }
+        //按立
+        public class cOAH
+        {
+            public string Title = "";
+            public DateTime TargetDate = DateTime.Now;
+            public string Note = "";
+        }
         public cAccount_Aldult_Edit GerAccountData(int ID, FormCollection FC)
         {
             var N = new cAccount_Aldult_Edit();
+            int UID = GetACID();
             #region 物件初始化
 
             //主日聚會點初始化
@@ -868,8 +960,126 @@ namespace Banner.Areas.Admin.Controllers
 
             #endregion
             //中低收入戶
-
             N.bShowBackUsedAreaFlag = CheckAdmin(GetACID());
+            //領夜同工
+            N.bJob24Flag = DC.M_Rool_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 24 && q.ACID == ID);
+            //按立歷史
+            var OAHs = DC.M_O_Account.Where(q => q.ACID == ID);
+            #region 建立按立資料
+
+            N.OAs = new List<cOAccount>();
+            int iSortNo = 0;
+            var O = DC.Organize.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 2);
+            do
+            {
+                if (!string.IsNullOrEmpty(O.JobTitle))
+                {
+                    cOAccount c = new cOAccount
+                    {
+                        OID = O.OID,
+                        SortNo = iSortNo++,
+                        JobTitle = O.JobTitle,
+                        Note = "",
+                        iType = 0//0:未被按立,不能案立/1:未被按立,可以按立/2:已被按立,不能卸任/3:已被按立,可以卸任
+                    };
+                    //判斷按立狀態
+
+                    //先確認對方是否已有職位,有的話就補充按立資料
+                    var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OID == O.OID && q.ACID == ID && q.ActiveFlag && !q.DeleteFlag);
+                    if (OI != null)
+                    {
+                        M_O_Account OAH = OAHs.FirstOrDefault(q => q.OID == O.OID && !q.DeleteFlag && q.ActiveFlag);
+                        if (OAH == null)
+                        {
+                            OAH = new M_O_Account
+                            {
+                                OID = O.OID,
+                                ACID = ID,
+                                ActiveFlag = true,
+                                DeleteFlag = false,
+                                CreDate = DT,
+                                CreUID = UID,
+                                UpdDate = DT,
+                                UpdUID = UID
+                            };
+                            DC.M_O_Account.InsertOnSubmit(OAH);
+                            DC.SubmitChanges();
+
+                            c.Note = "已按立 " + DT.ToString(DateFormat) + "(系統自動按立)";
+                            c.iType = 2;
+                        }
+                        else
+                        {
+                            var AC = DC.Account.FirstOrDefault(q => q.ACID == OAH.ACID);
+                            c.Note = "已按立 " + OAH.CreDate.ToString(DateFormat) + "(" + (AC != null ? AC.Name_First + AC.Name_Last : "ID:" + OAH.ACID) + "按立)";
+                            c.iType = 2;
+                        }
+                    }
+                    else
+                    {
+                        M_O_Account OAH = OAHs.FirstOrDefault(q => q.OID == O.OID && !q.DeleteFlag && q.ActiveFlag);
+                        if (OAH != null)
+                        {
+                            var AC_ = DC.Account.FirstOrDefault(q => q.ACID == OAH.CreUID);
+                            c.Note = "已按立 " + OAH.CreDate.ToString(DateFormat) + "(" + (AC_ != null ? AC_.Name_First + AC_.Name_Last : "ID:" + OAH.ACID) + "按立)";
+                            c.iType = 2;
+                        }
+                    }
+
+                    N.OAs.Add(c);
+                }
+                O = DC.Organize.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ParentID == O.OID);
+            } while (O != null);
+
+            #endregion
+            #region 檢查能不能按立
+            //0:未被按立,不能案立/1:未被按立,可以按立/2:已被按立,不能卸任/3:已被按立,可以卸任
+            N.OAs = N.OAs.OrderByDescending(q => q.SortNo).ToList();
+            if (N.OAs.Count > 0)
+            {
+                if (N.OAs[0].iType == 0)
+                {
+                    N.OAs[0].iType = 1;
+                }
+                else
+                {
+                    for (int j = 0; j < N.OAs.Count; j++)
+                    {
+                        if (j < N.OAs.Count - 1)
+                        {
+                            //2<->0
+                            if (N.OAs[j].iType == 2 && N.OAs[j + 1].iType == 0)
+                            {
+                                N.OAs[j].iType = 3;
+                                N.OAs[j + 1].iType = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion
+            foreach (var M in DC.M_O_Account.Where(q => q.ACID == ID))
+            {
+                //按立
+                cOAH OA = new cOAH();
+                OA.Title = M.Organize.JobTitle;
+                OA.TargetDate = M.CreDate;
+                var AC_ = DC.Account.FirstOrDefault(q => q.ACID == M.CreUID);
+                OA.Note = AC_ == null ? "(系統自動按立)" : "(" + AC_.Name_First + AC_.Name_Last + "按立)";
+                N.OAHs.Add(OA);
+                //卸任
+                if (!M.ActiveFlag)
+                {
+                    OA = new cOAH();
+                    OA.Title = M.Organize.JobTitle;
+                    OA.TargetDate = M.UpdDate;
+                    AC_ = DC.Account.FirstOrDefault(q => q.ACID == M.UpdUID);
+                    OA.Note = AC_ == null ? "(系統自動按立)" : "(" + AC_.Name_First + AC_.Name_Last + "卸任)";
+
+                    N.OAHs.Add(OA);
+                }
+            }
+
             #endregion
             #region 會員資料填入
 
@@ -1319,6 +1529,8 @@ namespace Banner.Areas.Admin.Controllers
         public ActionResult Account_Aldult_Edit(int ID)
         {
             GetViewBag();
+            if (ACID != 1)
+                SetAlert("此頁面只有Admin可以開啟", 2, "/Admin/Home/Index");
             return View(GerAccountData(ID, null));
         }
         [HttpPost]
@@ -1889,7 +2101,74 @@ namespace Banner.Areas.Admin.Controllers
             return View(N);
         }
         #endregion
+        #region 按立-列表
+        [HttpGet]
+        public ActionResult Account_Emtitle_List()
+        {
+            GetViewBag();
+            cAccount_List cAL = sAccount_Aldult_List(null);
+            cAL.cTL = GetAccountTable(5, null);
 
+            return View(cAL);
+        }
+        [HttpPost]
+        public ActionResult Account_Emtitle_List(FormCollection FC)
+        {
+            GetViewBag();
+            cAccount_List cAL = sAccount_Aldult_List(FC);
+            cAL.cTL = GetAccountTable(5, FC);
 
+            return View(cAL);
+        }
+        #endregion
+        #region 按立-顯示
+        [HttpGet]
+        public ActionResult Account_Emtitle_Edit(int ID)
+        {
+            GetViewBag();
+            if (ID == 0)
+                Error += "參數錯誤,無法新增會友";
+            if (Error != "")
+                SetAlert(Error, 2);
+            return View(GerAccountData(ID, null));
+        }
+        [HttpGet]
+
+        public string EmtitleAccount(int ACID,int OID)
+        {
+            Error = "";
+            int UID = GetACID();
+            var MOA = DC.M_O_Account.FirstOrDefault(q => q.ACID == ACID && q.OID == OID && q.ActiveFlag && !q.DeleteFlag);
+            if(MOA == null)//按立
+            {
+                if (!DC.M_Rool_Account.Any(q => q.ACID == ACID && q.RID == 2 && q.ActiveFlag && !q.DeleteFlag))
+                    Error += "此人尚未持有會友卡,無法按立";
+                else
+                {
+                    MOA = new M_O_Account
+                    {
+                        OID = OID,
+                        ACID = ACID,
+                        ActiveFlag = true,
+                        DeleteFlag = false,
+                        CreDate = DT,
+                        CreUID = UID,
+                        UpdDate = DT,
+                        UpdUID = UID
+                    };
+                    DC.M_O_Account.InsertOnSubmit(MOA);
+                    DC.SubmitChanges();
+                }
+            }
+            else
+            {
+                MOA.ActiveFlag = false;
+                MOA.UpdDate = DT;
+                MOA.UpdUID = UID;
+                DC.SubmitChanges();
+            }
+            return Error;
+        }
+        #endregion
     }
 }

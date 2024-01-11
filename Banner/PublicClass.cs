@@ -255,6 +255,14 @@ namespace Banner
             else { }
             return sName;
         }
+        //取得被加密的Email
+        public string CutMail(string sMail)
+        {
+            string[] Mails = sMail.Split('@');
+            if(Mails.Length==2)
+                sMail = Mails[0].Substring(0,Mails[0].Length/2) + new string('*',Mails[0].Length/2) + "@" + Mails[1];
+            return sMail;
+        }
         //設定Session
         public void SetSession(string sTitle, string sValue)
         {
@@ -2290,6 +2298,7 @@ namespace Banner
             ViewBag._Power = bGroup;
             ViewBag._Login = "";
             ViewBag._GroupTitle = "小組資訊";
+            ViewBag._BackFlag = "0";
             //http://localhost:1897
             //sDomanName修正成Localhost
             if (Request.Url.Host.ToLower().Contains("localhost"))
@@ -2303,7 +2312,7 @@ namespace Banner
                 ViewBag._UserName = AC.Name_First + AC.Name_Last;
                 ViewBag._UserID = ACID;
                 ViewBag._Login = AC.Login;
-
+                ViewBag._BackFlag = AC.BackUsedFlag ? "1" : "0";
                 #region 上層
                 string GroupMapTitle = "";
                 var OIs = DC.OrganizeInfo.Where(q => q.ACID == AC.ACID && q.OID == 8 && q.ActiveFlag && !q.DeleteFlag);
@@ -2395,7 +2404,7 @@ namespace Banner
             TempData["_url"] = NowURL;
             TempData["OID"] = "0";//組織層級ID
             TempData["OITitle"] = "";//組織搜尋用關鍵字
-
+            TempData["BackFlag"] = ViewBag._BackFlag;
             //CheckVCookie();
         }
         /*private void SetResponseVerify()

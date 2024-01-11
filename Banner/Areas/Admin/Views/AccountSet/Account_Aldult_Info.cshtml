@@ -75,7 +75,17 @@
                                 </div>
                             </div>
                         }
-
+                        else
+                        {
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label>帳號</label>
+                                        @Html.TextBox("txb_Login", Model.AC.Login, new { @class = "form-control form-control-lg input-underline" })
+                                    </div>
+                                </div>
+                            </div>
+                        }
                         <div class="form-group">
                             <label>性別<span>*</span></label><br />
                             <div class="form-check form-check-inline">
@@ -549,16 +559,6 @@
                         </div>
                     </div>
                 </div>
-                <!--複製用 預設隱藏-->
-                <div class="form-card-group d-none">
-                    <div id="#" class="header-container">
-                        <div class="header-left-border"></div>
-                        <div class="header"><!--標題--></div>
-                    </div>
-                    <div class="form-card">
-                        <!--內容-->
-                    </div>
-                </div>
 
 
             </div>
@@ -598,22 +598,23 @@
                 </div>
             </li>
             <li class="menuitem">
-                <a href="div_family">家庭狀況</a>
+                <a href="#div_JoinGroup">入組意願調查</a>
             </li>
-
             <li class="menuitem">
-                <a href="div_BankData">退款費用專用帳戶</a>
-                <!--</li>
-                <li class="menuitem">
-                    <a href="">多元表現</a>
-                </li>
-                <li class="menuitem">
-                    <a href="">事工團紀錄</a>
-                </li>
-                <li class="menuitem">
-                    <a href="">課程歷程</a>
-                </li>
-                    -->
+                <a href="#div_family">家庭狀況</a>
+            </li>
+            <li class="menuitem">
+                <a href="">退款費用專用帳戶</a>
+            </li>
+            <li class="menuitem">
+                <a href="">多元表現</a>
+            </li>
+            <li class="menuitem">
+                <a href="">事工團紀錄</a>
+            </li>
+            <li class="menuitem">
+                <a href="">課程歷程</a>
+            </li>
             <li class="menuitem">
                 <a href="#div_OtherNote">其他備註事項</a>
             </li>
@@ -623,7 +624,6 @@
         </ul>
     </div>
 
-
 </div>
 <div class="action-bar">
     @if (Model != null)
@@ -632,55 +632,8 @@
         {
             <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><i class="fa-solid fa-floppy-disk"></i>儲存</a>
         }
-        <a href="/Admin/AccountSet/Account_Aldult_List/0" class="btn btn-outline-primary btn-lg btn-round">
+        <a href="/Admin/AccountSet/Account_Emtitle_List/0" class="btn btn-outline-primary btn-lg btn-round">
             <i class="fa-solid fa-arrow-rotate-left"></i>返回列表
         </a>
     }
 </div>
-<script>
-    function ShowBaptizedTypeddl(rbut) {
-        document.getElementById('ddl_BaptizedType').style.display = (rbut.checked ? "" : "none");
-    }
-    function HideBaptizedTypeddl(rbut) {
-        document.getElementById('ddl_BaptizedType').style.display = (!rbut.checked ? "" : "none");
-    }
-    //儲存中低收入戶資料
-    function SavePoorNote(ACID) {
-        var box = document.getElementById('cbox_PoorFlag');
-        var iCheck = box.checked ? 1 : 0;
-        var txb = document.getElementById('txb_PoorNote');
-        var sNote = txb.value;
-        $.ajax({
-            url: '/Admin/AccountSet/SavePoot/' + ACID + '?Check=' + iCheck + '&Note=' + sNote,
-            method: 'GET',
-            dataType: 'text'
-
-        });
-        Swal.fire({
-            icon: 'success',
-            html: '存檔完成'
-        });
-
-        return;
-    }
-    //儲存帳戶設定
-    function SaveBackSys(ACID) {
-        var box1 = document.getElementById('cbox_ActiveFlag');
-        var iCheck1 = box1.checked ? 1 : 0;
-        var box2 = document.getElementById('cbox_BackUsedFlag');
-        var iCheck2 = box2.checked ? 1 : 0;
-        var box3 = document.getElementById('cbox_TeacherFlag');
-        var iCheck3 = box3.checked ? 1 : 0;
-        $.ajax({
-            url: '/Admin/AccountSet/SaveAcctFlag/' + ACID + '?Act=' + iCheck1 + '&Bac=' + iCheck2 + '&Tea=' + iCheck3,
-            method: 'GET',
-            dataType: 'text'
-
-        });
-        Swal.fire({
-            icon: 'success',
-            html: '存檔完成'
-        });
-        return;
-    }
-</script>
