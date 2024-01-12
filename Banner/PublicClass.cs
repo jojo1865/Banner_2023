@@ -2395,6 +2395,8 @@ namespace Banner
                     bGroup = new bool[] { true, true, true, true, true, true };
             }
 
+            //購物車
+            TempData["CartNo"] = DC.Order_Product.Count(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag);
             //SetResponseVerify();
 
             TempData["UID"] = ACID;
@@ -2407,19 +2409,7 @@ namespace Banner
             TempData["BackFlag"] = ViewBag._BackFlag;
             //CheckVCookie();
         }
-        /*private void SetResponseVerify()
-        {
-            var res = Response.Cookies["__RequestVerificationToken"];
-            var req = Request.Cookies["__RequestVerificationToken"];
-            if (res == null || string.IsNullOrEmpty(res.Value))//set Response
-            {
-                if (req != null && !string.IsNullOrEmpty(req.Value))
-                {
-                    res = new HttpCookie("__RequestVerificationToken", req.Value);
-                    Response.SetCookie(res);
-                }
-            }
-        }*/
+        
         /// <summary>
         /// 修正 需要的反仿冒 Cookie "__RequestVerificationToken" 不存在。 錯誤
         /// </summary>
@@ -2920,6 +2910,35 @@ namespace Banner
             }
             return iReturn;
         }
+
+        //檢查購物車中的商品狀態,並回傳剩餘數量
+        /*public int CheckCart(int ACID)
+        {
+            int iCartCt = 0;
+            var OPs = DC.Order_Product.Where(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag);
+            foreach(var OP in OPs)
+            {
+                bool deleteFlag = false;
+                if (OP.Product.DeleteFlag || !OP.Product.ActiveFlag)//商品已被移除
+                    deleteFlag = true;
+
+                var OP2s = DC.Order_Product.Where(q => q.Order_Header.ACID != ACID &&
+                q.Order_Header.Order_Type == 2 &&
+                !q.Order_Header.DeleteFlag
+                );
+
+
+
+                if (deleteFlag)
+                {
+                    DC.Order_Product.DeleteOnSubmit(OP);
+                    DC.SubmitChanges();
+                }
+            }
+
+
+            return iCartCt;
+        }*/
         #endregion
 
         #region 金流

@@ -36,6 +36,17 @@
                         <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="nav-link" target="_blank">進入後台</a>
                     </li>
                 }
+
+                <li class="nav-item">
+                    <a href="/Web/ClassStore/Order_Step1" class="nav-link">
+                        購物車
+                        @if (TempData["CartNo"].ToString() != "0")
+                        {
+                            @(TempData["CartNo"].ToString())
+                        }
+                    </a>
+                </li>
+                
                 <li class="nav-item li_TopMenu_UserData" style="border-bottom:1px solid #CCC;">
                     <a href="javascript:LogoutCheck();" class="nav-link">登出</a>
                 </li>

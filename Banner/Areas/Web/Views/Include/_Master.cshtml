@@ -20,23 +20,32 @@
             </a>
             @Html.Action("_TopMenu_New1", "Include")
         </div>
-        <div class="header-item d-none d-lg-block">
-            
+        <div class="header-item d-none d-lg-flex">
+            <div class="me-2">
+                <a href="/Web/ClassStore/Order_Step1" style="color:white;">
+                    購物車<i class="fa-solid fa-cart-shopping ms-1"></i>
+                    @if (TempData["CartNo"].ToString() != "0")
+                    {
+                        <span class="spanCordNo">@(TempData["CartNo"].ToString())</span>
+                    }
+                </a>
+            </div>
+            @if (TempData["BackFlag"].ToString() == "1")
+            {
+                <div class="me-2">
+                    <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="btn btn-outline-primary btn-round btn-lg" target="_blank">進入後台</a>
+                </div>
+            }
+
             <div class="profile">
                 <div class="profile-body">
-                    <span class="nickname"> @ViewBag._UserName </span>
+                    <span class="nickname"> @ViewBag._UserName 2</span>
                 </div>
                 <div class="profile-action">
                     <a href="javascript:ShowUserMenu();" class="material-icons" onmousemove="ShowUserMenu()"> arrow_drop_down </a>
                     <div class="div_UserMenu" id="UserMenu" onmousemove="ShowUserMenu()" onmouseout="CloseUserMenu()" style="display:none;">
                         <div class="div_UserMenuBtn"><a href="/Web/ChildrenAdd/Step1">為12歲以下兒童註冊</a></div>
                         <div class="div_UserMenuBtn mb-2"><a href="/Web/Home/ChangePassword">修改密碼</a></div>
-                        @if (TempData["BackFlag"].ToString() == "1")
-                        {
-                            <div class="div_UserMenuBtn mb-2">
-                                <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="btn btn-outline-primary btn-round btn-lg" target="_blank">進入後台</a>
-                            </div>
-                        }
                         <div class="div_UserMenuBtn"><a href="javascript:LogoutCheck();">登出</a></div>
                     </div>
                 </div>
