@@ -38,6 +38,9 @@
                     @if (((bool[])ViewBag._Power)[1])
                     {
                         <div class="table-func-container mb-4">
+                            <a class="btn btn-primary btn-lg btn-round me-2" href="/Admin/StoreSet/ProductClass_BatchAdd/@(Model.PID)">
+                                <i class="fa-solid fa-circle-plus"></i>批次新增
+                            </a>
                             <a class="btn btn-primary btn-lg btn-round" href="/Admin/StoreSet/ProductClass_Edit/0?PID=@(Model.PID)">
                                 <i class="fa-solid fa-circle-plus"></i>新增
                             </a>

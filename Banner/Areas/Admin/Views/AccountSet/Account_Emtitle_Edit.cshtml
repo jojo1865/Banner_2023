@@ -47,9 +47,9 @@
                                                         <p>&nbsp;&nbsp;<b>@(Model.OAs[i].JobTitle)</b>：@(Model.OAs[i].Note)</p>
                                                     }
                                                     break;
-                                                case 3://3:已被按立,可以卸任
+                                                case 3://3:已被按立,可以卸任//2024/1/15隱藏卸任的功能
                                                     {
-                                                        <p>&nbsp;&nbsp;<b>@(Model.OAs[i].JobTitle)</b>：@(Model.OAs[i].Note)<a class="btn btn-danger" href="javascript:;" onclick="EmtitleAC(@Model.AC.ACID, @Model.OAs[i].OID);">卸任</a></p>
+                                                        <p>&nbsp;&nbsp;<b>@(Model.OAs[i].JobTitle)</b>：@(Model.OAs[i].Note)<a class="btn btn-danger d-none" href="javascript:;" onclick="EmtitleAC(@Model.AC.ACID, @Model.OAs[i].OID);">卸任</a></p>
                                                     }
                                                     break;
                                             }

@@ -517,6 +517,8 @@
     <Content Include="Content\Image\CourseCategory_2.jpg" />
     <Content Include="Content\Image\CourseCategory_3.jpg" />
     <Content Include="Content\Image\CourseCategory_4.jpg" />
+    <Content Include="Content\searchableSelect\jquery.searchableSelect.css" />
+    <Content Include="Content\searchableSelect\jquery.searchableSelect.js" />
     <Content Include="Error.html" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -720,6 +722,7 @@
     <Content Include="Areas\Web\Views\StaffPlace\EventJoin_List.cshtml" />
     <Content Include="Areas\Admin\Views\AccountSet\Account_Emtitle_List.cshtml" />
     <Content Include="Areas\Admin\Views\AccountSet\Account_Emtitle_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Include\_ProductClass_BatchCell.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

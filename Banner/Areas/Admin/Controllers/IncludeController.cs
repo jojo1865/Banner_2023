@@ -23,6 +23,7 @@ namespace Banner.Areas.Admin.Controllers
                 .Replace("Event_Edit_1", "Event_List?CID=1")
                 .Replace("Event_Edit_2", "Event_List?CID=2")
                 .Replace("Event_Edit_3", "Event_List?CID=3")
+                .Replace("ProductClass_BatchAdd", "Product_List")
                 .Replace("_Edit", "_List")
                 .Replace("ProductClass_", "Product_")
                 .Replace("ProductClassTeacher_", "Product_")
@@ -550,7 +551,13 @@ namespace Banner.Areas.Admin.Controllers
             return PartialView(SLs);
         }
         #endregion
-
+        #region MyRegion
+        public PartialViewResult _ProductClass_BatchCell(cClassCell CC)
+        {
+            return PartialView(CC);
+        }
+        
+        #endregion
         public PartialViewResult _HeadInclude()
         {
             return PartialView();

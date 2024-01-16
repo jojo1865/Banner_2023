@@ -936,7 +936,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetProductClass_Edit(PID, ID, null));
         }
         [HttpPost]
-        
+
         public ActionResult ProductClass_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1088,7 +1088,7 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetProductClassDate_Edit(GetQueryStringInInt("PID"), GetQueryStringInInt("PCID"), ID, null));
         }
         [HttpPost]
-        
+
         public ActionResult ProductClassDate_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
@@ -1834,12 +1834,192 @@ namespace Banner.Areas.Admin.Controllers
 
         #endregion
 
-        #region 
+        #region 批次新增班級
+        public class cProductClass_BatchAdd
+        {
+            public int RowCt = 0;
+            public string sDate = DateTime.Now.ToString("yyyy-MM-dd");
+            public cClassCell cCBasic = new cClassCell();
+            public List<cClassCell> cCs = new List<cClassCell>();
+        }
+
+        public cProductClass_BatchAdd GetProductClass_BatchAdd(int ID, FormCollection FC)
+        {
+            cProductClass_BatchAdd c = new cProductClass_BatchAdd();
+
+            #region 物件初始化
+            List<SelectListItem> SLIs = new List<SelectListItem>();
+            SLIs = (from q in DC.Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.TeacherFlag).OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last)
+                    select new SelectListItem { Text = q.Name_First + q.Name_Last, Value = q.ACID.ToString() }).ToList();
+            if (SLIs.Count > 0)
+                SLIs[0].Selected = true;
+            c.cCBasic.cTs = SLIs;
+            #endregion
+            #region 前端資料匯入
+            if (FC != null)
+            {
+                int RowCt = 0;
+                int j = 0;
+                if (int.TryParse(FC.Get("txb_AddClassCt"), out RowCt))
+                {
+                    c.RowCt = RowCt;
+                    for (int i = 0; i <= RowCt; i++)
+                    {
+                        string sTitle = FC.Get("txb_ClassTitle_" + i + "_");
+                        if (!string.IsNullOrEmpty(sTitle))
+                        {
+                            cClassCell CC = new cClassCell();
+                            CC.SortNo = i.ToString();
+                            CC.ClassTitle = sTitle;//課堂名稱
+                            CC.ClassSDate = FC.Get("txb_ClassSDate_" + i + "_");//開課日期
+                            if (int.TryParse(FC.Get("txb_ClassCutDay_" + i + "_"), out j))
+                                CC.ClassCutDay = j;//相隔週期
+                            if (int.TryParse(FC.Get("txb_ClassCt_" + i + "_"), out j))
+                                CC.ClassCt = j;//上課堂數
+
+                            CC.ClassSTime = FC.Get("txb_ClassSTime_" + i + "_");//上課時間-始
+                            CC.ClassETime = FC.Get("txb_ClassETime_" + i + "_");//上課時間-末
+                            CC.ClassPhoneNo = FC.Get("txb_ClassPhoneNo_" + i + "_");//連絡電話
+                            CC.ClassLocationName = FC.Get("txb_ClassLocationName_" + i + "_");//地標名稱
+                            CC.ClassAddress = FC.Get("txb_ClassAddress_" + i + "_");//上課地點
+                            if (int.TryParse(FC.Get("txb_ClassPeopleCt_" + i + "_"), out j))
+                                CC.ClassPeopleCt = j;//人數限制
+                            if (int.TryParse(FC.Get("txb_ClassGraduateDate_" + i + "_"), out j))
+                                CC.ClassGraduateDate = j;//結業準備天數
+                            if (int.TryParse(FC.Get("ddl_ClassTeacher_" + i + "_"), out j))
+                                CC.ClassTeacher_ID = j;//講師ID
+
+                            CC.cTs = new List<SelectListItem>();
+                            foreach (var SLI in SLIs)
+                                CC.cTs.Add(new SelectListItem { Text = SLI.Text, Value = SLI.Value, Selected = SLI.Value == CC.ClassTeacher_ID.ToString() });
+                            c.cCs.Add(CC);
+                        }
+                    }
+                }
+            }
+            #endregion
+            #region 檢查輸入資料
+            Error = "";
+
+            foreach (var CC in c.cCs)
+            {
+                TimeSpan STime = new TimeSpan();
+                TimeSpan ETime = new TimeSpan();
+                TimeSpan.TryParse(CC.ClassSTime, out STime);
+                TimeSpan.TryParse(CC.ClassETime, out ETime);
+                if (ETime < STime)
+                    Error += CC.ClassTitle + "的上課時間輸入錯誤<br/>";
+            }
+            #endregion
+            return c;
+        }
         [HttpGet]
         public ActionResult ProductClass_BatchAdd(int ID)
         {
             GetViewBag();
-            return View();
+            if (ID == 0)
+                SetAlert("請先選擇課程後再建置班級", 2, "/Admin/StoreSet/Product_List");
+            else
+            {
+                var P = DC.Product.FirstOrDefault(q => !q.DeleteFlag && q.PID == ID);
+                if (P == null)
+                    SetAlert("請先選擇課程後再建置班級", 2, "/Admin/StoreSet/Product_List");
+            }
+            return View(GetProductClass_BatchAdd(ID, null));
+        }
+        [HttpPost]
+        public ActionResult ProductClass_BatchAdd(int ID, FormCollection FC)
+        {
+            GetViewBag();
+            ACID = GetACID();
+            var c = GetProductClass_BatchAdd(ID, FC);
+            if (Error != "")
+                SetAlert(Error, 2);
+            else
+            {
+                var P = DC.Product.FirstOrDefault(q => !q.DeleteFlag && q.PID == ID);
+                foreach (var CC in c.cCs)
+                {
+                    Product_Class PC_ = new Product_Class
+                    {
+                        Product = P,
+                        Title = CC.ClassTitle,
+                        PeopleCt = CC.ClassPeopleCt,
+                        PhoneNo = CC.ClassPhoneNo,
+                        LocationName = CC.ClassLocationName,
+                        Address = CC.ClassAddress,
+                        MeetURL = "",
+                        GraduateDate = DT,
+                        ActiveFlag = true,
+                        DeleteFlag = false,
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = ACID
+                    };
+                    DateTime SDate = DateTime.Now;
+                    DateTime.TryParse(CC.ClassSDate, out SDate);
+                    TimeSpan STime = new TimeSpan();
+                    TimeSpan ETime = new TimeSpan();
+                    TimeSpan.TryParse(CC.ClassSTime, out STime);
+                    TimeSpan.TryParse(CC.ClassSTime, out STime);
+
+                    for (int i = 0; i < CC.ClassCt; i++)
+                    {
+                        Product_ClassTime PCT = new Product_ClassTime
+                        {
+                            Product_Class = PC_,
+                            ClassDate = SDate,
+                            STime = STime,
+                            ETime = ETime
+                        };
+                        PC_.Product_ClassTime.Add(PCT);
+
+                        SDate = SDate.AddDays(CC.ClassCutDay);
+                    }
+                    PC_.GraduateDate = SDate.AddDays(CC.ClassGraduateDate - CC.ClassCutDay);
+                    DC.Product_Class.InsertOnSubmit(PC_);
+                    DC.SubmitChanges();
+
+                    var AC = DC.Account.FirstOrDefault(q => q.ACID == CC.ClassTeacher_ID);
+                    if (AC != null)
+                    {
+                        var T = DC.Teacher.FirstOrDefault(q => q.ACID == AC.ACID);
+                        if(T == null)
+                        {
+                            T = new Teacher
+                            {
+                                ACID = AC.ACID,
+                                Title = AC.Name_First + AC.Name_Last,
+                                Note = "",
+                                ActiveFlag = true,
+                                DeleteFlag = false,
+                                CreDate = DT,
+                                UpdDate = DT,
+                                SaveACID = ACID
+                            };
+                            DC.Teacher.InsertOnSubmit(T);
+                            DC.SubmitChanges();
+                        }
+                        M_Product_Teacher M = new M_Product_Teacher
+                        {
+                            Product = P,
+                            Product_Class = PC_,
+                            TID = T.TID,
+                            Title = T.Title,
+                            Note = "",
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = ACID
+                        };
+                        DC.M_Product_Teacher.InsertOnSubmit(M);
+                        DC.SubmitChanges();
+                    }
+
+                }
+
+                SetAlert("新增完成", 1);
+            }
+            return View(c);
         }
         #endregion
     }

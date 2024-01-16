@@ -382,7 +382,7 @@ main {
 
 .article {
     border-radius: 1rem;
-    box-shadow: 0.125rem 0.25rem 0.25rem 0.5rem oklch(0.1 0.37 315 / 0.25);
+    box-shadow: 0.125rem 0.25rem 0.25rem 0.5rem /*oklch(0.1 0.37 315 / 0.25)*/;
     color: white;
     padding: 1rem;
     width: min(400px, 90vw);

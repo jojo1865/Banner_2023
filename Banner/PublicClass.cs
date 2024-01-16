@@ -2392,7 +2392,12 @@ namespace Banner
                     ViewBag._Power = bGroup;
                 }
                 else if (CheckAdmin(ACID))//此使用者擁有系統管理者權限
+                {
+                    ViewBag._Title = ShortURL +"====="+ NewShortURL;
                     bGroup = new bool[] { true, true, true, true, true, true };
+                }
+                    
+
             }
 
             //購物車

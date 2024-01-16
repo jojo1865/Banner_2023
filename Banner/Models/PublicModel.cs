@@ -128,4 +128,23 @@ namespace Banner.Models
         public int SortNo = 0;
         public string URL;
     }
+    //批次課程
+    public class cClassCell
+    {
+        public string SortNo { get; set; } = "%";//流水號 內定值=%
+        public string ClassTitle { get; set; } = "";//課堂名稱
+        public string ClassSDate { get; set; } = DateTime.Now.ToString("yyyy-MM-dd");//開課日期
+        public string minClassSDate { get; set; } = DateTime.Now.ToString("yyyy-MM-dd");//開課日期
+        public int ClassCutDay { get; set; } = 1;//相隔週期
+        public int ClassCt { get; set; } = 1;//上課堂數
+        public string ClassSTime { get; set; } = "09:00";//上課時間-始
+        public string ClassETime { get; set; } = "12:00";//上課時間-末
+        public string ClassPhoneNo { get; set; } = "";//連絡電話
+        public string ClassLocationName { get; set; } = "";//地標名稱
+        public string ClassAddress { get; set; } = "";//上課地點
+        public int ClassPeopleCt { get; set; } = 0;//人數限制
+        public int ClassGraduateDate { get; set; } = 7;//結業準備天數
+        public int ClassTeacher_ID { get; set; } = 0;//講師ID
+        public List<SelectListItem> cTs { get; set; } = new List<SelectListItem>();//講師下拉選單
+    }
 }

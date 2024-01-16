@@ -1,139 +1,123 @@
-﻿
+﻿@model Banner.Areas.Admin.Controllers.StoreSetController.cProductClass_BatchAdd
 @{
     ViewBag.Title = "Product_Class_BatchAdd";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
 }
-
 <div class="main-container">
-    <div class="form-container-list">
-        <div class="form-container">
-            <div class="form-header visually-hidden">
-                <h5>@ViewBag._Title</h5>
-            </div>
-            <form method="post" id="form1" enctype="multipart/form-data">
-                <div class="form-body">
-                    <div class="form-card-group">
-                        <div id="personal-info" class="header-container">
-                            <div class="header-left-border"></div>
-                            <div class="header">課程上架管理</div>
-                        </div>
-                    </div>
-
-                    <div class="form-body mt-4">
-                        <div class="form-card-group">
-                            <div id="personal-info" class="header-container">
-                                <div class="header-left-border"></div>
-                                <div class="header">開班管理</div>
-                                <a class="ms-2" id="a_add_Class" href="javascript:;" onclick="AddClassRow1();"><i class="fa-solid fa-circle-plus lab_DarkBlue me-2"></i></a>
-                                <input type="hidden" id="txb_AddClassCt" name="txb_AddClassCt" value="0" />
-                            </div>
-                            <div class="form-card">
-                                <div class="form-group" id="div_ClassPlace">
-                                    <div class="row" id="div_Class_1">
-                                        <div class="col-4">
-                                            <label class="form-label"><span class="text-danger">*</span>課堂名稱</label>
-                                            <input class="form-control" />
-                                        </div>
-                                        <div class="col-4">
-                                            <label class="form-label"><span class="text-danger">*</span>上課堂數</label><br />
-                                            <input class="form-control" style="display:unset; width:80px;" type="number" min="0" value="1" />堂
-                                        </div>
-                                        <div class="col-4">
-                                            <label class="form-label"><span class="text-danger">*</span>開課日期</label>
-                                            <input class="form-control" type="date" value="2023-12-01" />
-                                        </div>
-                                        <div class="col-4">
-                                            <label class="form-label"><span class="text-danger">*</span>相隔週期</label><br />
-                                            <input class="form-control" style="display:unset; width:80px;" type="number" min="0" value="0" />天
-                                        </div>
-                                        <div class="col-4">
-                                            <label class="form-label"><span class="text-danger">*</span>上課時間</label><br />
-                                            <input class="form-control" type="time" value="09:00" style="width:150px;display:unset" />～
-                                            <input class="form-control" type="time" value="12:00" style="width: 150px; display: unset" />
-                                        </div>
-
-                                        <div class="col-4">
-                                            <label class="form-label"><span class="text-danger">*</span>連絡電話</label>
-                                            <input class="form-control" />
-                                        </div>
-                                        <div class="col-4">
-                                            <label class="form-label">地標名稱</label>
-                                            <input class="form-control" />
-                                        </div>
-                                        <div class="col-4">
-                                            <label class="form-label"><span class="text-danger">*</span>上課地點</label>
-                                            <input class="form-control" />
-                                        </div>
-                                        <div class="col-4">
-                                            <label class="form-label"><span class="text-danger">*</span>人數限制</label><br />
-                                            <input class="form-control" style="display:unset; width:80px;" type="number" min="0" value="0" />人
-                                        </div>
-                                        <div class="col-4">
-                                            <label class="form-label"><span class="text-danger">*</span>結業準備天數</label>
-                                            <input class="form-control" style="display:unset; width:80px;" type="number" min="0" value="0" />天
-                                        </div>
-                                        <div class="col-4">
-                                            <label class="form-label"><span class="text-danger">*</span>講師選擇</label>
-                                            <div class="dropdown">
-                                                <button class="form-select-lg" type="button" data-toggle="dropdown" id="but_Text_1">
-                                                    請選擇
-                                                </button>
-                                                <input type="hidden" id="txb_Value_1" value="" />
-                                                <ul class="dropdown-menu">
-                                                    <input class="form-control cInput" type="text" placeholder="搜尋...">
-                                                    <li><a href="javascript:;" onclick="SelectTeacher('張先生', '001', 'but_Text_1', 'txb_Value_1')">張先生</a></li>
-                                                    <li><a href="#">CSS</a></li>
-                                                    <li><a href="#">JavaScript</a></li>
-                                                    <li><a href="#">jQuery</a></li>
-                                                    <li><a href="#">Bootstrap</a></li>
-                                                    <li><a href="#">Angular</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <a class="btn btn-success" onclick="" href="javascript:;">複製</a>
-                                            <a class="btn btn-danger" onclick="" href="javascript:;">刪除</a>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-
-                </div>
-
-
-            </form>
-        </div>
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
     </div>
 </div>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-<style>
-    /* Style the input field */
-    .cInput {
-        padding: 20px;
-        margin-top: -6px;
-        border: 0;
-        border-radius: 0;
-        background: #f1f1f1;
+<div class="form-container-list">
+    <div class="form-container">
+        <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
+        <form method="post" id="form1" enctype="multipart/form-data">
+            <div class="form-body mt-4">
+                <a class="ms-2" id="a_add_Class" href="javascript:;" onclick="AddClassRow1();"><i class="fa-solid fa-circle-plus lab_DarkBlue me-2"></i>新增班級</a>
+                <input type="hidden" id="txb_AddClassCt" name="txb_AddClassCt" value="@Model.RowCt" />
+                <div id="div_ClassPlace">
+                    @foreach (var CC in Model.cCs)
+                    {
+                        @Html.Action("_ProductClass_BatchCell", "Include", new { CC = CC })
+                    }
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="action-bar">
+    @if (Model != null)
+    {
+        //if ((((bool[])ViewBag._Power)[1]))
+        {
+            <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-submit btn-lg btn-round btn-submit">
+                <i class="fa-solid fa-floppy-disk"></i>產生班級
+            </a>
+        }
+        <a href="/Admin/StoreSet/Product_List" class="btn btn-outline-primary btn-lg btn-round">
+            <i class="fa-solid fa-xmark"></i>取消
+        </a>
     }
-</style>
+</div>
+
+
+<div class="d-none" id="div_ClassPlace_Bata">
+    @Html.Action("_ProductClass_BatchCell", "Include", new { CC = Model.cCBasic })
+</div>
+
 <script>
-    $(document).ready(function () {
-        $(".cInput").on("keyup", function () {
-            var value = $(this).val().toLowerCase();
-            $(".dropdown-menu li").filter(function () {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-            });
-        });
-    });
+
+    //新增一行
+    function AddClassRow1() {
+        var sCt = document.getElementById('txb_AddClassCt');
+        var iCt = parseInt(sCt.value) + 1;
+
+        var clo = $('#div_ClassPlace_Bata').clone(true);
+        var str = clo.html();
+        for (i = 0; i < 50; i++) {
+            str = str.replace('%', iCt);
+        }
+        $('#div_ClassPlace').append(str);
+        sCt.value = iCt;
+
+        return;
+    }
+    //複製一行
+    function CopyClassRow(RowNo) {
+        var sCt = document.getElementById('txb_AddClassCt');
+        var iCt = parseInt(sCt.value) + 1;
+
+        var Controls = [
+            'txb_ClassTitle_',
+            'txb_ClassSDate_',
+            'txb_ClassCutDay_',
+            'txb_ClassCt_',
+            'txb_ClassSTime_',
+            'txb_ClassETime_',
+            'txb_ClassPhoneNo_',
+            'txb_ClassLocationName_',
+            'txb_ClassAddress_',
+            'txb_ClassPeopleCt_'
+        ];
+        for (i = 0; i < Controls.length; i++) {
+            var v0 = document.getElementsByName(Controls[i] + RowNo + '_');
+            v0[0].attributes['value'].value = v0[0].value;
+        }
+        var ddl_t = document.getElementsByName('ddl_ClassTeacher_' + RowNo + '_');
+        if (ddl_t != null) {
+            console.log(ddl_t[0].value);
+            for (i = 0; i < ddl_t[0].options.length; i++) {
+                var op = ddl_t[0].options[i];
+                if (op.value == ddl_t[0].value) {
+                    op.setAttribute('selected', 'selected');
+                }
+                else {
+                    op.removeAttribute('selected');
+                }
+            }
+        }
+
+        var str = document.getElementById('div_AddClass_' + RowNo + '_').innerHTML;
+        for (i = 0; i < 50; i++) {
+            str = str.replace('_' + RowNo + '_', '_' + iCt + '_');
+            str = str.replace("('" + RowNo + "')", "('" + iCt + "')");
+        }
+        $('#div_ClassPlace').append('<div class="form-card" id="div_AddClass_' + iCt + '_">' + str + '</div>');
+
+        sCt.value = iCt;
+
+        return;
+    }
+    //選擇老師
     function SelectTeacher(Text, Value, TextID, ValueID) {
         document.getElementById(TextID).innerText = Text;
         document.getElementById(ValueID).value = Value;
+    }
+    //刪除一行
+    function RemoveRow(RowID) {
+        document.getElementById(RowID).remove();
     }
 </script>

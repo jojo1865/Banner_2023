@@ -1,0 +1,75 @@
+﻿@model Banner.Models.cClassCell
+@if (Model != null)
+{
+    <div class="form-card" id="div_AddClass_@(Model.SortNo)_">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xxl-11 col-12">
+                    <div class="row">
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label"><span class="text-danger">*</span>課堂名稱</label>
+                            <input class="form-control" name="txb_ClassTitle_@(Model.SortNo)_" value="@(Model.ClassTitle)" />
+                        </div>
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label"><span class="text-danger">*</span>開課日期</label>
+                            <input class="form-control" type="date" value="@(Model.ClassSDate)" name="txb_ClassSDate_@(Model.SortNo)_" min="@(Model.minClassSDate)" />
+                        </div>
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label"><span class="text-danger">*</span>相隔週期</label><br />
+                            <input class="form-control" style="display:unset; width:70px; margin-top:4px;" type="number" min="1" value="@(Model.ClassCutDay)" name="txb_ClassCutDay_@(Model.SortNo)_" oninput="if(!/^[0-9]+$/.test(value)) value=value.replace(/\D/g,'');if(value>100)value=100;if(value<=0)value=null" />
+                            天
+                        </div>
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label"><span class="text-danger">*</span>上課堂數</label><br />
+                            <input class="form-control" style="display: unset; width: 70px; margin-top: 4px;" type="number" min="1" value="@(Model.ClassCt)" name="txb_ClassCt_@(Model.SortNo)_" oninput="if(!/^[0-9]+$/.test(value)) value=value.replace(/\D/g,'');if(value>100)value=100;if(value<=0)value=null" />
+                            堂
+                        </div>
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label"><span class="text-danger">*</span>上課時間</label><br />
+                            <input class="form-control" type="time" value="@(Model.ClassSTime)" style="width: 150px; display: unset; margin-top:4px;" name="txb_ClassSTime_@(Model.SortNo)_" />～
+                            <input class="form-control" type="time" value="@(Model.ClassETime)" style="width: 150px; display: unset; margin-top: 4px;" name="txb_ClassETime_@(Model.SortNo)_" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xxl-1 d-none d-xxl-block pt-5">
+                    <a class="btn btn-success" onclick="CopyClassRow('@(Model.SortNo)');" href="javascript:;">複製</a>
+                </div>
+
+                <div class="col-xxl-11 col-12">
+                    <div class="row">
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label">地標名稱</label>
+                            <input class="form-control" name="txb_ClassLocationName_@(Model.SortNo)_" value="@(Model.ClassLocationName)" style="width:100px;" />
+                        </div>
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label"><span class="text-danger">*</span>上課地點</label>
+                            <input class="form-control" name="txb_ClassAddress_@(Model.SortNo)_" value="@(Model.ClassAddress)" />
+                        </div>
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label"><span class="text-danger">*</span>連絡電話</label>
+                            <input class="form-control" name="txb_ClassPhoneNo_@(Model.SortNo)_" value="@(Model.ClassPhoneNo)" />
+                        </div>
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label"><span class="text-danger">*</span>人數限制</label><br />
+                            <input class="form-control" style="display: unset; width: 80px; margin-top: 4px;" type="number" min="0" value="@(Model.ClassPeopleCt)" name="txb_ClassPeopleCt_@(Model.SortNo)_" oninput="if(!/^[0-9]+$/.test(value)) value=value.replace(/\D/g,'');if(value>100)value=100;if(value<=0)value=null" />
+                            人
+                        </div>
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label"><span class="text-danger">*</span>結業準備天數</label><br />
+                            <input class="form-control" style="display: unset; width: 70px; margin-top: 4px;" type="number" min="0" value="@(Model.ClassGraduateDate)" name="txb_ClassGraduateDate_@(Model.SortNo)_" oninput="if(!/^[0-9]+$/.test(value)) value=value.replace(/\D/g,'');if(value>100)value=100;if(value<=0)value=null" />
+                            天
+                        </div>
+                        <div class="col-lg-auto col-4">
+                            <label class="form-label"><span class="text-danger">*</span>講師選擇</label>
+                            @Html.DropDownList("ddl_ClassTeacher_" + Model.SortNo + "_", Model.cTs, new { @class = "form-select" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xxl-1 col-12 pt-5">
+                    <a class="btn btn-success d-xxl-none" onclick="CopyClassRow('@(Model.SortNo)');" href="javascript:;">複製</a>
+                    <a class="btn btn-danger" onclick="RemoveRow('div_AddClass_@(Model.SortNo)_');" href="javascript:;">刪除</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
