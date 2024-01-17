@@ -736,40 +736,67 @@ namespace Banner.Areas.Admin.Controllers
             public string Name { get; set; }
             public string GroupName { get; set; }
         }
+        /// <summary>
+        /// 取得會員搜尋列表
+        /// </summary>
+        /// <param name="Name">姓名關鍵字</param>
+        /// <param name="OIID">限制所屬旌旗</param>
+        /// <param name="Type">0:成人會員/1:兒童會員/2:全職同工/3:成人會友/4:講師</param>
+        /// <returns></returns>
         [HttpGet]
-        public string GetAccountList(string Name, int OIID, bool ChildFlag = false, bool BackendFlag = true)
+        public string GetAccountList(string Name, int OIID, int Type)
         {
             List<cAC> Ns = new List<cAC>();
+
 
             var ACs = DC.Account.Where(q => q.ActiveFlag && !q.DeleteFlag);
             if (Name != "")
                 ACs = ACs.Where(q => (q.Name_First + q.Name_Last).Contains(Name));
-            if (OIID > 0 && !ChildFlag)//隸屬哪個旌旗(兒童不查例外)
-            {
-                ACs = from q in ACs
-                      join p in DC.M_OI_Account.Where(q => q.ActiveFlag &&
-                                                  !q.DeleteFlag &&
-                                                  q.OrganizeInfo.ActiveFlag &&
-                                                  !q.OrganizeInfo.DeleteFlag &&
-                                                  q.OrganizeInfo.OI2_ID == OIID).GroupBy(q => q.ACID)
-                      on q.ACID equals p.Key
-                      select q;
-            }
-
-            if (ChildFlag)//小孩就年齡限制12歲(含)以下,不限小組
+            if (Type == 1)//小孩就年齡限制12歲(含)以下,不限小組
             {
                 ACs = ACs.Where(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
 
                 foreach (var AC in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
                 {
                     cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "" };
-                    if (!BackendFlag)
-                        N.Name = CutName(N.Name);
+                    //if (!BackendFlag)
+                    //    N.Name = CutName(N.Name);
                     Ns.Add(N);
                 }
             }
-            else//成人至少是會友(有小組)
+            else
             {
+                if (OIID > 0)//隸屬哪個旌旗(兒童不查例外)
+                {
+                    ACs = from q in ACs
+                          join p in DC.M_OI_Account.Where(q => q.ActiveFlag &&
+                                                      !q.DeleteFlag &&
+                                                      q.OrganizeInfo.ActiveFlag &&
+                                                      !q.OrganizeInfo.DeleteFlag &&
+                                                      q.OrganizeInfo.OI2_ID == OIID).GroupBy(q => q.ACID)
+                          on q.ACID equals p.Key
+                          select q;
+                }
+                if (Type == 2)//全職同工
+                {
+                    ACs = ACs.Where(q => q.BackUsedFlag);
+                }
+                else if (Type == 3)//成人會友(會友卡)
+                {
+                    ACs = from q in ACs
+                          join p in DC.M_Rool_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 2)
+                          on q.ACID equals p.ACID
+                          select q;
+                }
+                else if (Type == 4)//講師
+                {
+                    ACs = from q in ACs
+                          join p in DC.Teacher.Where(q => q.ActiveFlag && !q.DeleteFlag)
+                          on q.ACID equals p.ACID
+                          select q;
+                }
+
+                //所屬小組資料
                 var Ms_ = (from q in DC.M_OI_Account.Where(q => q.OrganizeInfo.OID == 8)
                            join p in ACs
                            on q.ACID equals p.ACID
@@ -781,14 +808,9 @@ namespace Banner.Areas.Admin.Controllers
                     var M_ACs = Ms_.Where(q => q.ACID == AC.ACID);
                     foreach (var M in M_ACs)
                         N.GroupName += (N.GroupName == "" ? "" : ",") + M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title;
-
-                    if (!BackendFlag)
-                        N.Name = CutName(N.Name);
-                    if (N.GroupName != "")//沒有小組的就不算
-                        Ns.Add(N);
+                    Ns.Add(N);
                 }
             }
-
             return JsonConvert.SerializeObject(Ns);
         }
 
@@ -828,7 +850,7 @@ namespace Banner.Areas.Admin.Controllers
                 foreach (var M in M_ACs)
                     N.GroupName += (N.GroupName == "" ? "" : ",") + M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title;
 
-                if (N.GroupName != "" || AC.ACID == 1 || (MOI2s.Any(q=>q.ACID==AC.ACID)))//沒有小組的就不算,但Admin例外,全部旌旗的同工例外
+                if (N.GroupName != "" || AC.ACID == 1 || (MOI2s.Any(q => q.ACID == AC.ACID)))//沒有小組的就不算,但Admin例外,全部旌旗的同工例外
                     Ns.Add(N);
             }
 
@@ -1053,7 +1075,7 @@ namespace Banner.Areas.Admin.Controllers
         }
         #endregion
         #region 事工團移除團員
-        public string RemoveACFromStaff(string IDs,int SID)
+        public string RemoveACFromStaff(string IDs, int SID)
         {
             BasicResponse R = new BasicResponse();
             ACID = GetACID();

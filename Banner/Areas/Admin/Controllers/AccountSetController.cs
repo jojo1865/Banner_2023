@@ -519,10 +519,10 @@ namespace Banner.Areas.Admin.Controllers
                     case 5://按立會友
                         {
                             cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
-                            if(iType == 1)
-                            cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
+                            if (iType == 1)
+                                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
                             else
-                            cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Emtitle_Edit/" + N.ACID, Target = "_self", Value = "按立" });//檢視
+                                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Emtitle_Edit/" + N.ACID, Target = "_self", Value = "按立" });//檢視
                             var OI_8 = GetMOIAC(8, 0, N.ACID).FirstOrDefault(q => q.JoinDate != q.CreDate);//確定有入組再列
                             if (OI_8 != null)
                             {
@@ -635,7 +635,7 @@ namespace Banner.Areas.Admin.Controllers
                             }
                             else if (N.GroupType == "有意願")
                                 iJoinType = 4;
-        
+
                             if (iJoinType == 3 || iJoinType == 4)
                                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_New_Edit/" + N.ACID, Target = "_black", Value = "分發" });//操作
                             else
@@ -756,6 +756,8 @@ namespace Banner.Areas.Admin.Controllers
             public bool bJob24Flag = false;//是否為領夜同工
             public List<cOAccount> OAs = new List<cOAccount>();//目前按立狀況
             public List<cOAH> OAHs = new List<cOAH>();//按立歷史
+
+            public bool bFriendFlag = false;//是否為會友
         }
         //家庭樹
         public class cFamily
@@ -1079,7 +1081,8 @@ namespace Banner.Areas.Admin.Controllers
                     N.OAHs.Add(OA);
                 }
             }
-
+            //是否為會友
+            N.bFriendFlag = DC.M_Rool_Account.Any(q => q.ACID == ID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2);
             #endregion
             #region 會員資料填入
 
@@ -2134,12 +2137,12 @@ namespace Banner.Areas.Admin.Controllers
         }
         [HttpGet]
 
-        public string EmtitleAccount(int ACID,int OID)
+        public string EmtitleAccount(int ACID, int OID)
         {
             Error = "";
             int UID = GetACID();
             var MOA = DC.M_O_Account.FirstOrDefault(q => q.ACID == ACID && q.OID == OID && q.ActiveFlag && !q.DeleteFlag);
-            if(MOA == null)//按立
+            if (MOA == null)//按立
             {
                 if (!DC.M_Rool_Account.Any(q => q.ACID == ACID && q.RID == 2 && q.ActiveFlag && !q.DeleteFlag))
                     Error += "此人尚未持有會友卡,無法按立";
@@ -2170,5 +2173,6 @@ namespace Banner.Areas.Admin.Controllers
             return Error;
         }
         #endregion
+
     }
 }

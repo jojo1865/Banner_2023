@@ -189,13 +189,12 @@
         var Child = $("#txb_Child").val();
         var table = $('#tbody_Add')[0];
         table.innerHTML = "";
-
         if (Name == "") { alert("請輸入姓名"); }
         else {
             if (but != null) { but.classList.add("btn-loading"); }
             $('#div_Table').addClass('div_dark_gray');
             $.ajax({
-                url: '/Admin/Home/GetAccountList?Name=' + Name + '&OIID=' + OIID + '&ChildFlag=' + Child,
+                url: '/Admin/Home/GetAccountList?Name=' + Name + '&OIID=' + OIID + '&Type=' + (Child ? '1' : '2'),
                 method: 'GET',
                 dataType: 'text',
                 success: function (res) {

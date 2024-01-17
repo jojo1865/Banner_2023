@@ -7,7 +7,7 @@
                 <div class="col-xxl-11 col-12">
                     <div class="row">
                         <div class="col-lg-auto col-4">
-                            <label class="form-label"><span class="text-danger">*</span>課堂名稱</label>
+                            <label class="form-label"><span class="text-danger">*</span>班級名稱</label>
                             <input class="form-control" name="txb_ClassTitle_@(Model.SortNo)_" value="@(Model.ClassTitle)" />
                         </div>
                         <div class="col-lg-auto col-4">
@@ -37,14 +37,26 @@
 
                 <div class="col-xxl-11 col-12">
                     <div class="row">
-                        <div class="col-lg-auto col-4">
-                            <label class="form-label">地標名稱</label>
-                            <input class="form-control" name="txb_ClassLocationName_@(Model.SortNo)_" value="@(Model.ClassLocationName)" style="width:100px;" />
-                        </div>
-                        <div class="col-lg-auto col-4">
-                            <label class="form-label"><span class="text-danger">*</span>上課地點</label>
-                            <input class="form-control" name="txb_ClassAddress_@(Model.SortNo)_" value="@(Model.ClassAddress)" />
-                        </div>
+                        @if (Model.ProductType == 0 || Model.ProductType == 1)
+                        {
+
+
+                            <div class="col-lg-auto col-4">
+                                <label class="form-label">地點名稱</label>
+                                <input class="form-control" name="txb_ClassLocationName_@(Model.SortNo)_" value="@(Model.ClassLocationName)" style="width:100px;" />
+                            </div>
+                            <div class="col-lg-auto col-4">
+                                <label class="form-label"><span class="text-danger">*</span>上課地點</label>
+                                <input class="form-control" name="txb_ClassAddress_@(Model.SortNo)_" value="@(Model.ClassAddress)" />
+                            </div>
+                        }
+                        @if (Model.ProductType == 0 || Model.ProductType == 2)
+                        {
+                            <div class="col-lg-auto col-4">
+                                <label class="form-label"><span class="text-danger">*</span>網址</label>
+                                <input class="form-control" name="txb_ClassMeetURL_@(Model.SortNo)_" type="url" value="@(Model.ClassMeetURL)" />
+                            </div>
+                        }
                         <div class="col-lg-auto col-4">
                             <label class="form-label"><span class="text-danger">*</span>連絡電話</label>
                             <input class="form-control" name="txb_ClassPhoneNo_@(Model.SortNo)_" value="@(Model.ClassPhoneNo)" />
@@ -60,8 +72,9 @@
                             天
                         </div>
                         <div class="col-lg-auto col-4">
-                            <label class="form-label"><span class="text-danger">*</span>講師選擇</label>
-                            @Html.DropDownList("ddl_ClassTeacher_" + Model.SortNo + "_", Model.cTs, new { @class = "form-select" })
+                            <label class="form-label"><span class="text-danger">*</span>講師選擇</label><br />
+                            <a id="but_SelectTeacher_@(Model.SortNo)_" href="javascript:;" class="btn btn-primary" onclick="ShowPopupAC(4, '搜尋講師', @(Model.OIID), 'txb_TeacherID_@(Model.SortNo)_', 'but_SelectTeacher_@(Model.SortNo)_');">@Model.ClassTeacher_Name</a>
+                            <input id="txb_TeacherID_@(Model.SortNo)_" name="txb_TeacherID_@(Model.SortNo)_" type="hidden" style="width:100px;" value="@Model.ClassTeacher_ID" />
                         </div>
                     </div>
                 </div>

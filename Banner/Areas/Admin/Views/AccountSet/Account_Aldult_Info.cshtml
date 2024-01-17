@@ -521,35 +521,35 @@
                     <div class="form-card">
                         <div class="row">
                             <div class="col-12 pt-2">
-                                <label>帳戶啟用</label>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 pt-2">
-                                @Html.CheckBox("cbox_ActiveFlag", Model.AC.ActiveFlag, new { @class = "form-check-input" })
+                                @Html.CheckBox("cbox_ActiveFlag", Model.AC.ActiveFlag, new { @class = "form-check-input" })<label>帳戶啟用</label>
                             </div>
                         </div>
                         @if (Model.bShowBackUsedAreaFlag)
                         {
                             <div class="row">
                                 <div class="col-12 pt-2">
-                                    <label>後台權限</label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 pt-2">
-                                    @Html.CheckBox("cbox_BackUsedFlag", Model.AC.BackUsedFlag, new { @class = "form-check-input" })
+                                    @if (Model.bFriendFlag)
+                                    {
+                                        @Html.CheckBox("cbox_BackUsedFlag", Model.AC.BackUsedFlag, new { @class = "form-check-input" })<label for="cbox_BackUsedFlag">後台權限</label> 
+                                    }
+                                    else
+                                    {
+                                        @Html.CheckBox("cbox_BackUsedFlag", Model.AC.BackUsedFlag, new { @class = "form-check-input", @disabled = "true" })<label class="lab_gray">後台權限(無會友資格)</label>
+                                    }
+
                                 </div>
                             </div>
                         }
                         <div class="row">
                             <div class="col-12 pt-2">
-                                <label>講師權限</label>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 pt-2">
-                                @Html.CheckBox("cbox_TeacherFlag", Model.AC.TeacherFlag, new { @class = "form-check-input" })
+                                @if (Model.bFriendFlag)
+                                {
+                                    @Html.CheckBox("cbox_TeacherFlag", Model.AC.TeacherFlag, new { @class = "form-check-input" })<label for="cbox_TeacherFlag">講師權限</label>
+                                }
+                                else
+                                {
+                                    @Html.CheckBox("cbox_TeacherFlag", Model.AC.TeacherFlag, new { @class = "form-check-input", @disabled = "true" })<label class="lab_gray">講師權限(無會友資格)</label>
+                                }
                             </div>
                         </div>
                         <div class="row">
@@ -632,7 +632,7 @@
         {
             <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><i class="fa-solid fa-floppy-disk"></i>儲存</a>
         }
-        <a href="/Admin/AccountSet/Account_Emtitle_List/0" class="btn btn-outline-primary btn-lg btn-round">
+        <a href="/Admin/AccountSet/Account_Aldult_List/0" class="btn btn-outline-primary btn-lg btn-round">
             <i class="fa-solid fa-arrow-rotate-left"></i>返回列表
         </a>
     }

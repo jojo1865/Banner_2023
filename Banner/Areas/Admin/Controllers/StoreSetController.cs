@@ -1854,6 +1854,10 @@ namespace Banner.Areas.Admin.Controllers
             if (SLIs.Count > 0)
                 SLIs[0].Selected = true;
             c.cCBasic.cTs = SLIs;
+
+            var P = DC.Product.FirstOrDefault(q => q.PID == ID);
+            if (P != null)
+                ViewBag._Title += " - " + P.Title + P.SubTitle;
             #endregion
             #region 前端資料匯入
             if (FC != null)
@@ -1869,6 +1873,7 @@ namespace Banner.Areas.Admin.Controllers
                         if (!string.IsNullOrEmpty(sTitle))
                         {
                             cClassCell CC = new cClassCell();
+                            CC.OIID = P.OIID;
                             CC.SortNo = i.ToString();
                             CC.ClassTitle = sTitle;//課堂名稱
                             CC.ClassSDate = FC.Get("txb_ClassSDate_" + i + "_");//開課日期
@@ -1876,17 +1881,18 @@ namespace Banner.Areas.Admin.Controllers
                                 CC.ClassCutDay = j;//相隔週期
                             if (int.TryParse(FC.Get("txb_ClassCt_" + i + "_"), out j))
                                 CC.ClassCt = j;//上課堂數
-
+                            CC.ProductType = P.ProductType;//上課屬性:實體/線上
                             CC.ClassSTime = FC.Get("txb_ClassSTime_" + i + "_");//上課時間-始
                             CC.ClassETime = FC.Get("txb_ClassETime_" + i + "_");//上課時間-末
                             CC.ClassPhoneNo = FC.Get("txb_ClassPhoneNo_" + i + "_");//連絡電話
                             CC.ClassLocationName = FC.Get("txb_ClassLocationName_" + i + "_");//地標名稱
                             CC.ClassAddress = FC.Get("txb_ClassAddress_" + i + "_");//上課地點
+                            CC.ClassMeetURL = FC.Get("txb_ClassMeetURL_" + i + "_");//上課網址
                             if (int.TryParse(FC.Get("txb_ClassPeopleCt_" + i + "_"), out j))
                                 CC.ClassPeopleCt = j;//人數限制
                             if (int.TryParse(FC.Get("txb_ClassGraduateDate_" + i + "_"), out j))
                                 CC.ClassGraduateDate = j;//結業準備天數
-                            if (int.TryParse(FC.Get("ddl_ClassTeacher_" + i + "_"), out j))
+                            if (int.TryParse(FC.Get("ddl_ClassTeacher_ID_" + i + "_"), out j))
                                 CC.ClassTeacher_ID = j;//講師ID
 
                             CC.cTs = new List<SelectListItem>();
@@ -2021,6 +2027,23 @@ namespace Banner.Areas.Admin.Controllers
             }
             return View(c);
         }
+        #endregion
+        #region 批次班級一覽表
+        [HttpGet]
+        public ActionResult ProductClass_BatchEdit(int ID)
+        {
+            GetViewBag();
+            if (ID == 0)
+                SetAlert("請先選擇課程後再建置班級", 2, "/Admin/StoreSet/Product_List");
+            else
+            {
+                var P = DC.Product.FirstOrDefault(q => !q.DeleteFlag && q.PID == ID);
+                if (P == null)
+                    SetAlert("請先選擇課程後再建置班級", 2, "/Admin/StoreSet/Product_List");
+            }
+            return View();
+        }
+        
         #endregion
     }
 }

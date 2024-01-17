@@ -722,7 +722,9 @@
     <Content Include="Areas\Web\Views\StaffPlace\EventJoin_List.cshtml" />
     <Content Include="Areas\Admin\Views\AccountSet\Account_Emtitle_List.cshtml" />
     <Content Include="Areas\Admin\Views\AccountSet\Account_Emtitle_Edit.cshtml" />
-    <Content Include="Areas\Admin\Views\Include\_ProductClass_BatchCell.cshtml" />
+    <Content Include="Areas\Admin\Views\Include\_ProductClass_BatchAddCell.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\ProductClass_BatchEdit.cshtml" />
+    <Content Include="Areas\Admin\Views\Include\_SearchAccount.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

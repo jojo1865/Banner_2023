@@ -1,0 +1,72 @@
+﻿@model Banner.Models.cClassCell
+@{
+    ViewBag.Title = "ProductClass_BatchEdit";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+    ViewBag._Title = "班別批次管理";
+    var Model = new Banner.Models.cClassCell();
+    Model.SortNo = "0";
+    Model.OIID = 0;
+    Model.ClassTeacher_ID = 0;
+}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+</div>
+<div class="form-container-list">
+    <div class="form-container">
+        <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
+        <form method="post" id="form1" enctype="multipart/form-data">
+            <div class="form-body mt-4">
+                <!---->
+                <div class="form-card">
+                    <div class="row">
+                        <div class="col-3"><h3>班級名稱</h3></div>
+                        <div class="col-3">
+                            講師：<a id="but_SelectTeacher_@(Model.SortNo)_" href="javascript:;" class="btn btn-primary" onclick="ShowPopupAC(4, '搜尋講師', @(Model.OIID), 'txb_TeacherID_@(Model.SortNo)_', 'but_SelectTeacher_@(Model.SortNo)_');">@Model.ClassTeacher_Name</a>
+                            <input id="txb_TeacherID_@(Model.SortNo)_" name="txb_TeacherID_@(Model.SortNo)_" type="hidden" style="width:100px;" value="@Model.ClassTeacher_ID" />
+                        </div>
+                        <div class="col-3">
+                            <a class="btn btn-success" href="#">報名名單(20)</a>
+                        </div>
+                        <div class="col-3">
+                            <a class="btn btn-danger" href="#">取消課程</a>
+                            <a class="btn btn-warning" href="#">更新課程</a>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div>課堂數:10</div>
+                            <table class="table_RWDStyle table">
+                                <thead>
+                                    <tr class="Bgn">
+                                        <th>上課日期</th>
+                                        <th>起始時間</th>
+                                        <th>結束時間</th>
+                                        <th>打卡人數</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input class="form-control" type="date" value="2024-01-01" /></td>
+                                        <td><input class="form-control" type="time" value="08:00" /></td>
+                                        <td><input class="form-control" type="time" value="12:00" /></td>
+                                        <td><a href="#" class="btn btn-success">10</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!---->
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@Html.Action("_SearchAccount", "Include")

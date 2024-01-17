@@ -14,12 +14,12 @@
         <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
         <form method="post" id="form1" enctype="multipart/form-data">
             <div class="form-body mt-4">
-                <a class="ms-2" id="a_add_Class" href="javascript:;" onclick="AddClassRow1();"><i class="fa-solid fa-circle-plus lab_DarkBlue me-2"></i>新增班級</a>
+                <a class="ms-2 btn btn-primary" id="a_add_Class" href="javascript:;" onclick="AddClassRow1();"><i class="fa-solid fa-circle-plus me-2"></i>新增班級</a>
                 <input type="hidden" id="txb_AddClassCt" name="txb_AddClassCt" value="@Model.RowCt" />
                 <div id="div_ClassPlace">
                     @foreach (var CC in Model.cCs)
                     {
-                        @Html.Action("_ProductClass_BatchCell", "Include", new { CC = CC })
+                        @Html.Action("_ProductClass_BatchAddCell", "Include", new { CC = CC })
                     }
                 </div>
             </div>
@@ -45,8 +45,10 @@
 
 
 <div class="d-none" id="div_ClassPlace_Bata">
-    @Html.Action("_ProductClass_BatchCell", "Include", new { CC = Model.cCBasic })
+    @Html.Action("_ProductClass_BatchAddCell", "Include", new { CC = Model.cCBasic })
 </div>
+@Html.Action("_SearchAccount", "Include")
+
 
 <script>
 
@@ -80,24 +82,12 @@
             'txb_ClassPhoneNo_',
             'txb_ClassLocationName_',
             'txb_ClassAddress_',
-            'txb_ClassPeopleCt_'
+            'txb_ClassPeopleCt_',
+            'txb_TeacherID_'
         ];
         for (i = 0; i < Controls.length; i++) {
             var v0 = document.getElementsByName(Controls[i] + RowNo + '_');
             v0[0].attributes['value'].value = v0[0].value;
-        }
-        var ddl_t = document.getElementsByName('ddl_ClassTeacher_' + RowNo + '_');
-        if (ddl_t != null) {
-            console.log(ddl_t[0].value);
-            for (i = 0; i < ddl_t[0].options.length; i++) {
-                var op = ddl_t[0].options[i];
-                if (op.value == ddl_t[0].value) {
-                    op.setAttribute('selected', 'selected');
-                }
-                else {
-                    op.removeAttribute('selected');
-                }
-            }
         }
 
         var str = document.getElementById('div_AddClass_' + RowNo + '_').innerHTML;
@@ -120,4 +110,5 @@
     function RemoveRow(RowID) {
         document.getElementById(RowID).remove();
     }
+
 </script>

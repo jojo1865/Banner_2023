@@ -551,12 +551,18 @@ namespace Banner.Areas.Admin.Controllers
             return PartialView(SLs);
         }
         #endregion
-        #region MyRegion
-        public PartialViewResult _ProductClass_BatchCell(cClassCell CC)
+        #region 後臺批次開課程
+        public PartialViewResult _ProductClass_BatchAddCell(cClassCell CC)
         {
             return PartialView(CC);
         }
-        
+
+        #endregion
+        #region 會員搜尋彈出視窗
+        public PartialViewResult _SearchAccount()
+        {
+            return PartialView();
+        }
         #endregion
         public PartialViewResult _HeadInclude()
         {
