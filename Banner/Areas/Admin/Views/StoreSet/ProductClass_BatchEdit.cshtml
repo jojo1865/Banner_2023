@@ -1,14 +1,13 @@
-﻿@model Banner.Models.cClassCell
+﻿@model Banner.Areas.Admin.Controllers.StoreSetController.cGetProductClass_BatchEdit
 @{
     ViewBag.Title = "ProductClass_BatchEdit";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
-    ViewBag._Title = "班別批次管理";
-    var Model = new Banner.Models.cClassCell();
-    Model.SortNo = "0";
-    Model.OIID = 0;
-    Model.ClassTeacher_ID = 0;
 }
-
+<style>
+    .Bgn th, .Bgn td {
+        text-align: left;
+    }
+</style>
 <div class="main-container">
     <div class="header-container">
         <div class="header-left-border"></div>
@@ -18,55 +17,50 @@
 <div class="form-container-list">
     <div class="form-container">
         <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
-        <form method="post" id="form1" enctype="multipart/form-data">
-            <div class="form-body mt-4">
-                <!---->
-                <div class="form-card">
-                    <div class="row">
-                        <div class="col-3"><h3>班級名稱</h3></div>
-                        <div class="col-3">
-                            講師：<a id="but_SelectTeacher_@(Model.SortNo)_" href="javascript:;" class="btn btn-primary" onclick="ShowPopupAC(4, '搜尋講師', @(Model.OIID), 'txb_TeacherID_@(Model.SortNo)_', 'but_SelectTeacher_@(Model.SortNo)_');">@Model.ClassTeacher_Name</a>
-                            <input id="txb_TeacherID_@(Model.SortNo)_" name="txb_TeacherID_@(Model.SortNo)_" type="hidden" style="width:100px;" value="@Model.ClassTeacher_ID" />
-                        </div>
-                        <div class="col-3">
-                            <a class="btn btn-success" href="#">報名名單(20)</a>
-                        </div>
-                        <div class="col-3">
-                            <a class="btn btn-danger" href="#">取消課程</a>
-                            <a class="btn btn-warning" href="#">更新課程</a>
-                        </div>
-                    </div>
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div>課堂數:10</div>
-                            <table class="table_RWDStyle table">
-                                <thead>
-                                    <tr class="Bgn">
-                                        <th>上課日期</th>
-                                        <th>起始時間</th>
-                                        <th>結束時間</th>
-                                        <th>打卡人數</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><input class="form-control" type="date" value="2024-01-01" /></td>
-                                        <td><input class="form-control" type="time" value="08:00" /></td>
-                                        <td><input class="form-control" type="time" value="12:00" /></td>
-                                        <td><a href="#" class="btn btn-success">10</a></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                        </div>
-                    </div>
-
+        <div class="form-body mt-4">
+            @foreach (var CC in Model.CCs)
+            {
+                <div id="div_Class_@(CC.PCID)_">
+                    @Html.Action("_ProductClass_BatchEditCell", "Include", new { CC = CC })
                 </div>
-                <!---->
-            </div>
-
-        </form>
+            }
+        </div>
     </div>
 </div>
 
 @Html.Action("_SearchAccount", "Include")
+<script>
+    function UpdateClass(PCID) {
+        var obj = new Object;
+        obj.PCID = PCID;
+        obj.ClassTitle = $("input[name='txb_ClassTitle_" + PCID + "_']").val();
+        obj.LocationName = "";
+        obj.ClassAddress = "";
+        obj.ClassMeetURL = "";
+        if ($("input[name='txb_ClassLocationName_" + PCID + "_']") != null) { obj.LocationName = $("input[name='txb_ClassLocationName_" + PCID + "_']").val() }
+        if ($("input[name='txb_ClassAddress_" + PCID + "_']") != null) { obj.ClassAddress= $("input[name='txb_ClassAddress_" + PCID + "_']").val() }
+        if ($("input[name='txb_ClassMeetURL_" + PCID + "_']") != null) { obj.ClassMeetURL = $("input[name='txb_ClassMeetURL_" + PCID + "_']").val() }
+        obj.ClassPhoneNo = $("input[name='txb_ClassPhoneNo_" + PCID + "_']").val();
+        obj.GraduateDate = $("input[name='txb_ClassSDate_" + PCID + "_']").val();
+        obj.TeacherID = $("input[name='txb_TeacherID_" + PCID + "_']").val();
+        var ClassTimeCt = parseInt($("input[name='txb_ClassTimeCt_" + PCID + "_']").val()) ;
+        var TimeStr = '';
+        for (var i = 0; i < ClassTimeCt; i++) {
+            TimeStr += (TimeStr == '' ? '' : ';') + $("#txb_PCTID_" + PCID + "_" + i + "_").val() + "," + $("#txb_SDate_" + PCID + "_" + i + "_").val() + "," + $("#txb_STime_" + PCID + "_" + i + "_").val() + "," + $("#txb_ETime_" + PCID + "_" + i + "_").val();
+            //PCTID,Date,STime,ETime;
+        }
+        obj.TimeStr = TimeStr;
+        var sData = JSON.stringify(obj);
+        console.log(sData);
+        /*$.ajax({
+            url: '/Admin/StoreSet/ProductClass_BatchEdit',
+            data: sData,
+            method: 'post',
+            dataType: 'text',
+            success: function (res) {
+                location.reload();
+            },
+            error: function (err) { console.log(err) },
+        })*/
+    }
+</script>

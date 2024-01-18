@@ -39,8 +39,6 @@
                     <div class="row">
                         @if (Model.ProductType == 0 || Model.ProductType == 1)
                         {
-
-
                             <div class="col-lg-auto col-4">
                                 <label class="form-label">地點名稱</label>
                                 <input class="form-control" name="txb_ClassLocationName_@(Model.SortNo)_" value="@(Model.ClassLocationName)" style="width:100px;" />
@@ -68,13 +66,13 @@
                         </div>
                         <div class="col-lg-auto col-4">
                             <label class="form-label"><span class="text-danger">*</span>結業準備天數</label><br />
-                            <input class="form-control" style="display: unset; width: 70px; margin-top: 4px;" type="number" min="0" value="@(Model.ClassGraduateDate)" name="txb_ClassGraduateDate_@(Model.SortNo)_" oninput="if(!/^[0-9]+$/.test(value)) value=value.replace(/\D/g,'');if(value>100)value=100;if(value<=0)value=null" />
+                            <input class="form-control" style="display: unset; width: 70px; margin-top: 4px;" type="number" min="0" value="@(Model.ClassGraduateAddDay)" name="txb_ClassGraduateAddDay_@(Model.SortNo)_" oninput="if(!/^[0-9]+$/.test(value)) value=value.replace(/\D/g,'');if(value>100)value=100;if(value<=0)value=null" />
                             天
                         </div>
                         <div class="col-lg-auto col-4">
                             <label class="form-label"><span class="text-danger">*</span>講師選擇</label><br />
                             <a id="but_SelectTeacher_@(Model.SortNo)_" href="javascript:;" class="btn btn-primary" onclick="ShowPopupAC(4, '搜尋講師', @(Model.OIID), 'txb_TeacherID_@(Model.SortNo)_', 'but_SelectTeacher_@(Model.SortNo)_');">@Model.ClassTeacher_Name</a>
-                            <input id="txb_TeacherID_@(Model.SortNo)_" name="txb_TeacherID_@(Model.SortNo)_" type="hidden" style="width:100px;" value="@Model.ClassTeacher_ID" />
+                            <input id="txb_TeacherID_@(Model.SortNo)_" name="txb_TeacherID_@(Model.SortNo)_" type="hidden" style="width:100px;" value="@Model.ClassTeacher_ACID" />
                         </div>
                     </div>
                 </div>

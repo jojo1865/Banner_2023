@@ -145,10 +145,25 @@ namespace Banner.Models
         public string ClassMeetURL { get; set; } = "";//網址
         public string ClassAddress { get; set; } = "";//上課地點
         public int ClassPeopleCt { get; set; } = 0;//人數限制
-        public int ClassGraduateDate { get; set; } = 7;//結業準備天數
-        public int ClassTeacher_ID { get; set; } = 0;//講師ID
+        public int ClassGraduateAddDay { get; set; } = 7;//結業準備天數
+        public int ClassTeacher_ACID { get; set; } = 0;//講師ID
         public int ProductType { get; set; } = 0;//商品類型	0:不限制/1:實體/2:線上
-        public string ClassTeacher_Name { get; set; } = "請搜尋";//講師搜尋按鈕顯示文字
-        public List<SelectListItem> cTs { get; set; } = new List<SelectListItem>();//講師下拉選單
+        public string ClassTeacher_Name { get; set; } = "請搜尋";//講師搜尋按鈕顯示文字或是老師姓名
+
+        public List<cClassCellTime> cCCTs { get; set; } = new List<cClassCellTime>();//上課時間
+        public int PCID {  get; set; } = 0;//實際班級ID
+        public int TID { get; set; } = 0;//老師ID M_Product_Teacher->MID
+
+        public int OrderCt { get; set; } = 0;//訂購人數
+        public string ClassGraduateDate { get; set; } = "";//結業準備天數
+    }
+
+    public class cClassCellTime
+    {
+        public int PCTID { get; set; } = 0;//上課日ID
+        public string ClassDate { get; set; } = "";//上課日期
+        public string STime { get; set; } = "";//起始時間
+        public string ETime { get; set; } = "";//結束時間
+        public int JoinCt {  get; set; } = 0;//打卡人數
     }
 }

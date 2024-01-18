@@ -1,0 +1,92 @@
+﻿@model Banner.Models.cClassCell
+<div class="form-card">
+    <div class="row">
+        <div class="col-lg-auto col-4">
+            <label class="form-label"><span class="text-danger">*</span>班級名稱</label>
+            <input class="form-control" name="txb_ClassTitle_@(Model.SortNo)_" value="@(Model.ClassTitle)" />
+        </div>
+        @if (Model.ProductType == 0 || Model.ProductType == 1)
+        {
+            <div class="col-lg-auto col-4">
+                <label class="form-label">地點名稱</label>
+                <input class="form-control" name="txb_ClassLocationName_@(Model.SortNo)_" value="@(Model.ClassLocationName)" style="width:100px;" />
+            </div>
+            <div class="col-lg-auto col-4">
+                <label class="form-label"><span class="text-danger">*</span>上課地點</label>
+                <input class="form-control" name="txb_ClassAddress_@(Model.SortNo)_" value="@(Model.ClassAddress)" />
+            </div>
+        }
+        @if (Model.ProductType == 0 || Model.ProductType == 2)
+        {
+            <div class="col-lg-auto col-4">
+                <label class="form-label"><span class="text-danger">*</span>網址</label>
+                <input class="form-control" name="txb_ClassMeetURL_@(Model.SortNo)_" type="url" value="@(Model.ClassMeetURL)" />
+            </div>
+        }
+        <div class="col-lg-auto col-4">
+            <label class="form-label"><span class="text-danger">*</span>連絡電話</label>
+            <input class="form-control" name="txb_ClassPhoneNo_@(Model.SortNo)_" value="@(Model.ClassPhoneNo)" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <label class="form-label"><span class="text-danger">*</span>結業日</label>
+            <input class="form-control" type="date" value="@(Model.ClassSDate)" name="txb_ClassSDate_@(Model.SortNo)_" min="@(Model.minClassSDate)" />
+        </div>
+        <div class="col-2">
+            <label class="form-label"><span class="text-danger">*</span>講師</label><br />
+            <a id="but_SelectTeacher_@(Model.SortNo)_" href="javascript:;" class="btn btn-primary mt-1" onclick="ShowPopupAC(4, '搜尋講師', @(Model.OIID), 'txb_TeacherID_@(Model.SortNo)_', 'but_SelectTeacher_@(Model.SortNo)_');">@Model.ClassTeacher_Name</a>
+            <input id="txb_TeacherID_@(Model.SortNo)_" name="txb_TeacherID_@(Model.SortNo)_" type="hidden" style="width:100px;" value="@Model.ClassTeacher_ACID" />
+        </div>
+        <div class="col-6 text-end">
+            <label class="form-label" style="margin-bottom:12px;">&nbsp;</label><br />
+            @if (Model.OrderCt == 0)//已有人報名就不能取消
+            {
+                <a class="btn btn-danger" href="javascript:DataDelete('Product_Class', @(Model.PCID));">移除課程</a>
+            }
+            <a class="btn btn-warning" href="javascript:UpdateClass(@(Model.PCID));">更新課程</a>
+            <a class="btn btn-success" href="#@(Model.PCID)" target="_blank">檢視報名名單(@(Model.OrderCt))</a>
+        </div>
+    </div>
+
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div>課堂數:@(Model.cCCTs.Count)<input name="txb_ClassTimeCt_@(Model.SortNo)_" type="hidden" value="@(Model.cCCTs.Count)" /></div>
+            <table class="table_RWDStyle table">
+                <thead>
+                    <tr class="Bgn">
+                        <th>上課日期</th>
+                        <th>起始時間</th>
+                        <th>結束時間</th>
+                        <th>打卡人數</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        for (int i = 0; i < Model.cCCTs.Count; i++)
+                        {
+                            var CCT = Model.cCCTs[i];
+                            <tr>
+                                <td><input class="form-control" id="txb_SDate_@(Model.SortNo)_@(i)_" type="date" value="@CCT.ClassDate" /></td>
+                                <td><input class="form-control" id="txb_STime_@(Model.SortNo)_@(i)_" type="time" value="@CCT.STime" /></td>
+                                <td><input class="form-control" id="txb_ETime_@(Model.SortNo)_@(i)_" type="time" value="@CCT.ETime" /></td>
+                                <td>
+                                    <input id="txb_PCTID_@(Model.SortNo)_@(i)_" type="hidden" value="@(CCT.PCTID)"/>
+                                    @if (CCT.JoinCt < 0)
+                                    {
+                                        <span>尚未開始打卡</span>
+                                    }
+                                    else
+                                    {
+                                        <a href="#@(CCT.PCTID)" class="btn btn-success" target="_blank">@CCT.JoinCt</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

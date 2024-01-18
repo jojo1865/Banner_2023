@@ -24,6 +24,7 @@ namespace Banner.Areas.Admin.Controllers
                 .Replace("Event_Edit_2", "Event_List?CID=2")
                 .Replace("Event_Edit_3", "Event_List?CID=3")
                 .Replace("ProductClass_BatchAdd", "Product_List")
+                .Replace("ProductClass_BatchEdit", "Product_List")
                 .Replace("_Edit", "_List")
                 .Replace("ProductClass_", "Product_")
                 .Replace("ProductClassTeacher_", "Product_")
@@ -553,6 +554,13 @@ namespace Banner.Areas.Admin.Controllers
         #endregion
         #region 後臺批次開課程
         public PartialViewResult _ProductClass_BatchAddCell(cClassCell CC)
+        {
+            return PartialView(CC);
+        }
+
+        #endregion
+        #region 後臺批次管理課程
+        public PartialViewResult _ProductClass_BatchEditCell(cClassCell CC)
         {
             return PartialView(CC);
         }

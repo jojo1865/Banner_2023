@@ -647,7 +647,9 @@ namespace Banner.Areas.Web.Controllers
                                 Price_Basic = P.Price_Basic,
                                 Price_Finally = iPrice[1],
                                 Price_Type = iPrice[0],
-                                JoinDate = DT,
+                                Graduation_Flag = true,
+                                Graduation_ACID = 0,
+                                Graduation_Date = DT,
                                 CreDate = DT,
                                 UpdDate = DT,
                                 SaveACID = ACID
@@ -686,7 +688,9 @@ namespace Banner.Areas.Web.Controllers
                             Price_Basic = P.Price_Basic,
                             Price_Finally = iPrice[1],
                             Price_Type = iPrice[0],
-                            JoinDate = DT,
+                            Graduation_Flag = true,
+                            Graduation_ACID = 0,
+                            Graduation_Date = DT,
                             CreDate = DT,
                             UpdDate = DT,
                             SaveACID = ACID

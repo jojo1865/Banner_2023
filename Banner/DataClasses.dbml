@@ -560,25 +560,6 @@
       <Association Name="Order_Paid_Order_PaidDetail" Member="Order_Paid" ThisKey="OPID" OtherKey="OPID" Type="Order_Paid" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.Order_Product" Member="Order_Product">
-    <Type Name="Order_Product">
-      <Column Name="OPID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="OHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="PCID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="CAID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Price_Basic" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Price_Finally" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Price_Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="JoinDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Order_Header_Order_Product" Member="Order_Header" ThisKey="OHID" OtherKey="OHID" Type="Order_Header" IsForeignKey="true" />
-      <Association Name="Product_Order_Product" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
-      <Association Name="Product_Class_Order_Product" Member="Product_Class" ThisKey="PCID" OtherKey="PCID" Type="Product_Class" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.Organize" Member="Organize">
     <Type Name="Organize">
       <Column Name="OID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -666,10 +647,10 @@
       <Association Name="Product_Coupon_Header" Member="Coupon_Header" ThisKey="PID" OtherKey="PID" Type="Coupon_Header" />
       <Association Name="Product_M_Product_PayType" Member="M_Product_PayType" ThisKey="PID" OtherKey="PID" Type="M_Product_PayType" />
       <Association Name="Product_M_Product_Teacher" Member="M_Product_Teacher" ThisKey="PID" OtherKey="PID" Type="M_Product_Teacher" />
-      <Association Name="Product_Order_Product" Member="Order_Product" ThisKey="PID" OtherKey="PID" Type="Order_Product" />
       <Association Name="Product_Product_Class" Member="Product_Class" ThisKey="PID" OtherKey="PID" Type="Product_Class" />
       <Association Name="Product_Product_File" Member="Product_File" ThisKey="PID" OtherKey="PID" Type="Product_File" />
       <Association Name="Product_Product_Rool" Member="Product_Rool" ThisKey="PID" OtherKey="PID" Type="Product_Rool" />
+      <Association Name="Product_Order_Product" Member="Order_Product" ThisKey="PID" OtherKey="PID" Type="Order_Product" />
       <Association Name="Course_Product" Member="Course" ThisKey="CID" OtherKey="CID" Type="Course" IsForeignKey="true" />
       <Association Name="OrganizeInfo_Product" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
     </Type>
@@ -691,8 +672,8 @@
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Product_Class_M_Product_Teacher" Member="M_Product_Teacher" ThisKey="PCID" OtherKey="PCID" Type="M_Product_Teacher" />
-      <Association Name="Product_Class_Order_Product" Member="Order_Product" ThisKey="PCID" OtherKey="PCID" Type="Order_Product" />
       <Association Name="Product_Class_Product_ClassTime" Member="Product_ClassTime" ThisKey="PCID" OtherKey="PCID" Type="Product_ClassTime" />
+      <Association Name="Product_Class_Order_Product" Member="Order_Product" ThisKey="PCID" OtherKey="PCID" Type="Order_Product" />
       <Association Name="Product_Product_Class" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
     </Type>
   </Table>
@@ -703,6 +684,7 @@
       <Column Name="ClassDate" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
       <Column Name="STime" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
       <Column Name="ETime" Type="System.TimeSpan" DbType="Time NOT NULL" CanBeNull="false" />
+      <Association Name="Product_ClassTime_Order_Join" Member="Order_Join" ThisKey="PCTID" OtherKey="PCTID" Type="Order_Join" />
       <Association Name="Product_Class_Product_ClassTime" Member="Product_Class" ThisKey="PCID" OtherKey="PCID" Type="Product_Class" IsForeignKey="true" />
     </Type>
   </Table>
@@ -919,6 +901,42 @@
       <Column Name="UpdUID" Storage="_UpdACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Account_M_O_Account" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
       <Association Name="Organize_M_O_Account" Member="Organize" ThisKey="OID" OtherKey="OID" Type="Organize" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Order_Product" Member="Order_Product">
+    <Type Name="Order_Product">
+      <Column Name="OPID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="OHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PCID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CAID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Price_Basic" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Price_Finally" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Price_Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Graduation_Flag" Type="System.Boolean" DbType="Bit" CanBeNull="false" />
+      <Column Name="Graduation_Date" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Graduation_ACID" Type="System.Int32" DbType="Int" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Order_Product_Order_Join" Member="Order_Join" ThisKey="OPID" OtherKey="OPID" Type="Order_Join" />
+      <Association Name="Order_Header_Order_Product" Member="Order_Header" ThisKey="OHID" OtherKey="OHID" Type="Order_Header" IsForeignKey="true" />
+      <Association Name="Product_Order_Product" Member="Product" ThisKey="PID" OtherKey="PID" Type="Product" IsForeignKey="true" />
+      <Association Name="Product_Class_Order_Product" Member="Product_Class" ThisKey="PCID" OtherKey="PCID" Type="Product_Class" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Order_Join" Member="Order_Join">
+    <Type Name="Order_Join">
+      <Column Name="OJID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="OPID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PCTID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Order_Product_Order_Join" Member="Order_Product" ThisKey="OPID" OtherKey="OPID" Type="Order_Product" IsForeignKey="true" />
+      <Association Name="Product_ClassTime_Order_Join" Member="Product_ClassTime" ThisKey="PCTID" OtherKey="PCTID" Type="Product_ClassTime" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

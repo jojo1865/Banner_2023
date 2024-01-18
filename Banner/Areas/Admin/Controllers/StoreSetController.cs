@@ -14,6 +14,7 @@ using System.Security.Policy;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 
 namespace Banner.Areas.Admin.Controllers
 {
@@ -1853,7 +1854,6 @@ namespace Banner.Areas.Admin.Controllers
                     select new SelectListItem { Text = q.Name_First + q.Name_Last, Value = q.ACID.ToString() }).ToList();
             if (SLIs.Count > 0)
                 SLIs[0].Selected = true;
-            c.cCBasic.cTs = SLIs;
 
             var P = DC.Product.FirstOrDefault(q => q.PID == ID);
             if (P != null)
@@ -1873,6 +1873,7 @@ namespace Banner.Areas.Admin.Controllers
                         if (!string.IsNullOrEmpty(sTitle))
                         {
                             cClassCell CC = new cClassCell();
+                            CC.PCID = 0;
                             CC.OIID = P.OIID;
                             CC.SortNo = i.ToString();
                             CC.ClassTitle = sTitle;//課堂名稱
@@ -1890,14 +1891,14 @@ namespace Banner.Areas.Admin.Controllers
                             CC.ClassMeetURL = FC.Get("txb_ClassMeetURL_" + i + "_");//上課網址
                             if (int.TryParse(FC.Get("txb_ClassPeopleCt_" + i + "_"), out j))
                                 CC.ClassPeopleCt = j;//人數限制
-                            if (int.TryParse(FC.Get("txb_ClassGraduateDate_" + i + "_"), out j))
-                                CC.ClassGraduateDate = j;//結業準備天數
-                            if (int.TryParse(FC.Get("ddl_ClassTeacher_ID_" + i + "_"), out j))
-                                CC.ClassTeacher_ID = j;//講師ID
-
-                            CC.cTs = new List<SelectListItem>();
-                            foreach (var SLI in SLIs)
-                                CC.cTs.Add(new SelectListItem { Text = SLI.Text, Value = SLI.Value, Selected = SLI.Value == CC.ClassTeacher_ID.ToString() });
+                            if (int.TryParse(FC.Get("txb_ClassGraduateAddDay_" + i + "_"), out j))
+                                CC.ClassGraduateAddDay = j;//結業準備天數
+                            if (int.TryParse(FC.Get("txb_TeacherID_" + i + "_"), out j))
+                                CC.ClassTeacher_ACID = j;//講師的ACID
+                            var AC = DC.Account.FirstOrDefault(q => q.ACID == CC.ClassTeacher_ACID);
+                            if (AC != null)
+                                CC.ClassTeacher_Name = AC.Name_First + AC.Name_Last;
+                            CC.cCCTs = null;
                             c.cCs.Add(CC);
                         }
                     }
@@ -1944,7 +1945,7 @@ namespace Banner.Areas.Admin.Controllers
             else
             {
                 var P = DC.Product.FirstOrDefault(q => !q.DeleteFlag && q.PID == ID);
-                foreach (var CC in c.cCs)
+                foreach (var CC in c.cCs.OrderBy(q => q.SortNo))
                 {
                     Product_Class PC_ = new Product_Class
                     {
@@ -1982,15 +1983,15 @@ namespace Banner.Areas.Admin.Controllers
 
                         SDate = SDate.AddDays(CC.ClassCutDay);
                     }
-                    PC_.GraduateDate = SDate.AddDays(CC.ClassGraduateDate - CC.ClassCutDay);
+                    PC_.GraduateDate = SDate.AddDays(CC.ClassGraduateAddDay - CC.ClassCutDay);
                     DC.Product_Class.InsertOnSubmit(PC_);
                     DC.SubmitChanges();
 
-                    var AC = DC.Account.FirstOrDefault(q => q.ACID == CC.ClassTeacher_ID);
+                    var AC = DC.Account.FirstOrDefault(q => q.ACID == CC.ClassTeacher_ACID);
                     if (AC != null)
                     {
                         var T = DC.Teacher.FirstOrDefault(q => q.ACID == AC.ACID);
-                        if(T == null)
+                        if (T == null)
                         {
                             T = new Teacher
                             {
@@ -2023,16 +2024,87 @@ namespace Banner.Areas.Admin.Controllers
 
                 }
 
-                SetAlert("新增完成", 1);
+                SetAlert("新增完成", 1, "/Admin/StoreSet/ProductClass_BatchEdit/" + P.PID);
             }
             return View(c);
         }
         #endregion
         #region 批次班級一覽表
+        public class cGetProductClass_BatchEdit
+        {
+            public Product P = new Product();
+            public List<cClassCell> CCs = new List<cClassCell>();
+        }
+        public cGetProductClass_BatchEdit GetProductClass_BatchEdit(int ID, FormCollection FC)
+        {
+            cGetProductClass_BatchEdit c = new cGetProductClass_BatchEdit();
+            #region 資料庫匯入
+            var P = DC.Product.FirstOrDefault(q => !q.DeleteFlag && q.PID == ID);
+            if (P == null)
+                SetAlert("查無此課程,請重新操作", 2, "/Admin/StoreSet/Product_List");
+            else
+            {
+                c.P = P;
+                var Cs = DC.Product_Class.Where(q => !q.DeleteFlag && q.PID == P.PID);
+                foreach (var C in Cs.OrderBy(q => q.PCID))
+                {
+                    cClassCell CC = new cClassCell();
+                    CC.PCID = C.PCID;
+                    CC.OIID = P.OIID;
+                    CC.SortNo = C.PCID.ToString();
+                    CC.ClassTitle = C.Title;//課堂名稱
+
+                    CC.ProductType = P.ProductType;//上課屬性:實體/線上
+
+                    CC.ClassPhoneNo = C.PhoneNo;//連絡電話
+                    CC.ClassLocationName = C.LocationName;//地標名稱
+                    CC.ClassAddress = C.Address;//上課地點
+                    CC.ClassMeetURL = C.MeetURL;//上課網址
+                    CC.ClassGraduateDate = C.GraduateDate.ToString(DateFormat);//預計結業日期
+                    //講師部分
+                    var MPT = DC.M_Product_Teacher.FirstOrDefault(q => q.PID == P.PID && q.PCID == C.PCID);
+                    if (MPT != null)
+                    {
+                        CC.TID = MPT.MID;
+                        CC.ClassTeacher_Name = MPT.Title;
+                        CC.ClassTeacher_ACID = MPT.SaveACID;
+                    }
+
+                    CC.cCCTs = new List<cClassCellTime>();
+                    CC.OrderCt = DC.Order_Product.Count(q => q.Order_Header.Order_Type == 2 && !q.Order_Header.DeleteFlag);
+                    var CTs = DC.Product_ClassTime.Where(q => q.PCID == CC.PCID).OrderBy(q => q.ClassDate).ThenBy(q => q.STime);
+                    foreach (var CT in CTs)
+                    {
+                        cClassCellTime CCT = new cClassCellTime();
+                        CCT.PCTID = CT.PCTID;
+                        CCT.ClassDate = CT.ClassDate.ToString(DateFormat);
+                        CCT.STime = CT.STime.ToString(@"hh\:mm");
+                        CCT.ETime = CT.ETime.ToString(@"hh\:mm");
+                        if (DT.Date > CT.ClassDate)
+                            CCT.JoinCt = DC.Order_Join.Count(q => q.PCTID == CT.PCTID && !q.DeleteFlag && q.Order_Product.Order_Header.Order_Type == 2 && !q.Order_Product.Order_Header.DeleteFlag);
+                        else
+                            CCT.JoinCt = -1;
+                        CC.cCCTs.Add(CCT);
+                    }
+
+
+                    c.CCs.Add(CC);
+                }
+            }
+            #endregion
+
+
+
+
+
+
+            return c;
+        }
         [HttpGet]
         public ActionResult ProductClass_BatchEdit(int ID)
         {
             GetViewBag();
+            cGetProductClass_BatchEdit c = new cGetProductClass_BatchEdit();
             if (ID == 0)
                 SetAlert("請先選擇課程後再建置班級", 2, "/Admin/StoreSet/Product_List");
             else
@@ -2040,10 +2112,12 @@ namespace Banner.Areas.Admin.Controllers
                 var P = DC.Product.FirstOrDefault(q => !q.DeleteFlag && q.PID == ID);
                 if (P == null)
                     SetAlert("請先選擇課程後再建置班級", 2, "/Admin/StoreSet/Product_List");
+                else
+                    c = GetProductClass_BatchEdit(ID, null);
             }
-            return View();
+            return View(c);
         }
-        
+
         #endregion
     }
 }

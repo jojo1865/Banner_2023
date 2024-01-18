@@ -135,9 +135,6 @@ namespace Banner
     partial void InsertOrder_PaidDetail(Order_PaidDetail instance);
     partial void UpdateOrder_PaidDetail(Order_PaidDetail instance);
     partial void DeleteOrder_PaidDetail(Order_PaidDetail instance);
-    partial void InsertOrder_Product(Order_Product instance);
-    partial void UpdateOrder_Product(Order_Product instance);
-    partial void DeleteOrder_Product(Order_Product instance);
     partial void InsertOrganize(Organize instance);
     partial void UpdateOrganize(Organize instance);
     partial void DeleteOrganize(Organize instance);
@@ -189,6 +186,12 @@ namespace Banner
     partial void InsertM_O_Account(M_O_Account instance);
     partial void UpdateM_O_Account(M_O_Account instance);
     partial void DeleteM_O_Account(M_O_Account instance);
+    partial void InsertOrder_Product(Order_Product instance);
+    partial void UpdateOrder_Product(Order_Product instance);
+    partial void DeleteOrder_Product(Order_Product instance);
+    partial void InsertOrder_Join(Order_Join instance);
+    partial void UpdateOrder_Join(Order_Join instance);
+    partial void DeleteOrder_Join(Order_Join instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -495,14 +498,6 @@ namespace Banner
 			}
 		}
 		
-		public System.Data.Linq.Table<Order_Product> Order_Product
-		{
-			get
-			{
-				return this.GetTable<Order_Product>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Organize> Organize
 		{
 			get
@@ -644,6 +639,22 @@ namespace Banner
 			get
 			{
 				return this.GetTable<M_O_Account>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Order_Product> Order_Product
+		{
+			get
+			{
+				return this.GetTable<Order_Product>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Order_Join> Order_Join
+		{
+			get
+			{
+				return this.GetTable<Order_Join>();
 			}
 		}
 		
@@ -12921,455 +12932,6 @@ namespace Banner
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Order_Product")]
-	public partial class Order_Product : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _OPID;
-		
-		private int _OHID;
-		
-		private int _PID;
-		
-		private int _PCID;
-		
-		private int _CAID;
-		
-		private int _Price_Basic;
-		
-		private int _Price_Finally;
-		
-		private int _Price_Type;
-		
-		private System.DateTime _JoinDate;
-		
-		private System.DateTime _CreDate;
-		
-		private System.DateTime _UpdDate;
-		
-		private int _SaveACID;
-		
-		private EntityRef<Order_Header> _Order_Header;
-		
-		private EntityRef<Product> _Product;
-		
-		private EntityRef<Product_Class> _Product_Class;
-		
-    #region 擴充性方法定義
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnOPIDChanging(int value);
-    partial void OnOPIDChanged();
-    partial void OnOHIDChanging(int value);
-    partial void OnOHIDChanged();
-    partial void OnPIDChanging(int value);
-    partial void OnPIDChanged();
-    partial void OnPCIDChanging(int value);
-    partial void OnPCIDChanged();
-    partial void OnCAIDChanging(int value);
-    partial void OnCAIDChanged();
-    partial void OnPrice_BasicChanging(int value);
-    partial void OnPrice_BasicChanged();
-    partial void OnPrice_FinallyChanging(int value);
-    partial void OnPrice_FinallyChanged();
-    partial void OnPrice_TypeChanging(int value);
-    partial void OnPrice_TypeChanged();
-    partial void OnJoinDateChanging(System.DateTime value);
-    partial void OnJoinDateChanged();
-    partial void OnCreDateChanging(System.DateTime value);
-    partial void OnCreDateChanged();
-    partial void OnUpdDateChanging(System.DateTime value);
-    partial void OnUpdDateChanged();
-    partial void OnSaveACIDChanging(int value);
-    partial void OnSaveACIDChanged();
-    #endregion
-		
-		public Order_Product()
-		{
-			this._Order_Header = default(EntityRef<Order_Header>);
-			this._Product = default(EntityRef<Product>);
-			this._Product_Class = default(EntityRef<Product_Class>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int OPID
-		{
-			get
-			{
-				return this._OPID;
-			}
-			set
-			{
-				if ((this._OPID != value))
-				{
-					this.OnOPIDChanging(value);
-					this.SendPropertyChanging();
-					this._OPID = value;
-					this.SendPropertyChanged("OPID");
-					this.OnOPIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OHID", DbType="Int NOT NULL")]
-		public int OHID
-		{
-			get
-			{
-				return this._OHID;
-			}
-			set
-			{
-				if ((this._OHID != value))
-				{
-					if (this._Order_Header.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnOHIDChanging(value);
-					this.SendPropertyChanging();
-					this._OHID = value;
-					this.SendPropertyChanged("OHID");
-					this.OnOHIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PID", DbType="Int NOT NULL")]
-		public int PID
-		{
-			get
-			{
-				return this._PID;
-			}
-			set
-			{
-				if ((this._PID != value))
-				{
-					if (this._Product.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnPIDChanging(value);
-					this.SendPropertyChanging();
-					this._PID = value;
-					this.SendPropertyChanged("PID");
-					this.OnPIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PCID", DbType="Int NOT NULL")]
-		public int PCID
-		{
-			get
-			{
-				return this._PCID;
-			}
-			set
-			{
-				if ((this._PCID != value))
-				{
-					if (this._Product_Class.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnPCIDChanging(value);
-					this.SendPropertyChanging();
-					this._PCID = value;
-					this.SendPropertyChanged("PCID");
-					this.OnPCIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CAID", DbType="Int NOT NULL")]
-		public int CAID
-		{
-			get
-			{
-				return this._CAID;
-			}
-			set
-			{
-				if ((this._CAID != value))
-				{
-					this.OnCAIDChanging(value);
-					this.SendPropertyChanging();
-					this._CAID = value;
-					this.SendPropertyChanged("CAID");
-					this.OnCAIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Basic", DbType="Int NOT NULL")]
-		public int Price_Basic
-		{
-			get
-			{
-				return this._Price_Basic;
-			}
-			set
-			{
-				if ((this._Price_Basic != value))
-				{
-					this.OnPrice_BasicChanging(value);
-					this.SendPropertyChanging();
-					this._Price_Basic = value;
-					this.SendPropertyChanged("Price_Basic");
-					this.OnPrice_BasicChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Finally", DbType="Int NOT NULL")]
-		public int Price_Finally
-		{
-			get
-			{
-				return this._Price_Finally;
-			}
-			set
-			{
-				if ((this._Price_Finally != value))
-				{
-					this.OnPrice_FinallyChanging(value);
-					this.SendPropertyChanging();
-					this._Price_Finally = value;
-					this.SendPropertyChanged("Price_Finally");
-					this.OnPrice_FinallyChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Type", DbType="Int NOT NULL")]
-		public int Price_Type
-		{
-			get
-			{
-				return this._Price_Type;
-			}
-			set
-			{
-				if ((this._Price_Type != value))
-				{
-					this.OnPrice_TypeChanging(value);
-					this.SendPropertyChanging();
-					this._Price_Type = value;
-					this.SendPropertyChanged("Price_Type");
-					this.OnPrice_TypeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JoinDate", DbType="DateTime NOT NULL")]
-		public System.DateTime JoinDate
-		{
-			get
-			{
-				return this._JoinDate;
-			}
-			set
-			{
-				if ((this._JoinDate != value))
-				{
-					this.OnJoinDateChanging(value);
-					this.SendPropertyChanging();
-					this._JoinDate = value;
-					this.SendPropertyChanged("JoinDate");
-					this.OnJoinDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
-		public System.DateTime CreDate
-		{
-			get
-			{
-				return this._CreDate;
-			}
-			set
-			{
-				if ((this._CreDate != value))
-				{
-					this.OnCreDateChanging(value);
-					this.SendPropertyChanging();
-					this._CreDate = value;
-					this.SendPropertyChanged("CreDate");
-					this.OnCreDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
-		public System.DateTime UpdDate
-		{
-			get
-			{
-				return this._UpdDate;
-			}
-			set
-			{
-				if ((this._UpdDate != value))
-				{
-					this.OnUpdDateChanging(value);
-					this.SendPropertyChanging();
-					this._UpdDate = value;
-					this.SendPropertyChanged("UpdDate");
-					this.OnUpdDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
-		public int SaveACID
-		{
-			get
-			{
-				return this._SaveACID;
-			}
-			set
-			{
-				if ((this._SaveACID != value))
-				{
-					this.OnSaveACIDChanging(value);
-					this.SendPropertyChanging();
-					this._SaveACID = value;
-					this.SendPropertyChanged("SaveACID");
-					this.OnSaveACIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Header_Order_Product", Storage="_Order_Header", ThisKey="OHID", OtherKey="OHID", IsForeignKey=true)]
-		public Order_Header Order_Header
-		{
-			get
-			{
-				return this._Order_Header.Entity;
-			}
-			set
-			{
-				Order_Header previousValue = this._Order_Header.Entity;
-				if (((previousValue != value) 
-							|| (this._Order_Header.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Order_Header.Entity = null;
-						previousValue.Order_Product.Remove(this);
-					}
-					this._Order_Header.Entity = value;
-					if ((value != null))
-					{
-						value.Order_Product.Add(this);
-						this._OHID = value.OHID;
-					}
-					else
-					{
-						this._OHID = default(int);
-					}
-					this.SendPropertyChanged("Order_Header");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Order_Product", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
-		public Product Product
-		{
-			get
-			{
-				return this._Product.Entity;
-			}
-			set
-			{
-				Product previousValue = this._Product.Entity;
-				if (((previousValue != value) 
-							|| (this._Product.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Product.Entity = null;
-						previousValue.Order_Product.Remove(this);
-					}
-					this._Product.Entity = value;
-					if ((value != null))
-					{
-						value.Order_Product.Add(this);
-						this._PID = value.PID;
-					}
-					else
-					{
-						this._PID = default(int);
-					}
-					this.SendPropertyChanged("Product");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Order_Product", Storage="_Product_Class", ThisKey="PCID", OtherKey="PCID", IsForeignKey=true)]
-		public Product_Class Product_Class
-		{
-			get
-			{
-				return this._Product_Class.Entity;
-			}
-			set
-			{
-				Product_Class previousValue = this._Product_Class.Entity;
-				if (((previousValue != value) 
-							|| (this._Product_Class.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Product_Class.Entity = null;
-						previousValue.Order_Product.Remove(this);
-					}
-					this._Product_Class.Entity = value;
-					if ((value != null))
-					{
-						value.Order_Product.Add(this);
-						this._PCID = value.PCID;
-					}
-					else
-					{
-						this._PCID = default(int);
-					}
-					this.SendPropertyChanged("Product_Class");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Organize")]
 	public partial class Organize : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -14706,13 +14268,13 @@ namespace Banner
 		
 		private EntitySet<M_Product_Teacher> _M_Product_Teacher;
 		
-		private EntitySet<Order_Product> _Order_Product;
-		
 		private EntitySet<Product_Class> _Product_Class;
 		
 		private EntitySet<Product_File> _Product_File;
 		
 		private EntitySet<Product_Rool> _Product_Rool;
+		
+		private EntitySet<Order_Product> _Order_Product;
 		
 		private EntityRef<Course> _Course;
 		
@@ -14777,10 +14339,10 @@ namespace Banner
 			this._Coupon_Header = new EntitySet<Coupon_Header>(new Action<Coupon_Header>(this.attach_Coupon_Header), new Action<Coupon_Header>(this.detach_Coupon_Header));
 			this._M_Product_PayType = new EntitySet<M_Product_PayType>(new Action<M_Product_PayType>(this.attach_M_Product_PayType), new Action<M_Product_PayType>(this.detach_M_Product_PayType));
 			this._M_Product_Teacher = new EntitySet<M_Product_Teacher>(new Action<M_Product_Teacher>(this.attach_M_Product_Teacher), new Action<M_Product_Teacher>(this.detach_M_Product_Teacher));
-			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
 			this._Product_Class = new EntitySet<Product_Class>(new Action<Product_Class>(this.attach_Product_Class), new Action<Product_Class>(this.detach_Product_Class));
 			this._Product_File = new EntitySet<Product_File>(new Action<Product_File>(this.attach_Product_File), new Action<Product_File>(this.detach_Product_File));
 			this._Product_Rool = new EntitySet<Product_Rool>(new Action<Product_Rool>(this.attach_Product_Rool), new Action<Product_Rool>(this.detach_Product_Rool));
+			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
 			this._Course = default(EntityRef<Course>);
 			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
 			OnCreated();
@@ -15313,19 +14875,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Order_Product", Storage="_Order_Product", ThisKey="PID", OtherKey="PID")]
-		public EntitySet<Order_Product> Order_Product
-		{
-			get
-			{
-				return this._Order_Product;
-			}
-			set
-			{
-				this._Order_Product.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Product_Class", Storage="_Product_Class", ThisKey="PID", OtherKey="PID")]
 		public EntitySet<Product_Class> Product_Class
 		{
@@ -15362,6 +14911,19 @@ namespace Banner
 			set
 			{
 				this._Product_Rool.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Order_Product", Storage="_Order_Product", ThisKey="PID", OtherKey="PID")]
+		public EntitySet<Order_Product> Order_Product
+		{
+			get
+			{
+				return this._Order_Product;
+			}
+			set
+			{
+				this._Order_Product.Assign(value);
 			}
 		}
 		
@@ -15489,18 +15051,6 @@ namespace Banner
 			entity.Product = null;
 		}
 		
-		private void attach_Order_Product(Order_Product entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = this;
-		}
-		
-		private void detach_Order_Product(Order_Product entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product = null;
-		}
-		
 		private void attach_Product_Class(Product_Class entity)
 		{
 			this.SendPropertyChanging();
@@ -15532,6 +15082,18 @@ namespace Banner
 		}
 		
 		private void detach_Product_Rool(Product_Rool entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = null;
+		}
+		
+		private void attach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product = this;
+		}
+		
+		private void detach_Order_Product(Order_Product entity)
 		{
 			this.SendPropertyChanging();
 			entity.Product = null;
@@ -15574,9 +15136,9 @@ namespace Banner
 		
 		private EntitySet<M_Product_Teacher> _M_Product_Teacher;
 		
-		private EntitySet<Order_Product> _Order_Product;
-		
 		private EntitySet<Product_ClassTime> _Product_ClassTime;
+		
+		private EntitySet<Order_Product> _Order_Product;
 		
 		private EntityRef<Product> _Product;
 		
@@ -15617,8 +15179,8 @@ namespace Banner
 		public Product_Class()
 		{
 			this._M_Product_Teacher = new EntitySet<M_Product_Teacher>(new Action<M_Product_Teacher>(this.attach_M_Product_Teacher), new Action<M_Product_Teacher>(this.detach_M_Product_Teacher));
-			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
 			this._Product_ClassTime = new EntitySet<Product_ClassTime>(new Action<Product_ClassTime>(this.attach_Product_ClassTime), new Action<Product_ClassTime>(this.detach_Product_ClassTime));
+			this._Order_Product = new EntitySet<Order_Product>(new Action<Order_Product>(this.attach_Order_Product), new Action<Order_Product>(this.detach_Order_Product));
 			this._Product = default(EntityRef<Product>);
 			OnCreated();
 		}
@@ -15920,19 +15482,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Order_Product", Storage="_Order_Product", ThisKey="PCID", OtherKey="PCID")]
-		public EntitySet<Order_Product> Order_Product
-		{
-			get
-			{
-				return this._Order_Product;
-			}
-			set
-			{
-				this._Order_Product.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Product_ClassTime", Storage="_Product_ClassTime", ThisKey="PCID", OtherKey="PCID")]
 		public EntitySet<Product_ClassTime> Product_ClassTime
 		{
@@ -15943,6 +15492,19 @@ namespace Banner
 			set
 			{
 				this._Product_ClassTime.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Order_Product", Storage="_Order_Product", ThisKey="PCID", OtherKey="PCID")]
+		public EntitySet<Order_Product> Order_Product
+		{
+			get
+			{
+				return this._Order_Product;
+			}
+			set
+			{
+				this._Order_Product.Assign(value);
 			}
 		}
 		
@@ -16012,18 +15574,6 @@ namespace Banner
 			entity.Product_Class = null;
 		}
 		
-		private void attach_Order_Product(Order_Product entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product_Class = this;
-		}
-		
-		private void detach_Order_Product(Order_Product entity)
-		{
-			this.SendPropertyChanging();
-			entity.Product_Class = null;
-		}
-		
 		private void attach_Product_ClassTime(Product_ClassTime entity)
 		{
 			this.SendPropertyChanging();
@@ -16031,6 +15581,18 @@ namespace Banner
 		}
 		
 		private void detach_Product_ClassTime(Product_ClassTime entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_Class = null;
+		}
+		
+		private void attach_Order_Product(Order_Product entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_Class = this;
+		}
+		
+		private void detach_Order_Product(Order_Product entity)
 		{
 			this.SendPropertyChanging();
 			entity.Product_Class = null;
@@ -16053,6 +15615,8 @@ namespace Banner
 		
 		private System.TimeSpan _ETime;
 		
+		private EntitySet<Order_Join> _Order_Join;
+		
 		private EntityRef<Product_Class> _Product_Class;
 		
     #region 擴充性方法定義
@@ -16073,6 +15637,7 @@ namespace Banner
 		
 		public Product_ClassTime()
 		{
+			this._Order_Join = new EntitySet<Order_Join>(new Action<Order_Join>(this.attach_Order_Join), new Action<Order_Join>(this.detach_Order_Join));
 			this._Product_Class = default(EntityRef<Product_Class>);
 			OnCreated();
 		}
@@ -16181,6 +15746,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_ClassTime_Order_Join", Storage="_Order_Join", ThisKey="PCTID", OtherKey="PCTID")]
+		public EntitySet<Order_Join> Order_Join
+		{
+			get
+			{
+				return this._Order_Join;
+			}
+			set
+			{
+				this._Order_Join.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Product_ClassTime", Storage="_Product_Class", ThisKey="PCID", OtherKey="PCID", IsForeignKey=true)]
 		public Product_Class Product_Class
 		{
@@ -16233,6 +15811,18 @@ namespace Banner
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+		
+		private void attach_Order_Join(Order_Join entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_ClassTime = this;
+		}
+		
+		private void detach_Order_Join(Order_Join entity)
+		{
+			this.SendPropertyChanging();
+			entity.Product_ClassTime = null;
 		}
 	}
 	
@@ -20645,6 +20235,843 @@ namespace Banner
 						this._OID = default(int);
 					}
 					this.SendPropertyChanged("Organize");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Order_Product")]
+	public partial class Order_Product : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _OPID;
+		
+		private int _OHID;
+		
+		private int _PID;
+		
+		private int _PCID;
+		
+		private int _CAID;
+		
+		private int _Price_Basic;
+		
+		private int _Price_Finally;
+		
+		private int _Price_Type;
+		
+		private bool _Graduation_Flag;
+		
+		private System.DateTime _Graduation_Date;
+		
+		private int _Graduation_ACID;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntitySet<Order_Join> _Order_Join;
+		
+		private EntityRef<Order_Header> _Order_Header;
+		
+		private EntityRef<Product> _Product;
+		
+		private EntityRef<Product_Class> _Product_Class;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnOPIDChanging(int value);
+    partial void OnOPIDChanged();
+    partial void OnOHIDChanging(int value);
+    partial void OnOHIDChanged();
+    partial void OnPIDChanging(int value);
+    partial void OnPIDChanged();
+    partial void OnPCIDChanging(int value);
+    partial void OnPCIDChanged();
+    partial void OnCAIDChanging(int value);
+    partial void OnCAIDChanged();
+    partial void OnPrice_BasicChanging(int value);
+    partial void OnPrice_BasicChanged();
+    partial void OnPrice_FinallyChanging(int value);
+    partial void OnPrice_FinallyChanged();
+    partial void OnPrice_TypeChanging(int value);
+    partial void OnPrice_TypeChanged();
+    partial void OnGraduation_FlagChanging(bool value);
+    partial void OnGraduation_FlagChanged();
+    partial void OnGraduation_DateChanging(System.DateTime value);
+    partial void OnGraduation_DateChanged();
+    partial void OnGraduation_ACIDChanging(int value);
+    partial void OnGraduation_ACIDChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Order_Product()
+		{
+			this._Order_Join = new EntitySet<Order_Join>(new Action<Order_Join>(this.attach_Order_Join), new Action<Order_Join>(this.detach_Order_Join));
+			this._Order_Header = default(EntityRef<Order_Header>);
+			this._Product = default(EntityRef<Product>);
+			this._Product_Class = default(EntityRef<Product_Class>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int OPID
+		{
+			get
+			{
+				return this._OPID;
+			}
+			set
+			{
+				if ((this._OPID != value))
+				{
+					this.OnOPIDChanging(value);
+					this.SendPropertyChanging();
+					this._OPID = value;
+					this.SendPropertyChanged("OPID");
+					this.OnOPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OHID", DbType="Int NOT NULL")]
+		public int OHID
+		{
+			get
+			{
+				return this._OHID;
+			}
+			set
+			{
+				if ((this._OHID != value))
+				{
+					if (this._Order_Header.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOHIDChanging(value);
+					this.SendPropertyChanging();
+					this._OHID = value;
+					this.SendPropertyChanged("OHID");
+					this.OnOHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PID", DbType="Int NOT NULL")]
+		public int PID
+		{
+			get
+			{
+				return this._PID;
+			}
+			set
+			{
+				if ((this._PID != value))
+				{
+					if (this._Product.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnPIDChanging(value);
+					this.SendPropertyChanging();
+					this._PID = value;
+					this.SendPropertyChanged("PID");
+					this.OnPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PCID", DbType="Int NOT NULL")]
+		public int PCID
+		{
+			get
+			{
+				return this._PCID;
+			}
+			set
+			{
+				if ((this._PCID != value))
+				{
+					if (this._Product_Class.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnPCIDChanging(value);
+					this.SendPropertyChanging();
+					this._PCID = value;
+					this.SendPropertyChanged("PCID");
+					this.OnPCIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CAID", DbType="Int NOT NULL")]
+		public int CAID
+		{
+			get
+			{
+				return this._CAID;
+			}
+			set
+			{
+				if ((this._CAID != value))
+				{
+					this.OnCAIDChanging(value);
+					this.SendPropertyChanging();
+					this._CAID = value;
+					this.SendPropertyChanged("CAID");
+					this.OnCAIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Basic", DbType="Int NOT NULL")]
+		public int Price_Basic
+		{
+			get
+			{
+				return this._Price_Basic;
+			}
+			set
+			{
+				if ((this._Price_Basic != value))
+				{
+					this.OnPrice_BasicChanging(value);
+					this.SendPropertyChanging();
+					this._Price_Basic = value;
+					this.SendPropertyChanged("Price_Basic");
+					this.OnPrice_BasicChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Finally", DbType="Int NOT NULL")]
+		public int Price_Finally
+		{
+			get
+			{
+				return this._Price_Finally;
+			}
+			set
+			{
+				if ((this._Price_Finally != value))
+				{
+					this.OnPrice_FinallyChanging(value);
+					this.SendPropertyChanging();
+					this._Price_Finally = value;
+					this.SendPropertyChanged("Price_Finally");
+					this.OnPrice_FinallyChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Price_Type", DbType="Int NOT NULL")]
+		public int Price_Type
+		{
+			get
+			{
+				return this._Price_Type;
+			}
+			set
+			{
+				if ((this._Price_Type != value))
+				{
+					this.OnPrice_TypeChanging(value);
+					this.SendPropertyChanging();
+					this._Price_Type = value;
+					this.SendPropertyChanged("Price_Type");
+					this.OnPrice_TypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Graduation_Flag", DbType="Bit")]
+		public bool Graduation_Flag
+		{
+			get
+			{
+				return this._Graduation_Flag;
+			}
+			set
+			{
+				if ((this._Graduation_Flag != value))
+				{
+					this.OnGraduation_FlagChanging(value);
+					this.SendPropertyChanging();
+					this._Graduation_Flag = value;
+					this.SendPropertyChanged("Graduation_Flag");
+					this.OnGraduation_FlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Graduation_Date", DbType="DateTime NOT NULL")]
+		public System.DateTime Graduation_Date
+		{
+			get
+			{
+				return this._Graduation_Date;
+			}
+			set
+			{
+				if ((this._Graduation_Date != value))
+				{
+					this.OnGraduation_DateChanging(value);
+					this.SendPropertyChanging();
+					this._Graduation_Date = value;
+					this.SendPropertyChanged("Graduation_Date");
+					this.OnGraduation_DateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Graduation_ACID", DbType="Int")]
+		public int Graduation_ACID
+		{
+			get
+			{
+				return this._Graduation_ACID;
+			}
+			set
+			{
+				if ((this._Graduation_ACID != value))
+				{
+					this.OnGraduation_ACIDChanging(value);
+					this.SendPropertyChanging();
+					this._Graduation_ACID = value;
+					this.SendPropertyChanged("Graduation_ACID");
+					this.OnGraduation_ACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Product_Order_Join", Storage="_Order_Join", ThisKey="OPID", OtherKey="OPID")]
+		public EntitySet<Order_Join> Order_Join
+		{
+			get
+			{
+				return this._Order_Join;
+			}
+			set
+			{
+				this._Order_Join.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Header_Order_Product", Storage="_Order_Header", ThisKey="OHID", OtherKey="OHID", IsForeignKey=true)]
+		public Order_Header Order_Header
+		{
+			get
+			{
+				return this._Order_Header.Entity;
+			}
+			set
+			{
+				Order_Header previousValue = this._Order_Header.Entity;
+				if (((previousValue != value) 
+							|| (this._Order_Header.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Order_Header.Entity = null;
+						previousValue.Order_Product.Remove(this);
+					}
+					this._Order_Header.Entity = value;
+					if ((value != null))
+					{
+						value.Order_Product.Add(this);
+						this._OHID = value.OHID;
+					}
+					else
+					{
+						this._OHID = default(int);
+					}
+					this.SendPropertyChanged("Order_Header");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Order_Product", Storage="_Product", ThisKey="PID", OtherKey="PID", IsForeignKey=true)]
+		public Product Product
+		{
+			get
+			{
+				return this._Product.Entity;
+			}
+			set
+			{
+				Product previousValue = this._Product.Entity;
+				if (((previousValue != value) 
+							|| (this._Product.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Product.Entity = null;
+						previousValue.Order_Product.Remove(this);
+					}
+					this._Product.Entity = value;
+					if ((value != null))
+					{
+						value.Order_Product.Add(this);
+						this._PID = value.PID;
+					}
+					else
+					{
+						this._PID = default(int);
+					}
+					this.SendPropertyChanged("Product");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_Class_Order_Product", Storage="_Product_Class", ThisKey="PCID", OtherKey="PCID", IsForeignKey=true)]
+		public Product_Class Product_Class
+		{
+			get
+			{
+				return this._Product_Class.Entity;
+			}
+			set
+			{
+				Product_Class previousValue = this._Product_Class.Entity;
+				if (((previousValue != value) 
+							|| (this._Product_Class.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Product_Class.Entity = null;
+						previousValue.Order_Product.Remove(this);
+					}
+					this._Product_Class.Entity = value;
+					if ((value != null))
+					{
+						value.Order_Product.Add(this);
+						this._PCID = value.PCID;
+					}
+					else
+					{
+						this._PCID = default(int);
+					}
+					this.SendPropertyChanged("Product_Class");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Order_Join(Order_Join entity)
+		{
+			this.SendPropertyChanging();
+			entity.Order_Product = this;
+		}
+		
+		private void detach_Order_Join(Order_Join entity)
+		{
+			this.SendPropertyChanging();
+			entity.Order_Product = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Order_Join")]
+	public partial class Order_Join : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _OJID;
+		
+		private int _OPID;
+		
+		private int _PCTID;
+		
+		private int _ACID;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Order_Product> _Order_Product;
+		
+		private EntityRef<Product_ClassTime> _Product_ClassTime;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnOJIDChanging(int value);
+    partial void OnOJIDChanged();
+    partial void OnOPIDChanging(int value);
+    partial void OnOPIDChanged();
+    partial void OnPCTIDChanging(int value);
+    partial void OnPCTIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Order_Join()
+		{
+			this._Order_Product = default(EntityRef<Order_Product>);
+			this._Product_ClassTime = default(EntityRef<Product_ClassTime>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OJID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int OJID
+		{
+			get
+			{
+				return this._OJID;
+			}
+			set
+			{
+				if ((this._OJID != value))
+				{
+					this.OnOJIDChanging(value);
+					this.SendPropertyChanging();
+					this._OJID = value;
+					this.SendPropertyChanged("OJID");
+					this.OnOJIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPID", DbType="Int NOT NULL")]
+		public int OPID
+		{
+			get
+			{
+				return this._OPID;
+			}
+			set
+			{
+				if ((this._OPID != value))
+				{
+					if (this._Order_Product.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOPIDChanging(value);
+					this.SendPropertyChanging();
+					this._OPID = value;
+					this.SendPropertyChanged("OPID");
+					this.OnOPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PCTID", DbType="Int NOT NULL")]
+		public int PCTID
+		{
+			get
+			{
+				return this._PCTID;
+			}
+			set
+			{
+				if ((this._PCTID != value))
+				{
+					if (this._Product_ClassTime.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnPCTIDChanging(value);
+					this.SendPropertyChanging();
+					this._PCTID = value;
+					this.SendPropertyChanged("PCTID");
+					this.OnPCTIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_Product_Order_Join", Storage="_Order_Product", ThisKey="OPID", OtherKey="OPID", IsForeignKey=true)]
+		public Order_Product Order_Product
+		{
+			get
+			{
+				return this._Order_Product.Entity;
+			}
+			set
+			{
+				Order_Product previousValue = this._Order_Product.Entity;
+				if (((previousValue != value) 
+							|| (this._Order_Product.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Order_Product.Entity = null;
+						previousValue.Order_Join.Remove(this);
+					}
+					this._Order_Product.Entity = value;
+					if ((value != null))
+					{
+						value.Order_Join.Add(this);
+						this._OPID = value.OPID;
+					}
+					else
+					{
+						this._OPID = default(int);
+					}
+					this.SendPropertyChanged("Order_Product");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Product_ClassTime_Order_Join", Storage="_Product_ClassTime", ThisKey="PCTID", OtherKey="PCTID", IsForeignKey=true)]
+		public Product_ClassTime Product_ClassTime
+		{
+			get
+			{
+				return this._Product_ClassTime.Entity;
+			}
+			set
+			{
+				Product_ClassTime previousValue = this._Product_ClassTime.Entity;
+				if (((previousValue != value) 
+							|| (this._Product_ClassTime.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Product_ClassTime.Entity = null;
+						previousValue.Order_Join.Remove(this);
+					}
+					this._Product_ClassTime.Entity = value;
+					if ((value != null))
+					{
+						value.Order_Join.Add(this);
+						this._PCTID = value.PCTID;
+					}
+					else
+					{
+						this._PCTID = default(int);
+					}
+					this.SendPropertyChanged("Product_ClassTime");
 				}
 			}
 		}
