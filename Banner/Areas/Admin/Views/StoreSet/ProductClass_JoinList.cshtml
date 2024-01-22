@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "ProductClass_JoinList";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+</div>
+<div class="main-container">
+    <div class="body-container w-100">
+        <form method="post" id="form1">
+            <div class="table-container">
+                @if (Model != null)
+                {
+                    @Html.Action("_TableList", "Include", new { cTL = Model })
+                }
+            </div>
+        </form>
+    </div>
+</div>

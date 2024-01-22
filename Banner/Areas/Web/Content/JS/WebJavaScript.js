@@ -579,7 +579,7 @@ function AddCart(ACID, PID) {
                 Swal.fire({
                     icon: 'success',
                     html: '已加入購物車'
-                });
+                }).then((result) => { if (result.isConfirmed) { location.reload(); } });
             }
             else {
                 Swal.fire({

@@ -25,6 +25,7 @@ namespace Banner.Areas.Admin.Controllers
                 .Replace("Event_Edit_3", "Event_List?CID=3")
                 .Replace("ProductClass_BatchAdd", "Product_List")
                 .Replace("ProductClass_BatchEdit", "Product_List")
+                .Replace("ProductClass_JoinList", "Product_List")
                 .Replace("_Edit", "_List")
                 .Replace("ProductClass_", "Product_")
                 .Replace("ProductClassTeacher_", "Product_")

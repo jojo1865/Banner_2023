@@ -58,7 +58,7 @@ namespace Banner.Areas.Web.Controllers
 
             //即將結束報名課程
             List<c_TempProduct> c_TP = new List<c_TempProduct>();
-            
+
             //找線上
             Ps_ = Ps.Where(q => (q.EDate_Signup > q.CreDate && q.EDate_Signup > DT.Date)).OrderBy(q => (DT.Date - q.EDate_Signup)).Take(12);
             foreach (var P_ in Ps_)
@@ -381,7 +381,7 @@ namespace Banner.Areas.Web.Controllers
                     if (PC.Product_ClassTime.Any())
                     {
                         var PCT = PC.Product_ClassTime.OrderBy(q => q.ClassDate).First();
-                        SL.Text += PCT.ClassDate.ToString(DateFormat) + " " + PCT.STime.ToString("HH:mm");
+                        SL.Text += PCT.ClassDate.ToString(DateFormat) + " " + GetTimeSpanToString(PCT.STime);
                     }
                     else
                         SL.Text += "班級時間未定";
@@ -444,9 +444,68 @@ namespace Banner.Areas.Web.Controllers
             #endregion
 
             #region 前端載入
+            if (FC != null)
+            {
+                var but = FC.AllKeys.FirstOrDefault(q => q.StartsWith("but_Next_"));
+                if (but != null)
+                {
+                    int PayType = -1;
+                    int.TryParse(but.Replace("but_Next_", ""), out PayType);
+                    var PT = DC.PayType.FirstOrDefault(q => q.PTID == PayType);
+                    if (PT != null)
+                    {
+                        var OH_ = OPs.First().Order_Header;
+
+                        /*var Ms = from q in OPs
+                                 join p in DC.M_Product_PayType.Where(q => q.PTID == PayType && q.ActiveFlag)
+                                 on q.PID equals p.PID
+                                 select q;*/
+                        var CPs = c.cOIs.First(q => q.OIID == OH_.OIID).cPTs.First(q => q.PayID == PT.PTID).cPs;
+
+                        int SumPrict = CPs.Sum(q => q.Price_New);
+
+                        
+                        var OH = new Order_Header
+                        {
+                            OIID = OH_.OIID,
+                            ACID = OH_.ACID,
+                            Order_Type = 1,
+                            TotalPrice = 0,
+                            DeleteFlag = false,
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = ACID
+                        };
+
+                        OH.Order_Paid.Add(new Order_Paid
+                        {
+                            Order_Header = OH,
+                            PayType = PT,
+                            PaidFlag = false,
+                            PaidDateTime = DT,
+                            TradeNo = "",
+                            TradeAmt = 0,
+                            PayAmt = 0,
+                            CreDate = DT,
+                            UpdDate = DT
+                        });
 
 
+                        /*switch (PayType)
+                    {
+                        case 0:
+                            break;
 
+
+                        case 1:
+                           
+                            Order_Paid_Credit_Card()
+                            break;
+                    }
+                        */
+                    }
+                }
+            }
 
             #endregion
 
@@ -575,7 +634,7 @@ namespace Banner.Areas.Web.Controllers
             str += "&TradeLimit=600";//TradeLimit 交易有效時間  Int(3)
             str += "&ExpireDate=" + DT.AddDays(2).ToString("yyyyMMdd");//ExpireDate 繳費有效期限 String(10)
             str += "&ReturnURL=" + sDomanName + "/Web/ClassStore/Order_Back_Credit_Card/" + OHID;//ReturnURL 支付完成返回商店網址 String(200)
-            str += "&NotifyURL=" + sDomanName + "/Web/ClassStore/Order_Back_Credit_Card/" + OHID;//NotifyURL 支付通知網址 String(200)
+            str += "&NotifyURL=" + sDomanName + "/Web/ClassStore/Order_Back_Paid/" + OHID;//NotifyURL 支付通知網址 String(200)
             str += "&CustomerURL=" + sDomanName + "/Web/ClassStore/Order_GetNo/" + OHID;//CustomerURL 商店取號網址 String(200)
                                                                                         //4.2.3 回應參數-取號完成
                                                                                         //適用交易類別：超商代碼、超商條碼、超商取貨付款、ATM

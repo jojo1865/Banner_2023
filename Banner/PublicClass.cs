@@ -57,11 +57,17 @@ namespace Banner
 
         //測試用
 
-        public string sStoreTitle = "台中市基督教旌旗協會";
+        /*public string sStoreTitle = "台中市基督教旌旗協會";
         public string sNewebPagURL = "https://ccore.newebpay.com/MPG/period";//藍星金流網址
         public string sMerchantID = "MS3359938901";//商店代號
         public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
-        public string sHashIV = "PBV4pP9DpA9oBzvC";
+        public string sHashIV = "PBV4pP9DpA9oBzvC";*/
+
+        public string sStoreTitle = "JOJO測試店家";
+        public string sNewebPagURL = "https://ccore.newebpay.com/MPG/period";//藍星金流網址
+        public string sMerchantID = "MS151311400";//商店代號
+        public string sHashKey = "xiI3upb6WXwkvJS7PrYPfGrb6gX2aAAh";
+        public string sHashIV = "CHioAFLrrYhkcpYP";
 
         //正式用
         /*public string sDomanName = "台中市基督教旌旗協會";

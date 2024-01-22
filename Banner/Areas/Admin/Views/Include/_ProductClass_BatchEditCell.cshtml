@@ -29,23 +29,29 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-4">
-            <label class="form-label"><span class="text-danger">*</span>結業日</label>
-            <input class="form-control" type="date" value="@(Model.ClassSDate)" name="txb_ClassSDate_@(Model.SortNo)_" min="@(Model.minClassSDate)" />
+        <div class="col-lg-auto">
+            <label class="form-label"><span class="text-danger">*</span>人數限制</label><br />
+            <input class="form-control" style="display: unset; width: 80px; margin-top: 4px;" type="number" min="0" value="@(Model.ClassPeopleCt)" name="txb_ClassPeopleCt_@(Model.SortNo)_" oninput="if(!/^[0-9]+$/.test(value)) value=value.replace(/\D/g,'');if(value>100)value=100;if(value<=0)value=null" />
+            人
         </div>
-        <div class="col-2">
+        <div class="col-lg-auto">
+            <label class="form-label"><span class="text-danger">*</span>結業日</label>
+            <input class="form-control" type="date" value="@(Model.ClassGraduateDate)" name="txb_ClassSDate_@(Model.SortNo)_" min="@(Model.minClassSDate)" />
+        </div>
+        <div class="col-lg-auto">
             <label class="form-label"><span class="text-danger">*</span>講師</label><br />
             <a id="but_SelectTeacher_@(Model.SortNo)_" href="javascript:;" class="btn btn-primary mt-1" onclick="ShowPopupAC(4, '搜尋講師', @(Model.OIID), 'txb_TeacherID_@(Model.SortNo)_', 'but_SelectTeacher_@(Model.SortNo)_');">@Model.ClassTeacher_Name</a>
             <input id="txb_TeacherID_@(Model.SortNo)_" name="txb_TeacherID_@(Model.SortNo)_" type="hidden" style="width:100px;" value="@Model.ClassTeacher_ACID" />
         </div>
-        <div class="col-6 text-end">
+        <div class="col-lg-auto text-end">
             <label class="form-label" style="margin-bottom:12px;">&nbsp;</label><br />
             @if (Model.OrderCt == 0)//已有人報名就不能取消
             {
-                <a class="btn btn-danger" href="javascript:DataDelete('Product_Class', @(Model.PCID));">移除課程</a>
+                <a class="btn btn-danger" href="javascript:DataDelete('Product_Class', @(Model.PCID));">移除本班</a>
             }
-            <a class="btn btn-warning" href="javascript:UpdateClass(@(Model.PCID));">更新課程</a>
-            <a class="btn btn-success" href="#@(Model.PCID)" target="_blank">檢視報名名單(@(Model.OrderCt))</a>
+            <a class="btn btn-warning" href="javascript:UpdateClass(@(Model.PCID));">更新本班</a>
+            <a class="btn btn-info" href="javascript:CopyClass(@(Model.PCID));">複製本班</a>
+            <a class="btn btn-success" href="/Admin/StoreSet/ProductClass_JoinList/@(Model.PCID)" target="_blank">檢視學員名單(@(Model.OrderCt))</a>
         </div>
     </div>
 
@@ -79,7 +85,7 @@
                                     }
                                     else
                                     {
-                                        <a href="#@(CCT.PCTID)" class="btn btn-success" target="_blank">@CCT.JoinCt</a>
+                                        <a href="/Admin/StoreSet/ProductClass_JoinList/@(Model.PCID)?PCTID=@(CCT.PCTID)" class="btn btn-success" target="_blank">@CCT.JoinCt</a>
                                     }
                                 </td>
                             </tr>

@@ -18,6 +18,12 @@
     <div class="form-container">
         <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
         <div class="form-body mt-4">
+            <div>
+                <a class="btn btn-primary btn-lg btn-round me-2" href="/Admin/StoreSet/ProductClass_BatchAdd/@(Model.P.PID)">
+                    <i class="fa-solid fa-circle-plus"></i>批次新增
+                </a>
+            </div>
+            
             @foreach (var CC in Model.CCs)
             {
                 <div id="div_Class_@(CC.PCID)_">
@@ -43,6 +49,7 @@
         obj.ClassPhoneNo = $("input[name='txb_ClassPhoneNo_" + PCID + "_']").val();
         obj.GraduateDate = $("input[name='txb_ClassSDate_" + PCID + "_']").val();
         obj.TeacherID = $("input[name='txb_TeacherID_" + PCID + "_']").val();
+        obj.ClassPeopleCt = $("input[name='txb_ClassPeopleCt_" + PCID + "_']").val();
         var ClassTimeCt = parseInt($("input[name='txb_ClassTimeCt_" + PCID + "_']").val()) ;
         var TimeStr = '';
         for (var i = 0; i < ClassTimeCt; i++) {
@@ -52,15 +59,54 @@
         obj.TimeStr = TimeStr;
         var sData = JSON.stringify(obj);
         console.log(sData);
-        /*$.ajax({
-            url: '/Admin/StoreSet/ProductClass_BatchEdit',
-            data: sData,
+        $.ajax({
+            url: '/Admin/StoreSet/ProductClass_UpdateClass',
             method: 'post',
+            data: obj,
             dataType: 'text',
             success: function (res) {
-                location.reload();
+                //location.reload();
+                if (res == '') {
+                    Swal.fire({
+                        icon: 'success',
+                        html: '存檔完成'
+                    }).then((result) => {
+                        location.reload();
+                    });
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        html: res
+                    })
+                }
             },
             error: function (err) { console.log(err) },
-        })*/
+        })
+    }
+
+    function CopyClass(PCID) {
+        $.ajax({
+            url: '/Admin/StoreSet/ProductClass_CopyClass?PCID=' + PCID,
+            method: 'GET',
+            success: function (res) {
+                //location.reload();
+                if (res == '') {
+                    Swal.fire({
+                        icon: 'success',
+                        html: '複製完成'
+                    }).then((result) => {
+                        location.reload();
+                    });
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        html: res
+                    })
+                }
+            },
+            error: function (err) { console.log(err) },
+        })
     }
 </script>

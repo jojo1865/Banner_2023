@@ -47,10 +47,10 @@ namespace Banner.Areas.Web.Controllers
                     /*LogInAC(1);
                     SetBrowserData("UserName", "系統管理員");
                     */
-                    LogInAC(443);
-                    SetBrowserData("UserName", "江晨旭");
-                    /*LogInAC(8197);
-                    SetBrowserData("UserName", "JOJO");*/
+                    /*LogInAC(443);
+                    SetBrowserData("UserName", "江晨旭");*/
+                    LogInAC(8197);
+                    SetBrowserData("UserName", "JOJO");
                 }
                 Response.Redirect("/Web/Home/Index");
             }
@@ -498,25 +498,41 @@ namespace Banner.Areas.Web.Controllers
                             if (PCs.Count() > 0)//有班級可以上
                             {
                                 //先檢查限制名額的
-                                var PC_Ns = PCs.Where(q => q.PeopleCt > 0).OrderBy(q => q.PCID).ToList();
-                                foreach (var PC_N in PC_Ns)
+                                var PC_Ns = PCs.Where(q => q.PeopleCt > 0 && q.Product_ClassTime.Count>0).OrderBy(q => q.Product_ClassTime.Min(p => p.ClassDate)).ToList();
+                                if (OP_Gs.Count > 0)//已有相關訂單
                                 {
-                                    var OP_G = OP_Gs.FirstOrDefault(q => q.PCID == PC_N.PCID);
-                                    if (OP_G != null)//有限制
+                                    foreach (var PC_N in PC_Ns)
                                     {
-                                        if (PC_N.PeopleCt < OP_G.Ct)
-                                            PCID = OP_G.PCID;
-                                    }
+                                        var OP_G = OP_Gs.FirstOrDefault(q => q.PCID == PC_N.PCID);
+                                        if (OP_G != null)//有限制
+                                        {
+                                            if (PC_N.PeopleCt < OP_G.Ct)
+                                                PCID = OP_G.PCID;
+                                        }
+                                        else
+                                            PCID = PC_N.PCID;
 
-                                    if (PCID > 0)
-                                        break;
+                                        if (PCID > 0)
+                                            break;
+                                    }
                                 }
+                                else if (PC_Ns.Count > 0)
+                                {
+                                    PCID = PC_Ns.First().PCID;
+                                }
+
                                 if (PCID == 0)//沒班級再檢查不限名額的
                                 {
-                                    var PC_0s = PCs.Where(q => q.PeopleCt == 0).OrderBy(q => q.PCID).ToList();
-                                    if (PC_0s.Count() > 0)
-                                        PCID = PC_0s.First().PCID;
+                                    var PCT_0s = from q in PCs.Where(q => q.PeopleCt == 0).ToList()
+                                                 join p in DC.Product_ClassTime.Where(q => !q.Product_Class.DeleteFlag).ToList()
+                                                 on q.PCID equals p.PCID
+                                                 select p;
+                                    if(PCT_0s.Count()>0)
+                                        PCID = PCT_0s.OrderBy(q => q.ClassDate).First().PCID;
+                                    
+                                    //PCID = PCs.Where(q => q.PeopleCt > 0 && q.Product_ClassTime.Count > 0).OrderBy(q => q.Product_ClassTime.Min(p => p.ClassDate)).First().PCID;
                                 }
+
                                 if (PCID == 0)
                                     Error += "目前班級均已額滿<br/>";
                             }

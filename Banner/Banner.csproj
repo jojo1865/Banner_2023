@@ -726,6 +726,7 @@
     <Content Include="Areas\Admin\Views\StoreSet\ProductClass_BatchEdit.cshtml" />
     <Content Include="Areas\Admin\Views\Include\_SearchAccount.cshtml" />
     <Content Include="Areas\Admin\Views\Include\_ProductClass_BatchEditCell.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\ProductClass_JoinList.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

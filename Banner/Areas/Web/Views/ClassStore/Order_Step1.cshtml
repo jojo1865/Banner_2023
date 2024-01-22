@@ -19,6 +19,7 @@
                     <div class="header-left-border"></div>
                     <h5 class="header font-bold">購課明細</h5>
                 </div>
+
                 @if (Model.cOIs.Count > 0)
                 {
                     foreach (var OI in Model.cOIs)
@@ -37,94 +38,95 @@
                                         {
                                             if (cPT.cPs.Count > 0)
                                             {
-                                                <div class="card p-2 mb-2">
-                                                    <div class="header-container mb-2">
-                                                        <div class="header-left-border"></div>
-                                                        <h5 class="header font-bold">@cPT.PayTitle</h5>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        @foreach (var P in cPT.cPs)
-                                                        {
-                                                            <!-- 複製區域 -->
-                                                            <div class="row mx-0">
-                                                                <div class="card px-none mb-3 col-lg-12 p-md-4">
-                                                                    <div class="row g-0 d-flex">
-                                                                        <div class="col-12 col-lg-5">
-                                                                            <div class="d-sm-flex d-block">
-                                                                                <img src="@P.ImgURL" class="rounded-sm-4 me-3 mt-lg-0 mt-3" style="width:auto; height:120px;" alt="@P.Title">
-                                                                                <div class="w-100 px-3 px-md-0">
-                                                                                    <h6 class="py-1 mb-2 bg-secondary-subtle text-center mt-2 mt-sm-0" style="display: inline-block;white-space: nowrap;padding-left: 10px;padding: 10px;">
-                                                                                        @P.ClassType
-                                                                                    </h6>
-                                                                                    <div class="mb-2">
-                                                                                        <h6 class="fw-bold ">@P.Title</h6>
-                                                                                    </div>
-                                                                                    <div class="d-block">
-                                                                                        @if (P.Price_Type == 0)
-                                                                                        {
-                                                                                            if (P.Price_New > 0)
+                                                <form method="post">
+                                                    <div class="card p-2 mb-2">
+                                                        <div class="header-container mb-2">
+                                                            <div class="header-left-border"></div>
+                                                            <h5 class="header font-bold">@cPT.PayTitle</h5>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            @foreach (var P in cPT.cPs)
+                                                            {
+                                                                <!-- 複製區域 -->
+                                                                <div class="row mx-0">
+                                                                    <div class="card px-none mb-3 col-lg-12 p-md-4">
+                                                                        <div class="row g-0 d-flex">
+                                                                            <div class="col-12 col-lg-5">
+                                                                                <div class="d-sm-flex d-block">
+                                                                                    <img src="@P.ImgURL" class="rounded-sm-4 me-3 mt-lg-0 mt-3" style="width:auto; height:120px;" alt="@P.Title">
+                                                                                    <div class="w-100 px-3 px-md-0">
+                                                                                        <h6 class="py-1 mb-2 bg-secondary-subtle text-center mt-2 mt-sm-0" style="display: inline-block;white-space: nowrap;padding-left: 10px;padding: 10px;">
+                                                                                            @P.ClassType
+                                                                                        </h6>
+                                                                                        <div class="mb-2">
+                                                                                            <h6 class="fw-bold ">@P.Title</h6>
+                                                                                        </div>
+                                                                                        <div class="d-block">
+                                                                                            @if (P.Price_Type == 0)
                                                                                             {
-                                                                                                <span style="color: #3764AC">定價：NT$@(P.Price_Basic)</span>
+                                                                                                if (P.Price_New > 0)
+                                                                                                {
+                                                                                                    <span style="color: #3764AC">定價：NT$@(P.Price_Basic)</span>
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                    <span style="color: #3764AC">免費</span>
+                                                                                                }
                                                                                             }
-                                                                                            else
+                                                                                            else if (P.Price_Type == 1)
                                                                                             {
-                                                                                                <span style="color: #3764AC">免費</span>
+                                                                                                <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
+                                                                                                <p class="mb-0">早鳥價：NT$@P.Price_New</p>
                                                                                             }
-                                                                                        }
-                                                                                        else if (P.Price_Type == 1)
-                                                                                        {
-                                                                                            <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
-                                                                                            <p class="mb-0">早鳥價：NT$@P.Price_New</p>
-                                                                                        }
-                                                                                        else if (P.Price_Type == 2)
-                                                                                        {
-                                                                                            <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
-                                                                                            <p class="mb-0">優惠價：NT$@P.Price_New</p>
-                                                                                        }
+                                                                                            else if (P.Price_Type == 2)
+                                                                                            {
+                                                                                                <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
+                                                                                                <p class="mb-0">優惠價：NT$@P.Price_New</p>
+                                                                                            }
 
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div class="col-12 col-lg-2 my-lg-auto my-2 px-3 px-md-0 d-none">
-                                                                        </div>
-                                                                        <div class="col-12 col-lg-5 my-auto d-lg-block px-3 px-md-0">
-                                                                            @foreach (var d in P.LS.ddlList)
-                                                                            {
-                                                                                if (d.Disabled)
+                                                                            <div class="col-12 col-lg-2 my-lg-auto my-2 px-3 px-md-0 d-none">
+                                                                            </div>
+                                                                            <div class="col-12 col-lg-5 my-auto d-lg-block px-3 px-md-0">
+                                                                                @foreach (var d in P.LS.ddlList)
                                                                                 {
-                                                                                    <div class="d-block mb-2">
-                                                                                        @Html.RadioButton(P.LS.ControlName, d.Value, d.Selected, new { @class = "form-check-input me-2", id = P.LS.ControlName + d.Value, disabled = string.Empty })
-                                                                                        @Html.Label(d.Text, new { @for = P.LS.ControlName + d.Value, @class = "lab_gray form-check-label" })
-                                                                                    </div>
+                                                                                    if (d.Disabled)
+                                                                                    {
+                                                                                        <div class="d-block mb-2">
+                                                                                            @Html.RadioButton(P.LS.ControlName, d.Value, d.Selected, new { @class = "form-check-input me-2", id = P.LS.ControlName + d.Value, disabled = string.Empty })
+                                                                                            @Html.Label(d.Text, new { @for = P.LS.ControlName + d.Value, @class = "lab_gray form-check-label" })
+                                                                                        </div>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <div class="d-block mb-2">
+                                                                                            @Html.RadioButton(P.LS.ControlName, d.Value, d.Selected, new { @class = "form-check-input me-2", id = P.LS.ControlName + d.Value })
+                                                                                            @Html.Label(d.Text, new { @for = P.LS.ControlName + d.Value, @class = "form-check-label" })
+                                                                                        </div>
+                                                                                    }
                                                                                 }
-                                                                                else
-                                                                                {
-                                                                                    <div class="d-block mb-2">
-                                                                                        @Html.RadioButton(P.LS.ControlName, d.Value, d.Selected, new { @class = "form-check-input me-2", id = P.LS.ControlName + d.Value })
-                                                                                        @Html.Label(d.Text, new { @for = P.LS.ControlName + d.Value, @class = "form-check-label" })
-                                                                                    </div>
-                                                                                }
-                                                                            }
 
 
-                                                                        </div>
-                                                                        <div class="col-12 col-lg-2 my-auto text-lg-end text-center pb-2 d-flex d-sm-block gap-2 justify-content-lg-end justify-content-center">
-                                                                            <a class="btn btn-outline-primary btn-lg btn-round" href="javascript:;" onclick="RemoveCart('/Web/ClassStore/Order_Step1',@(P.OPID));">
-                                                                                <i class="fa-solid fa-circle-minus"></i>移除項目
-                                                                            </a>
+                                                                            </div>
+                                                                            <div class="col-12 col-lg-2 my-auto text-lg-end text-center pb-2 d-flex d-sm-block gap-2 justify-content-lg-end justify-content-center">
+                                                                                <a class="btn btn-outline-primary btn-lg btn-round" href="javascript:;" onclick="RemoveCart('/Web/ClassStore/Order_Step1',@(P.OPID));">
+                                                                                    <i class="fa-solid fa-circle-minus"></i>移除項目
+                                                                                </a>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <!------------>
+                                                            }
+                                                            <div style="text-align:end">
+                                                                <button type="submit" style="color:white;" name="but_Next_@(OI.OIID)_@(cPT.PayID)" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
                                                             </div>
-                                                            <!------------>
-                                                        }
-                                                        <div style="text-align:end">
-                                                            <button type="submit" style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
                                                         </div>
                                                     </div>
-                                                </div>
-
+                                                </form>
                                             }
                                         }
 
@@ -139,7 +141,7 @@
 
                     }
                 }
-
+               
             </div>
         </div>
 
