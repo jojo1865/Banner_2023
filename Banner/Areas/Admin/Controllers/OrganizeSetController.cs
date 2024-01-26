@@ -909,8 +909,8 @@ namespace Banner.Areas.Admin.Controllers
                         PL.ActiveFlag = GetViewCheckBox(FC.Get("cbox_PayType_" + i));
                         switch (i)
                         {
-
                             case 1://信用卡
+                            case 2://ATM
                                 {
                                     PL.Title = FC.Get("txb_PayType_Title");
                                     PL.MerchantID = FC.Get("txb_PayType_MerchantID");
@@ -921,10 +921,7 @@ namespace Banner.Areas.Admin.Controllers
                                 break;
                         }
                     }
-
                 }
-
-
             }
 
             return cIE;

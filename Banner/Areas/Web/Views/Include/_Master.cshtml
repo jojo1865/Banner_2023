@@ -21,6 +21,12 @@
             @Html.Action("_TopMenu_New1", "Include")
         </div>
         <div class="header-item d-none d-lg-flex">
+            @if (TempData["BackFlag"].ToString() == "1")
+            {
+                <div class="me-2">
+                    <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="btn btn-outline-primary d-block" style="background-color: white; color: #3764ac" target="_blank">進入後台</a>
+                </div>
+            }
             <div class="me-2">
                 <a href="/Web/ClassStore/Order_Step1" style="color:white;">
                     購物車<i class="fa-solid fa-cart-shopping ms-1"></i>
@@ -30,13 +36,6 @@
                     }
                 </a>
             </div>
-            @if (TempData["BackFlag"].ToString() == "1")
-            {
-                <div class="me-2">
-                    <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="btn btn-outline-primary btn-round btn-lg" target="_blank">進入後台</a>
-                </div>
-            }
-
             <div class="profile">
                 <div class="profile-body">
                     <span class="nickname"> @ViewBag._UserName 2</span>

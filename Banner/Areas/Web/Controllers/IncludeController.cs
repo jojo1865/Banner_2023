@@ -736,11 +736,11 @@ namespace Banner.Areas.Web.Controllers
         #region 商品上方加入購物車列
         public PartialViewResult _SotreSetTopCart()
         {
-            TempData["OPCt"] = "0";
+            /*TempData["OPCt"] = "0";
             if (ACID <= 0)
                 ACID = GetACID();
             if (ACID > 0)
-                TempData["OPCt"] = DC.Order_Product.Count(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 0).ToString();
+                TempData["OPCt"] = DC.Order_Product.Count(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 0).ToString();*/
             return PartialView();
         }
 

@@ -1,8 +1,124 @@
-﻿
+﻿@model Banner.Areas.Web.Controllers.ClassStoreController.cOrder_Step2
 @{
     ViewBag.Title = "Order_Step2";
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
 }
 
-<h2>Order_Step2</h2>
+<div class="body-container  container_phone">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/ClassStore/Index">課程選購首頁</a></li>
+                <li><img src="~/Areas/Web/Content/Img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/ClassStore/Order_Step1">購物車</a></li>
+                <li><img src="~/Areas/Web/Content/Img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="#">交易結果</a></li>
+            </ol>
+        </nav>
+
+        <div class="container-lg">
+            <div class="card p-4" style="width: 100%;background-color: #f7f7f9;border-radius: 12px;">
+                <div class="row">
+                    <div class="col-12">
+                        <span style="font-size:25px;color:red;">交易金額：@Model.TotalPrice</span>
+                    </div>
+                    <div class="col-12">
+                        <span style="font-size:25px;color:red;">交易結果：@Model.Status</span>
+                    </div>
+                    @if (Model.Title1 != "")
+                    {
+                        <div class="col-12">
+                            <span style="font-size:20px;color:green;">@Model.Title1：@Model.Data1</span>
+                        </div>
+                    }
+                    @if (Model.Title2 != "")
+                    {
+                        <div class="col-12">
+                            <span style="font-size:20px;color:green;">@Model.Title2：@Model.Data2</span>
+                        </div>
+                    }
+                    @if (Model.Title3 != "")
+                    {
+                        <div class="col-12">
+                            <span style="font-size:20px;color:green;">@Model.Title3：@Model.Data3</span>
+                        </div>
+                    }
+                    @if (Model.Title4 != "")
+                    {
+                        <div class="col-12">
+                            <span style="font-size:20px;color:green;">@Model.Title4：@Model.Data4</span>
+                        </div>
+                    }
+                    @if (Model.Title5 != "")
+                    {
+                        <div class="col-12">
+                            <span style="font-size:20px;color:green;">@Model.Title5：@Model.Data5</span>
+                        </div>
+                    }
+                    <div>
+                        <a href="/Web/AccountPlace/Order_List" class="btn btn-success">檢視我的訂單</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-lg">
+            <div class="card p-4" style="width: 100%;background-color: #f7f7f9;border-radius: 12px;">
+                <div class="header-container mb-2">
+                    <div class="header-left-border"></div>
+                    <h5 class="header font-bold">購課明細</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model != null)
+                    {
+                        foreach (var P in Model.cPs)
+                        {
+                            <!-- 複製區域 -->
+                            <div class="row mx-0">
+                                <div class="card px-none mb-3 col-lg-12 p-md-4">
+                                    <div class="row g-0 d-flex">
+                                        <div class="col-12 col-lg-5">
+                                            <div class="d-sm-flex d-block">
+                                                <img src="@P.ImgURL" class="rounded-sm-4 me-3 mt-lg-0 mt-3" style="width:auto; height:120px;" alt="@P.Title">
+                                                <div class="w-100 px-3 px-md-0">
+                                                    <h6 class="py-1 mb-2 bg-secondary-subtle text-center mt-2 mt-sm-0" style="display: inline-block;white-space: nowrap;padding-left: 10px;padding: 10px;">
+                                                        @P.ClassType
+                                                    </h6>
+                                                    <div class="mb-2">
+                                                        <h6 class="fw-bold ">@P.Title</h6>
+                                                    </div>
+                                                    <div class="d-block">
+                                                        @if (P.Price_New > 0)
+                                                        {
+                                                            <span style="color: #3764AC">NT$@(P.Price_New)</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span style="color: #3764AC">免費</span>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-2 my-lg-auto my-2 px-3 px-md-0 d-none">
+                                        </div>
+                                        <div class="col-12 col-lg-5 my-auto d-lg-block px-3 px-md-0">
+                                            @if (P.LS.ddlList.Count() == 1)
+                                            {
+                                                <div class="d-block mb-2">
+                                                    @P.LS.ddlList[0].Text
+                                                </div>
+                                            }
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!------------>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 

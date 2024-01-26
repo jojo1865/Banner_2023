@@ -53,28 +53,36 @@ namespace Banner
         public int EventQrCodeSTimeAdd = -30;
         public int EventQrCodeETimeAdd = 30;
 
-        public string sDomanName = "https://web-banner.viuto-aiot.com";
+        public string sDomanName
+        {
+            get
+            {
+                if (Request.Url.Host.Contains("viuto-aiot.com") || Request.Url.Host == ("localhost"))
+                {
+                    return "https://web-banner.viuto-aiot.com";
+                }
+                else
+                {
+                    return "https://"+ Request.Url.Host;
+                }
+            }
+        }
 
-        //測試用
+            //= "";
+            //測試用
 
-        /*public string sStoreTitle = "台中市基督教旌旗協會";
-        public string sNewebPagURL = "https://ccore.newebpay.com/MPG/period";//藍星金流網址
-        public string sMerchantID = "MS3359938901";//商店代號
-        public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
-        public string sHashIV = "PBV4pP9DpA9oBzvC";*/
+            /*public string sStoreTitle = "台中市基督教旌旗協會";
+            public string sNewebPagURL = "https://ccore.newebpay.com/MPG/period";//藍星金流網址
+            public string sMerchantID = "MS3359938901";//商店代號
+            public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
+            public string sHashIV = "PBV4pP9DpA9oBzvC";*/
 
-        public string sStoreTitle = "JOJO測試店家";
-        public string sNewebPagURL = "https://ccore.newebpay.com/MPG/period";//藍星金流網址
-        public string sMerchantID = "MS151311400";//商店代號
-        public string sHashKey = "xiI3upb6WXwkvJS7PrYPfGrb6gX2aAAh";
-        public string sHashIV = "CHioAFLrrYhkcpYP";
-
-        //正式用
-        /*public string sDomanName = "台中市基督教旌旗協會";
-        public string sNewebPagURL = "https://core.newebpay.com/MPG/period";//藍星金流網址
-        public string sMerchantID = "MS3359938901";//商店代號
-        public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
-        public string sHashIV = "PBV4pP9DpA9oBzvC";*/
+            //正式用
+            /*public string sDomanName = "台中市基督教旌旗協會";
+            public string sNewebPagURL = "https://core.newebpay.com/MPG/mpg_gateway";//藍星金流網址
+            public string sMerchantID = "MS3359938901";//商店代號
+            public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
+            public string sHashIV = "PBV4pP9DpA9oBzvC";*/
 
         public bool bUsedNewName = true;
         public bool[] bGroup = new bool[] { false, false, false, false, false, false }; //權限
@@ -265,8 +273,8 @@ namespace Banner
         public string CutMail(string sMail)
         {
             string[] Mails = sMail.Split('@');
-            if(Mails.Length==2)
-                sMail = Mails[0].Substring(0,Mails[0].Length/2) + new string('*',Mails[0].Length/2) + "@" + Mails[1];
+            if (Mails.Length == 2)
+                sMail = Mails[0].Substring(0, Mails[0].Length / 2) + new string('*', Mails[0].Length / 2) + "@" + Mails[1];
             return sMail;
         }
         //設定Session
@@ -349,6 +357,16 @@ namespace Banner
             if (int.TryParse(Input, out i))
                 return i;
             else return 0;
+        }
+        //把物件轉Json的字串
+        public string ChangeClassToJsonString<T>(T Input)
+        {
+            return JsonConvert.SerializeObject(Input);
+        }
+        //把Json的字串轉JObject物件
+        public JObject ChangeJsonStringToClass(string Input)
+        {
+            return JObject.Parse(Input);
         }
         //檢查Email格式
         public bool CheckEmail(string strIn)
@@ -2307,8 +2325,8 @@ namespace Banner
             ViewBag._BackFlag = "0";
             //http://localhost:1897
             //sDomanName修正成Localhost
-            if (Request.Url.Host.ToLower().Contains("localhost"))
-                sDomanName = Request.Url.Scheme + "://" + Request.Url.Host + (Request.Url.Port == 80 || Request.Url.Port == 443 ? "" : ":" + Request.Url.Port);
+            //if (Request.Url.Host.ToLower().Contains("localhost"))
+            //    sDomanName = Request.Url.Scheme + "://" + Request.Url.Host + (Request.Url.Port == 80 || Request.Url.Port == 443 ? "" : ":" + Request.Url.Port);
 
             string NowURL = Request.Url.AbsolutePath;
             ACID = GetACID();
@@ -2399,10 +2417,10 @@ namespace Banner
                 }
                 else if (CheckAdmin(ACID))//此使用者擁有系統管理者權限
                 {
-                    ViewBag._Title = ShortURL +"====="+ NewShortURL;
+                    ViewBag._Title = ShortURL + "=====" + NewShortURL;
                     bGroup = new bool[] { true, true, true, true, true, true };
                 }
-                    
+
 
             }
 
@@ -2420,7 +2438,7 @@ namespace Banner
             TempData["BackFlag"] = ViewBag._BackFlag;
             //CheckVCookie();
         }
-        
+
         /// <summary>
         /// 修正 需要的反仿冒 Cookie "__RequestVerificationToken" 不存在。 錯誤
         /// </summary>

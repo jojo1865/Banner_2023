@@ -100,11 +100,11 @@ btns.forEach((btn) => {
     });
 });*/
 function ClearLoading() {
-    btns.forEach((btn) => {
+    /*btns.forEach((btn) => {
         btn.disabled = false;
         btn.classList.remove("btn-loading");
         console.log('Remove loading CSS');
-    });
+    });*/
 }
 
 /*取得組織選單*/

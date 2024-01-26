@@ -20,16 +20,16 @@ namespace Banner.Controllers
             GetViewBag();
             //加密測試
             string str = "MerchantID=MS127874575&RespondType=String&TimeStamp=1695795410&Version=2.0&MerchantOrderNo=Vanespl_ec_1695795410&Amt=30&ItemDesc=test&NotifyURL=https%3A%2F%2Fwebhook.site%2Fd4db5ad1-2278-466a-9d66-78585c0dbadb";
-            sMerchantID = "MS127874575";//商店代號
-            sHashKey = "Fs5cX1TGqYM2PpdbE14a9H83YQSQF5jn";
-            sHashIV = "C6AcmfqJILwgnhIP";
+            string sMerchantID = "MS127874575";//商店代號
+            string sHashKey = "Fs5cX1TGqYM2PpdbE14a9H83YQSQF5jn";
+            string sHashIV = "C6AcmfqJILwgnhIP";
             string Data1 = HSM.EncryptAESHex(str, sHashKey, sHashIV);
 
             ViewBag._Return1 = Data1;
             string Data2 = "HashKey=" + sHashKey + "&" + Data1 + "&HashIV=" + sHashIV;
             ViewBag._Return2 = Data2;
             ViewBag._Return3 = HSM.EncryptSHA256(Data2).ToUpper();
-
+            
 
 
             //解密測試

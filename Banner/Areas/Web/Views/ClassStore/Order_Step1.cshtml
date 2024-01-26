@@ -19,9 +19,14 @@
                     <div class="header-left-border"></div>
                     <h5 class="header font-bold">購課明細</h5>
                 </div>
-
                 @if (Model.cOIs.Count > 0)
                 {
+                    if (Model.PayFlag)
+                    {
+                        <script>
+                            alert("交易準備中...請稍候");
+                        </script>
+                    }
                     foreach (var OI in Model.cOIs)
                     {
                         if (OI.cPTs.Count(q => q.cPs.Count() > 0) > 0)
@@ -121,8 +126,13 @@
                                                                 </div>
                                                                 <!------------>
                                                             }
-                                                            <div style="text-align:end">
-                                                                <button type="submit" style="color:white;" name="but_Next_@(OI.OIID)_@(cPT.PayID)" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
+                                                            <div class="row">
+                                                                <div class="col-12 text-end mb-1">
+                                                                    <span style="font-size: 25px; color: red;">總金額：@cPT.TotalPrice</span>
+                                                                </div>
+                                                                <div class="col-12 text-end">
+                                                                    <button type="submit" style="color:white;" name="but_Next_@(OI.OIID)_@(cPT.PTID)" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -141,7 +151,7 @@
 
                     }
                 }
-               
+
             </div>
         </div>
 
@@ -153,3 +163,17 @@
     </div>
 </div>
 
+<script>
+    /*const btns = document.querySelectorAll(".btn-submit");
+    btns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            Swal.fire({
+                icon: 'info',
+                html: '購物車金額計算中...<br/>請稍候'
+            })
+            btn.disabled = true;
+            btn.classList.add("btn-loading");
+            console.log('Add loading CSS');
+        });
+    });*/
+</script>

@@ -32,13 +32,20 @@
                 </li>
                 @if (TempData["BackFlag"].ToString() == "1")
                 {
-                    <li class="nav-item">
-                        <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="nav-link" target="_blank">進入後台</a>
+                    <li class="nav-item li_TopMenu_UserData">
+                        <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="btn btn-outline-primary d-block" style="background-color: white; color: #3764ac" target="_blank">進入後台</a>
+                    </li>
+                }
+                @if (TempData["CartNo"].ToString() != "0")
+                {
+                    <li class="nav-item li_TopMenu_UserData">
+                        <a href="/Web/ClassStore/Order_Step1" style="color:white;">購物車(@(TempData["CartNo"].ToString()))</a>
                     </li>
                 }
                 <li class="nav-item li_TopMenu_UserData" style="border-bottom:1px solid #CCC;">
                     <a href="javascript:LogoutCheck();" class="nav-link">登出</a>
                 </li>
+
                 @foreach (var M1 in Model.OrderBy(q => q.SortNo))
                 {
                     if (M1.Items.Count > 0)
