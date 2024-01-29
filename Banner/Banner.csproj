@@ -217,6 +217,7 @@
     <Compile Include="Areas\Web\Controllers\GroupPlaceController.cs" />
     <Compile Include="Areas\Web\Controllers\HomeController.cs" />
     <Compile Include="Areas\Web\Controllers\IncludeController.cs" />
+    <Compile Include="Areas\Web\Controllers\MyClassController.cs" />
     <Compile Include="Areas\Web\Controllers\OutputController.cs" />
     <Compile Include="Areas\Web\Controllers\StaffPlaceController.cs" />
     <Compile Include="Areas\Web\WebAreaRegistration.cs" />
@@ -729,6 +730,8 @@
     <Content Include="Areas\Admin\Views\StoreSet\ProductClass_JoinList.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Order_Paid_ATM.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Order_Back_ATM.cshtml" />
+    <Content Include="Areas\Web\Views\MyClass\Order_List.cshtml" />
+    <Content Include="Areas\Web\Views\MyClass\Order_Info.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

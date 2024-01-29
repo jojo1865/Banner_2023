@@ -87,7 +87,7 @@
 
                                                     <td style="word-break: break-all;">
                                                         <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                        <span class="@C.CSS">@C.Value</span>
+                                                        <span class="@C.CSS">@Html.Raw(C.Value)</span>
                                                     </td>
                                                 }
                                                 break;

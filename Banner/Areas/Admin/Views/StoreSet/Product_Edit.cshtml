@@ -76,31 +76,21 @@
                                     <div class="row">
                                         <div class="col-auto">
                                             <div class="form-check form-check-inline">
-                                                @Html.RadioButton("cbox_ShowFlag", true, Model.P.ShowFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
-                                                @Html.Label("已顯示", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
+                                                @Html.RadioButton("cbox_ShowFlag", 1, Model.P.ShowFlag, new { @id = "cbox_ShowFlag1", @class = "form-check-input" })
+                                                @Html.Label("顯示", new { @class = "form-check-label", @for = "cbox_ShowFlag1" })
                                             </div>
                                         </div>
                                         <div class="col-auto">
                                             <div class="form-check form-check-inline">
-                                                @Html.RadioButton("cbox_ShowFlag", false, !Model.P.ShowFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
-                                                @Html.Label("已隱藏", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>啟用狀態</label>
-                                    <div class="row">
-                                        <div class="col-auto">
-                                            <div class="form-check form-check-inline">
-                                                @Html.RadioButton("cbox_ActiveFlag", true, Model.P.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
-                                                @Html.Label("啟用", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
+                                                @Html.RadioButton("cbox_ShowFlag", 2, !Model.P.ShowFlag, new { @id = "cbox_ShowFlag2", @class = "form-check-input" })
+                                                @Html.Label("隱藏", new { @class = "form-check-label", @for = "cbox_ShowFlag2" })
                                             </div>
                                         </div>
                                         <div class="col-auto">
                                             <div class="form-check form-check-inline">
-                                                @Html.RadioButton("cbox_ActiveFlag", false, !Model.P.ActiveFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
-                                                @Html.Label("停用", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
+                                                @Html.RadioButton("cbox_ShowFlag", 3, !Model.P.ActiveFlag, new { @id = "cbox_ShowFlag3", @class = "form-check-input" })
+                                                @Html.Label("下架(禁止交易)", new { @class = "form-check-label", @for = "cbox_ShowFlag3" })
+                                                
                                             </div>
                                         </div>
                                     </div>

@@ -70,7 +70,7 @@ namespace Banner.Areas.Admin.Controllers
                 Ns = Ns.Where(q => q.Course.CCID == CCID);
             if (c.ActiveType >= 0)
                 Ns = Ns.Where(q => q.ActiveFlag == (c.ActiveType == 1));
-            
+
             if (!string.IsNullOrEmpty(c.SDate))
             {
                 DateTime SDT_ = DateTime.Now;
@@ -82,7 +82,7 @@ namespace Banner.Areas.Admin.Controllers
                          select q;
                 }
             }
-                
+
             if (!string.IsNullOrEmpty(c.EDate))
             {
                 DateTime EDT_ = DateTime.Now;
@@ -94,7 +94,7 @@ namespace Banner.Areas.Admin.Controllers
                          select q;
                 }
             }
-                
+
 
             //旌旗權限檢視門檻設置
             var OI2s = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
@@ -490,8 +490,18 @@ namespace Banner.Areas.Admin.Controllers
                 N.P.ProductInfo = FC.Get("txb_ProductInfo");
                 N.P.TargetInfo = FC.Get("txb_TargetInfo");
                 N.P.GraduationInfo = FC.Get("txb_GraduationInfo");
-                N.P.ShowFlag = GetViewCheckBox(FC.Get("cbox_ShowFlag"));
-                N.P.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
+                //N.P.ShowFlag = GetViewCheckBox(FC.Get("cbox_ShowFlag"));
+                //N.P.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
+                if (FC.Get("cbox_ShowFlag") == "3")
+                {
+                    N.P.ShowFlag = false;
+                    N.P.ActiveFlag = false;
+                }
+                else
+                {
+                    N.P.ActiveFlag = true;
+                    N.P.ShowFlag = FC.Get("cbox_ShowFlag") == "1";
+                }
                 N.P.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
                 N.P.ProductType = Convert.ToInt32(FC.Get("rbl_ProductType"));
                 N.P.YearNo = Convert.ToInt32(FC.Get("ddl_Year"));

@@ -135,6 +135,7 @@ namespace Banner
         public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)" };
         public string[] sCourseType = new string[] { "不限制", "實體", "線上" };
         public string[] sPayType = new string[] { "現金", "藍新-信用卡", "藍新-ATM", "PayPel", "支付寶" };
+        public string[] sOrderType = new string[] { "購物車", "交易中", "交易完成", "交易取消", "交易取消(退費處理中)", "交易取消(已退費)" };
         public string Error = "";
         public int iChildAge = 12;
         public int ACID = 0;

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -1356,7 +1357,7 @@ namespace Banner.Areas.Web.Controllers
                     else
                     {
                         Event_Join_Detail EJD = DC.Event_Join_Detail.FirstOrDefault(q => q.ACID == ACID);
-                        if(EJD == null)
+                        if (EJD == null)
                         {
                             EJD = new Event_Join_Detail();
                             EJD.Event_Join_Header = EH;
@@ -1390,6 +1391,7 @@ namespace Banner.Areas.Web.Controllers
         }
 
         #endregion
+
     }
 }
 

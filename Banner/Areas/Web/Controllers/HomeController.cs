@@ -494,7 +494,7 @@ namespace Banner.Areas.Web.Controllers
                                          group q by new { q.PCID } into g
                                          select new { g.Key.PCID, Ct = g.Count() }).ToList();
 
-                            var PCs = DC.Product_Class.Where(q => q.PID == PID).OrderBy(q => q.PCID).ToList();
+                            var PCs = DC.Product_Class.Where(q => q.PID == PID && !q.DeleteFlag).OrderBy(q => q.PCID).ToList();
                             if (PCs.Count() > 0)//有班級可以上
                             {
                                 //先檢查限制名額的
@@ -524,7 +524,7 @@ namespace Banner.Areas.Web.Controllers
                                 if (PCID == 0)//沒班級再檢查不限名額的
                                 {
                                     var PCT_0s = from q in PCs.Where(q => q.PeopleCt == 0).ToList()
-                                                 join p in DC.Product_ClassTime.Where(q => !q.Product_Class.DeleteFlag).ToList()
+                                                 join p in DC.Product_ClassTime.ToList()
                                                  on q.PCID equals p.PCID
                                                  select p;
                                     if(PCT_0s.Count()>0)
