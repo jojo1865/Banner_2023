@@ -90,7 +90,7 @@
                                             <div class="form-check form-check-inline">
                                                 @Html.RadioButton("cbox_ShowFlag", 3, !Model.P.ActiveFlag, new { @id = "cbox_ShowFlag3", @class = "form-check-input" })
                                                 @Html.Label("下架(禁止交易)", new { @class = "form-check-label", @for = "cbox_ShowFlag3" })
-                                                
+
                                             </div>
                                         </div>
                                     </div>
@@ -222,7 +222,7 @@
                                                         @Html.Label(PB.CCSL_Before.FirstOrDefault(q => q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
                                                     </div>
                                                     <div class="col-lg-6 col-12">
-                                                        @Html.Label(PB.CSL_Before.First().Text, new { @class = "form-select form-control-lg lab_gray" })
+                                                        @Html.Label(PB.CSL_Before.First(q => q.Selected).Text, new { @class = "form-select form-control-lg lab_gray" })
                                                     </div>
                                                     <div class="col-lg-2 col-12 text-lg-end text-start">
                                                     </div>
@@ -234,6 +234,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>限制性別</label><br />
+
                                     @{
                                         int iSex = -1;
                                         var PR2 = Model.PRs.FirstOrDefault(q => q.TargetType == 2);
@@ -340,11 +341,13 @@
                                     <label>牧養職分</label><br />
                                     @foreach (var CR1 in Model.OSL.ddlList)
                                     {
-                                        if (Model.OSL.SortNo > 0)
+                                        var PR1s = Model.PRs.Where(q => q.TargetType == 1);
+                                        //if (Model.OSL.SortNo > 0)
+                                        if (PR1s.Any(q => q.TargetInt1.ToString() == CR1.Value))
                                         {
                                             <div class="form-check form-check-inline">
                                                 @Html.CheckBox("cbox_O_" + CR1.Value, CR1.Selected, new { @id = "cbox_O" + CR1.Value, @class = "form-check-input cbox_Os", @disabled = true })
-                                                @Html.Label(CR1.Text, new { @class = "form-check-label", @for = "cbox_O" + CR1.Value })
+                                                @Html.Label(CR1.Text, new { @class = "form-check-label lab_gray", @for = "cbox_O" + CR1.Value })
                                             </div>
                                         }
                                         else
@@ -508,13 +511,13 @@
                 //性別
                 var Sexs = document.getElementsByName("rbl_Sex");
                 $.each(Sexs, function (j) {
-                    Sexs[j].disabled = false;
-                    if (j == 0) {
-                        Sexs[j].checked = true;
-                    }
-                    else {
-                        Sexs[j].checked = false;
-                    }
+                        Sexs[j].disabled = false;
+                        if (j == 0) {
+                            Sexs[j].checked = true;
+                        }
+                        else {
+                            Sexs[j].checked = false;
+                        }
                 });
                 //年齡
                 var Min = document.getElementById("txb_Age_Min");
@@ -555,13 +558,15 @@
                     }
                     else if (res.Rools[index].TargetType == 2) {//性別
                         $.each(Sexs, function (j) {
-                            Sexs[j].disabled = true;
+
                             if (res.Rools[index].TargetInt1.toString() == Sexs[j].value) {
-                                Sexs[j].checked = true;
-                            }
-                            else {
-                                Sexs[j].checked = false;
-                            }
+                                Sexs[j].disabled = false;
+                                    Sexs[j].checked = true;
+                                }
+                                else {
+                                    Sexs[j].disabled = true;
+                                    Sexs[j].checked = false;
+                                }
                         });
                     }
                     else if (res.Rools[index].TargetType == 3) {//年齡

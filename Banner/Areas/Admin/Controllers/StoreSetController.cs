@@ -38,7 +38,7 @@ namespace Banner.Areas.Admin.Controllers
             #region 物件初始化
             c.SL = new List<SelectListItem>();
             c.SL.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
-            var CCs = DC.Course_Category.Where(q => !q.DeleteFlag).OrderByDescending(q => q.CCID);
+            var CCs = DC.Course_Category.Where(q => !q.DeleteFlag).OrderBy(q => q.Code);
             foreach (var CC in CCs)
                 c.SL.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString() });
 
@@ -122,7 +122,7 @@ namespace Banner.Areas.Admin.Controllers
             TopTitles.Add(new cTableCell { Title = "線上報名日期" });
             TopTitles.Add(new cTableCell { Title = "開課日期" });
             TopTitles.Add(new cTableCell { Title = "原價" });
-            TopTitles.Add(new cTableCell { Title = "課程開班" });
+            //TopTitles.Add(new cTableCell { Title = "課程開班" });
             TopTitles.Add(new cTableCell { Title = "班級管理" });
             //TopTitles.Add(new cTableCell { Title = "會友限定" });
             TopTitles.Add(new cTableCell { Title = "顯示狀態" });
@@ -162,7 +162,7 @@ namespace Banner.Areas.Admin.Controllers
 
                 cTR.Cs.Add(new cTableCell { Value = N_.Price_Basic.ToString() });//原價
                 //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_List?PID=" + N_.PID, Target = "_self", Value = "班級管理" });//班別
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_BatchAdd/" + N_.PID, Target = "_self", Value = "課程開班" });//班別
+                //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_BatchAdd/" + N_.PID, Target = "_self", Value = "課程開班" });//班別
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_BatchEdit/" + N_.PID, Target = "_self", Value = "班級管理" });//班別
                 //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductAllowAccount_List/" + N_.PID, Target = "_self", Value = "指定名單" });//限定會員
                 cTR.Cs.Add(new cTableCell { Value = N_.ShowFlag ? "顯示" : "隱藏" });//顯示狀態
@@ -220,7 +220,7 @@ namespace Banner.Areas.Admin.Controllers
             int CID = 0;
             #region 物件初始化
             N.sCourseType = sCourseType;
-            var CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.ActiveFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag) > 0).OrderByDescending(q => q.CCID).ToList();
+            var CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.ActiveFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag) > 0).OrderBy(q => q.Code).ToList();
             foreach (var CC in CCs) N.CCSL.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString() });
             if (CCs.Count == 0)
                 SetAlert("請先新增課程分類", 3, "/Admin/StoreSet/Product_List");
@@ -356,7 +356,7 @@ namespace Banner.Areas.Admin.Controllers
                             CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag && p.CID != ID) > 0).OrderByDescending(q => q.CCID).ToList();
                             foreach (var CC in CCs) PB.CCSL_Before.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CC.CCID == CR.Course.CCID });
                             var Cs = DC.Course.Where(q => q.CCID == CR.Course.CCID).OrderByDescending(q => q.CID);
-                            foreach (var C in Cs) PB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CCID.ToString(), Selected = CR.CID == CID });
+                            foreach (var C in Cs) PB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString(), Selected = CR.CID == CID });
 
                             N.PBs.Add(PB);
                         }
@@ -428,7 +428,7 @@ namespace Banner.Areas.Admin.Controllers
                         CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag && p.CID != ID) > 0).OrderByDescending(q => q.CCID).ToList();
                         foreach (var CC in CCs) PB.CCSL_Before.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CC.CCID == C_.CCID });
                         var Cs = DC.Course.Where(q => q.CCID == C_.CCID).OrderByDescending(q => q.CID);
-                        foreach (var C in Cs) PB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CCID.ToString() });
+                        foreach (var C in Cs) PB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString(), Selected = C.CID == C_.CID });
 
                         N.PBs.Add(PB);
                     }
@@ -477,7 +477,6 @@ namespace Banner.Areas.Admin.Controllers
             #region 前端資料帶入
             if (FC != null)
             {
-
                 if (!string.IsNullOrEmpty(FC.Get("rbl_OI")))
                 {
                     var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID.ToString() == FC.Get("rbl_OI"));
@@ -528,7 +527,7 @@ namespace Banner.Areas.Admin.Controllers
                 N.P.SaveACID = ACID;
                 N.CCSL.ForEach(q => q.Selected = false);
                 N.CCSL.FirstOrDefault(q => q.Value == FC.Get("ddl_CCBasic")).Selected = true;
-                string zzz = FC.Get("ddl_CBasic");
+                //string zzz = FC.Get("ddl_CBasic");
                 var Cou = DC.Course.FirstOrDefault(q => q.CID == Convert.ToInt32(FC.Get("ddl_CBasic")));
                 if (Cou != null)
                     N.P.Course = Cou;
@@ -561,6 +560,7 @@ namespace Banner.Areas.Admin.Controllers
                     N.P.ImgURL = "/Photo/Product/" + FileName;
                 }
                 //擋修與對象
+
                 //新增UI新增的部分
                 #region 先修課程
                 if (N.PRs.Count(q => q.TargetType == 0) == 0)
@@ -653,6 +653,33 @@ namespace Banner.Areas.Admin.Controllers
                 }
 
                 #endregion
+                #region 永久課程的擋修覆蓋
+                var CRs = DC.Course_Rool.Where(q => q.CID == N.P.CID).OrderBy(q => q.TargetType);
+                foreach (var CR in CRs)
+                {
+                    var PR = N.PRs.FirstOrDefault(q => q.TargetType == CR.TargetType);
+                    if (PR != null)
+                    {
+                        PR.TargetInt1 = CR.TargetInt1;
+                        PR.TargetInt2 = CR.TargetInt2;
+                    }
+                    else
+                    {
+                        N.PRs.Add(new Product_Rool
+                        {
+                            Product = N.P,
+                            CRID = CR.CRID,
+                            TargetType = CR.TargetType,
+                            TargetInt1 = CR.TargetInt1,
+                            TargetInt2 = CR.TargetInt2,
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = ACID
+                        });
+                    }
+                }
+                #endregion
+
                 #region 付款方式
                 foreach (var ddl in N.PTSL.ddlList)
                     ddl.Selected = GetViewCheckBox(FC.Get(N.PTSL.ControlName + ddl.Value));
@@ -765,8 +792,10 @@ namespace Banner.Areas.Admin.Controllers
                     }
                 }
 
-
-                SetAlert("存檔完成", 1, "/Admin/StoreSet/Product_List");
+                if (ID == 0)
+                    SetAlert("新增完成,請進行開班", 1, "/Admin/StoreSet/ProductClass_BatchAdd/" + N.P.PID);
+                else
+                    SetAlert("存檔完成", 1, "/Admin/StoreSet/Product_List");
             }
 
             return View(N);
@@ -1866,7 +1895,10 @@ namespace Banner.Areas.Admin.Controllers
 
             var P = DC.Product.FirstOrDefault(q => q.PID == ID);
             if (P != null)
+            {
                 ViewBag._Title += " - " + P.Title + P.SubTitle;
+                c.sDate = P.EDate_Signup.ToString(DateFormat);
+            }
             #endregion
             #region 前端資料匯入
             if (FC != null)
@@ -1916,7 +1948,7 @@ namespace Banner.Areas.Admin.Controllers
             else
             {
                 c.RowCt = 1;
-                c.cCs.Add(new cClassCell { SortNo = "1", ProductType = P.ProductType });
+                c.cCs.Add(new cClassCell { SortNo = "1", ProductType = P.ProductType,ClassSDate = P.EDate_Signup.ToString(DateFormat) });
                 c.cCBasic.ProductType = P.ProductType;
             }
             #endregion

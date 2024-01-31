@@ -197,8 +197,10 @@ namespace Banner.Areas.Web.Controllers
 
             ClassStoreController CSC = new ClassStoreController();
             c.cPI = CSC.GETProduct_Info(ID);
-
-
+            var OP = DC.Order_Product.FirstOrDefault(q => q.PID == ID);
+            foreach (var R in c.cPI.cTL.Rs)
+                if (OP.PCID != R.ID)
+                    c.cPI.cTL.Rs.Remove(R);
             return View(c);
         }
 

@@ -32,7 +32,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @if (Model.AC.ACID == 0)
+                            @if (Model.UID == 1 || Model.AC.ACID==0)
                             {
                                 <div class="row">
                                     <div class="col">
@@ -520,16 +520,30 @@
                             {
                                 <div class="row">
                                     <div class="col-12 pt-2">
-                                        <label>後台權限</label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-12 pt-2">
-                                        @Html.CheckBox("cbox_BackUsedFlag", Model.AC.BackUsedFlag, new { @class = "form-check-input" })
+                                        @if (Model.bFriendFlag)
+                                        {
+                                            @Html.CheckBox("cbox_BackUsedFlag", Model.AC.BackUsedFlag, new { @class = "form-check-input" })<label for="cbox_BackUsedFlag">後台權限</label>
+                                        }
+                                        else
+                                        {
+                                            @Html.CheckBox("cbox_BackUsedFlag", Model.AC.BackUsedFlag, new { @class = "form-check-input", @disabled = "true" })<label class="lab_gray">後台權限(無會友資格)</label>
+                                        }
+
                                     </div>
                                 </div>
                             }
-
+                            <div class="row">
+                                <div class="col-12 pt-2">
+                                    @if (Model.bFriendFlag)
+                                    {
+                                        @Html.CheckBox("cbox_TeacherFlag", Model.AC.TeacherFlag, new { @class = "form-check-input" })<label for="cbox_TeacherFlag">講師權限</label>
+                                    }
+                                    else
+                                    {
+                                        @Html.CheckBox("cbox_TeacherFlag", Model.AC.TeacherFlag, new { @class = "form-check-input", @disabled = "true" })<label class="lab_gray">講師權限(無會友資格)</label>
+                                    }
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!--複製用 預設隱藏-->

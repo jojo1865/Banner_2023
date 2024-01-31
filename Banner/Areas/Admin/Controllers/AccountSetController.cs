@@ -520,7 +520,12 @@ namespace Banner.Areas.Admin.Controllers
                         {
                             cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
                             if (iType == 1)
-                                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
+                            {
+                                if (ACID == 1)
+                                    cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_self", Value = "編輯" });//編輯
+                                else
+                                    cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
+                            }
                             else
                                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Emtitle_Edit/" + N.ACID, Target = "_self", Value = "按立" });//檢視
                             var OI_8 = GetMOIAC(8, 0, N.ACID).FirstOrDefault(q => q.JoinDate != q.CreDate);//確定有入組再列
@@ -563,8 +568,10 @@ namespace Banner.Areas.Admin.Controllers
                                 cTR.Cs.Add(new cTableCell { Value = "" });//區
                                 cTR.Cs.Add(new cTableCell { Value = "" });//小組
                             }
-                            //去識別
-                            if (!string.IsNullOrEmpty(N.Name_Last))
+
+                            if (ACID == 1) //免去識別
+                                cTR.Cs.Add(new cTableCell { Value = (N.Name_First + N.Name_Last) });
+                            else if (!string.IsNullOrEmpty(N.Name_Last)) //去識別
                                 cTR.Cs.Add(new cTableCell { Value = (N.Name_First + new string('*', N.Name_Last.Length)) });
                             else
                                 cTR.Cs.Add(new cTableCell { Value = (N.Name_First + (N.ManFlag ? "先生" : "小姐")) });//姓名
@@ -725,6 +732,7 @@ namespace Banner.Areas.Admin.Controllers
         #region 牧養名單成人-新增/修改/刪除
         public class cAccount_Aldult_Edit
         {
+            public int UID = 0;
             public Account AC = new Account();
             public List<SelectListItem> EducationTypes = ddl_EducationTypes;//教育程度
             public List<SelectListItem> JobTypes = ddl_JobTypes;//職業
@@ -810,10 +818,10 @@ namespace Banner.Areas.Admin.Controllers
             public DateTime TargetDate = DateTime.Now;
             public string Note = "";
         }
-        public cAccount_Aldult_Edit GerAccountData(int ID, FormCollection FC)
+        public cAccount_Aldult_Edit GetAccountData(int ID, FormCollection FC)
         {
             var N = new cAccount_Aldult_Edit();
-            int UID = GetACID();
+            N.UID = GetACID();
             #region 物件初始化
 
             //主日聚會點初始化
@@ -1000,9 +1008,9 @@ namespace Banner.Areas.Admin.Controllers
                                 ActiveFlag = true,
                                 DeleteFlag = false,
                                 CreDate = DT,
-                                CreUID = UID,
+                                CreUID = N.UID,
                                 UpdDate = DT,
-                                UpdUID = UID
+                                UpdUID = N.UID
                             };
                             DC.M_O_Account.InsertOnSubmit(OAH);
                             DC.SubmitChanges();
@@ -1083,6 +1091,7 @@ namespace Banner.Areas.Admin.Controllers
             }
             //是否為會友
             N.bFriendFlag = DC.M_Rool_Account.Any(q => q.ACID == ID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2);
+
             #endregion
             #region 會員資料填入
 
@@ -1394,7 +1403,7 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     N.AC.Name_First = FC.Get("txb_Name_First");
                     N.AC.Name_Last = FC.Get("txb_Name_Last");
-                    if (ID == 0)
+                    if (ID == 0 || N.UID == 1)
                     {
                         N.AC.Login = FC.Get("txb_Login");
                         if (!CheckPasswork(FC.Get("txb_New1")))
@@ -1521,6 +1530,7 @@ namespace Banner.Areas.Admin.Controllers
                     //其他備註事項
                     N.AC.BackUsedFlag = GetViewCheckBox(FC.Get("cbox_BackUsedFlag"));
                     N.AC.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
+                    N.AC.TeacherFlag = GetViewCheckBox(FC.Get("cbox_TeacherFlag"));
                 }
                 #endregion
             }
@@ -1534,14 +1544,14 @@ namespace Banner.Areas.Admin.Controllers
             GetViewBag();
             if (ACID != 1)
                 SetAlert("此頁面只有Admin可以開啟", 2, "/Admin/Home/Index");
-            return View(GerAccountData(ID, null));
+            return View(GetAccountData(ID, null));
         }
         [HttpPost]
 
         public ActionResult Account_Aldult_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
-            var N = GerAccountData(ID, FC);
+            var N = GetAccountData(ID, FC);
             if (ID == 0)
                 Error += "目前不允許自後台新增會友";
             if (Error != "")
@@ -1630,7 +1640,7 @@ namespace Banner.Areas.Admin.Controllers
         public ActionResult Account_Aldult_Info(int ID)
         {
             GetViewBag();
-            return View(GerAccountData(ID, null));
+            return View(GetAccountData(ID, null));
         }
         #endregion
         #region 牧養成人-檢視-更新中低收入戶
@@ -1757,7 +1767,7 @@ namespace Banner.Areas.Admin.Controllers
         public ActionResult Account_Childen_Info(int ID)
         {
             GetViewBag();
-            return View(GerAccountData(ID, null));
+            return View(GetAccountData(ID, null));
         }
         #endregion
         #region 牧養名單新人-列表
@@ -2133,7 +2143,7 @@ namespace Banner.Areas.Admin.Controllers
                 Error += "參數錯誤,無法新增會友";
             if (Error != "")
                 SetAlert(Error, 2);
-            return View(GerAccountData(ID, null));
+            return View(GetAccountData(ID, null));
         }
         [HttpGet]
 

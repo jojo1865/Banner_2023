@@ -40,8 +40,6 @@
                                         <p class="mb-2">@Html.Raw(Model.P.TargetInfo)</p>
                                         <b>結業資格</b>
                                         <p class="mb-2">@Html.Raw(Model.P.GraduationInfo)</p>
-                                        <b>課程講師</b>
-                                        <p class="mb-2">@Html.Raw(Model.TeacherName)</p>
                                         <b>課程日期與地點</b>
                                         <table class="table table_RWDStyle">
                                             <tr class="Bgn">
@@ -118,7 +116,7 @@
                                         <b class="mt-2">報名費用</b>
                                         @if (Model.P.Price_Early > 0)
                                         {
-                                            <p>早鳥價：NT <span style="text-decoration:line-through">@(Model.P.Price_Early)</span> @(Model.P.Price_Early)</p>
+                                            <p>早鳥價：NT <span style="text-decoration:line-through">@(Model.P.Price_Basic)</span> @(Model.P.Price_Early)</p>
                                         }
                                         else
                                         {

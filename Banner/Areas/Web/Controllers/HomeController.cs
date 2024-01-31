@@ -485,59 +485,63 @@ namespace Banner.Areas.Web.Controllers
                                     Error += "此課程正在結帳中...<br/>";
                                 else if (OP.Order_Header.Order_Type == 2)
                                     Error += "此課程您已經買過了<br/>";
-
                             }
-
-                            //人數限制檢查
-                            //有買這個商品且結帳完成的正常訂單,統計每個班級的人數
-                            var OP_Gs = (from q in DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 2 && q.PID == PID)
-                                         group q by new { q.PCID } into g
-                                         select new { g.Key.PCID, Ct = g.Count() }).ToList();
-
-                            var PCs = DC.Product_Class.Where(q => q.PID == PID && !q.DeleteFlag).OrderBy(q => q.PCID).ToList();
-                            if (PCs.Count() > 0)//有班級可以上
+                            if(Error=="")
                             {
-                                //先檢查限制名額的
-                                var PC_Ns = PCs.Where(q => q.PeopleCt > 0 && q.Product_ClassTime.Count>0).OrderBy(q => q.Product_ClassTime.Min(p => p.ClassDate)).ToList();
-                                if (OP_Gs.Count > 0)//已有相關訂單
+                                //人數限制檢查
+                                //有買這個商品且結帳完成的正常訂單,統計每個班級的人數
+                                var OP_Gs = (from q in DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 2 && q.PID == PID)
+                                             group q by new { q.PCID } into g
+                                             select new { g.Key.PCID, Ct = g.Count() }).ToList();
+
+                                var PCs = DC.Product_Class.Where(q => q.PID == PID && !q.DeleteFlag && q.Product_ClassTime.Count()>0).OrderBy(q => q.PCID).ToList();
+                                if (PCs.Count() > 0)//有班級可以上
                                 {
-                                    foreach (var PC_N in PC_Ns)
+                                    //先檢查限制名額的
+                                    var PC_Ns = PCs.Where(q => q.PeopleCt > 0 && q.Product_ClassTime.Count > 0).OrderBy(q => q.Product_ClassTime.Min(p => p.ClassDate)).ToList();
+                                    if (OP_Gs.Count > 0)//已有相關訂單
                                     {
-                                        var OP_G = OP_Gs.FirstOrDefault(q => q.PCID == PC_N.PCID);
-                                        if (OP_G != null)//有限制
+                                        foreach (var PC_N in PC_Ns)
                                         {
-                                            if (PC_N.PeopleCt < OP_G.Ct)
-                                                PCID = OP_G.PCID;
+                                            var OP_G = OP_Gs.FirstOrDefault(q => q.PCID == PC_N.PCID);
+                                            if (OP_G != null)//有限制
+                                            {
+                                                if (PC_N.PeopleCt < OP_G.Ct)
+                                                    PCID = OP_G.PCID;
+                                            }
+                                            else
+                                                PCID = PC_N.PCID;
+
+                                            if (PCID > 0)
+                                                break;
                                         }
-                                        else
-                                            PCID = PC_N.PCID;
-
-                                        if (PCID > 0)
-                                            break;
                                     }
-                                }
-                                else if (PC_Ns.Count > 0)
-                                {
-                                    PCID = PC_Ns.First().PCID;
-                                }
+                                    else//目前沒人訂課
+                                    {
+                                        if (PC_Ns.Count > 0)
+                                        {
+                                            PCID = PC_Ns.First().PCID;
+                                        }
+                                    }
 
-                                if (PCID == 0)//沒班級再檢查不限名額的
-                                {
-                                    var PCT_0s = from q in PCs.Where(q => q.PeopleCt == 0).ToList()
-                                                 join p in DC.Product_ClassTime.ToList()
-                                                 on q.PCID equals p.PCID
-                                                 select p;
-                                    if(PCT_0s.Count()>0)
-                                        PCID = PCT_0s.OrderBy(q => q.ClassDate).First().PCID;
-                                    
-                                    //PCID = PCs.Where(q => q.PeopleCt > 0 && q.Product_ClassTime.Count > 0).OrderBy(q => q.Product_ClassTime.Min(p => p.ClassDate)).First().PCID;
-                                }
+                                    if (PCID == 0)//沒班級再檢查不限名額的
+                                    {
+                                        var PCT_0s = from q in PCs.Where(q => q.PeopleCt == 0).ToList()
+                                                     join p in DC.Product_ClassTime.Where(q=>q.Product_Class.PID==PID).ToList()
+                                                     on q.PCID equals p.PCID
+                                                     select p;
+                                        if (PCT_0s.Count() > 0)
+                                            PCID = PCT_0s.OrderBy(q => q.ClassDate).First().PCID;
 
-                                if (PCID == 0)
-                                    Error += "目前班級均已額滿<br/>";
+                                    }
+
+                                    if (PCID == 0)
+                                        Error += "目前班級均已額滿<br/>";
+                                }
+                                else
+                                    Error += "目前沒有班級可以上課<br/>";
                             }
-                            else
-                                Error += "目前沒有班級可以上課<br/>";
+                            
 
                         }
                     }

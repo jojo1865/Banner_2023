@@ -674,7 +674,7 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         case 0://先修課程ID[Course]
                             {
-                                var C_ = DC.Course.FirstOrDefault(q => q.CCID == CR.TargetInt1 && q.ActiveFlag && !q.DeleteFlag);
+                                var C_ = DC.Course.FirstOrDefault(q => q.CID == CR.TargetInt1 && q.ActiveFlag && !q.DeleteFlag);
                                 if (C_ != null)
                                 {
                                     c.CC_Title = "【" + C_.Course_Category.Code + "】" + C_.Course_Category.Title;

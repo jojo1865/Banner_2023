@@ -11,6 +11,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
 using WebGrease.Css.Ast.Selectors;
+using static Banner.Areas.Admin.Controllers.StoreSetController;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -43,8 +44,17 @@ namespace Banner.Areas.Web.Controllers
             !q.DeleteFlag &&
             q.Course.ActiveFlag &&
             !q.Course.DeleteFlag &&
-            q.ShowFlag
+            q.ShowFlag &&
+            q.Product_Class.Count(p=>!p.DeleteFlag)>0
             );
+            //確定有開班有開課時間的才能前台顯示
+            var PCT_Gs = from q in DC.Product_ClassTime
+                         group q by new { q.Product_Class.PID} into g
+                         select new { g.Key.PID};
+            Ps = from q in Ps
+                 join p in PCT_Gs
+                 on q.PID equals p.PID
+                 select q;
             //過濾使用者所屬旌旗
             /*ACID = GetACID();
             if (ACID != 1)//非管理者
@@ -171,7 +181,6 @@ namespace Banner.Areas.Web.Controllers
         public class cProduct_Info
         {
             public Product P = null;
-            public string TeacherName = "";
             public cTableList cTL = new cTableList();
             public string[] sRool = new string[] { "", "", "", "", "", "" };
         }
@@ -180,7 +189,7 @@ namespace Banner.Areas.Web.Controllers
             cProduct_Info c = new cProduct_Info();
             c.P = DC.Product.FirstOrDefault(q => q.PID == ID && !q.DeleteFlag);
             #region 取得師資
-            var Ts = DC.M_Product_Teacher.Where(q => q.PID == ID).OrderBy(q => q.CreDate);
+            /*var Ts = DC.M_Product_Teacher.Where(q => q.PID == ID).OrderBy(q => q.CreDate);
             foreach (var T in Ts)
             {
                 string cTitle = T.Title;
@@ -195,7 +204,7 @@ namespace Banner.Areas.Web.Controllers
                     }
                 }
                 c.TeacherName += (c.TeacherName == "" ? "" : "、") + cTitle;
-            }
+            }*/
             #endregion
             #region 取得班級
             c.cTL.Rs = new List<cTableRow>();
@@ -203,6 +212,7 @@ namespace Banner.Areas.Web.Controllers
             TopTitles.Add(new cTableCell { Title = "班級名稱" });
             TopTitles.Add(new cTableCell { Title = "上課日期" });
             TopTitles.Add(new cTableCell { Title = "上課地點" });
+            TopTitles.Add(new cTableCell { Title = "講師" });
             TopTitles.Add(new cTableCell { Title = "人數限制" });
             c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
 
@@ -211,7 +221,7 @@ namespace Banner.Areas.Web.Controllers
             foreach (var PC in PCs)
             {
                 cTableRow cTR = new cTableRow();
-
+                cTR.ID = PC.PCID;
                 cTR.Cs.Add(new cTableCell { Value = PC.Title });//班級名稱
                 string ClassDate = "";
                 if (PC.Product_ClassTime.Any())
@@ -230,12 +240,29 @@ namespace Banner.Areas.Web.Controllers
                     ClassDate = "尚無開課日期";
                 cTR.Cs.Add(new cTableCell { Value = ClassDate });//上課日期
                 cTR.Cs.Add(new cTableCell { Value = PC.LocationName });//上課地點
+                var PT = DC.M_Product_Teacher.FirstOrDefault(q => q.PID == ID && q.PCID == PC.PCID);
+                if(PT!=null)
+                {
+                    string cTitle = PT.Title;
+                    if (string.IsNullOrEmpty(cTitle))
+                    {
+                        if (PT.TID > 0)
+                        {
+                            var T_ = DC.Teacher.FirstOrDefault(q => q.TID == PT.TID && q.ActiveFlag && !q.DeleteFlag);
+                            if (T_ != null)
+                                if (!string.IsNullOrEmpty(T_.Title))
+                                    cTitle = T_.Title;
+                        }
+                    }
+                    cTR.Cs.Add(new cTableCell { Value = cTitle });
+                }
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "特約講師" });
+                //講師
+
                 cTR.Cs.Add(new cTableCell { Value = (PC.PeopleCt == 0 ? "不限制" : "限" + PC.PeopleCt + "人") });//人數限制
                 c.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
-
-
-
 
             #endregion
             #region 取得規則

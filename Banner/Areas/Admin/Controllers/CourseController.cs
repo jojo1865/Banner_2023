@@ -185,7 +185,7 @@ namespace Banner.Areas.Admin.Controllers
             cCourse_List N = new cCourse_List();
             #region 物件初始化
             N.SL = new List<SelectListItem>();
-            var CCs = DC.Course_Category.Where(q => !q.DeleteFlag).OrderByDescending(q => q.CCID);
+            var CCs = DC.Course_Category.Where(q => !q.DeleteFlag).OrderBy(q => q.Code);
             foreach (var CC in CCs)
                 N.SL.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CC.CCID == ID });
 
@@ -299,7 +299,7 @@ namespace Banner.Areas.Admin.Controllers
             #region 物件初始化
             N.sCourseType = sCourseType;
             int CCID = GetQueryStringInInt("CCID");
-            var CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.ActiveFlag).OrderByDescending(q => q.CCID).ToList();
+            var CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.ActiveFlag).OrderBy(q => q.Code).ToList();
             foreach (var CC in CCs)
             {
                 if (CCID > 0)
@@ -382,10 +382,10 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         CB = new cCourse_Before();
                         CB.CRID = CR.CRID;
-                        CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag && p.CID != ID) > 0).OrderByDescending(q => q.CCID).ToList();
+                        CCs = DC.Course_Category.Where(q => !q.DeleteFlag && q.Course.Count(p => p.ActiveFlag && !p.DeleteFlag && p.CID != ID) > 0).OrderBy(q => q.Code).ToList();
                         foreach (var CC in CCs) CB.CCSL_Before.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString(), Selected = CC.CCID == C_.CCID });
                         var Cs = DC.Course.Where(q => q.CCID == C_.CCID && q.CID != N.C.CID).OrderByDescending(q => q.CID);
-                        foreach (var C in Cs) CB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CCID.ToString(), Selected = C.CID == C_.CID });
+                        foreach (var C in Cs) CB.CSL_Before.Add(new SelectListItem { Text = C.Title, Value = C.CID.ToString(), Selected = C.CID == C_.CID });
 
                         N.CBs.Add(CB);
                     }

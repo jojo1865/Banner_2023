@@ -51,7 +51,7 @@ namespace Banner.Areas.Web.Controllers
                     };
                     #region 小組層級
 
-                    string sOITitle = MOI.OrganizeInfo.Title + MOI.OrganizeInfo.Organize.Title + "(" + MOI.OrganizeInfo.Organize.Title + "編號:" + MOI.OrganizeInfo.OIID.ToString().PadLeft(5, '0') + ")";
+                    string sOITitle = MOI.OrganizeInfo.Title + MOI.OrganizeInfo.Organize.Title + "(編號:" + MOI.OrganizeInfo.OIID + ")";
                     var OI_ = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == MOI.OrganizeInfo.ParentID && !q.DeleteFlag && q.ActiveFlag && q.OID > 4);
                     while (OI_ != null)
                     {

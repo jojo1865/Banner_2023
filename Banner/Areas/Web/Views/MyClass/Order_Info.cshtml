@@ -16,7 +16,7 @@
         </div>
         @if (Model != null)
         {
-            if (Model.P != null)
+            if (Model.+P != null)
             {
                 <div class="card">
                     <div class="card-body">
@@ -40,8 +40,6 @@
                                         <p class="mb-2">@Html.Raw(Model.P.TargetInfo)</p>
                                         <b>結業資格</b>
                                         <p class="mb-2">@Html.Raw(Model.P.GraduationInfo)</p>
-                                        <b>課程講師</b>
-                                        <p class="mb-2">@Html.Raw(Model.TeacherName)</p>
                                         <b>課程日期與地點</b>
                                         <table class="table table_RWDStyle">
                                             <tr class="Bgn">
