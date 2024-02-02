@@ -84,50 +84,52 @@
                 }
 
             </section>
-            <section class="section w-100">
-                <div style="position:relative">
-                    <img src="/Areas/Web/Content/Img/MemberCard.png" style="border: 2px solid #999; -webkit-border-radius: 25px; -moz-border-radius: 25px; border-radius: 25px;" />
-                    <span style="position:absolute;top:140px; left:20px;"><b>@(Model.Name)</b></span>
-                </div>
-                
-                
-            </section>
-                <section class="section w-100 d-none">
-                    <div class="section-header vw-75">
-                        小組資訊-樹狀圖
-                    </div>
-                    <div class="section-body">
-                        <div class="section-card">
-                            <div class="location-container">
-                                <img src="/Areas/Web/Content/Img/location.svg" alt="">
-                                台中旌旗教會分堂
-                            </div>
-                        </div>
-                        <div class="section-card">
-                            <table class="w-100">
-                                <tr>
-                                    <td align="center" colspan="2"><div class="td_O td_O_Basic1">XX牧區(48)</div></td>
-                                </tr>
-                                <tr>
-                                    <td align="center" colspan="2"><div class="td_Border_left"></div></td>
-                                </tr>
-                                <tr>
-                                    <td align="center" colspan="2"><div class="w-50 td_Border_Top_Side"></div></td>
-                                </tr>
-                                <tr>
-                                    <td align="center">
-                                        <div class="td_O td_O_Basic1">XX督區(48)</div>
-
-                                    </td>
-                                    <td align="center">
-                                        <div class="td_O td_O_Basic1">XX督區(48)</div>
-                                    </td>
-                                </tr>
-                            </table>
-
-                        </div>
+            @if (Model.bFriendFlag)//顯示會友卡
+            {
+                <section class="section w-100">
+                    <div style="position:relative">
+                        <img src="/Areas/Web/Content/Img/MemberCard.png" style="border: 2px solid #999; -webkit-border-radius: 25px; -moz-border-radius: 25px; border-radius: 25px;" />
+                        <span style="position:absolute;top:140px; left:20px;"><b>@(Model.Name)</b></span>
                     </div>
                 </section>
-</div>
+            }
+
+            <section class="section w-100 d-none">
+                <div class="section-header vw-75">
+                    小組資訊-樹狀圖
+                </div>
+                <div class="section-body">
+                    <div class="section-card">
+                        <div class="location-container">
+                            <img src="/Areas/Web/Content/Img/location.svg" alt="">
+                            台中旌旗教會分堂
+                        </div>
+                    </div>
+                    <div class="section-card">
+                        <table class="w-100">
+                            <tr>
+                                <td align="center" colspan="2"><div class="td_O td_O_Basic1">XX牧區(48)</div></td>
+                            </tr>
+                            <tr>
+                                <td align="center" colspan="2"><div class="td_Border_left"></div></td>
+                            </tr>
+                            <tr>
+                                <td align="center" colspan="2"><div class="w-50 td_Border_Top_Side"></div></td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <div class="td_O td_O_Basic1">XX督區(48)</div>
+
+                                </td>
+                                <td align="center">
+                                    <div class="td_O td_O_Basic1">XX督區(48)</div>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>
+            </section>
+        </div>
     }
 </div>

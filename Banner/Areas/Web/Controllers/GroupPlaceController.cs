@@ -44,9 +44,9 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult Index(int ID = 0)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID(ID);
             cIndex N = new cIndex();
             N.AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             if (N.AC != null)
@@ -107,9 +107,9 @@ namespace Banner.Areas.Web.Controllers
 
         public ActionResult Index(int ID, FormCollection FC)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID(ID);
             cIndex N = new cIndex();
             N.AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             for (int i = 1; i < sWeeks.Length; i++)
@@ -307,17 +307,19 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult Aldult_List(int ID)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            SetBrowserData("OIID", ID.ToString());
+            
             return View(GetAldult_List(null));
         }
         [HttpPost]
         public ActionResult Aldult_List(int ID, FormCollection FC)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            SetBrowserData("OIID", ID.ToString());
+            
             return View(GetAldult_List(FC));
         }
         #endregion
@@ -569,15 +571,17 @@ namespace Banner.Areas.Web.Controllers
             return cTL;
         }
         [HttpGet]
-        public ActionResult New_List()
+        public ActionResult New_List(int ID)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
             return View(GetNew_List(null));
         }
         [HttpPost]
-        public ActionResult New_List(FormCollection FC)
+        public ActionResult New_List(int ID,FormCollection FC)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
             return View(GetNew_List(FC));
@@ -726,14 +730,16 @@ namespace Banner.Areas.Web.Controllers
             return cTL;
         }
         [HttpGet]
-        public ActionResult Baptized_List()
+        public ActionResult Baptized_List(int ID)
         {
+            GetID(ID);
             GetViewBag();
             return View(GetBaptized_List(null));
         }
         [HttpPost]
-        public ActionResult Baptized_List(FormCollection FC)
+        public ActionResult Baptized_List(int ID,FormCollection FC)
         {
+            GetID(ID);
             GetViewBag();
             return View(GetBaptized_List(FC));
         }
@@ -832,18 +838,13 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult GroupMeet_QRCode(int ID)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
-            if (ID > 0)
-                SetBrowserData("OIID", ID.ToString());
-            else
-                ID = Convert.ToInt32(GetBrowserData("OIID"));
 
             string sQRCode_URL = Create_QRCode("/Web/AccountPlace/GroupMeet_Join/" + ID);
             TempData["QRCode_URL"] = sQRCode_URL;
             TempData["JoinGroup_URL"] = ("/Web/AccountPlace/GroupMeet_Join/" + ID);
-            ViewBag._OIID = ID;
 
             var MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == ID && !q.DeleteFlag);
             if (MLS != null)
@@ -1009,14 +1010,16 @@ namespace Banner.Areas.Web.Controllers
             return c;
         }
         [HttpGet]
-        public ActionResult GroupMeet_List()
+        public ActionResult GroupMeet_List(int ID)
         {
+            GetID(ID);
             GetViewBag();
             return View(GetGroupMeet_List(null));
         }
         [HttpPost]
-        public ActionResult GroupMeet_List(FormCollection FC)
+        public ActionResult GroupMeet_List(int ID, FormCollection FC)
         {
+            GetID(ID);
             GetViewBag();
             return View(GetGroupMeet_List(FC));
         }

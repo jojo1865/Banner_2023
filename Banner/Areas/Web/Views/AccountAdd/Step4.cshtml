@@ -143,7 +143,7 @@
         </div>
 
         <form id="form1" method="post" class="needs-validation" novalidate>
-            
+
             <div class="card mt-2 mb-2">
                 <div class="card-header">
                     <div class="text-center"><label></label></div>
@@ -151,7 +151,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-1 col-0"></div>
-                        <div class="col-lg-10 col-12"> <label>是否在旌旗小組<span>*</span></label></div>
+                        <div class="col-lg-10 col-12"> <label>是否已在旌旗小組<span>*</span></label></div>
                         <div class="col-lg-1 col-0"></div>
                     </div>
                     <div class="row">
@@ -162,7 +162,7 @@
                                     @Html.RadioButton("rbut_1", true, (Model.b_4_1), new { @id = "rbut_1_1", @class = "form-check-input", required = string.Empty, onclick = "Show4_1(0)" })
                                     @Html.Label("是", new { @class = "form-check-label", @for = "rbut_1_1" })
                                     <div class="ms-3">
-                                        @Html.TextBox("txb_GroupNo", "", new { @class = "form-control form-control-lg input-underline", @placeholder = "輸入小組編號，若忘記可之後再填" })
+                                        @Html.TextBox("txb_GroupNo1", "", new { @class = "form-control form-control-lg input-underline", @placeholder = "輸入小組編號，若忘記可之後再填" })
                                     </div>
                                 </div>
                             </div>
@@ -200,14 +200,32 @@
                         <div class="col-lg-1 col-0"></div>
                         <div class="col-lg-10 col-12">
                             <div class="form-group">
-                                <div class="form-check form-check-inline">
-                                    @Html.RadioButton("rbut_2", true, (Model.b_4_2), new { @id = "rbut_2_1", @class = "form-check-input", required = string.Empty, onclick = "Show4_2(1)" })
-                                    @Html.Label("願意", new { @class = "form-check-label", @for = "rbut_2_1" })
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("rbut_2", 1, (Model.i_4_2 == 1), new { @id = "rbut_2_1", @class = "form-check-input", required = string.Empty, onclick = "Show4_2(1)" })
+                                            @Html.Label("願意，接受分發", new { @class = "form-check-label", @for = "rbut_2_1" })
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("rbut_2", 2, (Model.i_4_2 == 2), new { @id = "rbut_2_2", @class = "form-check-input", required = string.Empty, onclick = "Show4_2(0)" })
+                                            @Html.Label("願意，希望指定小組", new { @class = "form-check-label", @for = "rbut_2_2" })
+
+                                            <div class="ms-3">@Html.TextBox("txb_GroupNo2", "", new { @class = "form-control form-control-lg input-underline", @placeholder = "輸入小組編號" })</div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButton("rbut_2", 3, (Model.i_4_2 == 3), new { @id = "rbut_2_3", @class = "form-check-input", required = string.Empty, onclick = "Show4_2(0)" })
+                                            @Html.Label("不願意", new { @class = "form-check-label", @for = "rbut_2_3" })
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    @Html.RadioButton("rbut_2", false, (!Model.b_4_2), new { @id = "rbut_2_2", @class = "form-check-input", required = string.Empty, onclick = "Show4_2(0)" })
-                                    @Html.Label("不願意", new { @class = "form-check-label", @for = "rbut_2_2" })
-                                </div>
+
+
+
                             </div>
                         </div>
                         <div class="col-lg-1 col-0"></div>
@@ -217,7 +235,7 @@
             @{
                 var htmlAT_cbox = new Dictionary<string, object>();
                 var htmlAT_ddl = new Dictionary<string, object>();
-                if (Model.JoinGroupType == 2)
+                if (Model.i_4_2 == 3)
                 {
                     htmlAT_cbox.Add("disabled", "disabled");
                     htmlAT_cbox.Add("class", "form-check-input");
@@ -234,7 +252,7 @@
                     htmlAT_ddl.Add("class", "form-select form-select-lg select-baptism-status");
                 }
             }
-            <div class="card mt-2 mb-2" id="div_Step4_2" style="@(Model.b_4_2 ? "" : "display:none;")">
+            <div class="card mt-2 mb-2" id="div_Step4_2" style="@(Model.i_4_2 == 1 ? "" : "display:none;")">
                 <div class="card-header">
                     <div class="text-center"><label>參加形式偏好</label></div>
                 </div>
@@ -290,6 +308,7 @@
                 </div>
             </div>
 
+
             <div class="row mt-2">
                 <div class="col mt-3 mb-5 text-center">
                     <a style="color:white;" class="btn btn-primary btn-lg btn-round btn-submit" href="/Web/AccountAdd/Step3?ACID=@Model.sACID"><img src="/Areas/Web/Content/Img/Back.svg" style="width:25px;" alt="" />上一步</a>
@@ -307,7 +326,7 @@
         if (ShowFlag == 1) {
             document.getElementById("div_Step4_1").style.display = "block";
             Show4_2(ShowFlag);
-            document.getElementById("rbut_2_1").checked=true;
+            document.getElementById("rbut_2_1").checked = true;
         }
         else {
             document.getElementById("div_Step4_1").style.display = "none";
@@ -316,7 +335,6 @@
     }
     function Show4_2(ShowFlag) {
         if (ShowFlag == 1) {
-            
             document.getElementById("div_Step4_2").style.display = "block";
         }
         else {

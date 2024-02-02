@@ -42,17 +42,20 @@ namespace Banner.Areas.Web.Controllers
             GetViewBag();
             if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
             {
-                if (GetACID() <= 0)
+                if (GetACID() <= 0 && false)
                 {
                     /*LogInAC(1);
                     SetBrowserData("UserName", "系統管理員");
                     */
                     /*LogInAC(443);
                     SetBrowserData("UserName", "江晨旭");*/
-                    LogInAC(8197);
-                    SetBrowserData("UserName", "JOJO");
+                    //LogInAC(8197);
+                    //SetBrowserData("UserName", "JOJO");
+                    LogInAC(2213);
+                    SetBrowserData("UserName", "劉冠廷");
+
+                    Response.Redirect("/Web/Home/Index");
                 }
-                Response.Redirect("/Web/Home/Index");
             }
             TempData["login"] = "";
             TempData["pw"] = "";

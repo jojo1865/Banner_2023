@@ -2341,7 +2341,7 @@ namespace Banner
                 #region 上層
                 string GroupMapTitle = "";
                 var OIs = DC.OrganizeInfo.Where(q => q.ACID == AC.ACID && q.OID == 8 && q.ActiveFlag && !q.DeleteFlag);
-                string sOIID = GetBrowserData("TargetGroupID");
+                string sOIID = GetBrowserData("OIID");
                 if (sOIID != "")
                     OIs = OIs.Where(q => q.OIID.ToString() == sOIID);
                 var OI = OIs.OrderByDescending(q => q.OIID).FirstOrDefault();
@@ -2418,7 +2418,7 @@ namespace Banner
                 }
                 else if (CheckAdmin(ACID))//此使用者擁有系統管理者權限
                 {
-                    ViewBag._Title = ShortURL + "=====" + NewShortURL;
+                    //ViewBag._Title = ShortURL + "=====" + NewShortURL;
                     bGroup = new bool[] { true, true, true, true, true, true };
                 }
 

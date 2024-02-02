@@ -681,12 +681,13 @@ namespace Banner.Areas.Web.Controllers
             public string sACID = "";
             public int iACID = 0;
             public Account AC = null;
-            public int JoinGroupType = 0;//入組意願調查選擇
+            //public int JoinGroupType = 0;//入組意願調查選擇  0:無意願 1:有意願 2:已加入小組
             public List<cJoinGroupWish> cJGWs = new List<cJoinGroupWish>();//加入小組有意願選項
             public string GroupNo = "";//想加入小組的編號
 
             public bool b_4_1 = false;//是否在旌旗小組
-            public bool b_4_2 = true;//是否願意加入旌旗小組
+            public int i_4_2 = 1;//是否願意加入旌旗小組(1:願意+接受分發 2:願意+指定小組 3:不願意)
+
         }
         public class cJoinGroupWish
         {
@@ -757,17 +758,17 @@ namespace Banner.Areas.Web.Controllers
                 {
                     N.AC = AC;
                     var MOIACs = GetMOIAC(0, 0, AC.ACID);
-                    if (MOIACs.Count() == 0)
-                        N.JoinGroupType = 0;
-                    else
+                    //if (MOIACs.Count() == 0)
+                    //    N.JoinGroupType = 0;
+                    if (MOIACs.Count() > 0)
                     {
                         var Js = DC.JoinGroupWish.Where(q => q.ACID == AC.ACID).ToList();
                         var MOIAC = MOIACs.OrderByDescending(q => q.MID).First();
                         if (MOIAC.OIID == 1)
                         {
                             N.b_4_1 = false;
-                            N.b_4_2 = false;
-                            N.JoinGroupType = 1;
+                            N.i_4_2 = 1;
+                            //N.JoinGroupType = 1;
                             foreach (var cJGW in N.cJGWs)
                             {
                                 cJGW.JGW.ACID = AC.ACID;
@@ -778,8 +779,8 @@ namespace Banner.Areas.Web.Controllers
                                     if (!cJGW.SelectFalg)
                                     {
                                         cJGW.SelectFalg = cJGW.JGW.WeeklyNo > 0 && cJGW.JGW.TimeNo > 0;
-                                        if (!N.b_4_2)
-                                            N.b_4_2 = cJGW.SelectFalg;
+                                        if (N.i_4_2 == 3)
+                                            N.i_4_2 = cJGW.SelectFalg ? 1 : 3;
                                     }
                                     cJGW.ddl_Weekly.ddlList.ForEach(q => q.Selected = false);
                                     cJGW.ddl_Weekly.ddlList.First(q => q.Value == cJGW.JGW.WeeklyNo.ToString()).Selected = true;
@@ -787,13 +788,13 @@ namespace Banner.Areas.Web.Controllers
                                     cJGW.ddl_Time.ddlList.First(q => q.Value == cJGW.JGW.TimeNo.ToString()).Selected = true;
                                 }
                             }
-                            N.b_4_1 = N.b_4_2;
+                            N.b_4_1 = N.i_4_2 != 3;
                         }
                         else
                         {
                             N.b_4_1 = true;
-                            N.b_4_2 = false;
-                            N.JoinGroupType = 2;
+                            N.i_4_2 = 1;
+                            //N.JoinGroupType = 2;
                             N.GroupNo = MOIAC.OrganizeInfo.OIID.ToString();
                         }
                     }
@@ -807,8 +808,8 @@ namespace Banner.Areas.Web.Controllers
             if (FC != null)
             {
                 N.b_4_1 = Convert.ToBoolean(FC.Get("rbut_1"));
-                N.b_4_2 = Convert.ToBoolean(FC.Get("rbut_2"));
-                N.JoinGroupType = N.b_4_2 ? 1 : 0;
+                N.i_4_2 = Convert.ToInt32(FC.Get("rbut_2"));
+                //N.JoinGroupType = N.i_4_2 !=3 ? 1 : 0;
                 for (int i = 0; i < 2; i++)
                 {
                     foreach (var _cJGW in N.cJGWs.Where(q => q.JoinType == (i + 1)).OrderBy(q => q.SortNo))
@@ -827,12 +828,33 @@ namespace Banner.Areas.Web.Controllers
 
                     }
                 }
-                if (N.JoinGroupType == 2)
-                    N.AC.GroupType = N.GroupNo = FC.Get("txb_GroupNo");
-                else
-                    N.AC.GroupType = N.JoinGroupType == 0 ? "無意願" : "有意願";
+                if (N.b_4_1)//是否已加入小組
+                    N.AC.GroupType = "已入組-" + FC.Get("txb_GroupNo1");
+                else if (N.i_4_2 == 1)//有意願 願分發
+                    N.AC.GroupType = "有意願-願分發";
+                else if (N.i_4_2 == 2)//有意願 有小組編號
+                    N.AC.GroupType = "有意願-" + FC.Get("txb_GroupNo2");
+                else if (N.i_4_2 == 3)//有意願 願分發
+                    N.AC.GroupType = "無意願";
+
+
+                #region 檢查
+                Error = "";
+                if (N.AC.GroupType != "有意願-願分發" && N.AC.GroupType.Contains("有意願"))
+                {
+                    string[] s = N.AC.GroupType.Split('-');
+                    if (s.Length == 2)
+                    {
+                        var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8 && q.OIID.ToString() == s[1]);
+                        if (OI == null)
+                            Error += "您期望加入的小組不存在或已被關閉,請重新輸入<br/>";
+                    }
+                }
+                #endregion
+
             }
             #endregion
+
             return N;
         }
 
@@ -850,7 +872,9 @@ namespace Banner.Areas.Web.Controllers
         {
             GetViewBag();
             cStep4 N = GetStep4(GetQueryStringInString("ACID"), FC);
-            if (FC != null)
+            if (Error != "")
+                SetAlert(Error, 2);
+            else if (FC != null)
             {
                 var Js = DC.JoinGroupWish.Where(q => q.ACID == N.AC.ACID).ToList();
                 foreach (var cJGW in N.cJGWs)
@@ -877,6 +901,35 @@ namespace Banner.Areas.Web.Controllers
                     }
                     DC.SubmitChanges();
                 }
+
+                if (N.AC.GroupType.Contains("有意願"))
+                {
+                    if (!N.AC.GroupType.Contains("願分發"))
+                    {
+                        string[] s = N.AC.GroupType.Split('-');
+                        if (s.Length == 2)
+                        {
+                            //直接推薦入組
+                            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8 && q.OIID.ToString() == s[1]);
+                            M_OI_Account M = new M_OI_Account
+                            {
+                                OrganizeInfo = OI,
+                                Account = N.AC,
+                                JoinDate = DT,
+                                LeaveDate = DT,
+                                ActiveFlag = true,
+                                DeleteFlag = false,
+                                CreDate = DT,
+                                UpdDate = DT,
+                                SaveACID = N.AC.ACID
+                            };
+                            DC.M_OI_Account.InsertOnSubmit(M);
+                            DC.SubmitChanges();
+                        }
+                    }
+                }
+
+
                 SetAlert("", 1, "/Web/AccountAdd/Step5?ACID=" + N.sACID);
             }
             else

@@ -185,8 +185,8 @@
                         <div class="col-lg-1 col-0"></div>
                         <div class="col-lg-10 col-12">
                             <div class="form-group">
-                                <label>身分證字號(或居留證/護照號碼)</label>
-                                @Html.TextBox("txb_SSN", Model.AC.IDNumber, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入身分證字號或居留證/護照號碼" })
+                                <label><span style="color:red">*</span>身分證字號(或居留證/護照號碼)</label>
+                                @Html.TextBox("txb_SSN", Model.AC.IDNumber, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入身分證字號或居留證/護照號碼", @required = "required" })
                             </div>
 
                         </div>

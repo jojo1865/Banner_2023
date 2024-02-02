@@ -178,6 +178,7 @@ namespace Banner.Areas.Admin.Controllers
                 case 3://新人
                     {
                         cTL.NowURL = "/Admin/AccountSet/Account_New_List";
+                        //先過濾仍在小組內的人
                         var M_OI_AGs = from q in DC.M_OI_Account.Where(q => !q.DeleteFlag)
                                        group q by new { q.ACID } into g
                                        select new { g.Key.ACID, MaxID = g.Max(q => q.MID), Ct = g.Count() };
@@ -186,6 +187,28 @@ namespace Banner.Areas.Admin.Controllers
                                       on q.MID equals p.MaxID
                                       select q;
                         var AIDs = (Ns.Select(q => q.ACID)).Except(M_OI_As.Where(q => q.OIID > 1 && q.JoinDate != q.CreDate).Select(q => q.ACID));
+
+                        //再依據管理者管理旌旗過濾主日聚會點所在旌旗
+                        #region 後台全職同工可檢視旌旗資料判斷
+                        if (ACID != 1)
+                        {
+                            var MOI2 = (from q in DC.M_OI2_Account.Where(q => q.ACID == ACID)
+                                        join p in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SetType == 0)
+                                        on q.OIID equals p.OIID
+                                        select p).GroupBy(q => q.MLID).Select(q => q.Key);
+
+                            var MLID_Gs = (from q in DC.M_ML_Account.Where(q => !q.DeleteFlag)
+                                           join p in MOI2
+                                           on q.MLID equals p
+                                           select q).GroupBy(q => q.ACID).Select(q => q.Key);
+
+                            AIDs = from q in AIDs
+                                   join p in MLID_Gs
+                                   on q equals p
+                                   select q;
+                        }
+                        #endregion
+
                         Ns = (from q in AIDs
                               join p in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge)
                               on q equals p.ACID
@@ -1821,6 +1844,7 @@ namespace Banner.Areas.Admin.Controllers
                 var JGWs_1 = DC.JoinGroupWish.Where(q => q.ACID == AC.ACID && q.WeeklyNo > 0 && q.TimeNo > 0 && q.JoinType == 1);
                 //線上
                 var JGWs_2 = DC.JoinGroupWish.Where(q => q.ACID == AC.ACID && q.WeeklyNo > 0 && q.TimeNo > 0 && q.JoinType == 2);
+
                 if (JGWs_1.Count() > 0)
                 {
                     //小組聚會點

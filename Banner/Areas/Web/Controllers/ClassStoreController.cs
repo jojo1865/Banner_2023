@@ -45,12 +45,12 @@ namespace Banner.Areas.Web.Controllers
             q.Course.ActiveFlag &&
             !q.Course.DeleteFlag &&
             q.ShowFlag &&
-            q.Product_Class.Count(p=>!p.DeleteFlag)>0
+            q.Product_Class.Count(p => !p.DeleteFlag) > 0
             );
             //確定有開班有開課時間的才能前台顯示
             var PCT_Gs = from q in DC.Product_ClassTime
-                         group q by new { q.Product_Class.PID} into g
-                         select new { g.Key.PID};
+                         group q by new { q.Product_Class.PID } into g
+                         select new { g.Key.PID };
             Ps = from q in Ps
                  join p in PCT_Gs
                  on q.PID equals p.PID
@@ -233,7 +233,7 @@ namespace Banner.Areas.Web.Controllers
                     else
                     {
                         var PCT = PC.Product_ClassTime.First();
-                        ClassDate = PCT.ClassDate.ToString(DateFormat) + " " + PCT.STime.ToString("HH:mm") + "~" + PCT.ETime.ToString("HH:mm");
+                        ClassDate = PCT.ClassDate.ToString(DateFormat) + " " + GetTimeSpanToString(PCT.STime) + "~" + GetTimeSpanToString(PCT.ETime);
                     }
                 }
                 else
@@ -241,7 +241,7 @@ namespace Banner.Areas.Web.Controllers
                 cTR.Cs.Add(new cTableCell { Value = ClassDate });//上課日期
                 cTR.Cs.Add(new cTableCell { Value = PC.LocationName });//上課地點
                 var PT = DC.M_Product_Teacher.FirstOrDefault(q => q.PID == ID && q.PCID == PC.PCID);
-                if(PT!=null)
+                if (PT != null)
                 {
                     string cTitle = PT.Title;
                     if (string.IsNullOrEmpty(cTitle))

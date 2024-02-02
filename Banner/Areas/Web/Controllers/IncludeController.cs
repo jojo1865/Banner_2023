@@ -159,6 +159,7 @@ namespace Banner.Areas.Web.Controllers
         {
             var Ms = DC.Menu.Where(q => q.ParentID == 0 && q.ActiveFlag && !q.DeleteFlag);
             ACID = GetACID();
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             var MOIs = GetMOIAC(0, 0, ACID);
             bool bGroupLeaderFlag = false;
             if (MOIs.Count() > 0)//是否已有小組
@@ -166,18 +167,11 @@ namespace Banner.Areas.Web.Controllers
             //是否有加入事工團
             var MSAs = DC.M_Staff_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.Staff.ActiveFlag && !q.Staff.DeleteFlag).ToList();
             bool bStaffFlag = MSAs.Count() > 0;//是否有加入事工團
+            bool bTeacherFlag = false;
+            if (AC != null)
+                bTeacherFlag = AC.TeacherFlag;//是否為講師
 
-            //SetAlert(ACID.ToString(), 1);
-            if (bStaffFlag && bGroupLeaderFlag)
-                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2 || q.MenuType == 3);
-            else if (bGroupLeaderFlag)//若是小組長
-                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
-            else if (bStaffFlag)//若是事工團成員
-                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 3);
-            else
-                Ms = Ms.Where(q => q.MenuType == 1);
-
-            Ms = Ms.OrderBy(q => q.SortNo);
+            Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == (bGroupLeaderFlag ? 2 : 1) || q.MenuType == (bStaffFlag ? 3 : 1) || q.MenuType == (bTeacherFlag ? 4 : 1)).OrderBy(q => q.SortNo);
 
             int OIID = GetOIID();
             //int SID = GetSID();
@@ -211,15 +205,16 @@ namespace Banner.Areas.Web.Controllers
                             ImgUrl = M.ImgURL,
                             SortNo = M.SortNo,
                             SelectFlag = M.URL.StartsWith(ThisController) && OI.OIID == OIID,
-                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, OI.OIID, 0)
+                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, OI.OIID, 0)
                         };
                         cM.Items.Add(cM1);
                     }
                     cMs.Add(cM);
                 }
+                else if (M.MenuType == 4 && !bTeacherFlag) { }//講師限定選單,非講師則過濾
                 else
                 {
-                    cM.Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, OIID, 0);
+                    cM.Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, OIID, 0);
                     cMs.Add(cM);
                 }
             }
@@ -229,24 +224,16 @@ namespace Banner.Areas.Web.Controllers
             return PartialView(cMs);
         }
 
-        private List<cMenu> GetSubItem(int MID, bool bGroupLeaderFlag, bool bStaffFlag, int OIID, int SID)
+        private List<cMenu> GetSubItem(int MID, bool bGroupLeaderFlag, bool bStaffFlag, bool bTeacherFlag, int OIID, int SID)
         {
             ACID = GetACID();
             string NowShortPath = GetThisAction().Replace("_Edit", "").Replace("_List", "").Replace("_Info", "").Replace("_Remove", "");
             string ThisController = GetThisController();
             List<cMenu> Items = new List<cMenu>();
-            var Ms = DC.Menu.Where(q => q.ParentID == MID && q.ActiveFlag && !q.DeleteFlag);
-
-            if (bStaffFlag && bGroupLeaderFlag)
-                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2 || q.MenuType == 3);
-            else if (bGroupLeaderFlag)
-                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 2);
-            else if (bStaffFlag)
-                Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == 3);
-            else
-                Ms = Ms.Where(q => q.MenuType == 1);
-
-            Ms = Ms.OrderBy(q => q.SortNo);
+            var Ms = DC.Menu.Where(q => q.ParentID == MID &&
+            q.ActiveFlag &&
+            !q.DeleteFlag &&
+            (q.MenuType == 1 || q.MenuType == (bGroupLeaderFlag ? 2 : 1) || q.MenuType == (bStaffFlag ? 3 : 1) || q.MenuType == (bTeacherFlag ? 4 : 1))).OrderBy(q => q.SortNo); ;
 
             foreach (var M in Ms)
             {
@@ -268,11 +255,12 @@ namespace Banner.Areas.Web.Controllers
                             ImgUrl = "",
                             SortNo = j++,
                             SelectFlag = false,
-                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, OIID, S.Key.SID)
+                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, OIID, S.Key.SID)
                         };
                         Items.Add(cM);
                     }
                 }
+                else if (M.MenuType == 4 && !bTeacherFlag) { }//講師限定選單,非講師則過濾
                 else
                 {
                     cMenu cM = new cMenu
@@ -283,12 +271,12 @@ namespace Banner.Areas.Web.Controllers
                         ImgUrl = M.ImgURL,
                         SortNo = M.SortNo,
                         SelectFlag = M.URL.StartsWith(ThisController) || M.URL.StartsWith(NowShortPath) || CM_ != null,
-                        Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, OIID, SID)
+                        Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, OIID, SID)
                     };
                     if (OIID > 0)
                         cM.Url += "/" + OIID;
                     if (SID > 0)
-                        cM.Url += "?SID=" + SID + "&OIID="+ OIID;
+                        cM.Url += "?SID=" + SID + "&OIID=" + OIID;
                     Items.Add(cM);
                 }
             }
@@ -608,7 +596,7 @@ namespace Banner.Areas.Web.Controllers
                     foreach (var Z1 in Z1s)
                         cL.Z1List.Add(new SelectListItem { Text = Z1.Title, Value = Z1.ZID.ToString(), Selected = Z1.ZID == Z.ParentID });
 
-                    var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z.ParentID).OrderBy(q => q.Title);
+                    var Z2s = DC.ZipCode.Where(q => q.ActiveFlag && q.ParentID == Z1s.First().ZID).OrderBy(q => q.Title);
                     foreach (var Z2 in Z2s)
                         cL.Z2List.Add(new SelectListItem { Text = Z2.Code + " " + Z2.Title, Value = Z2.ZID.ToString(), Selected = Z2.ZID == Z.ZID });
                 }

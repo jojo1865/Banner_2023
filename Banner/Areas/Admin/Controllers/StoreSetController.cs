@@ -732,6 +732,8 @@ namespace Banner.Areas.Admin.Controllers
 
             if (N.P.SDate_Signup != N.P.CreDate && N.P.EDate_Signup.Date < N.P.SDate_Early.Date)
                 Error += "線上報名起始日應在線上報名結束日之前<br/>";
+            if(N.PTSL.ddlList.Count(q=>q.Selected)==0)
+                Error += "請至少選擇一種交易方式<br/>";
             #endregion
 
 
@@ -2228,7 +2230,7 @@ namespace Banner.Areas.Admin.Controllers
                 Error += "班級ID遺失...無法後續處理<br/>";
             else if (PC == null)
                 Error += "查無此班<br/>";
-            else if (string.IsNullOrEmpty(c.ClassAddress) || string.IsNullOrEmpty(c.ClassMeetURL))
+            else if (string.IsNullOrEmpty(c.ClassAddress) && string.IsNullOrEmpty(c.ClassMeetURL))
                 Error += "上課地點或網址至少要填入一個<br/>";
             else if (string.IsNullOrEmpty(c.ClassPhoneNo))
                 Error += "請輸入連絡電話<br/>";
@@ -2236,6 +2238,10 @@ namespace Banner.Areas.Admin.Controllers
                 Error += "本班級沒有上課時間,請建立後再行調整<br/>";
             else
             {
+                foreach(var T in Ts)
+                    if(T.ETime<=T.STime)
+                        Error += T.ClassDate+"的啟始或結束時間錯誤<br/>";
+
                 var T_Max = Ts.OrderByDescending(q => q.ClassDate).First();
                 DateTime _GraduateDate = PC.GraduateDate;
                 if (DateTime.TryParse(c.GraduateDate, out _GraduateDate))

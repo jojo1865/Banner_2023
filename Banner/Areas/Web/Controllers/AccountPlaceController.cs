@@ -17,6 +17,7 @@ namespace Banner.Areas.Web.Controllers
         {
             public List<cMeetingMsg> cMLs = new List<cMeetingMsg>();
             public string Name = "";
+            public bool bFriendFlag = false;
             //public cTree Tree = new cTree();
         }
         public class cMeetingMsg
@@ -82,6 +83,9 @@ namespace Banner.Areas.Web.Controllers
                 {
                     N.cMLs.Add(new cMeetingMsg());
                 }
+
+                //會友卡
+                N.bFriendFlag = DC.M_Rool_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.RID == 2);
             }
 
             return View(N);
