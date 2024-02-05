@@ -17,9 +17,9 @@ namespace Banner.Areas.Web.Controllers
     {
         // GET: Web/GroupPlace
         private int OIID = 0;
-        private void GetID(int ID = 0)
+        private void GetID(int ID)
         {
-            if (ID > 0)
+            /*if (ID > 0)
             {
                 SetBrowserData("OIID", ID.ToString());
                 OIID = ID;
@@ -27,7 +27,21 @@ namespace Banner.Areas.Web.Controllers
             else if (GetBrowserData("OIID") != "")
                 OIID = Convert.ToInt32(GetBrowserData("OIID"));
             else if (GetQueryStringInInt("OIID") > 0)
-                OIID = GetQueryStringInInt("OIID");
+                OIID = GetQueryStringInInt("OIID");*/
+            OIID = ID;
+            #region 上層
+            string GroupMapTitle = "";
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID && q.ActiveFlag && !q.DeleteFlag);
+            while (OI != null)
+            {
+                if (OI.OID == 8)
+                    GroupMapTitle = "<span class='font-bold'>" + OI.Title + OI.Organize.Title + (OI.BusinessType == 1 ? "(外展)" : "") + "</span>";
+                else
+                    GroupMapTitle = OI.Title + OI.Organize.Title + (GroupMapTitle == "" ? "" : "/" + GroupMapTitle);
+                OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID && q.ActiveFlag && !q.DeleteFlag && q.OID > 1);
+            }
+            TempData["GroupTitle"] = GroupMapTitle;
+            #endregion
 
             ViewBag._OIID = OIID;
         }
@@ -42,7 +56,7 @@ namespace Banner.Areas.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Index(int ID = 0)
+        public ActionResult Index(int ID)
         {
             GetID(ID);
             GetViewBag();
@@ -235,7 +249,7 @@ namespace Banner.Areas.Web.Controllers
             cTL.NowPage = iNowPage;
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
-            GetID();
+            
             var TopTitles = new List<cTableCell>();
 
             TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 300 });
@@ -327,9 +341,10 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult Aldult_Edit(int ID)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
+            
             Account_Note N = new Account_Note();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
             if (M == null)
@@ -354,9 +369,9 @@ namespace Banner.Areas.Web.Controllers
 
         public ActionResult Aldult_Edit(int ID, FormCollection FC)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
             Account_Note N = new Account_Note();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
             if (M != null)
@@ -400,9 +415,9 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult Aldult_Remove(int ID)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
             Account_Note N = new Account_Note();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
             if (M == null)
@@ -420,9 +435,9 @@ namespace Banner.Areas.Web.Controllers
 
         public ActionResult Aldult_Remove(int ID, FormCollection FC)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
             ViewBag._OIID = OIID;
             Account_Note N = new Account_Note();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
@@ -447,7 +462,7 @@ namespace Banner.Areas.Web.Controllers
                     DC.Account_Note.InsertOnSubmit(N);
                     DC.SubmitChanges();
 
-                    M.Account.GroupType = "有意願";
+                    M.Account.GroupType =GetViewCheckBox(FC.Get("cbox_NoIntention")) ? "無意願" : "有意願";
                     M.Account.UpdDate = DT;
                     N.Account.SaveACID = ACID;
 
@@ -530,8 +545,6 @@ namespace Banner.Areas.Web.Controllers
             cTL.NowPage = iNowPage;
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
-            GetID();
-
             var TopTitles = new List<cTableCell>();
 
             TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 200 });
@@ -591,9 +604,9 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult New_Edit(int ID)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
             if (M == null)
                 SetAlert("查無此新人資料", 2, "/Web/GroupPlace/New_List/" + OIID);
@@ -613,9 +626,9 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult New_Remove(int ID)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
             Account_Note N = new Account_Note();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
             if (M == null)
@@ -633,9 +646,9 @@ namespace Banner.Areas.Web.Controllers
 
         public ActionResult New_Remove(int ID, FormCollection FC)
         {
+            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
             Account_Note N = new Account_Note();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
             if (M != null)
@@ -685,7 +698,6 @@ namespace Banner.Areas.Web.Controllers
             cTL.NowPage = iNowPage;
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
-            GetID();
             var TopTitles = new List<cTableCell>();
 
             TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 200 });
@@ -748,10 +760,10 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult Baptized_Edit(int ID)
         {
+            GetID(ID);
             GetViewBag();
             DateTime DT_ = Convert.ToDateTime("2000/1/1");
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
             Baptized N = new Baptized();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
             if (M == null)
@@ -777,10 +789,10 @@ namespace Banner.Areas.Web.Controllers
 
         public ActionResult Baptized_Edit(int ID, FormCollection FC)
         {
+            GetID(ID);
             GetViewBag();
             DateTime DT_ = Convert.ToDateTime("2000/1/1");
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            GetID();
             Baptized N = new Baptized();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
             if (M != null)
@@ -897,7 +909,6 @@ namespace Banner.Areas.Web.Controllers
         public cGroupMeet_List GetGroupMeet_List(FormCollection FC)
         {
             cGroupMeet_List c = new cGroupMeet_List();
-            GetID();
             #region 物件初始化
 
 

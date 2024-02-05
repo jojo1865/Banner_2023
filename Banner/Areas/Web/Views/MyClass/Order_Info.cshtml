@@ -16,139 +16,51 @@
         </div>
         @if (Model != null)
         {
-            if (Model.cPI.P != null)
-            {
-                <div class="card">
-                    <div class="card-body">
+            <div class="card">
+                <div class="card-header">
+                    <h2>訂單資訊</h2>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><b>訂單編號：</b>@Model.OHID</p>
+                    <p class="mb-2"><b>訂購日期：</b>@Model.CreDate</p>
+                    <p class="mb-2"><b>付款方式：</b>@Model.PayType</p>
+                    <p class="mb-2"><b>訂單狀況：</b>@Model.OrderType</p>
 
-                        <div class="row">
-                            <!--課程主要區域-->
-                            <div class="col-12">
-                                <h3 class="mb-3">@((Model.cPI.P.Title == "" ? "" : Model.cPI.P.Title + "-")+ Model.cPI.P.SubTitle)</h3>
-                                <!---->
-                                <h4 class="mt-2 mb-3 lab_DarkBlue"><i class="fa-solid fa-address-card me-1"></i>課程簡介</h4>
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <b>課程類型</b>
-                                        <p class="mb-2">@Html.Raw(Model.cPI.P.ProductType == 0 ? "實體與線上" : (Model.cPI.P.ProductType == 1 ? "實體" : "線上"))</p>
-                                        <b>年度梯次</b>
-                                        <p class="mb-0">年度：@Html.Raw(Model.cPI.P.YearNo)</p>
-                                        <p class="mb-2">梯次：@Html.Raw(Model.cPI.P.EchelonNo)</p>
-                                        <b>課程內容</b>
-                                        <p class="mb-2">@Html.Raw(Model.cPI.P.ProductInfo)</p>
-                                        <b>適用資格</b>
-                                        <p class="mb-2">@Html.Raw(Model.cPI.P.TargetInfo)</p>
-                                        <b>結業資格</b>
-                                        <p class="mb-2">@Html.Raw(Model.cPI.P.GraduationInfo)</p>
-                                        <b>課程日期與地點</b>
-                                        <table class="table table_RWDStyle">
-                                            <tr class="Bgn">
-                                                @for (int i = 0; i < Model.cPI.cTL.Rs[0].Cs.Count; i++)
-                                                {
-                                                    <td>@(Model.cPI.cTL.Rs[0].Cs[i].Title)</td>
-                                                }
-                                            </tr>
-                                            @for (int j = 1; j < Model.cPI.cTL.Rs.Count; j++)
-                                            {
-                                                <tr>
-                                                    @for (int i = 0; i < Model.cPI.cTL.Rs[j].Cs.Count; i++)
-                                                    {
-                                                        <td><span class="lab_MobelTitle">@(Model.cPI.cTL.Rs[0].Cs[i].Title)</span>@(Model.cPI.cTL.Rs[j].Cs[i].Value)</td>
-                                                    }
-                                                </tr>
-                                            }
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <!--報名資訊-->
-                                <h4 class="mt-2 mb-3 lab_DarkBlue"><i class="fa-solid fa-user-plus me-1"></i>報名資訊</h4>
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <b>報名日期</b>
-                                        @if (Model.cPI.P.SDate_Early >= Model.cPI.P.CreDate.Date || Model.cPI.P.EDate_Early >= Model.cPI.P.CreDate.Date)
-                                        {
-                                            string sDate = "";
-                                            if (Model.cPI.P.SDate_Early >= Model.cPI.P.CreDate.Date)
-                                            {
-                                                sDate = Model.cPI.P.SDate_Early.ToString("yyyy/MM/dd");
-                                            }
-                                            else
-                                            {
-                                                sDate = "即日起";
-                                            }
-                                            if (Model.cPI.P.EDate_Early >= Model.cPI.P.CreDate.Date)
-                                            {
-                                                sDate += " ~ " + Model.cPI.P.EDate_Early.ToString("yyyy/MM/dd");
-                                            }
-                                            else
-                                            {
-                                                sDate += " ~ ";
-                                            }
-                                            <p class="mb-2">早鳥：@sDate</p>
-                                        }
-                                        @if (Model.cPI.P.SDate_Signup >= Model.cPI.P.CreDate.Date || Model.cPI.P.EDate_Signup >= Model.cPI.P.CreDate.Date)
-                                        {
-                                            string sDate = "";
-                                            if (Model.cPI.P.SDate_Signup >= Model.cPI.P.CreDate.Date)
-                                            {
-                                                sDate = Model.cPI.P.SDate_Signup.ToString("yyyy/MM/dd");
-                                            }
-                                            else
-                                            {
-                                                sDate = "即日起";
-                                            }
-                                            if (Model.cPI.P.EDate_Signup >= Model.cPI.P.CreDate.Date)
-                                            {
-                                                sDate += " ~ " + Model.cPI.P.EDate_Signup.ToString("yyyy/MM/dd");
-                                            }
-                                            else
-                                            {
-                                                sDate += " ~ ";
-                                            }
-                                            <p class="mb-2">線上報名期間：@sDate</p>
-                                        }
-                                        <b>報名資格</b>
-                                        @for (int i = 0; i < Model.cPI.sRool.Length; i++)
-                                        {
-                                            <p>@(Model.cPI.sRool[i]) </p>
-                                        }
-                                        <b class="mt-2">報名費用</b>
-                                        @if (Model.cPI.P.Price_Early > 0)
-                                        {
-                                            <p>早鳥價：NT <span style="text-decoration:line-through">@(Model.cPI.P.Price_Early)</span> @(Model.cPI.P.Price_Early)</p>
-                                        }
-                                        else
-                                        {
-                                            <p>單一價：NT @(Model.cPI.P.Price_Basic) </p>
-                                        }
-
-                                    </div>
-                                </div>
-
-                                <!--其他應注意事項
-                                <h4 class="mt-2 mb-3 lab_DarkBlue"><i class="fa-solid fa-circle-exclamation me-1"></i>其他應注意事項</h4>
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                    </div>
-                                </div>-->
-                                <!--檔案下載
-                                <h4 class="mt-2 mb-3 lab_DarkBlue"><i class="fa-solid fa-cloud-arrow-down me-1"></i>檔案下載</h4>
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                    </div>
-                                </div>-->
-                            </div>
-
-                        </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h2>課程資訊</h2>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><b>課程名稱：</b>@Model.ProductTitle</p>
+                    <p class="mb-2"><b>上課方式：</b>@Model.ProductType</p>
+                    <p class="mb-2"><b>課程內容：</b><br />@Model.ProductInfo</p>
+                    <p class="mb-2"><b>適用資格：</b><br />@Model.TargetInfo</p>
+                    <p class="mb-2"><b>結業資格：</b><br />@Model.GraduationInfo</p>
+                    <p class="mb-2"><b>課程金額：</b>@Model.Peice</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h2>班級上課紀錄</h2>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><b>班級名稱：</b>@Model.ClassTitle</p>
+                    <p class="mb-2"><b>講師名稱：</b>@Model.TeacherTitle</p>
+                    <p class="mb-2"><b>結業狀態：</b>@Model.Graduation</p>
+                    <p class="mb-2"><b>上課時間：</b></p>
+                    <div class="row mb-2">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
                     </div>
                 </div>
-            }
-
+            </div>
         }
 
     </div>
 </main>
 
-
+<div class="action-bar">
+    <a href="/Web/MyClass/Order_List" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />返回我的課程</a>
+</div>
 

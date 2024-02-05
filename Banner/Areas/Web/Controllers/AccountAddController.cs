@@ -925,6 +925,8 @@ namespace Banner.Areas.Web.Controllers
                             };
                             DC.M_OI_Account.InsertOnSubmit(M);
                             DC.SubmitChanges();
+
+                            SendMailToGroupLeader(N.AC.Name_First + N.AC.Name_Last, OI.ACID, OI.Title + OI.Organize.JobTitle);
                         }
                     }
                 }

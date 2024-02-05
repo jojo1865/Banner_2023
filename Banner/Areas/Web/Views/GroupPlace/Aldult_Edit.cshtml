@@ -25,7 +25,7 @@
                 </nav>
                 <div class="header-container">
                     <div class="header-left-border"></div>
-                    <h5 class="header">@Html.Raw(ViewBag._GroupTitle) - 更新備註</h5>
+                    <h5 class="header">@Html.Raw(TempData["GroupTitle"]) - 更新備註</h5>
                 </div>
                 @Html.Action("_GroupTopMenu", "Include")
                 <div class="container-lg">
@@ -39,6 +39,7 @@
                                 <label>備註</label>
                                 @Html.TextArea("txb_Note", Model.Note, new { @class = "form-control form-control-lg input-underlin", maxlength = "200", @style = "height:250px" })
                             </div>
+                            
                         </form>
                     </div>
                 </div>

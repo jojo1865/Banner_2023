@@ -2322,7 +2322,7 @@ namespace Banner
             ViewBag._UserID = "0";
             ViewBag._Power = bGroup;
             ViewBag._Login = "";
-            ViewBag._GroupTitle = "小組資訊";
+
             ViewBag._BackFlag = "0";
             //http://localhost:1897
             //sDomanName修正成Localhost
@@ -2338,23 +2338,6 @@ namespace Banner
                 ViewBag._UserID = ACID;
                 ViewBag._Login = AC.Login;
                 ViewBag._BackFlag = AC.BackUsedFlag ? "1" : "0";
-                #region 上層
-                string GroupMapTitle = "";
-                var OIs = DC.OrganizeInfo.Where(q => q.ACID == AC.ACID && q.OID == 8 && q.ActiveFlag && !q.DeleteFlag);
-                string sOIID = GetBrowserData("OIID");
-                if (sOIID != "")
-                    OIs = OIs.Where(q => q.OIID.ToString() == sOIID);
-                var OI = OIs.OrderByDescending(q => q.OIID).FirstOrDefault();
-                while (OI != null)
-                {
-                    if (OI.OID == 8)
-                        GroupMapTitle = "<span class='font-bold'>" + OI.Title + OI.Organize.Title + (OI.BusinessType == 1 ? "(外展)" : "") + "</span>";
-                    else
-                        GroupMapTitle = OI.Title + OI.Organize.Title + (GroupMapTitle == "" ? "" : "/" + GroupMapTitle);
-                    OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID && q.ActiveFlag && !q.DeleteFlag && q.OID > 1);
-                }
-                ViewBag._GroupTitle = GroupMapTitle;
-                #endregion
             }
             else if (!NowURL.ToLower().Contains("/home/login") || !NowURL.ToLower().Contains("/home/logout"))
                 SetAlert("請先登入", 2, (NowURL.ToLower().StartsWith("/web/") ? "/Web/Home/Login" : "/Admin/Home/Login"));
@@ -2941,6 +2924,24 @@ namespace Banner
             return iReturn;
         }
 
+        public void SendMailToGroupLeader(string JoinName, int OILeaderID,string Title)
+        {
+            if(OILeaderID>0)
+            {
+                //簡訊
+                var Con = DC.Contect.FirstOrDefault(q => q.TargetID == OILeaderID && q.TargetType == 2 && q.ContectType == 1);
+                if(Con!=null)
+                {
+                    SendSNS(Con.ContectValue, "新人入組", "有一位新人:" + JoinName + "即將加入您的小組,請前往旌旗官網檢視");
+                }
+                //Email
+                 Con = DC.Contect.FirstOrDefault(q => q.TargetID == OILeaderID && q.TargetType == 2 && q.ContectType == 2);
+                if(Con!=null)
+                {
+                    SendMail(Con.ContectValue, Title, "新人入組", "有一位新人:" + JoinName + "即將加入您的小組,請前往旌旗官網檢視");
+                }
+            }
+        }
         //檢查購物車中的商品狀態,並回傳剩餘數量
         /*public int CheckCart(int ACID)
         {

@@ -24,7 +24,7 @@
         </nav>
         <div class="header-container">
             <div class="header-left-border"></div>
-            <h5 class="header">@Html.Raw(ViewBag._GroupTitle) - 設定受洗日期</h5>
+            <h5 class="header">@Html.Raw(TempData["GroupTitle"]) - 設定受洗日期</h5>
         </div>
         @Html.Action("_GroupTopMenu", "Include")
         <div class="container-lg">

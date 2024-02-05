@@ -186,7 +186,25 @@ namespace Banner.Areas.Web.Controllers
         #region 課程資訊-內容
         public class cGetOrder_Info
         {
-            public ClassStoreController.cProduct_Info cPI = new ClassStoreController.cProduct_Info();
+            public int OHID = 0;
+            public int OPID = 0;
+            public int PID = 0;
+
+            public string CreDate = "";
+            public string PayType = "";
+            public string OrderType = "";
+
+            public string ProductTitle = "";
+            public string ProductType = "";
+            public string ProductInfo = "";
+            public string TargetInfo = "";
+            public string GraduationInfo = "";
+            public int Peice = 0;
+
+            public string ClassTitle = "";
+            public string TeacherTitle = "";
+            public string Graduation = "";//結業時間
+            public cTableList cTL = new cTableList();
         }
         [HttpGet]
         public ActionResult Order_Info(int ID)
@@ -195,14 +213,108 @@ namespace Banner.Areas.Web.Controllers
             ACID = GetACID();
             cGetOrder_Info c = new cGetOrder_Info();
 
-            ClassStoreController CSC = new ClassStoreController();
-            c.cPI = CSC.GETProduct_Info(ID);
-            var OP = DC.Order_Product.FirstOrDefault(q => q.OPID == GetQueryStringInInt("OPID"));
-            if (c.cPI != null)
+            var OP = DC.Order_Product.FirstOrDefault(q => !q.Order_Header.DeleteFlag && q.Order_Header.ACID == ACID && q.PID == ID);
+            if (OP == null)
+                SetAlert("此訂單不存在", 2, "/Web/MyClass/Order_List");
+            else
             {
-                foreach (var R in c.cPI.cTL.Rs)
-                    if (OP.PCID != R.ID)
-                        c.cPI.cTL.Rs.Remove(R);
+                c.OHID = OP.OHID;
+                c.OPID = OP.OPID;
+                c.PID = OP.PID;
+                c.CreDate = OP.Order_Header.CreDate.ToString(DateTimeFormat);
+
+                var OPaid = DC.Order_Paid.FirstOrDefault(q => q.OHID == c.OHID);
+                if (OPaid != null)
+                    c.PayType = OPaid.PayType.Title;
+                c.OrderType = sOrderType[OP.Order_Header.Order_Type];
+                c.Peice = OP.Price_Finally;
+
+                c.ProductTitle = OP.Product.Title + OP.Product.SubTitle;
+                c.ProductType = OP.Product.ProductType == 0 ? "實體與線上" : (OP.Product.ProductType == 1 ? "實體" : "線上");
+                c.ProductInfo = OP.Product.ProductInfo;
+                c.TargetInfo = OP.Product.TargetInfo;
+                c.GraduationInfo = OP.Product.GraduationInfo;
+
+                var Class = DC.Product_Class.FirstOrDefault(q => q.PCID == OP.PCID);
+                if (Class != null)
+                {
+                    c.ClassTitle = Class.Title;
+
+                    var MT = DC.M_Product_Teacher.FirstOrDefault(q => q.PCID == Class.PCID);
+                    if (MT != null)
+                        c.TeacherTitle = MT.Title;
+
+                    if (Class.GraduateDate.Date > DT.Date)
+                        c.Graduation = "預計於" + Class.GraduateDate.ToString(DateFormat) + "結業計算";
+                    else if (!OP.Graduation_Flag)
+                        c.Graduation = "您未結業...";
+                    else
+                    {
+                        /*var AC = DC.Account.FirstOrDefault(q => q.ACID == OP.Graduation_ACID);
+                        if (AC != null)
+                            c.Graduation = "您已於" + OP.Graduation_Date.ToString(DateFormat) + "由" + AC.Name_First + AC.Name_Last + "判定可以結業";
+                        else
+                            c.Graduation = "您已於" + OP.Graduation_Date.ToString(DateFormat) + "由--判定可以結業";*/
+                        c.Graduation = "您已於" + OP.Graduation_Date.ToString(DateFormat) + "結業";
+                    }
+
+
+                    c.cTL = new cTableList();
+                    c.cTL.NumCut = 0;//分頁數字一次顯示幾個
+                    c.cTL.MaxNum = 0;//分頁數量最多多少
+                    //c.cTL.TotalCt = 0;//全部共多少資料
+                    c.cTL.NowPage = 1;//目前所在頁數
+                    c.cTL.NowURL = "";
+                    c.cTL.CID = 0;
+                    c.cTL.ATID = 0;
+                    c.cTL.Title = "";
+                    c.cTL.Rs = new List<cTableRow>();
+                    c.cTL.ShowFloor = false;
+
+                    var TopTitles = new List<cTableCell>();
+                    TopTitles.Add(new cTableCell { Title = "日期", WidthPX = 160 });
+                    TopTitles.Add(new cTableCell { Title = "起始時間", WidthPX = 100 });
+                    TopTitles.Add(new cTableCell { Title = "結束時間", WidthPX = 100 });
+                    TopTitles.Add(new cTableCell { Title = "上課簽到" });
+                    c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+
+                    var OJs = DC.Order_Join.Where(q => q.OPID == OP.OPID && !q.DeleteFlag).ToList();
+
+                    var CTs = DC.Product_ClassTime.Where(q => q.PCID == Class.PCID).OrderBy(q => q.ClassDate).ThenBy(q => q.STime);
+                    c.cTL.TotalCt = CTs.Count();//全部共多少資料
+                    foreach (var CT in CTs)
+                    {
+                        cTableRow cTR = new cTableRow();
+                        cTR.Cs.Add(new cTableCell { Value = CT.ClassDate.ToString(DateFormat) });//日期
+                        cTR.Cs.Add(new cTableCell { Value = GetTimeSpanToString(CT.STime) });//起始時間
+                        cTR.Cs.Add(new cTableCell { Value = GetTimeSpanToString(CT.ETime) });//結束時間
+                        string sJoinNote = "";
+                        if (DT.Date > CT.ClassDate.Date)
+                            sJoinNote = "尚未開始上課";
+                        else
+                        {
+                            var OJ = OJs.FirstOrDefault(q => q.PCTID == CT.PCTID);
+                            if (OJ != null)
+                            {
+                                if (OJ.SaveACID != ACID)
+                                {
+                                    var AC = DC.Account.FirstOrDefault(q => q.ACID == OJ.SaveACID);
+                                    if (AC != null)
+                                        sJoinNote = "已於" + OJ.CreDate.ToString(DateTimeFormat) + "由" + AC.Name_First + AC.Name_Last + "代為簽到";
+                                    else
+                                        sJoinNote = "已於" + OJ.CreDate.ToString(DateTimeFormat) + "由--代為簽到";
+                                }
+                                else
+                                    sJoinNote = "已於" + OJ.CreDate.ToString(DateTimeFormat) + "簽到";
+                            }
+                            else
+                                sJoinNote = "尚未簽到";
+                        }
+                        cTR.Cs.Add(new cTableCell { Value = sJoinNote });//上課簽到
+                        c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+                    }
+
+                }
             }
 
             return View(c);

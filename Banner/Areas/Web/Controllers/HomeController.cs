@@ -42,7 +42,7 @@ namespace Banner.Areas.Web.Controllers
             GetViewBag();
             if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
             {
-                if (GetACID() <= 0 && false)
+                if (GetACID() <= 0)
                 {
                     /*LogInAC(1);
                     SetBrowserData("UserName", "系統管理員");
