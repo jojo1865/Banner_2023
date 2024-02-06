@@ -134,7 +134,7 @@ namespace Banner
         public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
         public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)" };
         public string[] sCourseType = new string[] { "不限制", "實體", "線上" };
-        public string[] sPayType = new string[] { "現金", "藍新-信用卡", "藍新-ATM", "PayPel", "支付寶" };
+        public string[] sPayType = new string[] { "現金", "線上刷卡", "ATM匯款", "PayPel", "支付寶" };
         public string[] sOrderType = new string[] { "購物車", "交易中", "交易完成", "交易取消", "交易取消(退費處理中)", "交易取消(已退費)" };
         public string Error = "";
         public int iChildAge = 12;

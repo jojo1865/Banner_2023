@@ -14,9 +14,6 @@
     <main>
         <div class="admin-navbar">
             <a class="btn btn-primary" href="https://web-banner.viuto-aiot.com/Web/Home/Login" target="_blank">進入前台</a>
-            <img class="admin-navbar-avatar"
-                 src="~/Areas/Admin/Content/img/admin-navbar-avatar.svg"
-                 alt="" />
             <a href="javascript:ShowUserMenu();" class="ms-3 me-3" onmousemove="ShowUserMenu()">@ViewBag._UserName</a>
             <div class="div_BackUserMenu" id="BackUserMenu" onmousemove="ShowUserMenu()" onmouseout="CloseUserMenu()" style="display:none;">
                 <div class="div_UserMenuBtn mb-2"><a href="/Admin/Home/ChangePassword">修改密碼</a></div>

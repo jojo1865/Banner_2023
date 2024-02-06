@@ -30,17 +30,32 @@ namespace Banner.Areas.Admin.Controllers
             public string SDate = "";
             public string EDate = "";
             public List<SelectListItem> SL = new List<SelectListItem>();
+            public List<SelectListItem> OISL = new List<SelectListItem>();
             public cTableList cTL = new cTableList();
         }
         public cProduct_List GetProduct_List(FormCollection FC)
         {
             cProduct_List c = new cProduct_List();
+            ACID = GetACID();
             #region 物件初始化
             c.SL = new List<SelectListItem>();
             c.SL.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
             var CCs = DC.Course_Category.Where(q => !q.DeleteFlag).OrderBy(q => q.Code);
             foreach (var CC in CCs)
                 c.SL.Add(new SelectListItem { Text = "【" + CC.Code + "】" + CC.Title, Value = CC.CCID.ToString() });
+
+            c.OISL = new List<SelectListItem>();
+            c.OISL.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = true });
+            if (ACID == 1)
+            {
+                c.OISL.AddRange(from q in DC.OrganizeInfo.Where(q => q.OID == 2 && q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID).OrderBy(q => q.OID).ThenBy(q => q.OIID)
+                                select new SelectListItem { Text = q.Title + q.Organize.Title, Value = q.OIID.ToString() });
+            }
+            else
+            {
+                c.OISL.AddRange(from q in DC.M_OI2_Account.Where(q => q.OrganizeInfo.OID == 2 && q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID).OrderBy(q => q.OrganizeInfo.OID).ThenBy(q => q.OIID)
+                                select new SelectListItem { Text = q.OrganizeInfo.Title + q.OrganizeInfo.Organize.Title, Value = q.OIID.ToString() });
+            }
 
             #region 前端資料帶入
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
@@ -52,6 +67,10 @@ namespace Banner.Areas.Admin.Controllers
             int CCID = Convert.ToInt32(FC != null ? FC.Get("ddl_CC") : "0");
             c.SL.ForEach(q => q.Selected = false);
             c.SL.First(q => q.Value == CCID.ToString()).Selected = true;
+
+            int OIID = Convert.ToInt32(FC != null ? FC.Get("ddl_OI2") : "0");
+            c.OISL.ForEach(q => q.Selected = false);
+            c.OISL.First(q => q.Value == OIID.ToString()).Selected = true;
             #endregion
 
 
@@ -70,6 +89,8 @@ namespace Banner.Areas.Admin.Controllers
                 Ns = Ns.Where(q => q.Course.CCID == CCID);
             if (c.ActiveType >= 0)
                 Ns = Ns.Where(q => q.ActiveFlag == (c.ActiveType == 1));
+            if (OIID > 0)
+                Ns = Ns.Where(q => q.OIID == OIID);
 
             if (!string.IsNullOrEmpty(c.SDate))
             {
@@ -732,7 +753,7 @@ namespace Banner.Areas.Admin.Controllers
 
             if (N.P.SDate_Signup != N.P.CreDate && N.P.EDate_Signup.Date < N.P.SDate_Early.Date)
                 Error += "線上報名起始日應在線上報名結束日之前<br/>";
-            if(N.PTSL.ddlList.Count(q=>q.Selected)==0)
+            if (N.PTSL.ddlList.Count(q => q.Selected) == 0)
                 Error += "請至少選擇一種交易方式<br/>";
             #endregion
 
@@ -1950,7 +1971,7 @@ namespace Banner.Areas.Admin.Controllers
             else
             {
                 c.RowCt = 1;
-                c.cCs.Add(new cClassCell { SortNo = "1", ProductType = P.ProductType,ClassSDate = P.EDate_Signup.ToString(DateFormat) });
+                c.cCs.Add(new cClassCell { SortNo = "1", ProductType = P.ProductType, ClassSDate = P.EDate_Signup.ToString(DateFormat) });
                 c.cCBasic.ProductType = P.ProductType;
             }
             #endregion
@@ -2238,9 +2259,9 @@ namespace Banner.Areas.Admin.Controllers
                 Error += "本班級沒有上課時間,請建立後再行調整<br/>";
             else
             {
-                foreach(var T in Ts)
-                    if(T.ETime<=T.STime)
-                        Error += T.ClassDate+"的啟始或結束時間錯誤<br/>";
+                foreach (var T in Ts)
+                    if (T.ETime <= T.STime)
+                        Error += T.ClassDate + "的啟始或結束時間錯誤<br/>";
 
                 var T_Max = Ts.OrderByDescending(q => q.ClassDate).First();
                 DateTime _GraduateDate = PC.GraduateDate;
@@ -2492,5 +2513,215 @@ namespace Banner.Areas.Admin.Controllers
         }
 
         #endregion
+
+
+        #region 上架課程-列表
+        public class cOrder_List
+        {
+
+            public string ProductTitle = "";//課程標題關鍵字
+            public string AccountTitle = "";//會員姓名關鍵字
+            public string SDate = "";//訂單送出起始日
+            public string EDate = "";//訂單送出結束日
+            public List<SelectListItem> OTSL = new List<SelectListItem>();//訂單狀況
+            public List<SelectListItem> OPSL = new List<SelectListItem>();//交易方式
+            public List<SelectListItem> OISL = new List<SelectListItem>();//所屬旌旗
+            public cTableList cTL = new cTableList();
+        }
+        public cOrder_List GetOrder_List(FormCollection FC)
+        {
+            cOrder_List c = new cOrder_List();
+            ACID = GetACID();
+            #region 物件初始化
+            int iNumCut = 10;
+            int iNowPage = 1;
+            int OIID = -1;
+            int OTID = -1;
+            int OPID = -1;
+            //訂單狀況(包含購物車未結帳的人)
+            c.OTSL = new List<SelectListItem>();
+            c.OTSL.Add(new SelectListItem { Text = "請選擇", Value = "-1", Selected = true });
+            for (int i = 0; i < sOrderType.Length; i++)
+                c.OTSL.Add(new SelectListItem { Text = sOrderType[i], Value = i.ToString() });
+
+            c.OPSL = new List<SelectListItem>();
+            c.OPSL.Add(new SelectListItem { Text = "請選擇", Value = "-1", Selected = true });
+            for (int i = 0; i < sPayType.Length; i++)
+                c.OPSL.Add(new SelectListItem { Text = sPayType[i], Value = i.ToString() });
+
+            //所屬協會
+            c.OISL = new List<SelectListItem>();
+            c.OISL.Add(new SelectListItem { Text = "請選擇", Value = "-1", Selected = true });
+            var OI2s = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
+            var OI1s = DC.OrganizeInfo.Where(q => q.OID == 1 && !q.DeleteFlag).ToList();
+            var OI2_1 = OI2s.FirstOrDefault(q => q.OIID == 1);
+            if (ACID == 1 || OI2_1 != null)
+            {
+                c.OISL.AddRange(from q in DC.OrganizeInfo.Where(q => q.OID == 1 && q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID).OrderBy(q => q.OID).ThenBy(q => q.OIID)
+                                select new SelectListItem { Text = q.Title + q.Organize.Title, Value = q.OIID.ToString() });
+            }
+            else
+            {
+                OI1s = (from q in OI2s.GroupBy(q => q.OrganizeInfo.ParentID).Select(q => q.Key).ToList()
+                        join p in OI1s.ToList()
+                        on q equals p.OIID
+                        select p).ToList();
+                c.OISL.AddRange(from q in OI1s.OrderBy(q => q.OIID)
+                                select new SelectListItem { Text = q.Title + q.Organize.Title, Value = q.OIID.ToString() });
+            }
+
+            #region 前端資料帶入
+
+            if (FC != null)
+            {
+                iNumCut = Convert.ToInt32(FC.Get("ddl_ChangePageCut"));
+                iNowPage = Convert.ToInt32(FC.Get("hid_NextPage"));
+
+                c.SDate = FC.Get("txb_SDate");
+                c.EDate = FC.Get("txb_EDate");
+
+                c.ProductTitle = FC.Get("txb_ProductTitle");
+                c.AccountTitle = FC.Get("txb_AccountTitle");
+
+                OIID = Convert.ToInt32(FC.Get("ddl_OI2"));
+                c.OISL.ForEach(q => q.Selected = false);
+                c.OISL.First(q => q.Value == OIID.ToString()).Selected = true;
+
+                OTID = Convert.ToInt32(FC.Get("ddl_OT"));
+                c.OTSL.ForEach(q => q.Selected = false);
+                c.OTSL.First(q => q.Value == OTID.ToString()).Selected = true;
+
+                OPID = Convert.ToInt32(FC.Get("ddl_OP"));
+                c.OPSL.ForEach(q => q.Selected = false);
+                c.OPSL.First(q => q.Value == OPID.ToString()).Selected = true;
+            }
+
+            #endregion
+
+
+            c.cTL = new cTableList();
+            c.cTL.Title = "";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
+
+            #endregion
+            #region 資料庫資料帶入
+            var Ns = DC.Order_Header.Where(q => q.DeleteFlag);
+            if (!string.IsNullOrEmpty(c.ProductTitle))
+                Ns = Ns.Where(q => q.Order_Product.Any(p => p.Product.Title.Contains(c.ProductTitle) || p.Product.SubTitle.Contains(c.ProductTitle)));
+            if (!string.IsNullOrEmpty(c.AccountTitle))
+                Ns = Ns.Where(q => (q.Account.Name_First + q.Account.Name_Last).Contains(c.AccountTitle));
+
+            //旌旗權限檢視門檻設置
+            if (OIID > 0)
+                Ns = Ns.Where(q => q.OIID == OIID);
+            else if (ACID == 1 || OI2_1 != null)//Admin 或可以看全部旌旗
+            {
+            }
+            else
+            {
+                Ns = from q in Ns
+                     join p in OI1s.GroupBy(q => q.OIID).Select(q => q.Key)
+                     on q.OIID equals p
+                     select q;
+            }
+            if (OPID >= 0)
+                Ns = Ns.Where(q => q.Order_Paid.Any(p => p.PayType.PayTypeID == OPID));
+            if (OTID >= 0)
+                Ns = Ns.Where(q => q.Order_Type == OTID);
+
+            if (!string.IsNullOrEmpty(c.SDate))
+            {
+                DateTime SDT_ = DateTime.Now;
+                if (DateTime.TryParse(c.SDate, out SDT_))
+                    Ns = Ns.Where(q => q.CreDate.Date >= SDT_.Date);
+
+            }
+
+            if (!string.IsNullOrEmpty(c.EDate))
+            {
+                DateTime EDT_ = DateTime.Now;
+                if (DateTime.TryParse(c.EDate, out EDT_))
+                    Ns = Ns.Where(q => q.CreDate.Date <= EDT_.Date);
+            }
+
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "訂單編號" });
+            TopTitles.Add(new cTableCell { Title = "訂單日期" });
+            TopTitles.Add(new cTableCell { Title = "所屬協會" });
+            TopTitles.Add(new cTableCell { Title = "訂購人" });
+            TopTitles.Add(new cTableCell { Title = "總金額" });
+            TopTitles.Add(new cTableCell { Title = "交易方式" });
+            TopTitles.Add(new cTableCell { Title = "訂單狀態" });
+
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            c.cTL.TotalCt = Ns.Count();
+            c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.CreDate).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
+
+            foreach (var N in Ns)
+            {
+                cTableRow cTR = new cTableRow();
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/Order_Info/" + N.OHID, Target = "_self", Value = "檢視" });//檢視
+                cTR.Cs.Add(new cTableCell { Value = N.OHID.ToString() });//訂單編號
+                cTR.Cs.Add(new cTableCell { Value = N.CreDate.ToString(DateTimeFormat) });//訂單日期
+                var OI = OI1s.FirstOrDefault(q => q.OIID == N.OIID);
+                if (OI != null)
+                    cTR.Cs.Add(new cTableCell { Value = OI.Title + OI.Organize.Title });//所屬協會
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "--" });//無所屬協會
+                cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });//訂購人
+                cTR.Cs.Add(new cTableCell { Value = N.TotalPrice.ToString() }); //總金額
+
+                if (N.Order_Paid != null)
+                {
+                    var OP = N.Order_Paid.FirstOrDefault();
+                    if (OP != null)
+                        cTR.Cs.Add(new cTableCell { Value = sPayType[OP.PayType.PayTypeID] });//交易方式
+                    else
+                        cTR.Cs.Add(new cTableCell { Value = "--" });
+                }
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "--" });
+
+                if (N.Order_Type == 2)//訂單狀態
+                    cTR.Cs.Add(new cTableCell { Value = sOrderType[N.Order_Type] });
+                else
+                    cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/Order_Edit/" + N.OHID, Target = "_self", Value = sOrderType[N.Order_Type] });//訂單狀態
+
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+            #endregion
+
+
+            return c;
+        }
+        [HttpGet]
+        public ActionResult Order_List()
+        {
+            GetViewBag();
+            return View(GetOrder_List(null));
+        }
+        [HttpPost]
+        public ActionResult Order_List(FormCollection FC = null)
+        {
+            GetViewBag();
+            return View(GetOrder_List(FC));
+        }
+        #endregion
+        [HttpGet]
+        public ActionResult Order_Info(int ID)
+        {
+            GetViewBag();
+            return View();
+        }
+        [HttpGet]
+        public ActionResult Order_Edit(int ID)
+        {
+            GetViewBag();
+            return View();
+        }
     }
 }

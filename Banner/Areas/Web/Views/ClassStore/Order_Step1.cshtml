@@ -3,6 +3,16 @@
     ViewBag.Title = "Order_Step1";
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
 }
+<style>
+    .nav-link {
+        color: var(--bs-secondary) !important;
+    }
+        .nav-link:hover, .nav-link:focus, .nav-link.active {
+            color: var(--bs-secondary) !important;
+            background-color: #CCC !important;
+        }
+        
+</style>
 <div class="body-container  container_phone">
     <div class="section-container">
         <nav class="breadcrumb-nav">
@@ -13,145 +23,197 @@
             </ol>
         </nav>
         <div class="container-lg">
-
             <div class="card p-4" style="width: 100%;background-color: #f7f7f9;border-radius: 12px;">
                 <div class="header-container mb-2">
                     <div class="header-left-border"></div>
                     <h5 class="header font-bold">購課明細</h5>
                 </div>
-                @if (Model.cOIs.Count > 0)
-                {
-                    if (Model.PayFlag)
+                <div class="card-body">
+                    @if (Model.cOIs.Count > 0)
                     {
-                        <script>
-                            alert("交易準備中...請稍候");
-                        </script>
-                    }
-                    foreach (var OI in Model.cOIs)
-                    {
-                        if (OI.cPTs.Count(q => q.cPs.Count() > 0) > 0)
+                        int Index_OI = 0;
+                        string sAct_OI = "";
+                        if (Model.PayFlag)
                         {
-                            <div class="card p-2 mb-2">
-                                <div class="header-container mb-2">
-                                    <div class="header-left-border"></div>
-                                    <h5 class="header font-bold">@OI.OITitle</h5>
-                                </div>
-                                <div class="card-body">
-                                    @if (OI.cPTs.Count > 0)
+                            <script>
+                                alert("交易準備中...請稍候");
+                            </script>
+                        }
+                        <nav>
+                            <div class="nav nav-tabs" id="nav-OITab" role="tablist">
+                                @foreach (var OI in Model.cOIs)
+                                {
+                                    if (OI.cPTs.Count(q => q.cPs.Count() > 0) > 0)
                                     {
-                                        foreach (var cPT in OI.cPTs)
-                                        {
-                                            if (cPT.cPs.Count > 0)
-                                            {
-                                                <form method="post">
-                                                    <div class="card p-2 mb-2">
-                                                        <div class="header-container mb-2">
-                                                            <div class="header-left-border"></div>
-                                                            <h5 class="header font-bold">@cPT.PayTitle</h5>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            @foreach (var P in cPT.cPs)
-                                                            {
-                                                                <!-- 複製區域 -->
-                                                                <div class="row mx-0">
-                                                                    <div class="card px-none mb-3 col-lg-12 p-md-4">
-                                                                        <div class="row g-0 d-flex">
-                                                                            <div class="col-12 col-lg-5">
-                                                                                <div class="d-sm-flex d-block">
-                                                                                    <img src="@P.ImgURL" class="rounded-sm-4 me-3 mt-lg-0 mt-3" style="width:auto; height:120px;" alt="@P.Title">
-                                                                                    <div class="w-100 px-3 px-md-0">
-                                                                                        <h6 class="py-1 mb-2 bg-secondary-subtle text-center mt-2 mt-sm-0" style="display: inline-block;white-space: nowrap;padding-left: 10px;padding: 10px;">
-                                                                                            @P.ClassType
-                                                                                        </h6>
-                                                                                        <div class="mb-2">
-                                                                                            <h6 class="fw-bold ">@P.Title</h6>
-                                                                                        </div>
-                                                                                        <div class="d-block">
-                                                                                            @if (P.Price_Type == 0)
-                                                                                            {
-                                                                                                if (P.Price_New > 0)
-                                                                                                {
-                                                                                                    <span style="color: #3764AC">定價：NT$@(P.Price_Basic)</span>
-                                                                                                }
-                                                                                                else
-                                                                                                {
-                                                                                                    <span style="color: #3764AC">免費</span>
-                                                                                                }
-                                                                                            }
-                                                                                            else if (P.Price_Type == 1)
-                                                                                            {
-                                                                                                <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
-                                                                                                <p class="mb-0">早鳥價：NT$@P.Price_New</p>
-                                                                                            }
-                                                                                            else if (P.Price_Type == 2)
-                                                                                            {
-                                                                                                <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
-                                                                                                <p class="mb-0">優惠價：NT$@P.Price_New</p>
-                                                                                            }
+                                        sAct_OI = Index_OI == 0 ? "show active" : "";
 
+                                        <button class="nav-link @sAct_OI" id="nav-OI-tab-@OI.OIID" data-bs-toggle="tab" data-bs-target="#nav-OI-place-@OI.OIID" type="button" role="tab" aria-controls="nav-OI-place-@OI.OIID" aria-selected="@(Index_OI==0)">
+                                            <h5 class="header font-bold">@OI.OITitle</h5>
+                                        </button>
+
+                                        Index_OI++;
+                                    }
+                                }
+
+                            </div>
+                        </nav>
+                        <div class="tab-content" id="nav-OIPlace">
+                            @{
+                                Index_OI = 0;
+                                foreach (var OI in Model.cOIs)
+                                {
+                                    if (OI.cPTs.Count(q => q.cPs.Count() > 0) > 0)
+                                    {
+                                        int Index_OP = 0;
+                                        string sAct_OP = "";
+                                        <div class="tab-pane pt-2 fade @sAct_OI" id="nav-OI-place-@OI.OIID" role="tabpanel" aria-labelledby="nav-OI-tab-@OI.OIID" tabindex="@Index_OI">
+                                            <!--交易方式-開始-->
+
+                                            <nav>
+                                                <div class="nav nav-tabs" id="nav-OPTab-@OI.OIID" role="tablist">
+                                                    @if (OI.cPTs.Count > 0)
+                                                    {
+                                                        foreach (var cPT in OI.cPTs)
+                                                        {
+                                                            if (cPT.cPs.Count > 0)
+                                                            {
+                                                                sAct_OP = Index_OP == 0 ? "active" : "";
+
+                                                                <button class="nav-link @sAct_OP" id="nav-OP-tab-@OI.OIID-@cPT.PTID" data-bs-toggle="tab" data-bs-target="#nav-OP-place-@OI.OIID-@cPT.PTID" type="button" role="tab" aria-controls="nav-OP-place-@OI.OIID-@cPT.PTID" aria-selected="@(Index_OP==0)">
+                                                                    <h5 class="header font-bold">@cPT.PayTitle</h5></button>
+
+                                                                Index_OP++;
+                                                            }
+                                                        }
+                                                    }
+                                                </div>
+                                            </nav>
+                                            <div class="tab-content" id="nav-OIPlace-@OI.OIID">
+                                                @if (OI.cPTs.Count > 0)
+                                                {
+                                                    Index_OP = 0;
+                                                    foreach (var cPT in OI.cPTs)
+                                                    {
+                                                        if (cPT.cPs.Count > 0)
+                                                        {
+                                                            sAct_OP = Index_OP == 0 ? "show active" : "";
+
+                                                            <div class="tab-pane fade @sAct_OP" id="nav-OP-place-@OI.OIID-@cPT.PTID" role="tabpanel" aria-labelledby="nav-OP-tab-@OI.OIID-@cPT.PTID" tabindex="@Index_OP">
+                                                                <!--購物車商品內容 起始-->
+                                                                <form method="post">
+                                                                    <div class="card p-2 mb-2">
+
+                                                                        <div class="card-body">
+                                                                            @foreach (var P in cPT.cPs)
+                                                                            {
+                                                                                <!-- 複製區域 -->
+                                                                                <div class="row mx-0">
+                                                                                    <div class="card px-none mb-3 col-lg-12 p-md-4">
+                                                                                        <div class="row g-0 d-flex">
+                                                                                            <div class="col-12 col-lg-5">
+                                                                                                <div class="d-sm-flex d-block">
+                                                                                                    <img src="@P.ImgURL" class="rounded-sm-4 me-3 mt-lg-0 mt-3" style="width:auto; height:120px;" alt="@P.Title">
+                                                                                                    <div class="w-100 px-3 px-md-0">
+                                                                                                        <h6 class="py-1 mb-2 bg-secondary-subtle text-center mt-2 mt-sm-0" style="display: inline-block;white-space: nowrap;padding-left: 10px;padding: 10px;">
+                                                                                                            @P.ClassType
+                                                                                                        </h6>
+                                                                                                        <div class="mb-2">
+                                                                                                            <h6 class="fw-bold ">@P.Title</h6>
+                                                                                                        </div>
+                                                                                                        <div class="d-block">
+                                                                                                            @if (P.Price_Type == 0)
+                                                                                                            {
+                                                                                                                if (P.Price_New > 0)
+                                                                                                                {
+                                                                                                                    <span style="color: #3764AC">定價：NT$@(P.Price_Basic)</span>
+                                                                                                                }
+                                                                                                                else
+                                                                                                                {
+                                                                                                                    <span style="color: #3764AC">免費</span>
+                                                                                                                }
+                                                                                                            }
+                                                                                                            else if (P.Price_Type == 1)
+                                                                                                            {
+                                                                                                                <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
+                                                                                                                <p class="mb-0">早鳥價：NT$@P.Price_New</p>
+                                                                                                            }
+                                                                                                            else if (P.Price_Type == 2)
+                                                                                                            {
+                                                                                                                <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
+                                                                                                                <p class="mb-0">優惠價：NT$@P.Price_New</p>
+                                                                                                            }
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="col-12 col-lg-2 my-lg-auto my-2 px-3 px-md-0 d-none">
+                                                                                            </div>
+                                                                                            <div class="col-12 col-lg-5 my-auto d-lg-block px-3 px-md-0">
+                                                                                                @foreach (var d in P.LS.ddlList)
+                                                                                                {
+                                                                                                    if (d.Disabled)
+                                                                                                    {
+                                                                                                        <div class="d-block mb-2">
+                                                                                                            @Html.RadioButton(P.LS.ControlName, d.Value, d.Selected, new { @class = "form-check-input me-2", id = P.LS.ControlName + d.Value, disabled = string.Empty })
+                                                                                                            @Html.Label(d.Text, new { @for = P.LS.ControlName + d.Value, @class = "lab_gray form-check-label" })
+                                                                                                        </div>
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                        <div class="d-block mb-2">
+                                                                                                            @Html.RadioButton(P.LS.ControlName, d.Value, d.Selected, new { @class = "form-check-input me-2", id = P.LS.ControlName + d.Value })
+                                                                                                            @Html.Label(d.Text, new { @for = P.LS.ControlName + d.Value, @class = "form-check-label" })
+                                                                                                        </div>
+                                                                                                    }
+                                                                                                }
+
+
+                                                                                            </div>
+                                                                                            <div class="col-12 col-lg-2 my-auto text-lg-end text-center pb-2 d-flex d-sm-block gap-2 justify-content-lg-end justify-content-center">
+                                                                                                <a class="btn btn-outline-primary btn-lg btn-round" href="javascript:;" onclick="RemoveCart('/Web/ClassStore/Order_Step1',@(P.OPID));">
+                                                                                                    <i class="fa-solid fa-circle-minus"></i>移除項目
+                                                                                                </a>
+                                                                                            </div>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                            </div>
-                                                                            <div class="col-12 col-lg-2 my-lg-auto my-2 px-3 px-md-0 d-none">
-                                                                            </div>
-                                                                            <div class="col-12 col-lg-5 my-auto d-lg-block px-3 px-md-0">
-                                                                                @foreach (var d in P.LS.ddlList)
-                                                                                {
-                                                                                    if (d.Disabled)
-                                                                                    {
-                                                                                        <div class="d-block mb-2">
-                                                                                            @Html.RadioButton(P.LS.ControlName, d.Value, d.Selected, new { @class = "form-check-input me-2", id = P.LS.ControlName + d.Value, disabled = string.Empty })
-                                                                                            @Html.Label(d.Text, new { @for = P.LS.ControlName + d.Value, @class = "lab_gray form-check-label" })
-                                                                                        </div>
-                                                                                    }
-                                                                                    else
-                                                                                    {
-                                                                                        <div class="d-block mb-2">
-                                                                                            @Html.RadioButton(P.LS.ControlName, d.Value, d.Selected, new { @class = "form-check-input me-2", id = P.LS.ControlName + d.Value })
-                                                                                            @Html.Label(d.Text, new { @for = P.LS.ControlName + d.Value, @class = "form-check-label" })
-                                                                                        </div>
-                                                                                    }
-                                                                                }
-
-
-                                                                            </div>
-                                                                            <div class="col-12 col-lg-2 my-auto text-lg-end text-center pb-2 d-flex d-sm-block gap-2 justify-content-lg-end justify-content-center">
-                                                                                <a class="btn btn-outline-primary btn-lg btn-round" href="javascript:;" onclick="RemoveCart('/Web/ClassStore/Order_Step1',@(P.OPID));">
-                                                                                    <i class="fa-solid fa-circle-minus"></i>移除項目
-                                                                                </a>
+                                                                                <!------------>
+                                                                            }
+                                                                            <div class="row">
+                                                                                <div class="col-12 text-end mb-1">
+                                                                                    <span style="font-size: 25px; color: red;">總金額：@cPT.TotalPrice</span>
+                                                                                </div>
+                                                                                <div class="col-12 text-end">
+                                                                                    <button type="submit" style="color:white;" name="but_Next_@(OI.OIID)_@(cPT.PTID)" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                                <!------------>
-                                                            }
-                                                            <div class="row">
-                                                                <div class="col-12 text-end mb-1">
-                                                                    <span style="font-size: 25px; color: red;">總金額：@cPT.TotalPrice</span>
-                                                                </div>
-                                                                <div class="col-12 text-end">
-                                                                    <button type="submit" style="color:white;" name="but_Next_@(OI.OIID)_@(cPT.PTID)" class="btn btn-primary btn-lg btn-round btn-submit"><img src="/Areas/Web/Content/Img/Next.svg" style="width:25px;" alt="" />下一步</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            }
-                                        }
+                                                                </form>
 
+                                                                <!--購物車商品內容 結束-->
+                                                            </div>
+                                                            Index_OP++;
+                                                        }
+                                                    }
+                                                }
+                                            </div>
+
+
+                                            <!--交易方式-結束-->
+                                        </div>
+
+                                        Index_OI++;
                                     }
-                                    else
-                                    {
-                                        <div>您的購物車中沒有課程</div>
-                                    }
-                                </div>
-                            </div>
-                        }
+                                }
+                            }
+
+                        </div>
+
 
                     }
-                }
-
+                </div>
             </div>
         </div>
 
@@ -162,18 +224,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    /*const btns = document.querySelectorAll(".btn-submit");
-    btns.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            Swal.fire({
-                icon: 'info',
-                html: '購物車金額計算中...<br/>請稍候'
-            })
-            btn.disabled = true;
-            btn.classList.add("btn-loading");
-            console.log('Add loading CSS');
-        });
-    });*/
-</script>

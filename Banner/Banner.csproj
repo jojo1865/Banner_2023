@@ -732,6 +732,9 @@
     <Content Include="Areas\Web\Views\ClassStore\Order_Back_ATM.cshtml" />
     <Content Include="Areas\Web\Views\MyClass\Order_List.cshtml" />
     <Content Include="Areas\Web\Views\MyClass\Order_Info.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\Order_List.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\Order_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\Order_Info.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
