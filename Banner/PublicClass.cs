@@ -2353,6 +2353,7 @@ namespace Banner
                     .Replace("_Edit_1", "_List?CID=1")
                     .Replace("_Edit_2", "_List?CID=2")
                     .Replace("_Edit_3", "_List?CID=3")
+                    .Replace("_Info", "_List")
                     .Replace("_Edit", "_List").Split('/');
                 string NewShortURL = "";
                 for (int i = 0; i < ShortURLs.Length; i++)

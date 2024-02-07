@@ -160,7 +160,7 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/Product_Edit/" + N_.PID, Target = "_self", Value = "編輯" });//編輯
                 cTR.Cs.Add(new cTableCell { Value = "【" + N_.Course.Course_Category.Code + "】" + N_.Course.Course_Category.Title });//課程分類
                 cTR.Cs.Add(new cTableCell { Value = N_.Course.Title + " " + N_.SubTitle });//課程名稱
-                cTR.Cs.Add(new cTableCell { Value = (N_.SDate_Signup.ToString(DateFormat) + "<br/>↕<br/>" + N_.EDate_Signup.ToString(DateFormat)) });//線上報名日期
+                cTR.Cs.Add(new cTableCell { Value = (N_.SDate_Signup.ToString(DateFormat) + "<br/>" + N_.EDate_Signup.ToString(DateFormat)) });//線上報名日期
                 var PCTs = from q in DC.Product_Class.Where(q => q.PID == N_.PID && !q.DeleteFlag)
                            join p in DC.Product_ClassTime
                            on q.PCID equals p.PCID
@@ -170,21 +170,23 @@ namespace Banner.Areas.Admin.Controllers
                     DateTime SDate = PCTs.Min(q => q.ClassDate);
                     DateTime EDate = PCTs.Max(q => q.ClassDate);
                     if (SDate.Date != EDate.Date)
-                        cTR.Cs.Add(new cTableCell { Value = SDate.ToString(DateFormat) + "<br/>↕<br/>" + EDate.ToString(DateFormat) });
+                        cTR.Cs.Add(new cTableCell { Value = SDate.ToString(DateFormat) + "<br/>" + EDate.ToString(DateFormat) });
                     else
                     {
                         TimeSpan STime = PCTs.Where(q => q.ClassDate.Date == SDate).Min(q => q.STime);
                         TimeSpan ETime = PCTs.Where(q => q.ClassDate.Date == SDate).Max(q => q.ETime);
-                        cTR.Cs.Add(new cTableCell { Value = SDate.ToString(DateFormat) + "<br/>" + STime.ToString(@"hh\:mm") + "~" + ETime.ToString(@"hh\:mm") });
+                        //cTR.Cs.Add(new cTableCell { Value = SDate.ToString(DateFormat) + "<br/>" + STime.ToString(@"hh\:mm") + "~" + ETime.ToString(@"hh\:mm") });
+                        cTR.Cs.Add(new cTableCell { Value = SDate.ToString(DateFormat) });
                     }
                 }
                 else
                     cTR.Cs.Add(new cTableCell { Value = "尚未設定" });
 
                 cTR.Cs.Add(new cTableCell { Value = N_.Price_Basic.ToString() });//原價
-                //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_List?PID=" + N_.PID, Target = "_self", Value = "班級管理" });//班別
-                //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_BatchAdd/" + N_.PID, Target = "_self", Value = "課程開班" });//班別
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_BatchEdit/" + N_.PID, Target = "_self", Value = "班級管理" });//班別
+                                                                                 //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_List?PID=" + N_.PID, Target = "_self", Value = "班級管理" });//班別
+                                                                                 //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_BatchAdd/" + N_.PID, Target = "_self", Value = "課程開班" });//班別
+
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductClass_BatchEdit/" + N_.PID, Target = "_self", Value = (PCTs.Count() > 0 ? "班級管理" : "開班") });//班別
                 //cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/ProductAllowAccount_List/" + N_.PID, Target = "_self", Value = "指定名單" });//限定會員
                 cTR.Cs.Add(new cTableCell { Value = N_.ShowFlag ? "顯示" : "隱藏" });//顯示狀態
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "可交易" : "不可交易" });//交易狀態
@@ -2515,10 +2517,9 @@ namespace Banner.Areas.Admin.Controllers
         #endregion
 
 
-        #region 上架課程-列表
+        #region 訂單-列表
         public class cOrder_List
         {
-
             public string ProductTitle = "";//課程標題關鍵字
             public string AccountTitle = "";//會員姓名關鍵字
             public string SDate = "";//訂單送出起始日
@@ -2607,7 +2608,7 @@ namespace Banner.Areas.Admin.Controllers
 
             #endregion
             #region 資料庫資料帶入
-            var Ns = DC.Order_Header.Where(q => q.DeleteFlag);
+            var Ns = DC.Order_Header.Where(q => !q.DeleteFlag);
             if (!string.IsNullOrEmpty(c.ProductTitle))
                 Ns = Ns.Where(q => q.Order_Product.Any(p => p.Product.Title.Contains(c.ProductTitle) || p.Product.SubTitle.Contains(c.ProductTitle)));
             if (!string.IsNullOrEmpty(c.AccountTitle))
@@ -2686,10 +2687,30 @@ namespace Banner.Areas.Admin.Controllers
                 else
                     cTR.Cs.Add(new cTableCell { Value = "--" });
 
-                if (N.Order_Type == 2)//訂單狀態
+                if (N.Order_Type != 1)//訂單狀態 非交易中
                     cTR.Cs.Add(new cTableCell { Value = sOrderType[N.Order_Type] });
+                else if (N.Order_Paid != null)//交易中
+                {
+                    var OP = N.Order_Paid.FirstOrDefault();
+                    if (OP != null)
+                    {
+                        if (OP.PayType.PayTypeID == 0)//現金
+                        {
+                            cTableCell cTC = new cTableCell();
+                            cTC.cTCs.Add(new cTableCell { Value = sOrderType[N.Order_Type] });
+                            cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "javascript:ChengeOrderType(" + N.OHID + ",2);", Target = "_self", Value = "改為已繳費" });//訂單狀態
+
+                            cTR.Cs.Add(cTC);
+                        }
+                        else
+                            cTR.Cs.Add(new cTableCell { Value = sOrderType[N.Order_Type] });
+                    }
+                    else
+                        cTR.Cs.Add(new cTableCell { Value = sOrderType[N.Order_Type] });
+                }
                 else
-                    cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/Order_Edit/" + N.OHID, Target = "_self", Value = sOrderType[N.Order_Type] });//訂單狀態
+                    cTR.Cs.Add(new cTableCell { Value = sOrderType[N.Order_Type] });
+
 
                 c.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
@@ -2711,17 +2732,204 @@ namespace Banner.Areas.Admin.Controllers
             return View(GetOrder_List(FC));
         }
         #endregion
+        #region 訂單-內容
+        public class cGetOrder_Info
+        {
+            public int OHID = 0;
+            public string CreDate = "";
+            public string PayType = "";
+            public string OrderType = "";
+            public List<cGetOrder_Info_Product> OPs = new List<cGetOrder_Info_Product>();
+
+        }
+        public class cGetOrder_Info_Product
+        {
+            public int OPID = 0;
+            public int PID = 0;
+            public string ProductTitle = "";
+            public string ProductType = "";
+            public string ProductInfo = "";
+            public string TargetInfo = "";
+            public string GraduationInfo = "";
+            public int Peice = 0;
+
+            public string ClassTitle = "";
+            public string TeacherTitle = "";
+            public string Graduation = "";//結業時間
+            public cTableList cTL = new cTableList();
+        }
+        public cGetOrder_Info GetOrder_Info(int ID)
+        {
+            cGetOrder_Info c = new cGetOrder_Info();
+
+            var OH = DC.Order_Header.FirstOrDefault(q => q.OHID == ID && !q.DeleteFlag);
+            if (OH == null)
+                SetAlert("此訂單不存在", 2, "/Admin/StoreSet/Order_List");
+            else
+            {
+                c.OHID = OH.OHID;
+                c.CreDate = OH.CreDate.ToString(DateTimeFormat);
+
+                var OPaid = DC.Order_Paid.FirstOrDefault(q => q.OHID == c.OHID);
+                if (OPaid != null)
+                    c.PayType = OPaid.PayType.Title;
+                c.OrderType = sOrderType[OH.Order_Type];
+
+                c.OPs = new List<cGetOrder_Info_Product>();
+                foreach (var OP in OH.Order_Product)
+                {
+                    cGetOrder_Info_Product cOP = new cGetOrder_Info_Product();
+                    cOP.OPID = OP.OPID;
+                    cOP.PID = OP.PID;
+
+                    cOP.Peice = OP.Price_Finally;
+
+                    cOP.ProductTitle = OP.Product.Title + OP.Product.SubTitle;
+                    cOP.ProductType = OP.Product.ProductType == 0 ? "實體與線上" : (OP.Product.ProductType == 1 ? "實體" : "線上");
+                    cOP.ProductInfo = OP.Product.ProductInfo;
+                    cOP.TargetInfo = OP.Product.TargetInfo;
+                    cOP.GraduationInfo = OP.Product.GraduationInfo;
+
+                    var Class = DC.Product_Class.FirstOrDefault(q => q.PCID == OP.PCID);
+                    if (Class != null)
+                    {
+                        cOP.ClassTitle = Class.Title;
+
+                        var MT = DC.M_Product_Teacher.FirstOrDefault(q => q.PCID == Class.PCID);
+                        if (MT != null)
+                            cOP.TeacherTitle = MT.Title;
+
+                        if (Class.GraduateDate.Date > DT.Date)
+                            cOP.Graduation = "預計於" + Class.GraduateDate.ToString(DateFormat) + "結業計算";
+                        else if (!OP.Graduation_Flag)
+                            cOP.Graduation = "尚未未結業...";
+                        else
+                            cOP.Graduation = "已於" + OP.Graduation_Date.ToString(DateFormat) + "結業";
+
+                        cOP.cTL = new cTableList();
+                        cOP.cTL.NumCut = 0;//分頁數字一次顯示幾個
+                        cOP.cTL.MaxNum = 0;//分頁數量最多多少
+                                           //c.cTL.TotalCt = 0;//全部共多少資料
+                        cOP.cTL.NowPage = 1;//目前所在頁數
+                        cOP.cTL.NowURL = "";
+                        cOP.cTL.CID = 0;
+                        cOP.cTL.ATID = 0;
+                        cOP.cTL.Title = "";
+                        cOP.cTL.Rs = new List<cTableRow>();
+                        cOP.cTL.ShowFloor = false;
+
+                        var TopTitles = new List<cTableCell>();
+                        TopTitles.Add(new cTableCell { Title = "日期", WidthPX = 160 });
+                        TopTitles.Add(new cTableCell { Title = "起始時間", WidthPX = 100 });
+                        TopTitles.Add(new cTableCell { Title = "結束時間", WidthPX = 100 });
+                        TopTitles.Add(new cTableCell { Title = "上課簽到" });
+                        cOP.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+
+                        var OJs = DC.Order_Join.Where(q => q.OPID == OP.OPID && !q.DeleteFlag).ToList();
+
+                        var CTs = DC.Product_ClassTime.Where(q => q.PCID == Class.PCID).OrderBy(q => q.ClassDate).ThenBy(q => q.STime);
+                        cOP.cTL.TotalCt = CTs.Count();//全部共多少資料
+                        foreach (var CT in CTs)
+                        {
+                            cTableRow cTR = new cTableRow();
+                            cTR.Cs.Add(new cTableCell { Value = CT.ClassDate.ToString(DateFormat) });//日期
+                            cTR.Cs.Add(new cTableCell { Value = GetTimeSpanToString(CT.STime) });//起始時間
+                            cTR.Cs.Add(new cTableCell { Value = GetTimeSpanToString(CT.ETime) });//結束時間
+                            string sJoinNote = "";
+                            if (DT.Date > CT.ClassDate.Date)
+                                sJoinNote = "尚未開始上課";
+                            else
+                            {
+                                var OJ = OJs.FirstOrDefault(q => q.PCTID == CT.PCTID);
+                                if (OJ != null)
+                                {
+                                    if (OJ.SaveACID != ACID)
+                                    {
+                                        var AC = DC.Account.FirstOrDefault(q => q.ACID == OJ.SaveACID);
+                                        if (AC != null)
+                                            sJoinNote = "已於" + OJ.CreDate.ToString(DateTimeFormat) + "由" + AC.Name_First + AC.Name_Last + "代為簽到";
+                                        else
+                                            sJoinNote = "已於" + OJ.CreDate.ToString(DateTimeFormat) + "由--代為簽到";
+                                    }
+                                    else
+                                        sJoinNote = "已於" + OJ.CreDate.ToString(DateTimeFormat) + "簽到";
+                                }
+                                else
+                                    sJoinNote = "尚未簽到";
+                            }
+                            cTR.Cs.Add(new cTableCell { Value = sJoinNote });//上課簽到
+                            cOP.cTL.Rs.Add(SetTableCellSortNo(cTR));
+                        }
+
+                    }
+                    c.OPs.Add(cOP);
+                }
+
+            }
+
+
+            return c;
+        }
         [HttpGet]
         public ActionResult Order_Info(int ID)
         {
             GetViewBag();
-            return View();
+            return View(GetOrder_Info(ID));
         }
-        [HttpGet]
-        public ActionResult Order_Edit(int ID)
+        #endregion
+
+        #region 修改訂單狀態
+        public void ChangeOrderType(int OHID, int OrderType)
         {
-            GetViewBag();
-            return View();
+            var OH = DC.Order_Header.FirstOrDefault(q => q.OHID == OHID && !q.DeleteFlag);
+            if (OH != null)
+            {
+                OH.Order_Type = OrderType;
+                OH.UpdDate = DT;
+                OH.SaveACID = GetACID();
+                DC.SubmitChanges();
+
+                if(OrderType==2)
+                {
+                    var OP = DC.Order_Paid.FirstOrDefault(q => q.OHID == OH.OHID);
+                    if (OP != null)
+                    {
+                        if(!OP.PaidFlag)
+                        {
+                            OP.PaidFlag = true;
+                            OP.PaidDateTime = DT;
+                            OP.PayAmt = OH.TotalPrice;
+                            OP.UpdDate = DT;
+                            DC.SubmitChanges();
+                        }
+                    }
+                    else
+                    {
+                        Error = "";
+                        var PT = DC.PayType.FirstOrDefault(q => q.OIID == OH.OIID && q.PayTypeID == 0);
+                        if (PT == null)
+                        {
+                            Error = "no PT";
+                            PT = DC.PayType.FirstOrDefault(q => q.OIID == 1 && q.PayTypeID == 0);
+                        }
+
+                        OP = new Order_Paid();
+                        OP.Order_Header = OH;
+                        OP.PayType = PT;
+                        OP.PaidFlag = true;
+                        OP.PaidDateTime = DT;
+                        OP.TradeNo = Error;
+                        OP.TradeAmt = OH.TotalPrice;
+                        OP.PayAmt = OH.TotalPrice;
+                        OP.CreDate = DT;
+                        OP.UpdDate = DT;
+                        DC.Order_Paid.InsertOnSubmit(OP);
+                        DC.SubmitChanges();
+                    }
+                }
+
+            }
         }
+        #endregion
     }
 }

@@ -1,56 +1,57 @@
 ﻿@model Banner.Models.cClassCell
 <div class="form-card">
     <div class="row">
-        <div class="col-lg-auto col-4">
-            <label class="form-label"><span class="text-danger">*</span>班級名稱</label>
-            <input class="form-control" name="txb_ClassTitle_@(Model.SortNo)_" value="@(Model.ClassTitle)" />
+        <div class="col-lg-auto col-4 mt-3">
+            <label><span class="text-danger">*</span>班級名稱</label>
+            <input class="form-control" name="txb_ClassTitle_@(Model.SortNo)_" value="@(Model.ClassTitle)" style="width:150px;" />
         </div>
         @if (Model.ProductType == 0 || Model.ProductType == 1)
         {
-            <div class="col-lg-auto col-4">
-                <label class="form-label">地點名稱</label>
-                <input class="form-control" name="txb_ClassLocationName_@(Model.SortNo)_" value="@(Model.ClassLocationName)" style="width:100px;" />
+            <div class="col-lg-auto col-4 mt-3">
+                <label>地點名稱</label>
+                <input class="form-control" name="txb_ClassLocationName_@(Model.SortNo)_" value="@(Model.ClassLocationName)" />
             </div>
-            <div class="col-lg-auto col-4">
-                <label class="form-label"><span class="text-danger">*</span>上課地點</label>
+            <div class="col-lg-auto col-4 mt-3">
+                <label><span class="text-danger">*</span>上課地點</label>
                 <input class="form-control" name="txb_ClassAddress_@(Model.SortNo)_" value="@(Model.ClassAddress)" />
             </div>
         }
         @if (Model.ProductType == 0 || Model.ProductType == 2)
         {
-            <div class="col-lg-auto col-4">
-                <label class="form-label"><span class="text-danger">*</span>網址</label>
+            <div class="col-lg-auto col-4 mt-3">
+                <label><span class="text-danger">*</span>網址</label>
                 <input class="form-control" name="txb_ClassMeetURL_@(Model.SortNo)_" type="url" value="@(Model.ClassMeetURL)" />
             </div>
         }
-        <div class="col-lg-auto col-4">
-            <label class="form-label"><span class="text-danger">*</span>連絡電話</label>
+        <div class="col-lg-auto col-4 mt-3">
+            <label><span class="text-danger">*</span>連絡電話</label>
             <input class="form-control" name="txb_ClassPhoneNo_@(Model.SortNo)_" value="@(Model.ClassPhoneNo)" />
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-auto">
-            <label class="form-label"><span class="text-danger">*</span>人數限制</label><br />
+        <div class="col-lg-auto col-4 mt-3">
+            <label><span class="text-danger">*</span>人數限制</label><br />
             <input class="form-control" style="display: unset; width: 80px; margin-top: 4px;" type="number" min="0" value="@(Model.ClassPeopleCt)" name="txb_ClassPeopleCt_@(Model.SortNo)_" oninput="if(!/^[0-9]+$/.test(value)) value=value.replace(/\D/g,'');if(value>100)value=100;if(value<=0)value=null" />
             人
         </div>
-        <div class="col-lg-auto">
-            <label class="form-label"><span class="text-danger">*</span>結業日</label>
+        <div class="col-lg-auto col-4 mt-3">
+            <label><span class="text-danger">*</span>結業日</label>
             <input class="form-control" type="date" value="@(Model.ClassGraduateDate)" name="txb_ClassSDate_@(Model.SortNo)_" min="@(Model.minClassSDate)" />
         </div>
-        <div class="col-lg-auto">
-            <label class="form-label"><span class="text-danger">*</span>講師</label><br />
-            <a id="but_SelectTeacher_@(Model.SortNo)_" href="javascript:;" class="btn btn-primary mt-1" onclick="ShowPopupAC(4, '搜尋講師', @(Model.OIID), 'txb_TeacherID_@(Model.SortNo)_', 'but_SelectTeacher_@(Model.SortNo)_');">@Model.ClassTeacher_Name</a>
-            <input id="txb_TeacherID_@(Model.SortNo)_" name="txb_TeacherID_@(Model.SortNo)_" type="hidden" style="width:100px;" value="@Model.ClassTeacher_ACID" />
+        <div class="col-lg-auto col-4 mt-3">
+            <label><span class="text-danger">*</span>講師</label><br />
+            <a id="but_SelectTeacher_@(Model.SortNo)_" href="javascript:;" class="btn btn-info mt-1" onclick="ShowPopupAC(4, '搜尋講師', @(Model.OIID), 'txb_TeacherID_@(Model.SortNo)_', 'but_SelectTeacher_@(Model.SortNo)_');">@Model.ClassTeacher_Name</a>
+            <input id="txb_TeacherID_@(Model.SortNo)_" name="txb_TeacherID_@(Model.SortNo)_" type="hidden" value="@Model.ClassTeacher_ACID" />
         </div>
-        <div class="col-lg-auto text-end">
-            <label class="form-label" style="margin-bottom:12px;">&nbsp;</label><br />
+        <div class="col-lg-auto col-4 mt-3 text-end">
+            <label style="margin-bottom:5px;">&nbsp;</label><br />
+
+            <a class="btn btn-primary" href="javascript:UpdateClass(@(Model.PCID));">更新本班</a>
+            <a class="btn btn-secondary" href="javascript:CopyClass(@(Model.PCID));">複製本班</a>
             @if (Model.OrderCt == 0)//已有人報名就不能取消
             {
                 <a class="btn btn-danger" href="javascript:DataDelete('Product_Class', @(Model.PCID));">移除本班</a>
             }
-            <a class="btn btn-warning" href="javascript:UpdateClass(@(Model.PCID));">更新本班</a>
-            <a class="btn btn-info" href="javascript:CopyClass(@(Model.PCID));">複製本班</a>
             <a class="btn btn-success" href="/Admin/StoreSet/ProductClass_JoinList/@(Model.PCID)" target="_blank">檢視學員名單(@(Model.OrderCt))</a>
         </div>
     </div>
@@ -58,7 +59,7 @@
 
     <div class="row mt-4">
         <div class="col-12">
-            <div>課堂數:@(Model.cCCTs.Count)<input name="txb_ClassTimeCt_@(Model.SortNo)_" type="hidden" value="@(Model.cCCTs.Count)" /></div>
+            <div style="font-weight:bold">總堂數：@(Model.cCCTs.Count)<input name="txb_ClassTimeCt_@(Model.SortNo)_" type="hidden" value="@(Model.cCCTs.Count)" /></div>
             <table class="table_RWDStyle table">
                 <thead>
                     <tr class="Bgn">

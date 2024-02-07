@@ -331,3 +331,22 @@ function ShowBaptizedTypeddl(rbut) {
 function HideBaptizedTypeddl(rbut) {
     document.getElementById('ddl_BaptizedType').style.display = (!rbut.checked ? "" : "none");
 }
+
+/*訂單修改狀態*/
+function ChengeOrderType(OHID, OT) {
+    $.ajax({
+        url: '/Admin/StoreSet/ChangeOrderType?OHID=' + OHID + "&OrderType=" + OT,
+        method: 'GET',
+        dataType: 'text',
+        success: function (res) {
+            console.log(res);
+            Swal.fire({
+                icon: 'success',
+                html: '存檔完成'
+            }).then((result) => {
+                location.reload();
+            });
+        },
+        error: function (err) { console.log(err) },
+    })
+}

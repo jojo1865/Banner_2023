@@ -1,8 +1,66 @@
-﻿
+﻿@model Banner.Areas.Admin.Controllers.StoreSetController.cGetOrder_Info
 @{
     ViewBag.Title = "Order_Info";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
 }
+<div class="main-container">
+    <div class="form-container-list">
+        <div class="form-container">
+            <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
+            @if (Model != null)
+            {
+                int i = 1;
+                <div class="card">
+                    <div class="card-header">
+                        <h2>訂單資訊</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><b>訂單編號：</b>@Model.OHID</p>
+                        <p class="mb-2"><b>訂購日期：</b>@Model.CreDate</p>
+                        <p class="mb-2"><b>付款方式：</b>@Model.PayType</p>
+                        <p class="mb-2"><b>訂單狀況：</b>@Model.OrderType
+                        @if (Model.PayType == "現金" && Model.OrderType == "交易中")
+                        {
+                            <button onclick="ChengeOrderType(@Model.OHID, 2);" class="btn btn-success">改為已繳費</button>
+                        }
+                        </p>
+                    </div>
+                </div>
+                foreach (var OP in Model.OPs)
+                {
 
-<h2>Order_Info</h2>
+                    <div class="card mt-2">
+                        <div class="card-header">
+                            <h2>@(i++).課程資訊</h2>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2"><b>課程名稱：</b>@OP.ProductTitle</p>
+                            <p class="mb-2"><b>上課方式：</b>@OP.ProductType</p>
+                            <p class="mb-2"><b>課程內容：</b><br />@OP.ProductInfo</p>
+                            <p class="mb-2"><b>適用資格：</b><br />@OP.TargetInfo</p>
+                            <p class="mb-2"><b>結業資格：</b><br />@OP.GraduationInfo</p>
+                            <p class="mb-2"><b>課程金額：</b>@OP.Peice</p>
+                            <hr />
+                            <p class="mb-2"><b>班級名稱：</b>@OP.ClassTitle</p>
+                            <p class="mb-2"><b>講師名稱：</b>@OP.TeacherTitle</p>
+                            <p class="mb-2"><b>結業狀態：</b>@OP.Graduation</p>
+                            <p class="mb-2"><b>上課時間：</b></p>
+                            <div class="row mb-2">
+                                @Html.Action("_TableList", "Include", new { cTL = OP.cTL })
+                            </div>
+                        </div>
+                    </div>
 
+                }
+
+            }
+        </div>
+    </div>
+</div>
+<div class="action-bar">
+
+        <a href="/Admin/StoreSet/Order_List/" class="btn btn-outline-primary btn-lg btn-round">
+            <i class="fa-solid fa-xmark"></i>返回訂單列表
+        </a>
+
+</div>

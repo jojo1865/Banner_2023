@@ -61,6 +61,12 @@
                                                             <a href="@C_.URL" target="@C_.Target" class="btn btn-primary btn_Table_Gray btn-submit btn-round btn_Basic">@C_.Value</a>
                                                         }
                                                         break;
+
+                                                    default:
+                                                        {
+                                                            <p>@C_.Value</p>
+                                                        }
+                                                        break;
                                                 }
                                             }
                                         </td>
@@ -219,7 +225,8 @@
                             <div class="pagination-container">
                                 <div class="aux-empty">&nbsp;</div>
                                 <div class="pagination-button-group">
-                                    @{
+                                    @if (Model.ShowFloor)
+                                    {
                                         int iMin = (Model.NowPage / (Model.NumCut - (Model.NowPage % Model.NumCut == 0 ? 1 : 0))) * Model.NumCut + 1;
                                         if (iMin <= 0) { iMin = 1; }
                                         if (Model.NowPage > 1)
