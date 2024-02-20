@@ -141,6 +141,9 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 else
                 {
+                    //登入成功 順便進行每日批次
+                    Batch_EveryDay();
+
                     DelSession("LoginCt");
                     DelSession("LoginAccount");
                     LogInAC(AC.ACID);
@@ -482,9 +485,9 @@ namespace Banner.Areas.Admin.Controllers
                     }
                     break;
 
-                case "Rool":
+                case "Role":
                     {
-                        var M = DC.Rool.FirstOrDefault(q => q.RID == ID);
+                        var M = DC.Role.FirstOrDefault(q => q.RID == ID);
                         if (M != null)
                         {
                             M.ActiveFlag = !M.ActiveFlag;
@@ -556,9 +559,6 @@ namespace Banner.Areas.Admin.Controllers
                             Msg = "查無此班級";
                     }
                     break;
-
-
-
             }
             return Msg;
         }
@@ -631,7 +631,7 @@ namespace Banner.Areas.Admin.Controllers
             public string CourseInfo = "";
             public string TargetInfo = "";
             public string GraduationInfo = "";
-            public List<cCR> Rools = new List<cCR>();
+            public List<cCR> Roles = new List<cCR>();
         }
         public class cCR
         {
@@ -658,10 +658,10 @@ namespace Banner.Areas.Admin.Controllers
                     CourseInfo = C.CourseInfo,
                     TargetInfo = C.TargetInfo,
                     GraduationInfo = C.GraduationInfo,
-                    Rools = new List<cCR>()
+                    Roles = new List<cCR>()
                 };
 
-                var CRs = C.Course_Rool.OrderBy(q => q.TargetType);
+                var CRs = C.Course_Rule.OrderBy(q => q.TargetType);
                 foreach (var CR in CRs)
                 {
                     cCR c = new cCR();
@@ -700,7 +700,7 @@ namespace Banner.Areas.Admin.Controllers
                             }
                             break;
                     }
-                    cC.Rools.Add(c);
+                    cC.Roles.Add(c);
                 }
 
                 Error = JsonConvert.SerializeObject(cC);
@@ -783,7 +783,7 @@ namespace Banner.Areas.Admin.Controllers
                 else if (Type == 3)//成人會友(會友卡)
                 {
                     ACs = from q in ACs
-                          join p in DC.M_Rool_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 2)
+                          join p in DC.M_Role_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 2)
                           on q.ACID equals p.ACID
                           select q;
                 }
@@ -1113,7 +1113,14 @@ namespace Banner.Areas.Admin.Controllers
             return JsonConvert.SerializeObject(R);
         }
         #endregion
-
+        #region 每日批次
+        public string Batch_EveryDay()
+        {
+            Error = "OK";
+            ChangeOrder();//未完成交易的商品塞回購物車
+            return Error;
+        }
+        #endregion
         #region 測試用(檔案上傳)
         [HttpGet]
         public ActionResult Test()

@@ -4,10 +4,10 @@
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
 }
 <style>
-    .nav-link {
+    .nav-link-tab {
         color: var(--bs-secondary) !important;
     }
-        .nav-link:hover, .nav-link:focus, .nav-link.active {
+        .nav-link-tab:hover, .nav-link-tab:focus, .nav-link-tab.active {
             color: var(--bs-secondary) !important;
             background-color: #CCC !important;
         }
@@ -47,7 +47,7 @@
                                     {
                                         sAct_OI = Index_OI == 0 ? "show active" : "";
 
-                                        <button class="nav-link @sAct_OI" id="nav-OI-tab-@OI.OIID" data-bs-toggle="tab" data-bs-target="#nav-OI-place-@OI.OIID" type="button" role="tab" aria-controls="nav-OI-place-@OI.OIID" aria-selected="@(Index_OI==0)">
+                                        <button class="nav-link nav-link-tab @sAct_OI" id="nav-OI-tab-@OI.OIID" data-bs-toggle="tab" data-bs-target="#nav-OI-place-@OI.OIID" type="button" role="tab" aria-controls="nav-OI-place-@OI.OIID" aria-selected="@(Index_OI==0)">
                                             <h5 class="header font-bold">@OI.OITitle</h5>
                                         </button>
 
@@ -79,7 +79,7 @@
                                                             {
                                                                 sAct_OP = Index_OP == 0 ? "active" : "";
 
-                                                                <button class="nav-link @sAct_OP" id="nav-OP-tab-@OI.OIID-@cPT.PTID" data-bs-toggle="tab" data-bs-target="#nav-OP-place-@OI.OIID-@cPT.PTID" type="button" role="tab" aria-controls="nav-OP-place-@OI.OIID-@cPT.PTID" aria-selected="@(Index_OP==0)">
+                                                                <button class="nav-link nav-link-tab @sAct_OP" id="nav-OP-tab-@OI.OIID-@cPT.PTID" data-bs-toggle="tab" data-bs-target="#nav-OP-place-@OI.OIID-@cPT.PTID" type="button" role="tab" aria-controls="nav-OP-place-@OI.OIID-@cPT.PTID" aria-selected="@(Index_OP==0)">
                                                                     <h5 class="header font-bold">@cPT.PayTitle</h5></button>
 
                                                                 Index_OP++;

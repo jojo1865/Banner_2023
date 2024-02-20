@@ -85,7 +85,7 @@ namespace Banner.Areas.Web.Controllers
                 }
 
                 //會友卡
-                N.bFriendFlag = DC.M_Rool_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.RID == 2);
+                N.bFriendFlag = DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.RID == 2);
             }
 
             return View(N);

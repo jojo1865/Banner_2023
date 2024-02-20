@@ -64,21 +64,9 @@
                             </div>
 
                             <div class="form-group">
-                                <label>啟用狀態</label>
-                                <div class="row">
-                                    <div class="col-auto">
-                                        <div class="form-check form-check-inline">
-                                            @Html.RadioButton("cbox_ActiveFlag", true, Model.ActiveFlag, new { @id = "cbox_ActiveFlag1", @class = "form-check-input" })
-                                            @Html.Label("啟用", new { @class = "form-check-label", @for = "cbox_ActiveFlag1" })
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="form-check form-check-inline">
-                                            @Html.RadioButton("cbox_ActiveFlag", false, !Model.ActiveFlag, new { @id = "cbox_ActiveFlag2", @class = "form-check-input" })
-                                            @Html.Label("停用", new { @class = "form-check-label", @for = "cbox_ActiveFlag2" })
-                                        </div>
-                                    </div>
-                                </div>
+                                <label>啟用狀態</label><br />
+                                @Html.CheckBox("cbox_ActiveFlag", Model.ActiveFlag, new { @class = "form-check-input" })
+                                @Html.Label("活動上線中", new { @class = "form-check-label", @for = "cbox_ActiveFlag" })
                             </div>
                             @if (Model.EHID > 0)
                             {

@@ -277,10 +277,10 @@ namespace Banner.Areas.Web.Controllers
                     cTableCell cTC = new cTableCell();
                     if (N.ACID != ACID)//小組長不能移除自己
                         cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Aldult_Remove/" + N.MID, Target = "_self", Value = "移除" });
-                    else if (!DC.M_Rool_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//補案立
+                    else if (!DC.M_Role_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//補案立
                         EditEmtitle(ACID);
                     cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Aldult_Edit/" + N.MID, Target = "_self", Value = "編輯" });
-                    if(!DC.M_Rool_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//沒被按立
+                    if(!DC.M_Role_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//沒被按立
                         cTC.cTCs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ");", Target = "_self", CSS = "btn btn-success btn-round-nocolor btn-sm", Value = "發卡" });
                     else
                         cTC.cTCs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ");", Target = "_self", CSS = "btn btn-danger btn-round-nocolor btn-sm", Value = "收卡" });
@@ -462,7 +462,7 @@ namespace Banner.Areas.Web.Controllers
                     DC.Account_Note.InsertOnSubmit(N);
                     DC.SubmitChanges();
 
-                    M.Account.GroupType =GetViewCheckBox(FC.Get("cbox_NoIntention")) ? "無意願" : "有意願";
+                    M.Account.GroupType =GetViewCheckBox(FC.Get("cbox_NoIntention")) ? "無意願" : "有意願-願分發";
                     M.Account.UpdDate = DT;
                     N.Account.SaveACID = ACID;
 
@@ -472,7 +472,7 @@ namespace Banner.Areas.Web.Controllers
                     DC.SubmitChanges();
 
                     //退會友卡
-                    var MR = DC.M_Rool_Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == N.ACID && q.RID == 2);
+                    var MR = DC.M_Role_Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == N.ACID && q.RID == 2);
                     if(MR !=null)
                     {
                         MR.ActiveFlag = false;
@@ -491,7 +491,7 @@ namespace Banner.Areas.Web.Controllers
         public string EditEmtitle(int ACID)
         {
             string Error = "";
-            var M = DC.M_Rool_Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2);
+            var M = DC.M_Role_Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2);
             if(M!=null)
             {
                 if (DC.OrganizeInfo.Count(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag) > 1)
@@ -515,7 +515,7 @@ namespace Banner.Areas.Web.Controllers
             }
             else
             {
-                M = new M_Rool_Account();
+                M = new M_Role_Account();
                 M.ACID = ACID;
                 M.RID = 2;
                 M.JoinDate = DT;
@@ -526,7 +526,7 @@ namespace Banner.Areas.Web.Controllers
                 M.CreDate = DT;
                 M.UpdDate = DT;
                 M.SaveACID = GetACID();
-                DC.M_Rool_Account.InsertOnSubmit(M);
+                DC.M_Role_Account.InsertOnSubmit(M);
                 DC.SubmitChanges();
             }
             return Error;
@@ -635,6 +635,7 @@ namespace Banner.Areas.Web.Controllers
                 SetAlert("查無此會員資料", 2, "/Web/GroupPlace/New_List/" + OIID);
             else
             {
+                
                 N.Account = M.Account;
                 N.NoteType = 1;
                 N.OIID = M.OIID;
@@ -671,7 +672,8 @@ namespace Banner.Areas.Web.Controllers
                 {
                     DC.Account_Note.InsertOnSubmit(N);
                     DC.SubmitChanges();
-
+                    if(FC!=null)
+                        M.Account.GroupType = GetViewCheckBox(FC.Get("cbox_NoIntention")) ? "無意願" : "有意願-願分發";
                     M.ActiveFlag = false;
                     M.UpdDate = DT;
                     M.SaveACID = ACID;

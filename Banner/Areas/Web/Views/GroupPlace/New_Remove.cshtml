@@ -30,7 +30,7 @@
         <div class="container-lg">
             <div class="section-card">
                 <form method="post" id="form1">
-                    
+
 
                     <div class="form-group">
                         <label>組員名稱</label>
@@ -40,7 +40,11 @@
                         <label>駁回原因</label>
                         @Html.TextArea("txb_Note", Model.Note, new { @class = "form-control form-control-lg input-underlin", maxlength = "200", @style = "height:250px" })
                     </div>
-
+                    <div class="form-group">
+                        <label>其他設定</label>
+                        @Html.CheckBox("cbox_NoIntention", false, new { @class = "form-control form-control-lg input-underlin" })
+                        @Html.Label("此人無意願繼續加入小組", new { @for = "cbox_NoIntention" })
+                    </div>
                 </form>
             </div>
         </div>

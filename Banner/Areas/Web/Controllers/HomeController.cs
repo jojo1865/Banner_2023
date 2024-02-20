@@ -59,6 +59,7 @@ namespace Banner.Areas.Web.Controllers
             }
             TempData["login"] = "";
             TempData["pw"] = "";
+            
             return View();
         }
         [HttpPost]
@@ -566,7 +567,7 @@ namespace Banner.Areas.Web.Controllers
                         bool bCheck0 = false;//先修課程檢查過沒?
                         bool bCheck1 = false;//職分檢查過沒?
                         //有購買限制規則
-                        foreach (var R in P.Product_Rool.OrderBy(q => q.TargetType))
+                        foreach (var R in P.Product_Rule.OrderBy(q => q.TargetType))
                         {
                             switch (R.TargetType)
                             {
@@ -575,7 +576,7 @@ namespace Banner.Areas.Web.Controllers
                                         if (!bCheck0)
                                         {
                                             var Os = from q in DC.Order_Product.Where(q => q.Order_Header.ACID == AC.ACID && q.Order_Header.Order_Type == 2 && !q.Order_Header.DeleteFlag)
-                                                     join p in DC.Product_Rool.Where(q => q.PID == P.PID && q.TargetType == 0 && q.TargetInt1 > 0)
+                                                     join p in DC.Product_Rule.Where(q => q.PID == P.PID && q.TargetType == 0 && q.TargetInt1 > 0)
                                                      on q.PID equals p.TargetInt1
                                                      select p;
                                             if (Os.Count() == 0)
@@ -590,7 +591,7 @@ namespace Banner.Areas.Web.Controllers
                                         if (!bCheck1)
                                         {
                                             var Os = from q in DC.M_O_Account.Where(q => q.ACID == AC.ACID && !q.DeleteFlag && q.ActiveFlag)
-                                                     join p in DC.Product_Rool.Where(q => q.PID == P.PID && q.TargetType == 1 && q.TargetInt1 > 0)
+                                                     join p in DC.Product_Rule.Where(q => q.PID == P.PID && q.TargetType == 1 && q.TargetInt1 > 0)
                                                      on q.OID equals p.TargetInt1
                                                      select p;
                                             if (Os.Count() == 0)
@@ -649,6 +650,15 @@ namespace Banner.Areas.Web.Controllers
                         var OICheck = DC.M_OI2_Account.Where(q => q.ACID == ACID && q.OIID == P.OIID);
                         if (OICheck == null)//本課程限制的旌旗與報名者不符
                             Error += "本課程只允許特定旌旗教會下的會友報名<br/>";
+                        else
+                        {
+                            /*var PTs = from q in DC.PayType.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == P.OrganizeInfo.ParentID)
+                                      join p in DC.M_Product_PayType.Where(q => q.ActiveFlag && q.PID == P.PID)
+                                      on q.PTID equals p.PTID
+                                      select p;
+                            if (PTs.Count() == 0)
+                                Error += "本課程所屬協會並未設定付款方式,因此不能加入購物車<br/>";*/
+                        }
                     }
                 }
                 #endregion
@@ -762,6 +772,14 @@ namespace Banner.Areas.Web.Controllers
             return Error;
         }
 
+        #endregion
+        #region 每日批次
+        public string Batch_EveryDay()
+        {
+            Error = "OK";
+            ChangeOrder();//未完成交易的商品塞回購物車
+            return Error;
+        }
         #endregion
     }
 }

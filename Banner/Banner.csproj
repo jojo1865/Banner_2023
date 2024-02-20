@@ -638,7 +638,7 @@
     <Content Include="Areas\Admin\Views\Home\Test.cshtml" />
     <Content Include="Areas\Admin\Views\SystemSet\Menu_List.cshtml" />
     <Content Include="Areas\Admin\Views\SystemSet\Menu_Edit.cshtml" />
-    <Content Include="Areas\Admin\Views\SystemSet\Rool_List.cshtml" />
+    <Content Include="Areas\Admin\Views\SystemSet\Role_List.cshtml" />
     <Content Include="Areas\Admin\Content\CSS\webfonts\fa-brands-400.ttf" />
     <Content Include="Areas\Admin\Content\CSS\webfonts\fa-brands-400.woff2" />
     <Content Include="Areas\Admin\Content\CSS\webfonts\fa-regular-400.ttf" />
@@ -649,7 +649,7 @@
     <Content Include="Areas\Admin\Content\CSS\webfonts\fa-v4compatibility.woff2" />
     <Content Include="Areas\Admin\Content\JS\bootstrap.bundle.js.map" />
     <Content Include="Areas\Admin\Content\JS\bootstrap.js.map" />
-    <Content Include="Areas\Admin\Views\SystemSet\Rool_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\SystemSet\Role_Edit.cshtml" />
     <Content Include="Areas\Web\Content\CSS\webfonts\fa-brands-400.ttf" />
     <Content Include="Areas\Web\Content\CSS\webfonts\fa-brands-400.woff2" />
     <Content Include="Areas\Web\Content\CSS\webfonts\fa-regular-400.ttf" />
@@ -730,10 +730,12 @@
     <Content Include="Areas\Admin\Views\StoreSet\ProductClass_JoinList.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Order_Paid_ATM.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Order_Back_ATM.cshtml" />
-    <Content Include="Areas\Web\Views\MyClass\Order_List.cshtml" />
-    <Content Include="Areas\Web\Views\MyClass\Order_Info.cshtml" />
+    <Content Include="Areas\Web\Views\MyClass\MyClass_List.cshtml" />
+    <Content Include="Areas\Web\Views\MyClass\MyClass_Info.cshtml" />
     <Content Include="Areas\Admin\Views\StoreSet\Order_List.cshtml" />
     <Content Include="Areas\Admin\Views\StoreSet\Order_Info.cshtml" />
+    <Content Include="Areas\Web\Views\MyClass\MyOrder_List.cshtml" />
+    <Content Include="Areas\Web\Views\MyClass\MyOrder_Delete.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

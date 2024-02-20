@@ -170,8 +170,28 @@ namespace Banner.Areas.Admin.Controllers
                 case 2://兒童
                     {
                         cTL.NowURL = "/Admin/AccountSet/Account_Childen_List";
-
                         Ns = Ns.Where(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
+
+                        if (ACID != 1)
+                        {
+                            var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                            if (MOI2 == null)//他沒有全部的權限
+                            {
+                                var MLIDs = (from q in DC.M_OI2_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag)
+                                             join p in DC.Meeting_Location_Set.Where(q => !q.DeleteFlag && q.SetType == 0)
+                                             on q.OIID equals p.OIID
+                                             select new { p.MLID }).GroupBy(q => q.MLID);
+                                var MLs = (from q in MLIDs
+                                           join p in DC.M_ML_Account.Where(q => !q.DeleteFlag)
+                                           on q.Key equals p.MLID
+                                           select p).GroupBy(q => q.ACID);
+                                Ns = from q in MLs
+                                     join p in Ns
+                                     on q.Key equals p.ACID
+                                     select p;
+                            }
+                        }
+
                     }
                     break;
 
@@ -239,7 +259,7 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         cTL.NowURL = "/Admin/AccountSet/Account_Aldult_List";
                         Ns = from q in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.Birthday != q.CreDate)
-                             join p in DC.M_Rool_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 2).GroupBy(q => q.ACID).Select(q => q.Key)
+                             join p in DC.M_Role_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 2).GroupBy(q => q.ACID).Select(q => q.Key)
                              on q.ACID equals p
                              select q;
 
@@ -501,6 +521,7 @@ namespace Banner.Areas.Admin.Controllers
                     TopTitles.Add(new cTableCell { Title = "姓名" });
                     TopTitles.Add(new cTableCell { Title = "性別", WidthPX = 50 });
                     TopTitles.Add(new cTableCell { Title = "受洗狀態" });
+                    TopTitles.Add(new cTableCell { Title = "主日聚會點" });
                     break;
 
                 case 3://新人
@@ -630,6 +651,19 @@ namespace Banner.Areas.Admin.Controllers
                                 cTR.Cs.Add(new cTableCell { Value = "預計於" + B.BaptismDate.ToString(DateFormat) + "受洗" });//受洗狀態
                             else
                                 cTR.Cs.Add(new cTableCell { Value = "已於" + B.BaptismDate.ToString(DateFormat) + "受洗" });//受洗狀態
+
+                            var M = DC.M_ML_Account.FirstOrDefault(q => q.ACID == N.ACID && !q.DeleteFlag);
+                            if (M == null)
+                                cTR.Cs.Add(new cTableCell { Value = "" });//主日聚會點
+                            else
+                            {
+                                var OI = (from q in DC.Meeting_Location_Set.Where(q => q.MLID == M.MLID && q.SetType == 0)
+                                          join p in DC.OrganizeInfo.Where(q => !q.DeleteFlag)
+                                          on q.OIID equals p.OIID
+                                          select p).FirstOrDefault();
+                                cTR.Cs.Add(new cTableCell { Value = (OI != null ? "(" + OI.Title + OI.Organize.Title + ")" : "") + M.Meeting_Location.Title });//主日聚會點
+                            }
+
                         }
                         break;
 
@@ -663,7 +697,7 @@ namespace Banner.Areas.Admin.Controllers
                                         iJoinType = 4;//跟進中(未分發)
                                 }
                             }
-                            else if (N.GroupType == "有意願")
+                            else if (N.GroupType == "有意願-願分發")
                                 iJoinType = 4;
 
                             if (iJoinType == 3 || iJoinType == 4)
@@ -995,7 +1029,7 @@ namespace Banner.Areas.Admin.Controllers
             //中低收入戶
             N.bShowBackUsedAreaFlag = CheckAdmin(GetACID());
             //領夜同工
-            N.bJob24Flag = DC.M_Rool_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 24 && q.ACID == ID);
+            N.bJob24Flag = DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 24 && q.ACID == ID);
             //按立歷史
             var OAHs = DC.M_O_Account.Where(q => q.ACID == ID);
             #region 建立按立資料
@@ -1113,7 +1147,7 @@ namespace Banner.Areas.Admin.Controllers
                 }
             }
             //是否為會友
-            N.bFriendFlag = DC.M_Rool_Account.Any(q => q.ACID == ID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2);
+            N.bFriendFlag = DC.M_Role_Account.Any(q => q.ACID == ID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2);
 
             #endregion
             #region 會員資料填入
@@ -1242,10 +1276,10 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 #endregion
                 #region 入組意願調查
-                N.JoinGroupType = N.AC.GroupType == "有意願" ? 1 : (N.AC.GroupType == "無意願" ? 0 : 2);
+                N.JoinGroupType = N.AC.GroupType == "有意願-願分發" ? 1 : (N.AC.GroupType == "無意願" ? 0 : 2);
                 switch (N.AC.GroupType)
                 {
-                    case "有意願":
+                    case "有意願-願分發":
                         {
                             N.JoinGroupType = 1;
                             var Js = DC.JoinGroupWish.Where(q => q.ACID == ID).ToList();
@@ -1518,7 +1552,7 @@ namespace Banner.Areas.Admin.Controllers
                     }
                     else
                     {
-                        N.AC.GroupType = N.JoinGroupType == 0 ? "無意願" : "有意願";
+                        N.AC.GroupType = N.JoinGroupType == 0 ? "無意願" : "有意願-願分發";
                     }
                     //家庭狀況
                     foreach (var cF in N.cFs.OrderBy(q => q.SortNo1).ThenBy(q => q.SortNo2))
@@ -2178,7 +2212,7 @@ namespace Banner.Areas.Admin.Controllers
             var MOA = DC.M_O_Account.FirstOrDefault(q => q.ACID == ACID && q.OID == OID && q.ActiveFlag && !q.DeleteFlag);
             if (MOA == null)//按立
             {
-                if (!DC.M_Rool_Account.Any(q => q.ACID == ACID && q.RID == 2 && q.ActiveFlag && !q.DeleteFlag))
+                if (!DC.M_Role_Account.Any(q => q.ACID == ACID && q.RID == 2 && q.ActiveFlag && !q.DeleteFlag))
                     Error += "此人尚未持有會友卡,無法按立";
                 else
                 {

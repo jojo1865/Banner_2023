@@ -52,7 +52,7 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 else
                 {
-                    var Rs = from q in DC.Rool.Where(q => q.ActiveFlag && !q.DeleteFlag && (q.RoolType == 3 || q.RoolType == 4))
+                    var Rs = from q in DC.Role.Where(q => q.ActiveFlag && !q.DeleteFlag && (q.RoleType == 3 || q.RoleType == 4))
                              join p in GetMRAC(0, ACID)
                              on q.RID equals p.RID
                              select q;
@@ -124,13 +124,13 @@ namespace Banner.Areas.Admin.Controllers
             return sURL.Split('?')[0];
         }
 
-        private List<cMenu> GetMenu(List<Rool> Rs, string sURL, int MID)
+        private List<cMenu> GetMenu(List<Role> Rs, string sURL, int MID)
         {
             List<cMenu> Ms = new List<cMenu>();
             var Ns = DC.Menu.Where(q => q.ActiveFlag && !q.DeleteFlag && q.MenuType == 0 && q.ParentID == MID).ToList();
             if (Rs != null)
             {
-                var MPs = from q in (from q in DC.M_Rool_Menu.Where(q => q.ShowFlag && q.Menu.MenuType == 0).ToList()
+                var MPs = from q in (from q in DC.M_Role_Menu.Where(q => q.ShowFlag && q.Menu.MenuType == 0).ToList()
                                      join p in Rs
                                      on q.RID equals p.RID
                                      select new { q.MID })

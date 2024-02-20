@@ -19,7 +19,7 @@ namespace Banner.Areas.Web.Controllers
     {
         //測試預定值
         public string sStoreTitle = "JOJO測試店家";
-        public string sNewebPagURL = "https://ccore.newebpay.com/MPG/mpg_gateway";//藍星金流網址
+        public string sNewebPagURL = "https://ccore.newebpay.com/MPG/mpg_gateway";//藍新金流網址
         public string sMerchantID = "MS151311400";//商店代號
         public string sHashKey = "xiI3upb6WXwkvJS7PrYPfGrb6gX2aAAh";
         public string sHashIV = "CHioAFLrrYhkcpYP";
@@ -182,7 +182,7 @@ namespace Banner.Areas.Web.Controllers
         {
             public Product P = null;
             public cTableList cTL = new cTableList();
-            public string[] sRool = new string[] { "", "", "", "", "", "" };
+            public string[] sRule = new string[] { "", "", "", "", "", "" };
         }
         public cProduct_Info GETProduct_Info(int ID)
         {
@@ -266,7 +266,7 @@ namespace Banner.Areas.Web.Controllers
 
             #endregion
             #region 取得規則
-            foreach (var PR in DC.Product_Rool.Where(q => q.PID == ID).OrderBy(q => q.TargetType))
+            foreach (var PR in DC.Product_Rule.Where(q => q.PID == ID).OrderBy(q => q.TargetType))
             {
                 switch (PR.TargetType)
                 {
@@ -274,7 +274,7 @@ namespace Banner.Areas.Web.Controllers
                         {
                             var C = DC.Course.FirstOrDefault(q => q.CID == PR.TargetInt1);
                             if (C != null)
-                                c.sRool[PR.TargetType] += (c.sRool[PR.TargetType] == "" ? "先修課程：" : "、") + C.Title;
+                                c.sRule[PR.TargetType] += (c.sRule[PR.TargetType] == "" ? "先修課程：" : "、") + C.Title;
                         }
                         break;
 
@@ -282,21 +282,21 @@ namespace Banner.Areas.Web.Controllers
                         {
                             var O = DC.Organize.FirstOrDefault(q => q.OID == PR.TargetInt1);
                             if (O != null)
-                                c.sRool[PR.TargetType] += (c.sRool[PR.TargetType] == "" ? "限定職分：" : "、") + O.JobTitle;
+                                c.sRule[PR.TargetType] += (c.sRule[PR.TargetType] == "" ? "限定職分：" : "、") + O.JobTitle;
                         }
                         break;
 
                     case 2://2:性別/
                         {
                             if (PR.TargetType >= 0)
-                                c.sRool[PR.TargetType] = "限定性別：" + (PR.TargetInt1 == 1 ? "男性" : "女性");
+                                c.sRule[PR.TargetType] = "限定性別：" + (PR.TargetInt1 == 1 ? "男性" : "女性");
                         }
                         break;
 
                     case 3://3:年齡/
                         {
                             if (PR.TargetInt1 > 0 && PR.TargetInt2 > 0)
-                                c.sRool[PR.TargetType] = "限定年齡：" + PR.TargetInt1 + "歲 ~ " + PR.TargetInt2 + "歲";
+                                c.sRule[PR.TargetType] = "限定年齡：" + PR.TargetInt1 + "歲 ~ " + PR.TargetInt2 + "歲";
                         }
                         break;
 
@@ -305,8 +305,8 @@ namespace Banner.Areas.Web.Controllers
 
                     case 5://5:指定會員ACID
                         {
-                            if (c.sRool[PR.TargetType] == "")
-                                c.sRool[PR.TargetType] = "限定特定會友";
+                            if (c.sRule[PR.TargetType] == "")
+                                c.sRule[PR.TargetType] = "限定特定會友";
                         }
                         break;
                 }
@@ -490,6 +490,7 @@ namespace Banner.Areas.Web.Controllers
                     }
                 }
             }
+
             #endregion
             #region 前端載入
             if (FC != null)
@@ -623,6 +624,40 @@ namespace Banner.Areas.Web.Controllers
                 }
             }
             #endregion
+            #region 購物車清除校正
+            foreach (var OP in OPs)
+            {
+                bool bAllow = false;
+                foreach (var OI in c.cOIs)
+                {
+                    foreach (var PT in OI.cPTs)
+                    {
+                        if (PT.cPs.Any(q => q.OPID == OP.OPID))
+                        {
+                            bAllow = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!bAllow)
+                {
+                    DC.Order_Product.DeleteOnSubmit(OP);
+                    DC.SubmitChanges();
+
+                    Error = "部分商品課程已過期,自動為您清除過期項目";
+                }
+            }
+            if (Error != "")
+            {
+                int iOPCt = DC.Order_Product.Count(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag);
+                if (iOPCt > 0)
+                    SetAlert(Error, 3);
+                else
+                    SetAlert(Error + "<br/>您的購物車目前沒有商品", 2, "/Web/ClassStore/Index");
+            }
+            #endregion
+
             return c;
         }
         [HttpGet]
@@ -977,7 +1012,7 @@ namespace Banner.Areas.Web.Controllers
                     str += "&Amt=" + OH.TotalPrice;//Amt 訂單金額 int(10)
                     str += "&ItemDesc=" + OrderInfo + "課程共" + OH.Order_Product.Count() + "堂";//temDesc 商品資訊
                     str += "&TradeLimit=600";//TradeLimit 交易有效時間  Int(3)
-                    str += "&ExpireDate=" + DT.AddDays(2).ToString("yyyyMMdd");//ExpireDate 繳費有效期限 String(10)
+                    str += "&ExpireDate=" + OH.CreDate.AddDays(CreditCardAddDays).ToString("yyyyMMdd");//ExpireDate 繳費有效期限 String(10)
                     str += "&ReturnURL=" + sDomanName + "/Web/ClassStore/Order_Back_Credit_Card?OHID=" + OHID;//ReturnURL 支付完成返回商店網址 String(200)
                     //str += "&NotifyURL=" + sDomanName + "/Web/ClassStore/Order_Back_Paid?OHID=" + OHID;//NotifyURL 支付通知網址 String(200)
                     str += "&NotifyURL=";//信用卡就不用回傳了
@@ -1255,7 +1290,7 @@ namespace Banner.Areas.Web.Controllers
                     str += "&Amt=" + OH.TotalPrice;//Amt 訂單金額 int(10)
                     str += "&ItemDesc=" + OrderInfo + "課程共" + OH.Order_Product.Count() + "堂";//temDesc 商品資訊
                     str += "&TradeLimit=600";//TradeLimit 交易有效時間  Int(3)
-                    str += "&ExpireDate=" + DT.AddDays(2).ToString("yyyyMMdd");//ExpireDate 繳費有效期限 String(10)
+                    str += "&ExpireDate=" + OH.CreDate.AddDays(ATMAddDays).ToString("yyyyMMdd");//ExpireDate 繳費有效期限 String(10)
 
                     str += "&ReturnURL=" + sDomanName + "/Web/ClassStore/Order_Back_ATM?OHID=" + OHID;//ReturnURL 支付完成返回商店網址 String(200)
                                                                                                       //str += "&ReturnURL=";
@@ -1426,7 +1461,7 @@ namespace Banner.Areas.Web.Controllers
                         var J1 = ChangeJsonStringToClass(sInfo);
                         var J2 = ChangeJsonStringToClass(J1["Result"].ToString());
 
-                        OP.TradeNo = J2["TradeNo"].ToString();//藍星交易編號
+                        OP.TradeNo = J2["TradeNo"].ToString();//藍新交易編號
                         DC.SubmitChanges();
 
                         string PaymentType = J2["PaymentType"].ToString();//WEBATM / 其他
@@ -1528,25 +1563,6 @@ namespace Banner.Areas.Web.Controllers
             }*/
 
         }
-
-        #endregion
-        #region 測試
-        [HttpGet]
-        public void Test()
-        {
-            //string TradeInfo = "336518f8623afe2947e078ec89fa446900766cc94b564a3614ba38bdf207b07cab5fdb416a880bce7104aba68cd0cb22b9e87032b7f4b6dabb066dfa5af654674399207cd8a70785596bc76ffbae46021e3841bf44ce28b3b336db9b8a61467f3c138cb45aab4ca8e59ca8d132381a03dd06d6d0d0ebb93ccea8330b9008d2bb89878aae58106dced8f67a389ea61ca5484427a4a037fee97dfc2bad311ebcc8144bb1863dcc2d37f55bc69d62167aad874d14a57e42c203e2231d5cab644eab281b2215ec28c26f9ef372d82bee6701d87468af5be491cdbe16515370f068ea53e2e4ff07090428d1bd80c42082475c343191420ce87f734b127b7ef0b6be9f4be73e8c1040ef0a18525383c16c57bf238c4f2eba9d6e063fa540acb498b4696ec25e7b1b515e4ace896f3d87d747ec14b5ca88cb56b422578e6e329113d5719ecb554916773da26079b0716c028edf3f48332727c52deb9898c934a9a9f078c00a40f644168d7df0af1bbde4b2a3b7350aa0491dbbc5d4c025e6582fae5bdc049df745ca00d1240c5d9265264142ebbafe50600c98219e65231db6b9f3adf047e54820ce26b6addcd7f08a484ac0d00a45fe9315463bed4b52acea70f0b5c3bad01051ea55cc5b8d17394f31d4f966ae66d08058ff5361dfa4cad32d92ed17";
-            string TradeInfo = "336518f8623afe2947e078ec89fa446900766cc94b564a3614ba38bdf207b07c3f005f94a09ba3842ae762c914f16b8dea152c00825475ad7722980a219509b938da02e6bb97547f75eedd461de31a79a6e5610d02cc041c3ffb7d59efa9c0ee1f6d360e456373d9e2ea30591666b01a65923db3e6c010c6c143ba9d945e23ac5dc741f6f42bab8e7c0c3a1bd2b5e271a59900ad74e4b926a31e3dcb1a45e599cf8edf6b78101cc21c8156e6718bb6cb9ec18dd924682511004b2419d8a180ced2ca96523bca5d102891940ee8fb823e31d9e839e1752b8adefd2c55adb14d309685b3ccbbf6f6b6bb7c2e739ec527a657f59c62778211bbbda9ff32c2fdb77124ce7514e36a059d92dc4d099fb20fc9a84347b7deec02773e90119d5f745a3b642714d4827f01da5fa3bc721c5405cbc5389298a970728c22756b60e9448132";
-
-            /*string sInfo = HSM.DecryptAESHex(TradeInfo, sHashKey, sHashIV);
-            var J1 = ChangeJsonStringToClass(sInfo);
-            var J2 = ChangeJsonStringToClass(J1["Result"].ToString());
-            string TradeNo = J2["TradeNo"].ToString();
-            string EscrowBank = J2["EscrowBank"].ToString();
-            string PaymentType = J2["PaymentType"].ToString();//WEBATM
-            string PayerAccount5Code = J2["PayerAccount5Code"].ToString();//後五碼
-            string PayBankCode = J2["PayBankCode"].ToString(); //付款銀行代碼809*/
-        }
-
 
         #endregion
     }

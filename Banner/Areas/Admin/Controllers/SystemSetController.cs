@@ -208,18 +208,18 @@ namespace Banner.Areas.Admin.Controllers
             else
                 SetAlert("查無資料,請重新操作", 2, "/Admin/SystemSet/BackUser_List");
             cBUE.RList = new List<SelectListItem>();
-            var Rs = DC.Rool.Where(q => (q.RoolType == 3 || q.RoolType == 4) && !q.DeleteFlag && q.ActiveFlag).ToList();
+            var Rs = DC.Role.Where(q => (q.RoleType == 3 || q.RoleType == 4) && !q.DeleteFlag && q.ActiveFlag).ToList();
             var MAs = GetMRAC(0, ID).ToList();
-            foreach (var R in Rs.Where(q => q.RoolType != 5).OrderBy(q => q.RID))
+            foreach (var R in Rs.Where(q => q.RoleType != 5).OrderBy(q => q.RID))
             {
                 var MA = MAs.FirstOrDefault(q => q.RID == R.RID);
                 if (MA != null)
                 {
-                    if ((!cBUE.R4Flag && MA.Rool.RoolType == 4) || ID == 0)
+                    if ((!cBUE.R4Flag && MA.Role.RoleType == 4) || ID == 0)
                         cBUE.R4Flag = true;
                 }
                 if (FC != null)
-                    cBUE.RList.Add(new SelectListItem { Text = R.Title, Value = R.RID.ToString(), Selected = GetViewCheckBox(FC.Get("cbox_rool_" + R.RID)) });
+                    cBUE.RList.Add(new SelectListItem { Text = R.Title, Value = R.RID.ToString(), Selected = GetViewCheckBox(FC.Get("cbox_role_" + R.RID)) });
                 else
                     cBUE.RList.Add(new SelectListItem { Text = R.Title, Value = R.RID.ToString(), Selected = MA != null });
             }
@@ -288,7 +288,7 @@ namespace Banner.Areas.Admin.Controllers
                         {
                             if (B.Selected)
                             {
-                                MA = new M_Rool_Account
+                                MA = new M_Role_Account
                                 {
                                     ACID = ID,
                                     RID = Convert.ToInt32(B.Value),
@@ -301,7 +301,7 @@ namespace Banner.Areas.Admin.Controllers
                                     UpdDate = DT,
                                     SaveACID = ACID
                                 };
-                                DC.M_Rool_Account.InsertOnSubmit(MA);
+                                DC.M_Role_Account.InsertOnSubmit(MA);
                                 DC.SubmitChanges();
                             }
                         }
@@ -597,25 +597,25 @@ namespace Banner.Areas.Admin.Controllers
         #endregion
 
         #region 權限管理-列表
-        public string[] sRoolType = new string[] { "前台基本功能", "前台會友功能", "前台牧養職分功能", "後台一般功能", "後台系統管理功能" };
+        public string[] sRoleType = new string[] { "前台基本功能", "前台會友功能", "前台牧養職分功能", "後台一般功能", "後台系統管理功能" };
 
-        public class cRool_List
+        public class cRole_List
         {
             public cTableList cTL = new cTableList();
 
-            public int RoolType = 0;
+            public int RoleType = 0;
             public int ActiveFlag = -1;
             public List<SelectListItem> TypeList = new List<SelectListItem>();
         }
-        private cRool_List GetRool_List(FormCollection FC)
+        private cRole_List GetRole_List(FormCollection FC)
         {
-            cRool_List RL = new cRool_List();
+            cRole_List RL = new cRole_List();
             RL.cTL = new cTableList();
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             RL.cTL.Title = "";
             RL.cTL.NowPage = iNowPage;
-            RL.cTL.NowURL = "/Admin/SystemSet/Rool_List";
+            RL.cTL.NowURL = "/Admin/SystemSet/Role_List";
             RL.cTL.NumCut = iNumCut;
             RL.cTL.ShowFloor = false;
             RL.cTL.Rs = new List<cTableRow>();
@@ -623,17 +623,17 @@ namespace Banner.Areas.Admin.Controllers
             RL.TypeList = new List<SelectListItem>();
             RL.TypeList.Add(new SelectListItem { Text = "請選擇", Value = "-1", Selected = true });
             for (int i = 3; i <= 4; i++)
-                RL.TypeList.Add(new SelectListItem { Text = sRoolType[i], Value = i.ToString() });
+                RL.TypeList.Add(new SelectListItem { Text = sRoleType[i], Value = i.ToString() });
 
-            var Ns = DC.Rool.Where(q => !q.DeleteFlag);
+            var Ns = DC.Role.Where(q => !q.DeleteFlag);
             if (FC != null)
             {
-                if (FC.Get("rbl_RoolType") == "-1")
-                    Ns = Ns.Where(q => q.RoolType == 3 || q.RoolType == 4);
+                if (FC.Get("rbl_RoleType") == "-1")
+                    Ns = Ns.Where(q => q.RoleType == 3 || q.RoleType == 4);
                 else
-                    Ns = Ns.Where(q => q.RoolType.ToString() == FC.Get("rbl_RoolType"));
+                    Ns = Ns.Where(q => q.RoleType.ToString() == FC.Get("rbl_RoleType"));
                 RL.TypeList.ForEach(q => q.Selected = false);
-                RL.TypeList.First(q => q.Value == FC.Get("rbl_RoolType")).Selected = true;
+                RL.TypeList.First(q => q.Value == FC.Get("rbl_RoleType")).Selected = true;
 
                 if (FC.Get("rbl_ActiveFlag") != "-1")
                 {
@@ -642,7 +642,7 @@ namespace Banner.Areas.Admin.Controllers
                 }
             }
             else
-                Ns = Ns.Where(q => q.RoolType == 3 || q.RoolType == 4);
+                Ns = Ns.Where(q => q.RoleType == 3 || q.RoleType == 4);
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "控制", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "類別" });
@@ -654,43 +654,43 @@ namespace Banner.Areas.Admin.Controllers
             RL.cTL.TotalCt = Ns.Count();
             RL.cTL.MaxNum = GetMaxNum(RL.cTL.TotalCt, RL.cTL.NumCut);
 
-            foreach (var N1 in Ns.OrderBy(q => q.RoolType).ThenByDescending(q => q.RID))
+            foreach (var N1 in Ns.OrderBy(q => q.RoleType).ThenByDescending(q => q.RID))
             {
                 cTableRow cTR = new cTableRow();
                 cTR.ID = N1.RID;
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/Rool_Edit/" + N1.RID, Target = "_self", Value = "編輯" });
-                cTR.Cs.Add(new cTableCell { Value = sRoolType[N1.RoolType] });//類別
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/SystemSet/Role_Edit/" + N1.RID, Target = "_self", Value = "編輯" });
+                cTR.Cs.Add(new cTableCell { Value = sRoleType[N1.RoleType] });//類別
                 cTR.Cs.Add(new cTableCell { Value = N1.Title });//權限名稱
                 if (N1.ActiveFlag)
-                    cTR.Cs.Add(new cTableCell { Value = "啟用", CSS = "btn btn-outline-success", Type = "activebutton", URL = "ChangeActive(this,'Rool'," + N1.RID + ")" });//狀態
+                    cTR.Cs.Add(new cTableCell { Value = "啟用", CSS = "btn btn-outline-success", Type = "activebutton", URL = "ChangeActive(this,'Role'," + N1.RID + ")" });//狀態
                 else
-                    cTR.Cs.Add(new cTableCell { Value = "停用", CSS = "btn btn-outline-danger", Type = "activebutton", URL = "ChangeActive(this,'Rool'," + N1.RID + ")" });//狀態
+                    cTR.Cs.Add(new cTableCell { Value = "停用", CSS = "btn btn-outline-danger", Type = "activebutton", URL = "ChangeActive(this,'Role'," + N1.RID + ")" });//狀態
                 RL.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
             return RL;
         }
         [HttpGet]
-        public ActionResult Rool_List()
+        public ActionResult Role_List()
         {
             GetViewBag();
-            return View(GetRool_List(null));
+            return View(GetRole_List(null));
         }
         [HttpPost]
-        public ActionResult Rool_List(FormCollection FC)
+        public ActionResult Role_List(FormCollection FC)
         {
             GetViewBag();
-            return View(GetRool_List(FC));
+            return View(GetRole_List(FC));
         }
 
         #endregion
         #region 權限管理-新增/修改/刪除
-        public class cRool_Edit
+        public class cRole_Edit
         {
-            public Rool R = new Rool();
+            public Role R = new Role();
             public List<SelectListItem> TypeList = new List<SelectListItem>();
-            public List<cRoolMenu> MsnuList = new List<cRoolMenu>();
+            public List<cRoleMenu> MsnuList = new List<cRoleMenu>();
         }
-        public class cRoolMenu
+        public class cRoleMenu
         {
             public string Title = "";
             public int MID = 0;
@@ -704,35 +704,35 @@ namespace Banner.Areas.Admin.Controllers
             public bool PrintFlag = false;
             public bool UploadFlag = false;
         }
-        private cRool_Edit GetRool_Edit(int ID, FormCollection FC)
+        private cRole_Edit GetRole_Edit(int ID, FormCollection FC)
         {
-            cRool_Edit N = new cRool_Edit();
+            cRole_Edit N = new cRole_Edit();
             #region 物件初始化
             for (int i = 3; i <= 4; i++)
-                N.TypeList.Add(new SelectListItem { Text = sRoolType[i], Value = i.ToString() });
+                N.TypeList.Add(new SelectListItem { Text = sRoleType[i], Value = i.ToString() });
             N.TypeList[0].Selected = true;
 
             var Ms = DC.Menu.Where(q => !q.DeleteFlag && q.MenuType == 0).ToList();
             foreach (var M1 in Ms.Where(q => q.ParentID == 0).OrderBy(q => q.SortNo))
             {
-                N.MsnuList.Add(new cRoolMenu { MID = M1.MID, PMID = M1.ParentID, SortNo = M1.SortNo, Title = M1.Title });
+                N.MsnuList.Add(new cRoleMenu { MID = M1.MID, PMID = M1.ParentID, SortNo = M1.SortNo, Title = M1.Title });
                 foreach (var M2 in Ms.Where(q => q.ParentID == M1.MID).OrderBy(q => q.SortNo))
                 {
-                    N.MsnuList.Add(new cRoolMenu { MID = M2.MID, PMID = M2.ParentID, SortNo = M2.SortNo, Title = M2.Title });
+                    N.MsnuList.Add(new cRoleMenu { MID = M2.MID, PMID = M2.ParentID, SortNo = M2.SortNo, Title = M2.Title });
                 }
             }
 
             #endregion
             #region 資料帶入
-            N.R = DC.Rool.FirstOrDefault(q => q.RID == ID && !q.DeleteFlag);
+            N.R = DC.Role.FirstOrDefault(q => q.RID == ID && !q.DeleteFlag);
             if (N.R == null)
             {
-                N.R = new Rool
+                N.R = new Role
                 {
                     ParentID = 0,
                     OID = 0,
                     Title = "",
-                    RoolType = 3,
+                    RoleType = 3,
                     ActiveFlag = true,
                     DeleteFlag = false,
                     CreDate = DT,
@@ -742,7 +742,7 @@ namespace Banner.Areas.Admin.Controllers
             }
             else
             {
-                var MRMs = DC.M_Rool_Menu.Where(q => q.RID == N.R.RID);
+                var MRMs = DC.M_Role_Menu.Where(q => q.RID == N.R.RID);
                 foreach (var MRM in MRMs)
                 {
                     var ML = N.MsnuList.FirstOrDefault(q => q.MID == MRM.MID);
@@ -758,10 +758,10 @@ namespace Banner.Areas.Admin.Controllers
                     }
                 }
             }
-            if (N.R.RoolType == 3 || N.R.RoolType == 4)
+            if (N.R.RoleType == 3 || N.R.RoleType == 4)
             {
                 N.TypeList.ForEach(q => q.Selected = false);
-                N.TypeList.First(q => q.Value == N.R.RoolType.ToString()).Selected = true;
+                N.TypeList.First(q => q.Value == N.R.RoleType.ToString()).Selected = true;
             }
 
             #endregion
@@ -769,9 +769,9 @@ namespace Banner.Areas.Admin.Controllers
             if (FC != null)
             {
                 N.R.Title = FC.Get("txb_Title");
-                N.R.RoolType = Convert.ToInt32(FC.Get("rbl_RoolType"));
+                N.R.RoleType = Convert.ToInt32(FC.Get("rbl_RoleType"));
                 N.TypeList.ForEach(q => q.Selected = false);
-                N.TypeList.First(q => q.Value == N.R.RoolType.ToString()).Selected = true;
+                N.TypeList.First(q => q.Value == N.R.RoleType.ToString()).Selected = true;
                 N.R.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
                 N.R.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
 
@@ -791,19 +791,19 @@ namespace Banner.Areas.Admin.Controllers
             return N;
         }
         [HttpGet]
-        public ActionResult Rool_Edit(int ID)
+        public ActionResult Role_Edit(int ID)
         {
             GetViewBag();
             ChangeTitle(ID == 0);
-            return View(GetRool_Edit(ID, null));
+            return View(GetRole_Edit(ID, null));
         }
         [HttpPost]
         
-        public ActionResult Rool_Edit(int ID, FormCollection FC)
+        public ActionResult Role_Edit(int ID, FormCollection FC)
         {
             GetViewBag();
             ChangeTitle(ID == 0);
-            var N = GetRool_Edit(ID, FC);
+            var N = GetRole_Edit(ID, FC);
             Error = "";
             if (N.R.Title == "")
                 Error += "請輸入權限標題";
@@ -815,7 +815,7 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     N.R.CreDate = N.R.UpdDate = DT;
                     N.R.SaveACID = ACID;
-                    DC.Rool.InsertOnSubmit(N.R);
+                    DC.Role.InsertOnSubmit(N.R);
                 }
                 else
                 {
@@ -826,7 +826,7 @@ namespace Banner.Areas.Admin.Controllers
 
                 foreach (var ML in N.MsnuList)
                 {
-                    var MRM = DC.M_Rool_Menu.FirstOrDefault(q => q.RID == N.R.RID && q.MID == ML.MID);
+                    var MRM = DC.M_Role_Menu.FirstOrDefault(q => q.RID == N.R.RID && q.MID == ML.MID);
                     if (MRM != null)
                     {
                         if (ML.AllFlag)
@@ -851,7 +851,7 @@ namespace Banner.Areas.Admin.Controllers
                     }
                     else
                     {
-                        MRM = new M_Rool_Menu
+                        MRM = new M_Role_Menu
                         {
                             RID = N.R.RID,
                             MID = ML.MID,
@@ -862,12 +862,12 @@ namespace Banner.Areas.Admin.Controllers
                             PrintFlag = ML.PrintFlag,
                             UploadFlag = ML.UploadFlag,
                         };
-                        DC.M_Rool_Menu.InsertOnSubmit(MRM);
+                        DC.M_Role_Menu.InsertOnSubmit(MRM);
                         DC.SubmitChanges();
                     }
                 }
 
-                SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/SystemSet/Rool_List");
+                SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/SystemSet/Role_List");
             }
 
             return View(N);

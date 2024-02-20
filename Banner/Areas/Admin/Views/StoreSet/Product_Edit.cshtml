@@ -537,29 +537,29 @@
 
 
                 var s = document.getElementById("div_BeforeCourse_Set").innerHTML;
-                $.each(res.Rools, function (index) {
-                    if (res.Rools[index].TargetType == 0) {
+                $.each(res.Roles, function (index) {
+                    if (res.Roles[index].TargetType == 0) {
                         var str = s;
                         for (i = 0; i < 10; i++) {
-                            str = str.replace('*', res.Rools[index].CRID);
+                            str = str.replace('*', res.Roles[index].CRID);
                         }
-                        str = str.replace('#1', res.Rools[index].CC_Title);
-                        str = str.replace('#2', res.Rools[index].C_Title);
+                        str = str.replace('#1', res.Roles[index].CC_Title);
+                        str = str.replace('#2', res.Roles[index].C_Title);
                         document.getElementById("div_BeforeCourse").innerHTML += str;
                         a_add_Course.classList.add('d-none');
                     }
-                    else if (res.Rools[index].TargetType == 1) {//職分
+                    else if (res.Roles[index].TargetType == 1) {//職分
                         $.each(Os, function (j) {
                             Os[j].disabled = true;
-                            if (res.Rools[index].TargetInt1.toString() == Os[j].id.replace('cbox_O', '')) {
+                            if (res.Roles[index].TargetInt1.toString() == Os[j].id.replace('cbox_O', '')) {
                                 Os[j].checked = true;
                             }
                         });
                     }
-                    else if (res.Rools[index].TargetType == 2) {//性別
+                    else if (res.Roles[index].TargetType == 2) {//性別
                         $.each(Sexs, function (j) {
 
-                            if (res.Rools[index].TargetInt1.toString() == Sexs[j].value) {
+                            if (res.Roles[index].TargetInt1.toString() == Sexs[j].value) {
                                 Sexs[j].disabled = false;
                                     Sexs[j].checked = true;
                                 }
@@ -569,10 +569,10 @@
                                 }
                         });
                     }
-                    else if (res.Rools[index].TargetType == 3) {//年齡
+                    else if (res.Roles[index].TargetType == 3) {//年齡
 
-                        Min.value = res.Rools[index].TargetInt1;
-                        Max.value = res.Rools[index].TargetInt2;
+                        Min.value = res.Roles[index].TargetInt1;
+                        Max.value = res.Roles[index].TargetInt2;
                         Min.disabled = true;
                         Max.disabled = true;
                         Min.classList.add("lab_gray");

@@ -219,7 +219,7 @@ namespace Banner.Areas.Admin.Controllers
             public List<SelectListItem> OI2SL = new List<SelectListItem>();
             //擋修限制
             public List<cProduct_Before> PBs = new List<cProduct_Before>();
-            public List<Product_Rool> PRs = new List<Product_Rool>();
+            public List<Product_Rule> PRs = new List<Product_Rule>();
             public ListSelect OSL = new ListSelect();
             public string[] sCourseType = new string[0];
             //細節設定
@@ -368,7 +368,7 @@ namespace Banner.Areas.Admin.Controllers
                 };
                 if (CID > 0)
                 {
-                    var CRs = DC.Course_Rool.Where(q => q.CID == CID).OrderBy(q => q.CID);
+                    var CRs = DC.Course_Rule.Where(q => q.CID == CID).OrderBy(q => q.CID);
                     foreach (var CR in CRs)
                     {
                         if (CR.TargetType == 0)//擋修
@@ -390,7 +390,7 @@ namespace Banner.Areas.Admin.Controllers
                                 N.OSL.ddlList.First(q => q.Value == CR.TargetInt1.ToString()).Selected = true;
                         }
 
-                        N.PRs.Add(new Product_Rool
+                        N.PRs.Add(new Product_Rule
                         {
                             PID = 0,
                             CRID = CR.CRID,
@@ -437,7 +437,7 @@ namespace Banner.Areas.Admin.Controllers
                     }
                 }
 
-                N.PRs = N.P.Product_Rool.ToList();
+                N.PRs = N.P.Product_Rule.ToList();
                 N.PBs.Clear();
                 //擋修
                 foreach (var PR in N.PRs.Where(q => q.TargetType == 0).OrderBy(q => q.PRID))
@@ -593,7 +593,7 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         if (!string.IsNullOrEmpty(FC.Get("ddl_C_" + i)))
                         {
-                            N.PRs.Add(new Product_Rool
+                            N.PRs.Add(new Product_Rule
                             {
                                 Product = N.P,
                                 CRID = 0,
@@ -614,7 +614,7 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     if (FC.Get("rbl_Sex") != "-1")
                     {
-                        N.PRs.Add(new Product_Rool
+                        N.PRs.Add(new Product_Rule
                         {
                             Product = N.P,
                             CRID = 0,
@@ -636,7 +636,7 @@ namespace Banner.Areas.Admin.Controllers
                 catch { iMax = 0; }
                 if (N.PRs.FirstOrDefault(q => q.TargetType == 3) == null && (iMin > 0 || iMax > 0))
                 {
-                    N.PRs.Add(new Product_Rool
+                    N.PRs.Add(new Product_Rule
                     {
                         Product = N.P,
                         CRID = 0,
@@ -658,7 +658,7 @@ namespace Banner.Areas.Admin.Controllers
                         var CR = N.PRs.FirstOrDefault(q => q.TargetInt1.ToString() == _O.Value && q.TargetType == 1);
                         if (_O.Selected && CR == null)
                         {
-                            N.PRs.Add(new Product_Rool
+                            N.PRs.Add(new Product_Rule
                             {
                                 Product = N.P,
                                 CRID = 0,
@@ -677,7 +677,7 @@ namespace Banner.Areas.Admin.Controllers
 
                 #endregion
                 #region 永久課程的擋修覆蓋
-                var CRs = DC.Course_Rool.Where(q => q.CID == N.P.CID).OrderBy(q => q.TargetType);
+                var CRs = DC.Course_Rule.Where(q => q.CID == N.P.CID).OrderBy(q => q.TargetType);
                 foreach (var CR in CRs)
                 {
                     var PR = N.PRs.FirstOrDefault(q => q.TargetType == CR.TargetType);
@@ -688,7 +688,7 @@ namespace Banner.Areas.Admin.Controllers
                     }
                     else
                     {
-                        N.PRs.Add(new Product_Rool
+                        N.PRs.Add(new Product_Rule
                         {
                             Product = N.P,
                             CRID = CR.CRID,
@@ -773,12 +773,10 @@ namespace Banner.Areas.Admin.Controllers
                 foreach (var PR in N.PRs.Where(q => q.PRID == 0))
                 {
                     PR.PID = N.P.PID;
-                    DC.Product_Rool.InsertOnSubmit(PR);
+                    DC.Product_Rule.InsertOnSubmit(PR);
                     DC.SubmitChanges();
                 }
 
-                //DC.Product_Rool.DeleteAllOnSubmit(N.PRs.Where(q => q.TargetInt2 < 0));
-                //DC.SubmitChanges();
                 var Ms = DC.M_Product_PayType.Where(q => q.PID == N.P.PID).ToList();
                 foreach (var ddl in N.PTSL.ddlList)
                 {

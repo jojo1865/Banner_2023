@@ -56,7 +56,7 @@ namespace Banner.Controllers
                 for (int i = 1; i < 4; i++)
                 {
                     var O = DC.Organize.FirstOrDefault(q => q.OID == OID);
-                    var R = DC.Rool.FirstOrDefault(q => q.RID == RID);
+                    var R = DC.Role.FirstOrDefault(q => q.RID == RID);
                     string sLogin = "Test" + O.OID.ToString().PadLeft(2, '0') + i.ToString().PadLeft(2, '0');
                     string Phone = "0912345678";
                     Account AC = new Account
@@ -146,10 +146,10 @@ namespace Banner.Controllers
                     DC.Contect.InsertOnSubmit(Con);
                     DC.SubmitChanges();
 
-                    M_Rool_Account MR = new M_Rool_Account
+                    M_Role_Account MR = new M_Role_Account
                     {
                         Account = AC,
-                        Rool = R,
+                        Role = R,
                         JoinDate = DT_,
                         LeaveDate = DT_,
                         Note = "",
@@ -159,7 +159,7 @@ namespace Banner.Controllers
                         UpdDate = DT_,
                         SaveACID = 1
                     };
-                    DC.M_Rool_Account.InsertOnSubmit(MR);
+                    DC.M_Role_Account.InsertOnSubmit(MR);
                     DC.SubmitChanges();
 
                     //小組長
@@ -178,7 +178,7 @@ namespace Banner.Controllers
                 {
                     for (int i = 1; i < 7; i++)
                     {
-                        var R = DC.Rool.FirstOrDefault(q => q.RID == 1);
+                        var R = DC.Role.FirstOrDefault(q => q.RID == 1);
                         string sLogin = "User00" + i.ToString().PadLeft(2, '0');
                         string Phone = "0912345678";
                         Account AC = new Account
@@ -224,10 +224,10 @@ namespace Banner.Controllers
                         DC.Contect.InsertOnSubmit(Con);
                         DC.SubmitChanges();
 
-                        M_Rool_Account MR = new M_Rool_Account
+                        M_Role_Account MR = new M_Role_Account
                         {
                             Account = AC,
-                            Rool = R,
+                            Role = R,
                             JoinDate = DT_,
                             LeaveDate = DT_,
                             Note = "",
@@ -237,7 +237,7 @@ namespace Banner.Controllers
                             UpdDate = DT_,
                             SaveACID = 1
                         };
-                        DC.M_Rool_Account.InsertOnSubmit(MR);
+                        DC.M_Role_Account.InsertOnSubmit(MR);
                         DC.SubmitChanges();
 
                         if (j > 0)

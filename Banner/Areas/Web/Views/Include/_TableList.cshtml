@@ -65,7 +65,7 @@
 
                                                     case "button"://button
                                                         {
-                                                            <button onclick="@C_.URL"  class="@C_.CSS">@C_.Value</button>
+                                                            <button onclick="@C_.URL" class="@C_.CSS">@C_.Value</button>
                                                         }
                                                         break;
 
@@ -190,7 +190,16 @@
                                                 {
                                                     <td>
                                                         <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
-                                                        <a href="@C.URL"><i class="fa-solid fa-trash"></i></a>
+                                                        <a href="@C.URL"><i class="fa-solid fa-trash"></i>@C.Value</a>
+                                                    </td>
+                                                }
+                                                break;
+
+                                            case "paid"://paid
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <a href="@C.URL"><i class="fa-solid fa-money-bill-1"></i>@C.Value</a>
                                                     </td>
                                                 }
                                                 break;

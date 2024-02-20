@@ -17,7 +17,8 @@
                             <div class="form-card">
                                 <div class="form-group">
                                     <label>講師名稱<span>*</span></label>
-                                    @Html.TextBox("txb_Title", Model.Title, new { @class = "form-control form-control-lg input-underline" })
+                                    @Html.Label("lab_Title", Model.Title, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                    @Html.TextBox("txb_Title", Model.Title, new { @class = "form-control form-control-lg input-underline d-none" })
                                 </div>
                                 <div class="form-group">
                                     <label>講師備註</label>

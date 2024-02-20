@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banner", "Banner\Banner.csproj", "{94A1C0FE-3513-4AF7-A138-45785D4562EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchEveryDay", "BatchEveryDay\BatchEveryDay.csproj", "{F846BF19-18DF-45F1-BDFD-6F1B6EC8D9F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{94A1C0FE-3513-4AF7-A138-45785D4562EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94A1C0FE-3513-4AF7-A138-45785D4562EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94A1C0FE-3513-4AF7-A138-45785D4562EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F846BF19-18DF-45F1-BDFD-6F1B6EC8D9F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F846BF19-18DF-45F1-BDFD-6F1B6EC8D9F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F846BF19-18DF-45F1-BDFD-6F1B6EC8D9F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F846BF19-18DF-45F1-BDFD-6F1B6EC8D9F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

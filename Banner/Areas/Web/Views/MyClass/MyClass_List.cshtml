@@ -1,0 +1,85 @@
+﻿@model Banner.Areas.Web.Controllers.MyClassController.cGetMyClass_List
+@{
+    ViewBag.Title = "Order_List";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container ">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/MyClass/MyClass_List">課程管理(會友)</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">課程資訊列表</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">課程資訊列表</h5>
+        </div>
+
+        <div class="container-lg">
+            <form id="form1" method="post">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-2 col-12">
+                                <label class="lab_DarkBlue">課程訂單狀態：</label>
+                                <span class="lab_info">
+                                    @Html.DropDownList(Model.ddl_Type.ControlName, Model.ddl_Type.ddlList, new { @class = "form-select form-select-lg" })
+                                </span>
+                            </div>
+                            <div class="col-lg-5 col-12">
+                                <label class="lab_DarkBlue">報名日期：</label>
+                                <div class="row">
+                                    <div class="col-auto">
+                                        @Html.TextBox("Cre_SDate", Model.Cre_SDate.ToString("yyyy-MM-dd"),new {@class= "form-select form-select-lg" ,type="date"})
+                                    </div>
+                                    <div class="col-auto"><label class="form-label col-form-label-lg">~</label></div>
+                                    <div class="col-auto">
+                                        @Html.TextBox("Cre_EDate", Model.Cre_EDate.ToString("yyyy-MM-dd"), new { @class = "form-select form-select-lg", type = "date" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-5 col-12">
+                                <label class="lab_DarkBlue">開課日期：</label>
+                                <div class="row">
+                                    <div class="col-auto">
+                                        @Html.TextBox("Class_SDate", Model.Class_SDate.ToString("yyyy-MM-dd"), new { @class = "form-select form-select-lg", type = "date" })
+                                    </div>
+                                    <div class="col-auto"><label class="form-label col-form-label-lg">~</label></div>
+                                    <div class="col-auto">
+                                        @Html.TextBox("Class_EDate", Model.Class_EDate.ToString("yyyy-MM-dd"), new { @class = "form-select form-select-lg", type = "date" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-8 col-12">
+                                <div class="form-group">
+                                    <label>課程名稱：</label>
+                                    @Html.TextBox("txb_Title", Model.Title, new { @class = "form-control" })
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-12 text-lg-end text-center pt-4">
+                                <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+

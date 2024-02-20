@@ -282,7 +282,7 @@ namespace Banner.Areas.Admin.Controllers
             public Course C = new Course();
             public List<SelectListItem> CCSL = new List<SelectListItem>();
             public List<cCourse_Before> CBs = new List<cCourse_Before>();
-            public List<Course_Rool> CRs = new List<Course_Rool>();
+            public List<Course_Rule> CRs = new List<Course_Rule>();
             public List<SelectListItem> OSL = new List<SelectListItem>();
             public string[] sCourseType = new string[0];
         }
@@ -373,7 +373,7 @@ namespace Banner.Areas.Admin.Controllers
                 else if (N.CCSL.Count > 0)
                     N.CCSL[0].Selected = true;
 
-                N.CRs = N.C.Course_Rool.ToList();
+                N.CRs = N.C.Course_Rule.ToList();
                 //擋修
                 foreach (var CR in N.CRs.Where(q => q.TargetType == 0).OrderBy(q => q.CRID))
                 {
@@ -480,7 +480,7 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     if (!string.IsNullOrEmpty(FC.Get("ddl_C_" + i)))
                     {
-                        N.CRs.Add(new Course_Rool
+                        N.CRs.Add(new Course_Rule
                         {
                             CID = N.C.CID,
                             TargetType = 0,
@@ -498,7 +498,7 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     if (FC.Get("rbl_Sex") != "-1")
                     {
-                        N.CRs.Add(new Course_Rool
+                        N.CRs.Add(new Course_Rule
                         {
                             CID = N.C.CID,
                             TargetType = 2,
@@ -519,7 +519,7 @@ namespace Banner.Areas.Admin.Controllers
                 catch { iMax = 0; }
                 if (N.CRs.FirstOrDefault(q => q.TargetType == 3) == null && (iMin > 0 || iMax > 0))
                 {
-                    N.CRs.Add(new Course_Rool
+                    N.CRs.Add(new Course_Rule
                     {
                         CID = N.C.CID,
                         TargetType = 3,
@@ -538,7 +538,7 @@ namespace Banner.Areas.Admin.Controllers
                     var CR = N.CRs.FirstOrDefault(q => q.TargetInt1.ToString() == _O.Value && q.TargetType == 1);
                     if (_O.Selected && CR == null)
                     {
-                        N.CRs.Add(new Course_Rool
+                        N.CRs.Add(new Course_Rule
                         {
                             CID = N.C.CID,
                             TargetType = 1,
@@ -592,11 +592,11 @@ namespace Banner.Areas.Admin.Controllers
                     foreach (var CR in N.CRs.Where(q => q.CID == 0 || q.CRID == 0))
                     {
                         CR.Course = N.C;
-                        DC.Course_Rool.InsertOnSubmit(CR);
+                        DC.Course_Rule.InsertOnSubmit(CR);
                     }
                     foreach (var CR in N.CRs.Where(q => q.TargetInt1 == 0 && (q.TargetType == 0 || q.TargetType == 1 || q.TargetType == 4)))
                     {
-                        DC.Course_Rool.DeleteOnSubmit(CR);
+                        DC.Course_Rule.DeleteOnSubmit(CR);
                     }
                 }
                 DC.SubmitChanges();
@@ -640,6 +640,7 @@ namespace Banner.Areas.Admin.Controllers
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "講師姓名" });
+            TopTitles.Add(new cTableCell { Title = "所屬旌旗" });
             TopTitles.Add(new cTableCell { Title = "所屬小組" });
             TopTitles.Add(new cTableCell { Title = "狀態" });
             TopTitles.Add(new cTableCell { Title = "備註" });
@@ -657,10 +658,21 @@ namespace Banner.Areas.Admin.Controllers
                 if (N_.ACID > 0)
                 {
                     var OIs = GetMOIAC(8, 0, N_.ACID);
-                    cTR.Cs.Add(new cTableCell { Value = string.Join(";", OIs.Select(q => q.OrganizeInfo.Title + "小組")) });//所屬小組
+                    var OI2s = from q in (from q in OIs
+                              join p in DC.OrganizeInfo.Where(q=>q.OID==2)
+                              on q.OrganizeInfo.OI2_ID equals p.OIID
+                              select p)
+                              group q by new {q.OIID,q.Title} into g
+                              select new {g.Key.OIID,g.Key.Title};
+                    cTR.Cs.Add(new cTableCell { Value = string.Join("<br/>", OI2s.Select(q => q.Title + "旌旗")) });//所屬旌旗
+                    cTR.Cs.Add(new cTableCell { Value = string.Join("<br/>", OIs.Select(q => q.OrganizeInfo.Title + "小組")) });//所屬小組
                 }
                 else
+                {
+                    cTR.Cs.Add(new cTableCell { Value = "--" });//所屬旌旗
                     cTR.Cs.Add(new cTableCell { Value = "--" });//所屬小組
+                }
+                   
 
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "啟用" : "停用" });//狀態
                 cTR.Cs.Add(new cTableCell { Value = N_.Note });//備註

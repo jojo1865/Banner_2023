@@ -50,9 +50,10 @@ namespace Banner
         public string DateFormat = "yyyy-MM-dd";
         public string DateTimeFormat = "yyyy-MM-dd HH:mm";
         public string CompanyTitle = "【全球旌旗資訊網】";
-        public int EventQrCodeSTimeAdd = -30;
-        public int EventQrCodeETimeAdd = 30;
-
+        public int EventQrCodeSTimeAdd = -30;//活動可打卡的起始時間提前校正(-30=開始前30分鐘可以開始打卡)
+        public int EventQrCodeETimeAdd = 30;//活動可打卡的結束時間校正(30=活動結束後30分鐘內可以打卡)
+        public int CreditCardAddDays = 1;//信用卡可付款天數加入數字
+        public int ATMAddDays = 2;//ATM可付款天數加入數字
         public string sDomanName
         {
             get
@@ -63,26 +64,26 @@ namespace Banner
                 }
                 else
                 {
-                    return "https://"+ Request.Url.Host;
+                    return "https://" + Request.Url.Host;
                 }
             }
         }
 
-            //= "";
-            //測試用
+        //= "";
+        //測試用
 
-            /*public string sStoreTitle = "台中市基督教旌旗協會";
-            public string sNewebPagURL = "https://ccore.newebpay.com/MPG/period";//藍星金流網址
-            public string sMerchantID = "MS3359938901";//商店代號
-            public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
-            public string sHashIV = "PBV4pP9DpA9oBzvC";*/
+        /*public string sStoreTitle = "台中市基督教旌旗協會";
+        public string sNewebPagURL = "https://ccore.newebpay.com/MPG/period";//藍新金流網址
+        public string sMerchantID = "MS3359938901";//商店代號
+        public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
+        public string sHashIV = "PBV4pP9DpA9oBzvC";*/
 
-            //正式用
-            /*public string sDomanName = "台中市基督教旌旗協會";
-            public string sNewebPagURL = "https://core.newebpay.com/MPG/mpg_gateway";//藍星金流網址
-            public string sMerchantID = "MS3359938901";//商店代號
-            public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
-            public string sHashIV = "PBV4pP9DpA9oBzvC";*/
+        //正式用
+        /*public string sDomanName = "台中市基督教旌旗協會";
+        public string sNewebPagURL = "https://core.newebpay.com/MPG/mpg_gateway";//藍新金流網址
+        public string sMerchantID = "MS3359938901";//商店代號
+        public string sHashKey = "Rxc8lYu7qZeyfrklMXbKc00WH9WRgtYJ";
+        public string sHashIV = "PBV4pP9DpA9oBzvC";*/
 
         public bool bUsedNewName = true;
         public bool[] bGroup = new bool[] { false, false, false, false, false, false }; //權限
@@ -134,7 +135,7 @@ namespace Banner
         public string[] FamilyTitle = new string[] { "父親", "母親", "配偶", "緊急聯絡人", "子女" };
         public string[] BaptizedType = new string[] { "未受洗", "已受洗(旌旗)", "已受洗(非旌旗)" };
         public string[] sCourseType = new string[] { "不限制", "實體", "線上" };
-        public string[] sPayType = new string[] { "現金", "線上刷卡", "ATM匯款", "PayPel", "支付寶" };
+        public string[] sPayType = new string[] { "現金", "線上刷卡", "ATM匯款", "PayPal", "支付寶" };
         public string[] sOrderType = new string[] { "購物車", "交易中", "交易完成", "交易取消", "交易取消(退費處理中)", "交易取消(已退費)" };
         public string Error = "";
         public int iChildAge = 12;
@@ -256,7 +257,7 @@ namespace Banner
                 return true;
             else
             {
-                var PA = GetMRAC(0, ACID).FirstOrDefault(q => q.Rool.RoolType == 4);
+                var PA = GetMRAC(0, ACID).FirstOrDefault(q => q.Role.RoleType == 4);
                 return PA != null;
             }
         }
@@ -2354,7 +2355,9 @@ namespace Banner
                     .Replace("_Edit_2", "_List?CID=2")
                     .Replace("_Edit_3", "_List?CID=3")
                     .Replace("_Info", "_List")
-                    .Replace("_Edit", "_List").Split('/');
+                    .Replace("_Edit", "_List")
+                    .Replace("Organize_List_List", "Organize_Info_List")
+                    .Split('/');
                 string NewShortURL = "";
                 for (int i = 0; i < ShortURLs.Length; i++)
                 {
@@ -2373,12 +2376,12 @@ namespace Banner
                         bGroup = new bool[] { true, true, true, true, true, true };
                     else
                     {
-                        /*var MACs = from q in DC.M_Rool_Account.Where(q => q.ACID == ACID && q.ActiveFlag && (q.Rool.RoolType == 3 || q.Rool.RoolType == 4) && !q.DeleteFlag && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date))
-                                   join p in DC.M_Rool_Menu.Where(q => q.MID == M.MID)
+                        /*var MACs = from q in DC.M_Role_Account.Where(q => q.ACID == ACID && q.ActiveFlag && (q.Role.RoleType == 3 || q.Role.RoleType == 4) && !q.DeleteFlag && (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) && (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date))
+                                   join p in DC.M_Role_Menu.Where(q => q.MID == M.MID)
                                    on q.RID equals p.RID
                                    select p;*/
-                        var MACs = from q in GetMRAC(0, ACID).Where(q => q.Rool.RoolType == 3 || q.Rool.RoolType == 4)
-                                   join p in DC.M_Rool_Menu.Where(q => q.MID == M.MID)
+                        var MACs = from q in GetMRAC(0, ACID).Where(q => q.Role.RoleType == 3 || q.Role.RoleType == 4)
+                                   join p in DC.M_Role_Menu.Where(q => q.MID == M.MID)
                                    on q.RID equals p.RID
                                    select p;
                         foreach (var MAC in MACs)
@@ -2410,7 +2413,24 @@ namespace Banner
             }
 
             //購物車
-            TempData["CartNo"] = DC.Order_Product.Count(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag);
+            #region 購物車資料校正
+            //購物車中課程的付款方式
+            var OPs = DC.Order_Product.Where(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag);
+            /*foreach (var OP in OPs)
+            {
+                var PTs = from q in DC.PayType.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == OP.Product.OrganizeInfo.ParentID)
+                          join p in DC.M_Product_PayType.Where(q => q.ActiveFlag && q.PID == OP.PID)
+                          on q.PTID equals p.PTID
+                          select p;
+                if (PTs.Count() == 0)
+                {
+                    DC.Order_Product.DeleteOnSubmit(OP);
+                }
+            }
+            DC.SubmitChanges();
+            OPs = DC.Order_Product.Where(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag);*/
+            #endregion
+            TempData["CartNo"] = OPs.Count();
             //SetResponseVerify();
 
             TempData["UID"] = ACID;
@@ -2598,27 +2618,27 @@ namespace Banner
             if (string.IsNullOrEmpty(sJWT))
                 sJWT = GetQueryStringInString("Token");
 
-            bool[] bRool = new bool[cCheckType_List.Count + 1];
-            for (int i = 0; i < bRool.Length; i++)
-                bRool[i] = false;
+            bool[] bRule = new bool[cCheckType_List.Count + 1];
+            for (int i = 0; i < bRule.Length; i++)
+                bRule[i] = false;
             var C = DC.Token_Check.FirstOrDefault(q => q.JWT == sJWT && q.ActiveFlag && !q.DeleteFlag && (q.NoEndFlag || (!q.NoEndFlag && q.S_DateTime < DT && q.E_DateTime > DT)));
             if (C != null)
             {
-                bRool[0] = true;
+                bRule[0] = true;
                 string[] str = C.CheckType.Split(',');
                 for (int j = 0; j < str.Length; j++)
                 {
                     int k = 0;
                     if (int.TryParse(str[j], out k))
                     {
-                        bRool[k] = true;
+                        bRule[k] = true;
                     }
                 }
             }
             /*if (Request.Url.Host == "localhost" && Request.Url.Port == 44307)
                 return true;
             else*/
-            return bRool[APINo];
+            return bRule[APINo];
 
         }
         public string ReturnJWT0()
@@ -2822,12 +2842,12 @@ namespace Banner
             return MAs;
         }
 
-
-        public IQueryable<M_Rool_Account> GetMRAC(int RID = 0, int ACID = 0)
+        //取得會員角色
+        public IQueryable<M_Role_Account> GetMRAC(int RID = 0, int ACID = 0)
         {
-            var MAs = DC.M_Rool_Account.Where(q => !q.DeleteFlag &&
+            var MAs = DC.M_Role_Account.Where(q => !q.DeleteFlag &&
             q.ActiveFlag &&
-            !q.Rool.DeleteFlag &&
+            !q.Role.DeleteFlag &&
             !q.Account.DeleteFlag &&
             (q.JoinDate == q.CreDate || q.JoinDate.Date <= DT.Date) &&
             (q.LeaveDate == q.CreDate || q.LeaveDate.Date >= DT.Date));
@@ -2925,58 +2945,151 @@ namespace Banner
             return iReturn;
         }
 
-        public void SendMailToGroupLeader(string JoinName, int OILeaderID,string Title)
+        public void SendMailToGroupLeader(string JoinName, int OILeaderID, string Title)
         {
-            if(OILeaderID>0)
+            if (OILeaderID > 0)
             {
                 //簡訊
                 var Con = DC.Contect.FirstOrDefault(q => q.TargetID == OILeaderID && q.TargetType == 2 && q.ContectType == 1);
-                if(Con!=null)
+                if (Con != null)
                 {
                     SendSNS(Con.ContectValue, "新人入組", "有一位新人:" + JoinName + "即將加入您的小組,請前往旌旗官網檢視");
                 }
                 //Email
-                 Con = DC.Contect.FirstOrDefault(q => q.TargetID == OILeaderID && q.TargetType == 2 && q.ContectType == 2);
-                if(Con!=null)
+                Con = DC.Contect.FirstOrDefault(q => q.TargetID == OILeaderID && q.TargetType == 2 && q.ContectType == 2);
+                if (Con != null)
                 {
                     SendMail(Con.ContectValue, Title, "新人入組", "有一位新人:" + JoinName + "即將加入您的小組,請前往旌旗官網檢視");
                 }
             }
         }
-        //檢查購物車中的商品狀態,並回傳剩餘數量
-        /*public int CheckCart(int ACID)
+        //未完成交易的商品塞回購物車
+        public void ChangeOrder(int ACID = 0)
         {
-            int iCartCt = 0;
-            var OPs = DC.Order_Product.Where(q => q.Order_Header.ACID == ACID && q.Order_Header.Order_Type == 0 && !q.Order_Header.DeleteFlag);
-            foreach(var OP in OPs)
+            #region 信用卡逾期
+            var OHs = from q in DC.Order_Header.Where(q => !q.DeleteFlag && q.Order_Type == 1 && (DT - q.CreDate).Hours > 1 && (ACID > 0 ? q.ACID == ACID : true))
+                      join p in DC.Order_Paid.Where(q => q.PayType.PayTypeID == 1 && !q.PaidFlag)
+                      on q.OHID equals p.OHID
+                      select q;
+            foreach (var OH in OHs)
             {
-                bool deleteFlag = false;
-                if (OP.Product.DeleteFlag || !OP.Product.ActiveFlag)//商品已被移除
-                    deleteFlag = true;
-
-                var OP2s = DC.Order_Product.Where(q => q.Order_Header.ACID != ACID &&
-                q.Order_Header.Order_Type == 2 &&
-                !q.Order_Header.DeleteFlag
-                );
-
-
-
-                if (deleteFlag)
+                #region 訂單頭
+                var OH_0 = DC.Order_Header.FirstOrDefault(q => q.ACID == OH.ACID && q.Order_Type == 0);
+                if (OH_0 == null)
                 {
-                    DC.Order_Product.DeleteOnSubmit(OP);
+                    OH_0 = new Order_Header
+                    {
+                        OIID = 0,
+                        ACID = OH.ACID,
+                        Order_Type = 0,
+                        TotalPrice = 0,
+                        DeleteFlag = false,
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = OH.ACID
+                    };
+                    DC.Order_Header.InsertOnSubmit(OH_0);
                     DC.SubmitChanges();
                 }
+                else
+                    OH_0.DeleteFlag = false;
+                #endregion
+                #region 商品複製轉移
+                foreach (var OP in OH.Order_Product)
+                {
+                    int[] iPrice = GetPrice(OH.ACID, OP.Product);
+                    Order_Product OP_ = new Order_Product
+                    {
+                        Order_Header = OH_0,
+                        Product = OP.Product,
+                        Product_Class = OP.Product_Class,
+                        CAID = iPrice[2],
+                        Price_Basic = OP.Product.Price_Basic,
+                        Price_Finally = iPrice[1],
+                        Price_Type = iPrice[0],
+                        Graduation_Flag = true,
+                        Graduation_ACID = 0,
+                        Graduation_Date = DT,
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = ACID
+                    };
+                    DC.Order_Product.InsertOnSubmit(OP_);
+                    DC.SubmitChanges();
+                }
+                #endregion
+                #region 原訂單改為取消
+                OH.Order_Type = 3;
+                DC.SubmitChanges();
+                #endregion  
             }
+            #endregion
+            #region ATM逾期
+            OHs = from q in DC.Order_Header.Where(q => !q.DeleteFlag && q.Order_Type == 1 && (DT - q.CreDate).Days > ATMAddDays && (ACID > 0 ? q.ACID == ACID : true))
+                  join p in DC.Order_Paid.Where(q => q.PayType.PayTypeID == 2 && !q.PaidFlag)
+                  on q.OHID equals p.OHID
+                  select q;
+            foreach (var OH in OHs)
+            {
+                #region 訂單頭
+                var OH_0 = DC.Order_Header.FirstOrDefault(q => q.ACID == OH.ACID && q.Order_Type == 0);
+                if (OH_0 == null)
+                {
+                    OH_0 = new Order_Header
+                    {
+                        OIID = 0,
+                        ACID = OH.ACID,
+                        Order_Type = 0,
+                        TotalPrice = 0,
+                        DeleteFlag = false,
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = OH.ACID
+                    };
+                    DC.Order_Header.InsertOnSubmit(OH_0);
+                    DC.SubmitChanges();
+                }
+                else
+                    OH_0.DeleteFlag = false;
+                #endregion
+                #region 商品複製轉移
+                foreach (var OP in OH.Order_Product)
+                {
+                    int[] iPrice = GetPrice(OH.ACID, OP.Product);
+                    Order_Product OP_ = new Order_Product
+                    {
+                        Order_Header = OH_0,
+                        Product = OP.Product,
+                        Product_Class = OP.Product_Class,
+                        CAID = iPrice[2],
+                        Price_Basic = OP.Product.Price_Basic,
+                        Price_Finally = iPrice[1],
+                        Price_Type = iPrice[0],
+                        Graduation_Flag = true,
+                        Graduation_ACID = 0,
+                        Graduation_Date = DT,
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = ACID
+                    };
+                    DC.Order_Product.InsertOnSubmit(OP_);
+                    DC.SubmitChanges();
+                }
+                #endregion
+                #region 原訂單改為取消
+                OH.Order_Type = 3;
+                DC.SubmitChanges();
+                #endregion  
+            }
+            #endregion
 
-
-            return iCartCt;
-        }*/
+        }
         #endregion
 
         #region 金流
         public void PaidOrder()
         {
-            //付款方式(0:現金/1:藍星-信用卡/2:藍星-ATM/3:PayPel/4:支付寶
+            //付款方式(0:現金/1:藍新-信用卡/2:藍新-ATM/3:PayPel/4:支付寶
             int PayType = 1;
             switch (PayType)
             {
@@ -2986,12 +3099,12 @@ namespace Banner
 
                     }
                     break;
-                case 1://藍星-信用卡
+                case 1://藍新-信用卡
                     {
 
                     }
                     break;
-                case 2://藍星-ATM
+                case 2://藍新-ATM
                     {
 
                     }

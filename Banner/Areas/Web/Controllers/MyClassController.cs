@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using static Banner.Areas.Web.Controllers.MyClassController;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -16,7 +17,7 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
         #region 課程資訊-列表
-        public class cGetOrder_List
+        public class cGetMyClass_List
         {
             public cTableList cTL = new cTableList();
 
@@ -30,10 +31,12 @@ namespace Banner.Areas.Web.Controllers
 
             public string Title = "";
         }
-        public cGetOrder_List GetOrder_List(FormCollection FC)
+        public cGetMyClass_List GetMyClass_List(FormCollection FC)
         {
-            cGetOrder_List c = new cGetOrder_List();
+            cGetMyClass_List c = new cGetMyClass_List();
             ACID = GetACID();
+            ChangeOrder(ACID);
+            int OHID = GetQueryStringInInt("OHID");
             #region 物件初始化
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
@@ -85,6 +88,7 @@ namespace Banner.Areas.Web.Controllers
 
             var Ns = from q in DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag &&
                                 q.Order_Header.ACID == ACID &&
+                                q.Order_Header.Order_Type == 2 &&
                                 q.CreDate.Date >= c.Cre_SDate &&
                                 q.CreDate <= c.Cre_EDate)
                      join p in ClassTimeGroup
@@ -110,6 +114,8 @@ namespace Banner.Areas.Web.Controllers
                 Ns = Ns.Where(q => q.OrderType.ToString() == sOT);
             if (!string.IsNullOrEmpty(c.Title))
                 Ns = Ns.Where(q => (q.Title + q.SubTitle).Contains(c.Title));
+            if (OHID > 0)
+                Ns = Ns.Where(q => q.OHID == OHID);
 
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "訂單編號", WidthPX = 80 });
@@ -132,7 +138,7 @@ namespace Banner.Areas.Web.Controllers
                 cTR.Cs.Add(new cTableCell { Value = N.OHID.ToString().PadLeft(5, '0') });//訂單編號
                 cTR.Cs.Add(new cTableCell { Value = sOrderType[N.OrderType] });//訂單狀態
                 cTR.Cs.Add(new cTableCell { Value = N.CreDate.ToString(DateTimeFormat) });//報名日期
-                cTR.Cs.Add(new cTableCell { Value = N.Title, Type = "link", URL = "/Web/MyClass/Order_Info/" + N.PID + "?OPID=" + N.OPID });//課程名稱
+                cTR.Cs.Add(new cTableCell { Value = N.Title, Type = "link", URL = "/Web/MyClass/MyClass_Info/" + N.PID + "?OPID=" + N.OPID });//課程名稱
                 cTR.Cs.Add(new cTableCell { Value = N.ClassTitle });//報名班級
                 var MT = DC.M_Product_Teacher.FirstOrDefault(q => q.PCID == N.PCID);
                 if (MT != null)
@@ -171,20 +177,20 @@ namespace Banner.Areas.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Order_List()
+        public ActionResult MyClass_List()
         {
             GetViewBag();
-            return View(GetOrder_List(null));
+            return View(GetMyClass_List(null));
         }
         [HttpPost]
-        public ActionResult Order_List(FormCollection FC)
+        public ActionResult MyClass_List(FormCollection FC)
         {
             GetViewBag();
-            return View(GetOrder_List(FC));
+            return View(GetMyClass_List(FC));
         }
         #endregion
         #region 課程資訊-內容
-        public class cGetOrder_Info
+        public class cGetMyClass_Info
         {
             public int OHID = 0;
             public int OPID = 0;
@@ -207,15 +213,15 @@ namespace Banner.Areas.Web.Controllers
             public cTableList cTL = new cTableList();
         }
         [HttpGet]
-        public ActionResult Order_Info(int ID)
+        public ActionResult MyClass_Info(int ID)
         {
             GetViewBag();
             ACID = GetACID();
-            cGetOrder_Info c = new cGetOrder_Info();
+            cGetMyClass_Info c = new cGetMyClass_Info();
 
             var OP = DC.Order_Product.FirstOrDefault(q => !q.Order_Header.DeleteFlag && q.Order_Header.ACID == ACID && q.PID == ID);
             if (OP == null)
-                SetAlert("此訂單不存在", 2, "/Web/MyClass/Order_List");
+                SetAlert("此課程資料不存在", 2, "/Web/MyClass/MyClass_List");
             else
             {
                 c.OHID = OP.OHID;
@@ -321,6 +327,235 @@ namespace Banner.Areas.Web.Controllers
         }
 
 
+        #endregion
+
+        #region 課程資訊-列表
+        public class cGetMyOrder_List
+        {
+            public cTableList cTL = new cTableList();
+
+            public ListSelect ddl_Type = new ListSelect();
+
+            public DateTime Cre_SDate = DateTime.Now;
+            public DateTime Cre_EDate = DateTime.Now;
+        }
+        public cGetMyOrder_List GetMyOrder_List(FormCollection FC)
+        {
+            cGetMyOrder_List c = new cGetMyOrder_List();
+            ACID = GetACID();
+            ChangeOrder(ACID);
+            #region 物件初始化
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            c.cTL.Title = "訂單清單";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
+
+            c.Cre_SDate = DT.AddMonths(-3);
+            c.Cre_EDate = DT.AddMonths(3);
+
+            #endregion
+            #region 前端物件帶入
+            string sOT = "0";
+            c.ddl_Type = new ListSelect();
+            c.ddl_Type.ControlName = "ddl_OrderType";
+            if (FC != null)
+            {
+                sOT = FC.Get(c.ddl_Type.ControlName);
+                DateTime dCre_SDate = DT, dCre_EDate = DT, dClass_SDate = DT, dClass_EDate = DT;
+                if (DateTime.TryParse(FC.Get("Cre_SDate"), out dCre_SDate))
+                    c.Cre_SDate = dCre_SDate;
+                if (DateTime.TryParse(FC.Get("Cre_EDate"), out dCre_EDate))
+                    c.Cre_EDate = dCre_EDate;
+            }
+            c.ddl_Type.ddlList = new List<SelectListItem>();
+            c.ddl_Type.ddlList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = sOT == "0" });
+            for (int i = 1; i < sOrderType.Length; i++)
+                c.ddl_Type.ddlList.Add(new SelectListItem { Text = sOrderType[i], Value = i.ToString(), Selected = i.ToString() == sOT });
+
+            #endregion
+            #region 表單帶入
+
+
+            var Ns = DC.Order_Header.Where(q => !q.DeleteFlag &&
+                                q.ACID == ACID &&
+                                q.Order_Type > 0 &&
+                                q.CreDate.Date >= c.Cre_SDate &&
+                                q.CreDate <= c.Cre_EDate);
+            if (sOT != "0")
+                Ns = Ns.Where(q => q.Order_Type.ToString() == sOT);
+
+
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "刪除或補繳", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "訂單編號", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "訂單狀態", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "訂單日期", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "金額", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "付款方式", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "課程名稱" });
+
+
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+            c.cTL.TotalCt = Ns.Count();
+            c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.OHID).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
+            foreach (var N in Ns)
+            {
+                var Paid = N.Order_Paid.OrderByDescending(q => q.OPID).FirstOrDefault();
+                var MinClass = (from q in DC.Order_Product.Where(q => q.OHID == N.OHID)
+                         join p in DC.Product_ClassTime.Where(q => !q.Product_Class.DeleteFlag)
+                         on q.PCID equals p.PCID
+                         select p).OrderBy(q => q.ClassDate).FirstOrDefault();
+                DateTime DT_MinClass = MinClass != null ? MinClass.ClassDate : N.CreDate.AddDays(3);
+                cTableRow cTR = new cTableRow();
+                //控制
+                if (N.Order_Type > 2)//被取消就可以刪除了
+                    cTR.Cs.Add(new cTableCell { Value = "刪除", Type = "delete", URL = "/Web/MyClass/MyOrder_Delete/" + N.OHID });
+                else if(Paid!=null)
+                {
+                    switch (Paid.PayType.PayTypeID)
+                    {
+                        case 0://現金
+                            {
+                                if(DT >= DT_MinClass)//已經超過課程第一天,不能刪除
+                                    cTR.Cs.Add(new cTableCell { Value = "" });
+                                else
+                                    cTR.Cs.Add(new cTableCell { Value = "刪除", Type = "delete", URL = "/Web/MyClass/MyOrder_Delete/" + N.OHID });
+                            }
+                            break;
+
+                        case 1://信用卡
+                            {
+                                if (DT > N.CreDate.AddDays(CreditCardAddDays))//已過期,可以刪除
+                                    cTR.Cs.Add(new cTableCell { Value = "刪除", Type = "delete", URL = "/Web/MyClass/MyOrder_Delete/" + N.OHID });
+                                else //可重新付款
+                                    cTR.Cs.Add(new cTableCell { Value = "補刷卡", Type = "paid", URL = "/Web/ClassStore/Order_Paid_Credit_Card?OHID=" + N.OHID });
+                            }
+                            break;
+
+                        case 2://ATM
+                            {
+                                if (DT > N.CreDate.AddDays(ATMAddDays))//已過期,可以刪除
+                                    cTR.Cs.Add(new cTableCell { Value = "刪除", Type = "delete", URL = "/Web/MyClass/MyOrder_Delete/" + N.OHID });
+                                else //可重新付款
+                                    cTR.Cs.Add(new cTableCell { Value = "重新取號", Type = "paid", URL = "/Web/ClassStore/Order_Paid_ATM?OHID=" + N.OHID });
+                            }
+                            break;
+
+                        case 3://Paypal
+                            {
+                                cTR.Cs.Add(new cTableCell { Value = "" });
+                            }
+                            break;
+
+                        case 4://支付寶
+                            {
+                                cTR.Cs.Add(new cTableCell { Value = "" });
+                            }
+                            break;
+                    }
+                }
+                else 
+                    cTR.Cs.Add(new cTableCell { Value = "" });
+                cTR.Cs.Add(new cTableCell { Value = N.OHID.ToString().PadLeft(5, '0') });//訂單編號
+                cTR.Cs.Add(new cTableCell { Value = sOrderType[N.Order_Type] });//訂單狀態
+                cTR.Cs.Add(new cTableCell { Value = N.CreDate.ToString(DateTimeFormat) });//訂單日期
+                
+                if (Paid != null)
+                {
+                    if (Paid.PaidFlag)
+                        cTR.Cs.Add(new cTableCell { Value = "已於" + Paid.PaidDateTime.ToString(DateTimeFormat) + "使用" + sPayType[Paid.PTID] + "付款完成" });
+                    else
+                        cTR.Cs.Add(new cTableCell { Value = "預計使用" + sPayType[Paid.PayType.PayTypeID] + "付款" });
+                }
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "--" });//付款方式
+
+
+                cTR.Cs.Add(new cTableCell { Value = N.TotalPrice.ToString() });//金額
+                if (N.Order_Type == 2)
+                    cTR.Cs.Add(new cTableCell { Value = string.Join("<br/>", N.Order_Product.Select(q => q.Product.Title + " " + q.Product.SubTitle)), Type = "link", URL = "/Web/MyClass/MyClass_List?OHID=" + N.OHID });//課程名稱
+                else
+                    cTR.Cs.Add(new cTableCell { Value = string.Join("<br/>", N.Order_Product.Select(q => q.Product.Title + " " + q.Product.SubTitle)) });//課程名稱
+
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+            #endregion
+            return c;
+        }
+
+        [HttpGet]
+        public ActionResult MyOrder_List()
+        {
+            GetViewBag();
+            return View(GetMyOrder_List(null));
+        }
+        [HttpPost]
+        public ActionResult MyOrder_List(FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetMyOrder_List(FC));
+        }
+        #endregion
+        #region 移除訂單
+        [HttpGet]
+        public ActionResult MyOrder_Delete(int ID)
+        {
+            GetViewBag();
+            ACID = GetACID();
+            Error = "";
+            var OH = DC.Order_Header.FirstOrDefault(q => q.OHID == ID && q.ACID == ACID);
+            if (OH == null)
+                Error = "此訂單不存在或非您的訂單,不能刪除";
+            else if (OH.Order_Type == 2)
+                Error = "此訂單已完成付款,不能刪除";
+            else if (OH.Order_Type == 1)//交易中
+            {
+                var OP = DC.Order_Paid.OrderByDescending(q => q.OHID == OH.OHID).FirstOrDefault();
+                if (OP != null)
+                {
+                    switch (OP.PayType.PayTypeID)
+                    {
+                        case 0://現金
+                            break;
+
+                        case 1://信用卡
+                            if (DT < OH.CreDate.AddDays(CreditCardAddDays))//尚未過期
+                                Error = "此訂單正在等待第三方回應,不能自行刪除";
+                            break;
+
+                        case 2://ATM
+                            if (DT < OH.CreDate.AddDays(ATMAddDays))//尚未過期
+                                Error = "此訂單正在等待第三方回應,不能自行刪除";
+                            break;
+
+                        case 3://Paypal
+                            Error = "此訂單正在等待第三方回應,不能自行刪除";
+                            break;
+
+                        case 4://支付寶
+                            Error = "此訂單正在等待第三方回應,不能自行刪除";
+                            break;
+                    }
+                }
+            }
+
+            if (Error != "")
+                SetAlert(Error, 2);
+            else
+            {
+                OH.DeleteFlag = true;
+                OH.UpdDate = DT;
+                OH.SaveACID = ACID;
+                DC.SubmitChanges();
+
+                SetAlert("訂單已移除", 1, "/Web/MyClass/MyOrder_List");
+            }
+            return View();
+        }
         #endregion
     }
 }

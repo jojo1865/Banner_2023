@@ -67,7 +67,7 @@ namespace Banner.Areas.Web.Controllers
             TopTitles.Add(new cTableCell { Title = "活動時間", WidthPX = 160 });
             TopTitles.Add(new cTableCell { Title = "活動內容" });
             TopTitles.Add(new cTableCell { Title = "參加人數", WidthPX = 100 });
-            
+
             cTL.Rs.Add(SetTableRowTitle(TopTitles));
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
 
@@ -81,7 +81,7 @@ namespace Banner.Areas.Web.Controllers
                 cTableRow cTR = new cTableRow();
                 //操作
                 cTableCell cTC = new cTableCell();
-                if(N.Event.EventDate.Date>=DT.Date)//過期後就不能編輯
+                if (N.Event.EventDate.Date >= DT.Date || N.Event.CircleFlag)//過期後就不能編輯
                     cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/StaffPlace/Event_Edit?SID=" + SID + "&EHID=" + N.EJHID, Target = "_self", Value = "編輯" });
                 cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/StaffPlace/Event_QRCode?SID=" + SID + "&EHID=" + N.EJHID, Target = "_black", Value = "報到QR-Code" });
                 cTR.Cs.Add(cTC);
@@ -97,7 +97,7 @@ namespace Banner.Areas.Web.Controllers
                 cTR.Cs.Add(new cTableCell { Value = N.Event.EventInfo });
                 //參加人數
                 cTR.Cs.Add(new cTableCell { Type = "link", URL = "/Web/StaffPlace/EventJoin_List?SID=" + SID + "&EHID=" + N.EJHID, Target = "_black", Value = N.Event_Join_Detail.Count(q => !q.DeleteFlag) + "/" + iTotal });
-                
+
                 cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
 

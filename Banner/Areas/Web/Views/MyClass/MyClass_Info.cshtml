@@ -1,0 +1,74 @@
+﻿@model Banner.Areas.Web.Controllers.MyClassController.cGetMyClass_Info
+@{
+    ViewBag.Title = "Order_Info";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+<div class="body-container ">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/MyClass/MyClass_List">課程管理(會友)</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">課程資訊</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">課程資訊</h5>
+        </div>
+        <div class="container-lg">
+
+                <div class="container mt-2 mb-2 pt-2 pb-5">
+                    @if (Model != null)
+                    {
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>訂單資訊</h2>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2"><b>訂單編號：</b>@Model.OHID</p>
+                                <p class="mb-2"><b>訂購日期：</b>@Model.CreDate</p>
+                                <p class="mb-2"><b>付款方式：</b>@Model.PayType</p>
+                                <p class="mb-2"><b>訂單狀況：</b>@Model.OrderType</p>
+
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>課程資訊</h2>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2"><b>課程名稱：</b>@Model.ProductTitle</p>
+                                <p class="mb-2"><b>上課方式：</b>@Model.ProductType</p>
+                                <p class="mb-2"><b>課程內容：</b><br />@Model.ProductInfo</p>
+                                <p class="mb-2"><b>適用資格：</b><br />@Model.TargetInfo</p>
+                                <p class="mb-2"><b>結業資格：</b><br />@Model.GraduationInfo</p>
+                                <p class="mb-2"><b>課程金額：</b>@Model.Peice</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>班級上課紀錄</h2>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2"><b>班級名稱：</b>@Model.ClassTitle</p>
+                                <p class="mb-2"><b>講師名稱：</b>@Model.TeacherTitle</p>
+                                <p class="mb-2"><b>結業狀態：</b>@Model.Graduation</p>
+                                <p class="mb-2"><b>上課時間：</b></p>
+                                <div class="row mb-2">
+                                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+
+            <div class="action-bar">
+                <a href="/Web/MyClass/Order_List" class="btn btn-outline-primary btn-lg btn-round"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />返回我的課程</a>
+            </div>
+        </div>
+    </div>
+</div>
