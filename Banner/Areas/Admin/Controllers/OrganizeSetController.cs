@@ -334,6 +334,7 @@ namespace Banner.Areas.Admin.Controllers
             //public cTableRow cOrganize = new cTableRow();
             public cTableList cTL = new cTableList();
             public string sAddURL = "";
+            
         }
         private cOrganize_Info_List GetOrganize_Info_List(int OID, int OIID, FormCollection FC)
         {

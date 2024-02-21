@@ -341,7 +341,7 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult Aldult_Edit(int ID)
         {
-            GetID(ID);
+
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             
@@ -351,6 +351,7 @@ namespace Banner.Areas.Web.Controllers
                 SetAlert("查無此小組成員資料", 2, "/Web/GroupPlace/Aldult_List/" + OIID);
             else
             {
+                GetID(M.OIID);
                 N = DC.Account_Note.FirstOrDefault(q => q.ACID == M.ACID && q.OIID == M.OIID && q.NoteType == 0);
                 if (N == null)
                 {
@@ -373,7 +374,7 @@ namespace Banner.Areas.Web.Controllers
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
+            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
             if (M != null)
             {
                 N = DC.Account_Note.FirstOrDefault(q => q.ACID == M.ACID && q.OIID == M.OIID && q.NoteType == 0);
@@ -415,15 +416,16 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult Aldult_Remove(int ID)
         {
-            GetID(ID);
+
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
+            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
             if (M == null)
                 SetAlert("查無此小組成員資料", 2, "/Web/GroupPlace/Aldult_List/" + OIID);
             else
             {
+                GetID(M.OIID);
                 N.Account = M.Account;
                 N.NoteType = 3;
                 N.OIID = M.OIID;
@@ -440,7 +442,7 @@ namespace Banner.Areas.Web.Controllers
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             ViewBag._OIID = OIID;
             Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
+            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
             if (M != null)
             {
                 N = new Account_Note();
@@ -604,14 +606,15 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult New_Edit(int ID)
         {
-            GetID(ID);
+
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
+            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
             if (M == null)
                 SetAlert("查無此新人資料", 2, "/Web/GroupPlace/New_List/" + OIID);
             else
             {
+                GetID(M.OIID);
                 M.JoinDate = DT;
                 M.UpdDate = DT;
                 M.ActiveFlag = true;
@@ -626,16 +629,15 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult New_Remove(int ID)
         {
-            GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
+            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
             if (M == null)
                 SetAlert("查無此會員資料", 2, "/Web/GroupPlace/New_List/" + OIID);
             else
             {
-                
+                GetID(M.OIID);
                 N.Account = M.Account;
                 N.NoteType = 1;
                 N.OIID = M.OIID;
@@ -647,13 +649,14 @@ namespace Banner.Areas.Web.Controllers
 
         public ActionResult New_Remove(int ID, FormCollection FC)
         {
-            GetID(ID);
+            
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             Account_Note N = new Account_Note();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
+            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
             if (M != null)
             {
+                GetID(M.OIID);
                 N = new Account_Note();
                 N.Account = M.Account;
                 N.NoteType = 1;
@@ -762,12 +765,12 @@ namespace Banner.Areas.Web.Controllers
         [HttpGet]
         public ActionResult Baptized_Edit(int ID)
         {
-            GetID(ID);
+
             GetViewBag();
             DateTime DT_ = Convert.ToDateTime("2000/1/1");
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             Baptized N = new Baptized();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
+            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
             if (M == null)
                 SetAlert("查無此小組成員資料", 2, "/Web/GroupPlace/Baptized_List/" + OIID);
             else
@@ -791,12 +794,11 @@ namespace Banner.Areas.Web.Controllers
 
         public ActionResult Baptized_Edit(int ID, FormCollection FC)
         {
-            GetID(ID);
             GetViewBag();
             DateTime DT_ = Convert.ToDateTime("2000/1/1");
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             Baptized N = new Baptized();
-            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
+            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
             if (M != null)
             {
                 N = DC.Baptized.FirstOrDefault(q => q.ACID == M.ACID && q.OIID == M.OIID && !q.DeleteFlag && !q.ImplementFlag);

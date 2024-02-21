@@ -40,10 +40,10 @@
                         <label>駁回原因</label>
                         @Html.TextArea("txb_Note", Model.Note, new { @class = "form-control form-control-lg input-underlin", maxlength = "200", @style = "height:250px" })
                     </div>
-                    <div class="form-group">
-                        <label>其他設定</label>
-                        @Html.CheckBox("cbox_NoIntention", false, new { @class = "form-control form-control-lg input-underlin" })
-                        @Html.Label("此人無意願繼續加入小組", new { @for = "cbox_NoIntention" })
+                    <div class="form-group ">
+                        <label>其他設定</label><br />
+                        @Html.CheckBox("cbox_NoIntention", false, new { @class = "form-check-input" })
+                        @Html.Label("此人無意願繼續加入小組", new { @for = "cbox_NoIntention", @class = "form-check-label" })
                     </div>
                 </form>
             </div>
@@ -58,7 +58,7 @@
             <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;"><img src="/Areas/Web/Content/Img/save.svg" alt="" />儲存</a>
         </div>
         <div class="btn btn-outline-primary btn-lg btn-round">
-            <a href="/Web/GroupPlace/New_List"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />取消</a>
+            <a href="/Web/GroupPlace/New_List/@Model.OIID"><img src="/Areas/Web/Content/Img/cancel.svg" alt="" />取消</a>
         </div>
     }
 </div>

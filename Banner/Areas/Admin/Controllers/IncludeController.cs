@@ -239,7 +239,7 @@ namespace Banner.Areas.Admin.Controllers
         public PartialViewResult _OrganizeFilter(int OID, string OTitle, bool LockFlag = false)
         {
             List<SelectListItem> OList = new List<SelectListItem>();
-
+            ACID = GetACID();
             OList.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = OID == 0 });
             var Os = DC.Organize.Where(q => !q.DeleteFlag).ToList();
             int PID = 0;
@@ -546,7 +546,7 @@ namespace Banner.Areas.Admin.Controllers
                 }
 
 
-                SLs.Add(new ListInput { Title = O.Title + (string.IsNullOrEmpty(O.JobTitle) ? "" : "-" + O.JobTitle), ControlName = CSS });
+                SLs.Add(new ListInput { Title = O.Title + (string.IsNullOrEmpty(O.JobTitle) ? "" : "-" + O.JobTitle), ControlName = CSS,SortNo=O.OID });
                 O = DC.Organize.FirstOrDefault(q => q.ParentID == O.OID);
             }
 
