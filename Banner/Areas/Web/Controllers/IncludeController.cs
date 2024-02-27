@@ -211,7 +211,10 @@ namespace Banner.Areas.Web.Controllers
                     }
                     cMs.Add(cM);
                 }
-                else if (M.MenuType == 4 && !bTeacherFlag) { }//講師限定選單,非講師則過濾
+                else if (M.MenuType == 4 && bTeacherFlag)
+                {
+
+                }//講師限定選單,非講師則過濾
                 else
                 {
                     cM.Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, OIID, 0);
@@ -260,7 +263,62 @@ namespace Banner.Areas.Web.Controllers
                         Items.Add(cM);
                     }
                 }
-                else if (M.MenuType == 4 && !bTeacherFlag) { }//講師限定選單,非講師則過濾
+                else if (M.MenuType == 4 && bTeacherFlag)
+                {
+                    var MPTs = from q in DC.M_Product_Teacher.Where(q => q.Product.ActiveFlag && !q.Product.DeleteFlag && q.Product_Class.ActiveFlag && !q.Product_Class.DeleteFlag)
+                               join p in DC.Teacher.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID)
+                               on q.TID equals p.TID
+                               select q;
+                    var MPTG_Ps = from q in MPTs
+                                  group q by new { q.PID, q.Product.Title, q.Product.SubTitle } into g
+                                  select new { g.Key.PID, g.Key.Title, g.Key.SubTitle };
+                    cMenu cM = new cMenu
+                    {
+                        MenuID = M.MID,
+                        Title = M.Title,
+                        Url = M.URL,
+                        ImgUrl = M.ImgURL,
+                        SortNo = M.SortNo,
+                        SelectFlag = M.URL.StartsWith(ThisController) || M.URL.StartsWith(NowShortPath) || CM_ != null,
+                        Items = new List<cMenu>()
+                    };
+
+                    foreach (var MPTP in MPTG_Ps.OrderBy(q => q.PID))
+                    {
+                        foreach (var MPT in MPTs.Where(q => q.PID == MPTP.PID).OrderBy(q => q.Product_Class.Title))
+                        {
+                            cMenu cM_ = new cMenu
+                            {
+                                Title = MPTP.Title + " " + MPTP.SubTitle + " " + MPT.Product_Class.Title,
+                                Url = "",
+                                ImgUrl = "",
+                                SortNo = MPT.PCID,
+                                SelectFlag = false,
+                                Items = new List<cMenu>() 
+                                {
+                                    new cMenu{
+                                        Title = "上課打卡",
+                                        Url = "/Web/Teacher/Index/" + MPT.PCID,
+                                        ImgUrl = "",
+                                        SortNo = 0,
+                                        SelectFlag = false,
+                                        Items = new List<cMenu>()
+                                    },
+                                    new cMenu { 
+                                        Title = "學生管理",
+                                        Url = "/Web/Teacher/Student_List/" + MPT.PCID,
+                                        ImgUrl = "",
+                                        SortNo = 1,
+                                        SelectFlag = false,
+                                        Items = new List<cMenu>()
+                                    }
+                                }
+                            };
+                            cM.Items.Add(cM_);
+                        }
+                    }
+                    Items.Add(cM);
+                }//講師限定選單,非講師則過濾
                 else
                 {
                     cMenu cM = new cMenu

@@ -49,10 +49,10 @@ namespace Banner.Areas.Web.Controllers
                     */
                     /*LogInAC(443);
                     SetBrowserData("UserName", "江晨旭");*/
-                    //LogInAC(8197);
-                    //SetBrowserData("UserName", "JOJO");
-                    LogInAC(2213);
-                    SetBrowserData("UserName", "劉冠廷");
+                    LogInAC(8197);
+                    SetBrowserData("UserName", "JOJO");
+                    //LogInAC(2213);
+                    //SetBrowserData("UserName", "劉冠廷");
 
                     Response.Redirect("/Web/Home/Index");
                 }

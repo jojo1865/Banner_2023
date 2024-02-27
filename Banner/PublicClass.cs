@@ -868,6 +868,10 @@ namespace Banner
         {
             return $"{TS:hh\\:mm}";
         }
+        public DateTime ChangeTimeSpanToDateTime(DateTime DT_,TimeSpan TS)
+        {
+            return Convert.ToDateTime(DT.ToString(DateFormat) + " " + GetTimeSpanToString(TS) + ":00");
+        }
         //產生圖形驗證碼
         public string GenerateCheckCode()
         {

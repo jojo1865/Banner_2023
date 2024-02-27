@@ -1,0 +1,53 @@
+﻿@model Banner.Areas.Web.Controllers.TeacherController.cGetStudent_List
+@{
+    ViewBag.Title = "Student_List";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+
+<div class="body-container ">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/Teacher/Index">上課打卡</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="#">班級學員列表</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">班級學員列表</h5>
+        </div>
+
+        <div class="container-lg">
+            <form id="form1" method="post">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8 col-12">
+                                <div class="form-group">
+                                    <label>學員名稱：</label>
+                                    @Html.TextBox("txb_Name", Model.Name, new { @class = "form-control" })
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-12 text-lg-end text-center pt-4">
+                                <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
