@@ -2142,7 +2142,7 @@ namespace Banner.Areas.Admin.Controllers
                     }
 
                     CC.cCCTs = new List<cClassCellTime>();
-                    CC.OrderCt = DC.Order_Product.Count(q => q.Order_Header.Order_Type == 2 && !q.Order_Header.DeleteFlag);
+                    CC.OrderCt = DC.Order_Product.Count(q => q.Order_Header.Order_Type == 2 && !q.Order_Header.DeleteFlag && q.PCID == C.PCID);
                     var CTs = DC.Product_ClassTime.Where(q => q.PCID == CC.PCID).OrderBy(q => q.ClassDate).ThenBy(q => q.STime);
                     foreach (var CT in CTs)
                     {

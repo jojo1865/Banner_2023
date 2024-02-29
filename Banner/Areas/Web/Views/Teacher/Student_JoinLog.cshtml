@@ -1,0 +1,54 @@
+﻿@model Banner.Areas.Web.Controllers.TeacherController.cGetStudent_JoinLog
+@{
+    ViewBag.Title = "Student_JoinLog";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container ">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/Teacher/Index/@Model.PCID">上課打卡</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/Teacher/Student_List/@Model.PCID">班級學員列表</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="#">學生打卡管理</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">@Model.ClassTitle 學生打卡管理</h5>
+        </div>
+
+        <div class="container-lg">
+            <form id="form1" method="post">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8 col-12">
+                                
+                            </div>
+
+                            <div class="col-lg-4 col-12 text-lg-end text-center pt-4">
+                                <a href="/Web/Teacher/Student_List/@Model.PCID" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2">返回學員列表</a>
+                                <button type="submit" name="btn_AddJoin" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>補打卡</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
