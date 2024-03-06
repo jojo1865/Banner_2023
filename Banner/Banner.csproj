@@ -741,6 +741,8 @@
     <Content Include="Areas\Web\Views\Teacher\Index.cshtml" />
     <Content Include="Areas\Web\Views\Teacher\Class_Join.cshtml" />
     <Content Include="Areas\Web\Views\Teacher\Student_JoinLog.cshtml" />
+    <Content Include="Areas\Web\Views\MyClass\MyJoinClassHistory_List.cshtml" />
+    <Content Include="Areas\Web\Views\MyClass\MyGraduationHistory_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

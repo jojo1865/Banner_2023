@@ -818,11 +818,13 @@ namespace Banner.Areas.Admin.Controllers
             public bool bBackUsedFlag = false;//是否為後台管理者
             public bool bShowBackUsedAreaFlag = false;//是否顯示後台管理者勾選介面
 
-            public bool bJob24Flag = false;//是否為領夜同工
+            //public bool bJob24Flag = false;//是否為領夜同工
             public List<cOAccount> OAs = new List<cOAccount>();//目前按立狀況
             public List<cOAH> OAHs = new List<cOAH>();//按立歷史
 
             public bool bFriendFlag = false;//是否為會友
+
+            public bool bNeightLeaderFlag = false;//是否為領夜同工
         }
         //家庭樹
         public class cFamily
@@ -1029,7 +1031,8 @@ namespace Banner.Areas.Admin.Controllers
             //中低收入戶
             N.bShowBackUsedAreaFlag = CheckAdmin(GetACID());
             //領夜同工
-            N.bJob24Flag = DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 24 && q.ACID == ID);
+            //N.bJob24Flag = DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 24 && q.ACID == ID);
+            N.bNeightLeaderFlag = GetMOIAC(8, 0, ID).Count() > 0;
             //按立歷史
             var OAHs = DC.M_O_Account.Where(q => q.ACID == ID);
             #region 建立按立資料
@@ -1462,13 +1465,20 @@ namespace Banner.Areas.Admin.Controllers
                     N.AC.Name_Last = FC.Get("txb_Name_Last");
                     if (ID == 0 || N.UID == 1)
                     {
-                        N.AC.Login = FC.Get("txb_Login");
-                        if (!CheckPasswork(FC.Get("txb_New1")))
-                            Error += "密碼必須為包含大小寫英文與數字的8碼以上字串</br>";
-                        else if (FC.Get("txb_New2") != FC.Get("txb_New1"))
-                            Error += "新密碼與重複輸入的不同</br>";
+                        if (!string.IsNullOrEmpty(FC.Get("txb_Login")))
+                            N.AC.Login = FC.Get("txb_Login");
                         else
-                            N.AC.Password = HSM.Enc_1(FC.Get("txb_New1"));
+                            Error += "請輸入帳號</br>";
+
+                        if (!string.IsNullOrEmpty(FC.Get("txb_New1")))
+                        {
+                            if (!CheckPasswork(FC.Get("txb_New1")))
+                                Error += "密碼必須為包含大小寫英文與數字的8碼以上字串</br>";
+                            else if (FC.Get("txb_New2") != FC.Get("txb_New1"))
+                                Error += "新密碼與重複輸入的不同</br>";
+                            else
+                                N.AC.Password = HSM.Enc_1(FC.Get("txb_New1"));
+                        }
                     }
 
                     N.AC.ManFlag = GetViewCheckBox(FC.Get("cbox_Sex"));
@@ -1588,6 +1598,7 @@ namespace Banner.Areas.Admin.Controllers
                     N.AC.BackUsedFlag = GetViewCheckBox(FC.Get("cbox_BackUsedFlag"));
                     N.AC.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
                     N.AC.TeacherFlag = GetViewCheckBox(FC.Get("cbox_TeacherFlag"));
+                    N.AC.NightLeaderFlag = GetViewCheckBox(FC.Get("cbox_NightLeaderFlag"));
                 }
                 #endregion
             }
@@ -1685,6 +1696,39 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 else
                     DC.SubmitChanges();
+                //領夜
+                if(N.AC.NightLeaderFlag)
+                {
+                    if(!DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 24 && q.ACID == ID))
+                    {
+                        M_Role_Account MRA = new M_Role_Account
+                        {
+                            ACID = ID,
+                            RID = 24,
+                            JoinDate = DT,
+                            LeaveDate = DT,
+                            Note = "",
+                            ActiveFlag = true,
+                            DeleteFlag = false,
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = ACID
+                        };
+                        DC.M_Role_Account.InsertOnSubmit(MRA);
+                        DC.SubmitChanges();
+                    }
+                }
+                else
+                {
+                    var MRA = DC.M_Role_Account.FirstOrDefault(q => q.RID == 24 && q.ACID == ID);
+                    if(MRA!=null)
+                    {
+                        MRA.ActiveFlag = false;
+                        MRA.UpdDate = DT;
+                        MRA.SaveACID = ACID;
+                        DC.SubmitChanges();
+                    }
+                }
 
                 SetAlert("完成", 1, "/Admin/AccountSet/Account_Aldult_List/0");
             }

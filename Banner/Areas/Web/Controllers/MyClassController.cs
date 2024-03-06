@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
+using ZXing.OneD;
 using static Banner.Areas.Web.Controllers.MyClassController;
 
 namespace Banner.Areas.Web.Controllers
@@ -406,21 +408,21 @@ namespace Banner.Areas.Web.Controllers
             {
                 var Paid = N.Order_Paid.OrderByDescending(q => q.OPID).FirstOrDefault();
                 var MinClass = (from q in DC.Order_Product.Where(q => q.OHID == N.OHID)
-                         join p in DC.Product_ClassTime.Where(q => !q.Product_Class.DeleteFlag)
-                         on q.PCID equals p.PCID
-                         select p).OrderBy(q => q.ClassDate).FirstOrDefault();
+                                join p in DC.Product_ClassTime.Where(q => !q.Product_Class.DeleteFlag)
+                                on q.PCID equals p.PCID
+                                select p).OrderBy(q => q.ClassDate).FirstOrDefault();
                 DateTime DT_MinClass = MinClass != null ? MinClass.ClassDate : N.CreDate.AddDays(3);
                 cTableRow cTR = new cTableRow();
                 //控制
                 if (N.Order_Type > 2)//被取消就可以刪除了
                     cTR.Cs.Add(new cTableCell { Value = "刪除", Type = "delete", URL = "/Web/MyClass/MyOrder_Delete/" + N.OHID });
-                else if(Paid!=null)
+                else if (Paid != null)
                 {
                     switch (Paid.PayType.PayTypeID)
                     {
                         case 0://現金
                             {
-                                if(DT >= DT_MinClass)//已經超過課程第一天,不能刪除
+                                if (DT >= DT_MinClass)//已經超過課程第一天,不能刪除
                                     cTR.Cs.Add(new cTableCell { Value = "" });
                                 else
                                     cTR.Cs.Add(new cTableCell { Value = "刪除", Type = "delete", URL = "/Web/MyClass/MyOrder_Delete/" + N.OHID });
@@ -458,12 +460,12 @@ namespace Banner.Areas.Web.Controllers
                             break;
                     }
                 }
-                else 
+                else
                     cTR.Cs.Add(new cTableCell { Value = "" });
                 cTR.Cs.Add(new cTableCell { Value = N.OHID.ToString().PadLeft(5, '0') });//訂單編號
                 cTR.Cs.Add(new cTableCell { Value = sOrderType[N.Order_Type] });//訂單狀態
                 cTR.Cs.Add(new cTableCell { Value = N.CreDate.ToString(DateTimeFormat) });//訂單日期
-                
+
                 if (Paid != null)
                 {
                     if (Paid.PaidFlag)
@@ -556,6 +558,178 @@ namespace Banner.Areas.Web.Controllers
             }
             return View();
         }
+        #endregion
+
+        #region 我的打卡紀錄
+        public class cGetMyJoinClassHistory_List
+        {
+            public cTableList cTL = new cTableList();
+            public string Title = "";
+            public DateTime SDate = DateTime.Now;
+            public DateTime EDate = DateTime.Now;
+        }
+        public cGetMyJoinClassHistory_List GetMyJoinClassHistory_List(FormCollection FC)
+        {
+            cGetMyJoinClassHistory_List c = new cGetMyJoinClassHistory_List();
+            ACID = GetACID();
+            var Ns = DC.Order_Join.Where(q => !q.DeleteFlag && !q.Order_Product.Order_Header.DeleteFlag && q.Order_Product.Order_Header.Order_Type == 2);
+            #region 物件初始化
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            c.cTL.Title = "出勤紀錄";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
+
+            c.SDate = DT.AddMonths(-3);
+            c.EDate = DT;
+
+            #endregion
+            #region 前端物件帶入
+            if (FC != null)
+            {
+                DateTime dSDate = DT, dEDate = DT;
+                if (DateTime.TryParse(FC.Get("txb_SDate"), out dSDate))
+                    c.SDate = dSDate;
+                if (DateTime.TryParse(FC.Get("txb_EDate"), out dEDate))
+                    c.EDate = dEDate;
+
+                c.Title = FC.Get("txb_Title");
+
+            }
+            #endregion
+            #region 表單帶入
+            Ns = Ns.Where(q => q.CreDate.Date >= c.SDate.Date && q.CreDate.Date <= c.EDate.Date);
+            if (!string.IsNullOrEmpty(c.Title))
+                Ns = Ns.Where(q => (q.Order_Product.Product.Title + " " + q.Order_Product.Product.SubTitle).Contains(c.Title));
+
+            var TopTitles = new List<cTableCell>();
+
+            TopTitles.Add(new cTableCell { Title = "課程名稱" });
+            TopTitles.Add(new cTableCell { Title = "報名班級" });
+            TopTitles.Add(new cTableCell { Title = "上課時間" });
+            TopTitles.Add(new cTableCell { Title = "打卡時間" });
+
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+            c.cTL.TotalCt = Ns.Count();
+            c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.CreDate).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
+            foreach (var N in Ns)
+            {
+                cTableRow cTR = new cTableRow();
+                cTR.Cs.Add(new cTableCell { Value = N.Order_Product.Product.Title + " " + N.Order_Product.Product.SubTitle });//課程名稱
+                cTR.Cs.Add(new cTableCell { Value = N.Product_ClassTime.Product_Class.Title });//報名班級
+                cTR.Cs.Add(new cTableCell { Value = ChangeTimeSpanToDateTime(N.Product_ClassTime.ClassDate, N.Product_ClassTime.STime).ToString(DateTimeFormat) + " ~ " + ChangeTimeSpanToDateTime(N.Product_ClassTime.ClassDate, N.Product_ClassTime.ETime).ToString(DateTimeFormat) });//上課時間
+                cTR.Cs.Add(new cTableCell { Value = N.CreDate.ToString(DateTimeFormat) });//打卡時間
+
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+            #endregion
+            return c;
+        }
+        [HttpGet]
+        public ActionResult MyJoinClassHistory_List()
+        {
+            GetViewBag();
+            return View(GetMyJoinClassHistory_List(null));
+        }
+        [HttpPost]
+        public ActionResult MyJoinClassHistory_List(FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetMyJoinClassHistory_List(FC));
+        }
+
+        #endregion
+        #region 我的結業紀錄
+        public class cGetMyGraduationHistory_List
+        {
+            public cTableList cTL = new cTableList();
+            public ListSelect LS_Graduation = new ListSelect();
+            public string Title = "";
+        }
+        public cGetMyGraduationHistory_List GetMyGraduationHistory_List(FormCollection FC)
+        {
+            cGetMyGraduationHistory_List c = new cGetMyGraduationHistory_List();
+            ACID = GetACID();
+            var Ns = DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 2);
+            #region 物件初始化
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            c.cTL.Title = "結業狀態";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
+
+            c.LS_Graduation = new ListSelect();
+            c.LS_Graduation.ControlName = "ddl_Type";
+            c.LS_Graduation.ddlList.Add(new SelectListItem { Text = "全部", Value = "-1", Selected = true });
+            c.LS_Graduation.ddlList.Add(new SelectListItem { Text = "已結業", Value = "1" });
+            c.LS_Graduation.ddlList.Add(new SelectListItem { Text = "上課中", Value = "0" });
+            #endregion
+            #region 前端物件帶入
+            string GType = "-1";
+            if (FC != null)
+            {
+                c.Title = FC.Get("txb_Title");
+                GType = FC.Get(c.LS_Graduation.ControlName);
+                c.LS_Graduation.ddlList.ForEach(q => q.Selected = false);
+                c.LS_Graduation.ddlList.First(q => q.Value == GType).Selected = true;
+            }
+            #endregion
+            #region 表單帶入
+
+            if (!string.IsNullOrEmpty(c.Title))
+                Ns = Ns.Where(q => (q.Product.Title + " " + q.Product.SubTitle).Contains(c.Title));
+            if (GType != "-1")
+                Ns = Ns.Where(q => q.Graduation_Flag == (GType == "1"));
+
+            var TopTitles = new List<cTableCell>();
+
+            TopTitles.Add(new cTableCell { Title = "課程名稱" });
+            TopTitles.Add(new cTableCell { Title = "報名班級" });
+            TopTitles.Add(new cTableCell { Title = "結業狀態" });
+            TopTitles.Add(new cTableCell { Title = "結業時間" });
+
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+            c.cTL.TotalCt = Ns.Count();
+            c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.CreDate).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
+            foreach (var N in Ns)
+            {
+                cTableRow cTR = new cTableRow();
+                cTR.Cs.Add(new cTableCell { Value = N.Product.Title + " " + N.Product.SubTitle });//課程名稱
+                cTR.Cs.Add(new cTableCell { Value = N.Product_Class.Title });//報名班級
+                if (N.Graduation_Flag)
+                {
+                    cTR.Cs.Add(new cTableCell { Value = "已結業" });//結業狀態
+                    cTR.Cs.Add(new cTableCell { Value = N.Graduation_Date.ToString(DateFormat) });//結業時間
+                }
+                else
+                {
+                    cTR.Cs.Add(new cTableCell { Value = "上課中" });//結業狀態
+                    cTR.Cs.Add(new cTableCell { Value = "--" });//結業時間
+                }
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+            #endregion
+            return c;
+        }
+        [HttpGet]
+        public ActionResult MyGraduationHistory_List()
+        {
+            GetViewBag();
+            return View(GetMyGraduationHistory_List(null));
+        }
+        [HttpPost]
+        public ActionResult MyGraduationHistory_List(FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetMyGraduationHistory_List(FC));
+        }
+
         #endregion
     }
 }

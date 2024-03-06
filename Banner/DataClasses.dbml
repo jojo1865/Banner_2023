@@ -1,16 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="db_Banner" Class="DataClassesDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Table Name="dbo.ZipCode" Member="ZipCode">
-    <Type Name="ZipCode">
-      <Column Name="ZID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="ParentID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Code" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
-      <Column Name="GroupName" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
-      <Column Name="Note" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Association Name="ZipCode_Location" Member="Location" ThisKey="ZID" OtherKey="ZID" Type="Location" />
-    </Type>
-  </Table>
   <Table Name="dbo.Account" Member="Account">
     <Type Name="Account">
       <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -30,6 +18,7 @@
       <Column Name="GroupType" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Column Name="BackUsedFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="TeacherFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="NightLeaderFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
@@ -55,6 +44,18 @@
       <Association Name="Account_M_Staff_Account" Member="M_Staff_Account" ThisKey="ACID" OtherKey="ACID" Type="M_Staff_Account" />
       <Association Name="Account_Order_Header" Member="Order_Header" ThisKey="ACID" OtherKey="ACID" Type="Order_Header" />
       <Association Name="Account_OrganizeInfo" Member="OrganizeInfo" ThisKey="ACID" OtherKey="ACID" Type="OrganizeInfo" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ZipCode" Member="ZipCode">
+    <Type Name="ZipCode">
+      <Column Name="ZID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ParentID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="GroupName" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="Note" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="ZipCode_Location" Member="Location" ThisKey="ZID" OtherKey="ZID" Type="Location" />
     </Type>
   </Table>
   <Table Name="dbo.Account_Bank" Member="Account_Bank">

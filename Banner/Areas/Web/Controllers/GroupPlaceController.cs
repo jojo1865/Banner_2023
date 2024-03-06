@@ -463,7 +463,7 @@ namespace Banner.Areas.Web.Controllers
                 {
                     DC.Account_Note.InsertOnSubmit(N);
                     DC.SubmitChanges();
-
+                    N.Account.NightLeaderFlag = false;//拔領夜
                     M.Account.GroupType =GetViewCheckBox(FC.Get("cbox_NoIntention")) ? "無意願" : "有意願-願分發";
                     M.Account.UpdDate = DT;
                     N.Account.SaveACID = ACID;

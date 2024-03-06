@@ -1,0 +1,69 @@
+﻿@model Banner.Areas.Web.Controllers.MyClassController.cGetMyJoinClassHistory_List
+@{
+    ViewBag.Title = "Order_List";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container ">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/MyClass/MyClass_List">課程管理(會友)</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">出勤紀錄</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">出勤紀錄</h5>
+        </div>
+
+        <div class="container-lg">
+            <form id="form1" method="post">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-3 col-12">
+                                <label class="lab_DarkBlue">課程名稱：</label>
+                                <span class="lab_info">
+                                    @Html.TextBox("txb_Title", Model.Title, new { @class = "form-control form-select-lg" })
+                                </span>
+                            </div>
+                            <div class="col-lg-7 col-12">
+                                <label class="lab_DarkBlue">打卡日期：</label>
+                                <div class="row">
+                                    <div class="col-auto">
+                                        @Html.TextBox("txb_SDate", Model.SDate.ToString("yyyy-MM-dd"), new { @class = "form-select form-select-lg", type = "date" })
+                                    </div>
+                                    <div class="col-auto"><label class="form-label col-form-label-lg">~</label></div>
+                                    <div class="col-auto">
+                                        @Html.TextBox("txb_EDate", Model.EDate.ToString("yyyy-MM-dd"), new { @class = "form-select form-select-lg", type = "date" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-12 text-lg-end text-center">
+                                <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2 mt-4"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                            </div>
+                        </div>
+                        <div class="row">
+
+
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+

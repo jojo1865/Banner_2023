@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
 
@@ -15,74 +16,109 @@ namespace Banner.Areas.Web.Controllers
         #region 會員中心-首頁
         public class cAccountPlace_Index
         {
-            public List<cMeetingMsg> cMLs = new List<cMeetingMsg>();
+
             public string Name = "";
+            public string Title_OI = "";
+            public string Title_Staff = "";
+            public string Title_Teacher = "";
+            public List<cMenu> c_MyClass = new List<cMenu>();
             public bool bFriendFlag = false;
-            //public cTree Tree = new cTree();
+            public GroupData MuGroup = new GroupData();
+            public List<GroupData> MyGroups = new List<GroupData>();
         }
-        public class cMeetingMsg
+        public class GroupData
         {
-            public string JobTitle = "";
-            public string OIList = "";
-            public string GroupTitle = "";
-            public string Week = "";
-            public string Time = "";
-            public string Location = "";
+
+            public string Title;
+            public string Date;
+            public string Time;
+            public string Address;
         }
         public ActionResult Index()
         {
             GetViewBag();
             cAccountPlace_Index N = new cAccountPlace_Index();
-            N.cMLs = new List<cMeetingMsg>();
+
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag);
             if (AC != null)
             {
                 N.Name = AC.Name_First + AC.Name_Last;
-                var MOIs = GetMOIAC(0, 0, ACID);
-                foreach (var MOI in MOIs)
+
+                #region 區塊1=參與職分或團體
+                //按立
+                var MOA = DC.M_O_Account.Where(q => q.ACID == ACID &&
+                                            q.ActiveFlag &&
+                                            !q.DeleteFlag &&
+                                            q.Organize.ActiveFlag &&
+                                            !q.Organize.DeleteFlag &&
+                                            q.Organize.JobTitle != ""
+                                            ).OrderBy(q => q.OID).FirstOrDefault();
+                if (MOA != null) { N.Title_OI = MOA.Organize.JobTitle; }
+                //事工團
+                var MSAs = DC.M_Staff_Account.Where(q => q.ACID == ACID &&
+                                                q.ActiveFlag &&
+                                                !q.DeleteFlag &&
+                                                q.Staff.ActiveFlag &&
+                                                !q.Staff.DeleteFlag
+                                                ).OrderBy(q => q.JoinDate);
+                if (MSAs.Count() > 0)
+                    N.Title_Staff = string.Join("/", MSAs.Select(q => q.Staff.Title));
+                //講師
+                if (AC.TeacherFlag)
                 {
-                    cMeetingMsg cM = new cMeetingMsg
-                    {
-                        JobTitle = MOI.OrganizeInfo.ACID == ACID ? "小組長" : "小組員",
-                        OIList = "",
-                        GroupTitle = MOI.OrganizeInfo.Title + MOI.OrganizeInfo.Organize.Title,
-                        Week = "--",
-                        Time = "--",
-                        Location = "--",
-                    };
-                    #region 小組層級
-
-                    string sOITitle = MOI.OrganizeInfo.Title + MOI.OrganizeInfo.Organize.Title + "(編號:" + MOI.OrganizeInfo.OIID + ")";
-                    var OI_ = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == MOI.OrganizeInfo.ParentID && !q.DeleteFlag && q.ActiveFlag && q.OID > 4);
-                    while (OI_ != null)
-                    {
-                        sOITitle = OI_.Title + OI_.Organize.Title + "/" + sOITitle;
-                        OI_ = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI_.ParentID && !q.DeleteFlag && q.ActiveFlag && q.OID > 4);
-                    }
-                    cM.OIList = sOITitle;
-                    #endregion
-                    #region 小組聚會點
-
-                    var MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == MOI.OIID && q.ActiveFlag && !q.DeleteFlag);
-                    if (MLS != null)
-                    {
-                        cM.Week = sWeeks[MLS.WeeklyNo];
-                        cM.Time = MLS.S_hour.ToString().PadLeft(2, '0') + ":" +
-                            MLS.S_minute.ToString().PadLeft(2, '0') + "~" +
-                            MLS.E_hour.ToString().PadLeft(2, '0') + ":" +
-                            MLS.E_minute.ToString().PadLeft(2, '0');
-
-                        var L = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MLSID);
-                        cM.Location = GetLocationString(L);
-                    }
-
-                    #endregion
-                    N.cMLs.Add(cM);
+                    var MPTs = from q in DC.Teacher.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag)
+                               join p in DC.M_Product_Teacher.Where(q => q.Product.ActiveFlag && !q.Product.DeleteFlag && q.Product_Class.ActiveFlag && !q.Product_Class.DeleteFlag)
+                               on q.TID equals p.TID
+                               select p;
+                    if (MPTs.Count() > 0)
+                        N.Title_Teacher = string.Join("/", MPTs.Select(q => q.Product.Title + " " + q.Product.SubTitle + " " + q.Product_Class.Title));
                 }
-                if (MOIs.Count() == 0)
+                #endregion
+                #region 區塊2=上課中
+                var MPCs = DC.Order_Product.Where(q => q.Order_Header.Order_Type == 2 && q.Order_Header.ACID == ACID && !q.Order_Header.DeleteFlag && !q.Product.DeleteFlag && q.Product_Class.GraduateDate.Date > DT.Date && !q.Graduation_Flag).OrderBy(q => q.Order_Header.CreDate);
+                if (MPCs.Count() > 0)
                 {
-                    N.cMLs.Add(new cMeetingMsg());
+                    int i = 0;
+                    foreach (var MPC in MPCs)
+                    {
+                        cMenu cM = new cMenu
+                        {
+                            MenuID = MPC.PID,
+                            Title = MPC.Product.Title + " " + MPC.Product.SubTitle,
+                            Url = "/Web/MyClass/MyClass_Info/" + MPC.PID,
+                            SortNo = i,
+                            SelectFlag = false,
+                            Items = null
+                        };
+                        N.c_MyClass.Add(cM);
+                        i++;
+                    }
                 }
+                #endregion
+                #region 我的小組
+                var MOI8 = GetMOIAC(8, 0, ACID).FirstOrDefault();
+                if (MOI8 != null)
+                {
+                    N.MuGroup = new GroupData();
+                    List<string> sList = GetOITitles(MOI8.OIID);
+                    sList = (sList.Take(5)).ToList();
+                    sList.Reverse();
+                    N.MuGroup.Title = string.Join("-", sList) + "(#"+MOI8.OIID+")";
+                    var Meet = DC.Meeting_Location_Set.FirstOrDefault(q => q.OIID == MOI8.OIID && q.SetType==1 && q.ActiveFlag && !q.DeleteFlag);
+                    if(Meet!=null)
+                    {
+                        N.MuGroup.Date = sWeeks[Meet.WeeklyNo];
+                        N.MuGroup.Time = Meet.TimeNo + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":"+Meet.S_minute.ToString().PadLeft(2,'0')+"~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
+                        N.MuGroup.Address = Meet.Meeting_Location.Title;
+                        var Loc = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == Meet.MLSID);
+                        if(Loc!=null)
+                        {
+                            N.MuGroup.Address += " " + GetZipData(Loc.ZID) + Loc.Address;
+                        }
+                    }
+                }
+                #endregion
+                
 
                 //會友卡
                 N.bFriendFlag = DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.RID == 2);

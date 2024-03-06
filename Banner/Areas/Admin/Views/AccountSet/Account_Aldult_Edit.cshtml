@@ -544,6 +544,18 @@
                                     }
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-12 pt-2">
+                                    @if (Model.bNeightLeaderFlag)
+                                    {
+                                        @Html.CheckBox("cbox_NightLeaderFlag", Model.AC.NightLeaderFlag, new { @class = "form-check-input" })<label for="cbox_NightLeaderFlag">領夜同工</label>
+                                    }
+                                    else
+                                    {
+                                        @Html.CheckBox("cbox_NightLeaderFlag", Model.AC.NightLeaderFlag, new { @class = "form-check-input", @disabled = "true" })<label class="lab_gray">領夜同工(無小組)</label>
+                                    }
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!--複製用 預設隱藏-->
@@ -558,7 +570,7 @@
                     </div>
 
 
-                    <div class="row">
+                    <div class="row d-none">
                         <div class="col">
                             <a href="javascript:;" onclick="SubmitConfirm();" class="btn_Basic btn btn-primary btn-sm btn-round">儲存</a>
                         </div>

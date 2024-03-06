@@ -2750,7 +2750,24 @@ namespace Banner
 
             return OIs;
         }
+        //取得某小組上面全部組織名稱
+        
+        public List<string> GetOITitles(int OIID)
+        {
+            List<string> S = new List<string>();
 
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID && q.OID==8 && !q.DeleteFlag);
+            do
+            {
+                S.Add(OI.Title + OI.Organize.Title);
+                if (OI.ParentID > 0)
+                    OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID && !q.DeleteFlag);
+                else
+                    break;
+            } while (OI != null);
+
+            return S;
+        }
 
         //取得全部組織組織下拉選單
         public List<ListSelect> GetO(int OIID = 0)

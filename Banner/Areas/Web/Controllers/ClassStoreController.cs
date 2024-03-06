@@ -1033,8 +1033,8 @@ namespace Banner.Areas.Web.Controllers
                     str += "&ImageUrl=" + sDomanName + "/Content/Image/CourseCategory_1.jpg";//ImageUrl 產品圖檔連結網址 String(200)
                     str += "&InstFlag=0";//InstFlag 信用卡分期付款啟用 String(18)
                     str += "&CreditRed=0";//CreditRed 信用卡紅利啟用 Int(1)
-                    str += "&UNIONPAY=0";//UNIONPAY 信用卡銀聯卡啟用 Int(1)
-                    str += "&CREDITAE=0";//CREDITAE 信用卡美國運通卡啟用 Int(1)
+                    str += "&UNIONPAY=1";//UNIONPAY 信用卡銀聯卡啟用 Int(1)
+                    str += "&CREDITAE=1";//CREDITAE 信用卡美國運通卡啟用 Int(1)
                     str += "&WEBATM=0";//WEBATM WEBATM啟用 Int(1)
                     str += "&VACC=0";//VACC ATM轉帳啟用 Int(1)
                     str += "&BankType=";//BankType 金融機構 String(26)//先選台銀
