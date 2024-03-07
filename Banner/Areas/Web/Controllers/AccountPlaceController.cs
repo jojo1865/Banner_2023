@@ -23,8 +23,11 @@ namespace Banner.Areas.Web.Controllers
             public string Title_Teacher = "";
             public List<cMenu> c_MyClass = new List<cMenu>();
             public bool bFriendFlag = false;
-            public GroupData MuGroup = new GroupData();
+            public GroupData MyGroup = new GroupData();
             public List<GroupData> MyGroups = new List<GroupData>();
+            public List<cMenu> c_Teacher = new List<cMenu>();
+
+            public List<SelectListItem> SL_Spiritual = new List<SelectListItem>();
         }
         public class GroupData
         {
@@ -34,11 +37,10 @@ namespace Banner.Areas.Web.Controllers
             public string Time;
             public string Address;
         }
-        public ActionResult Index()
+        public cAccountPlace_Index GetIndex(FormCollection FC)
         {
-            GetViewBag();
             cAccountPlace_Index N = new cAccountPlace_Index();
-
+            ACID = GetACID();
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag);
             if (AC != null)
             {
@@ -64,15 +66,12 @@ namespace Banner.Areas.Web.Controllers
                 if (MSAs.Count() > 0)
                     N.Title_Staff = string.Join("/", MSAs.Select(q => q.Staff.Title));
                 //講師
-                if (AC.TeacherFlag)
-                {
-                    var MPTs = from q in DC.Teacher.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag)
-                               join p in DC.M_Product_Teacher.Where(q => q.Product.ActiveFlag && !q.Product.DeleteFlag && q.Product_Class.ActiveFlag && !q.Product_Class.DeleteFlag)
-                               on q.TID equals p.TID
-                               select p;
-                    if (MPTs.Count() > 0)
-                        N.Title_Teacher = string.Join("/", MPTs.Select(q => q.Product.Title + " " + q.Product.SubTitle + " " + q.Product_Class.Title));
-                }
+                var MPTs = from q in DC.Teacher.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag)
+                           join p in DC.M_Product_Teacher.Where(q => q.Product.ActiveFlag && !q.Product.DeleteFlag && q.Product_Class.ActiveFlag && !q.Product_Class.DeleteFlag)
+                           on q.TID equals p.TID
+                           select p;
+                if (AC.TeacherFlag && MPTs.Count() > 0)
+                    N.Title_Teacher = string.Join("/", MPTs.Select(q => q.Product.Course.Title));
                 #endregion
                 #region 區塊2=上課中
                 var MPCs = DC.Order_Product.Where(q => q.Order_Header.Order_Type == 2 && q.Order_Header.ACID == ACID && !q.Order_Header.DeleteFlag && !q.Product.DeleteFlag && q.Product_Class.GraduateDate.Date > DT.Date && !q.Graduation_Flag).OrderBy(q => q.Order_Header.CreDate);
@@ -99,32 +98,174 @@ namespace Banner.Areas.Web.Controllers
                 var MOI8 = GetMOIAC(8, 0, ACID).FirstOrDefault();
                 if (MOI8 != null)
                 {
-                    N.MuGroup = new GroupData();
+                    N.MyGroup = new GroupData();
                     List<string> sList = GetOITitles(MOI8.OIID);
                     sList = (sList.Take(5)).ToList();
                     sList.Reverse();
-                    N.MuGroup.Title = string.Join("-", sList) + "(#"+MOI8.OIID+")";
-                    var Meet = DC.Meeting_Location_Set.FirstOrDefault(q => q.OIID == MOI8.OIID && q.SetType==1 && q.ActiveFlag && !q.DeleteFlag);
-                    if(Meet!=null)
+                    N.MyGroup.Title = string.Join("-", sList) + "(#" + MOI8.OIID + ")";
+                    var Meet = DC.Meeting_Location_Set.FirstOrDefault(q => q.OIID == MOI8.OIID && q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag);
+                    if (Meet != null)
                     {
-                        N.MuGroup.Date = sWeeks[Meet.WeeklyNo];
-                        N.MuGroup.Time = Meet.TimeNo + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":"+Meet.S_minute.ToString().PadLeft(2,'0')+"~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
-                        N.MuGroup.Address = Meet.Meeting_Location.Title;
+                        N.MyGroup.Date = sWeeks[Meet.WeeklyNo];
+                        N.MyGroup.Time = Meet.TimeNo + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
+                        N.MyGroup.Address = Meet.Meeting_Location.Title;
                         var Loc = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == Meet.MLSID);
-                        if(Loc!=null)
+                        if (Loc != null)
                         {
-                            N.MuGroup.Address += " " + GetZipData(Loc.ZID) + Loc.Address;
+                            N.MyGroup.Address += " " + GetZipData(Loc.ZID) + Loc.Address;
                         }
                     }
                 }
                 #endregion
-                
+                #region 小組長園地
+                var OI_Leaders = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8);
+                foreach (var OI in OI_Leaders)
+                {
+                    GroupData G = new GroupData();
+                    List<string> sList = GetOITitles(OI.OIID);
+                    sList = (sList.Take(5)).ToList();
+                    sList.Reverse();
+                    G.Title = string.Join("-", sList) + "(#" + OI.OIID + ")";
+                    var Meet = DC.Meeting_Location_Set.FirstOrDefault(q => q.OIID == OI.OIID && q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag);
+                    if (Meet != null)
+                    {
+                        G.Date = sWeeks[Meet.WeeklyNo];
+                        G.Time = Meet.TimeNo + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
+                        G.Address = Meet.Meeting_Location.Title;
+                        var Loc = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == Meet.MLSID);
+                        if (Loc != null)
+                        {
+                            G.Address += " " + GetZipData(Loc.ZID) + Loc.Address;
+                        }
+                    }
+                    N.MyGroups.Add(G);
+                }
+                #endregion
+                #region 講師專區
+                if (AC.TeacherFlag)
+                {
+                    int i = 0;
+                    foreach (var MPT in MPTs.OrderBy(q => q.PID).ThenBy(q => q.Product_Class.Product_ClassTime.Min(p => p.ClassDate)))
+                    {
+                        cMenu cM = new cMenu
+                        {
+                            MenuID = MPT.PCID,
+                            Title = MPT.Product.Title + " " + MPT.Product.SubTitle + " " + MPT.Product_Class.Title,
+                            Url = "/Web/Teacher/Student_List/" + MPT.PCID,
+                            SortNo = i,
+                            SelectFlag = false,
+                            Items = null
+                        };
+                        N.c_Teacher.Add(cM);
+                        i++;
+                    }
+                }
+                #endregion
+                #region 屬靈健檢表
+                /*屬靈=是否有參加主日聚會的紀錄
+                 *1:抓主日聚會點的聚會星期幾(假設為每周日)
+                 *2:由今天以前算10次主日聚會日 
+                 *3.若今天是3/5 周二,則顯示列表為3/2 2/24 2/17....
+                 *4:多一個送出存檔的按鈕
+                 *5:當周靈修(QT)次數 為純數字,送出後不能改
+                */
+                //查資料前先更新
+                if (FC != null)
+                {
+                    int iCheckCt = 0;
+                    for (int i = 0; i < 10; i++)
+                    {
+                        if (!string.IsNullOrEmpty(FC.Get("hid_" + i)))
+                        {
+                            DateTime DT_ = Convert.ToDateTime(FC.Get("hid_" + i));
+                            bool bCheck = GetViewCheckBox(FC.Get("cbox_" + i));
+                            string sValue = FC.Get("txb_" + i);
+                            int iCt = 0;
+                            if (bCheck && int.TryParse(sValue, out iCt))//有打勾或是有數字
+                            {
+                                Account_Spiritual AS = new Account_Spiritual();
+                                AS.Account = AC;
+                                AS.QTCt = iCt;
+                                AS.QTDate = DT_;
+                                AS.CreDate = DT;
+                                DC.Account_Spiritual.InsertOnSubmit(AS);
+                                DC.SubmitChanges();
 
+                                iCheckCt++;
+                            }
+                        }
+                    }
+                    if (iCheckCt > 0)
+                        SetAlert("有勾選主日的屬靈健檢表已記錄", 1);
+                    else
+                        SetAlert("屬靈健檢表紀錄失敗", 2);
+                }
+
+
+                DateTime MaxDate = Convert.ToDateTime("2020/1/1");//最後一次主日應該是哪天
+                var ASs = DC.Account_Spiritual.Where(q => q.ACID == ACID);
+                //DateTime OldDate = AS.Count() > 0 ? AS.Max(q => q.QTDate) : MaxDate;//有紀錄的屬靈表最後是哪天
+
+                var MLS = (from q in DC.M_ML_Account.Where(q => q.ACID == ACID && !q.DeleteFlag)
+                           join p in DC.Meeting_Location_Set.Where(q => q.SetType == 0 && q.ActiveFlag && !q.DeleteFlag)
+                           on q.MLID equals p.MLID
+                           select p).FirstOrDefault();
+                if (MLS != null)
+                {
+                    DateTime DT_Max = DT;
+                    for (int i = 0; i < 7; i++)//找到距離最近的主日聚會日
+                    {
+                        int iDay = Convert.ToInt32(DT.AddDays(i * -1).DayOfWeek);
+                        if (iDay == MLS.WeeklyNo)
+                        {
+                            DT_Max = DT.AddDays(i * -1).Date;
+                            break;
+                        }
+                    }
+                    if (DT_Max != DT)
+                    {
+                        for (int i = 0; i < 10; i++)
+                        {
+                            DateTime DT_ = DT_Max.AddDays(i * -7).Date;
+                            var AS = ASs.FirstOrDefault(q => q.QTDate == DT_);
+
+                            SelectListItem SL = new SelectListItem();
+                            SL.Text = DT_.ToString(DateFormat);
+                            if (AS != null)
+                            {
+                                SL.Value = AS.QTCt.ToString();
+                                SL.Selected = true;
+                            }
+                            else
+                            {
+                                SL.Value = "";
+                                SL.Selected = false;
+                            }
+
+                            N.SL_Spiritual.Add(SL);
+                        }
+                    }
+                }
+                #endregion
                 //會友卡
                 N.bFriendFlag = DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.RID == 2);
             }
+            else
+                SetAlert("遺失登入訊息,請重新登入", 4, "/Web/Home/Index");
+            return N;
+        }
 
-            return View(N);
+        [HttpGet]
+        public ActionResult Index()
+        {
+            GetViewBag();
+            return View(GetIndex(null));
+        }
+        [HttpPost]
+        public ActionResult Index(FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetIndex(FC));
         }
         #endregion
         #region 會員中心-基本資料

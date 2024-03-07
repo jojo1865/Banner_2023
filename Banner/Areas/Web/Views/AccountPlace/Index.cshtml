@@ -8,6 +8,11 @@
         margin-top: 56px;
         gap: 48px;
     }
+
+    .card {
+        display: inline-block;
+        width: 100%;
+    }
 </style>
 <div class="body-container pt-3">
     @if (Model != null)
@@ -17,105 +22,149 @@
                 <div class="section-header">
                     會員職分
                 </div>
-                <div class="row">
-                    <div class="col-lg-6 col-12">
-                        <div class="card p-4 m-2">
-                            <div class="card-body">
-                                <h3 class="lab_DarkBlue mb-3">@Model.Name</h3>
-                                @if (Model.Title_OI != "")
-                                {
-                                    <p><span class="lab_DarkBlue">●</span> @("職分：")<span style="font-weight:bold">@(Model.Title_OI)</span></p>
-                                }
-                                @if (Model.Title_Staff != "")
-                                {
-                                    <p><span class="lab_DarkBlue">●</span> @("事工團：")<span style="font-weight:bold">@(Model.Title_Staff)</span></p>
-                                }
-                                @if (Model.Title_Teacher != "")
-                                {
-                                    <p><span class="lab_DarkBlue">●</span> @("講師：")<span style="font-weight:bold">@(Model.Title_Teacher)</span></p>
-                                }
-                            </div>
+                <div class="card-columns">
+                    <div class="card p-4 m-2">
+                        <div class="card-body">
+                            <h3 class="lab_DarkBlue mb-3">@Model.Name</h3>
+                            @if (Model.Title_OI != "")
+                            {
+                                <p><span class="lab_DarkBlue">●</span> @("職分：")<span style="font-weight:bold">@(Model.Title_OI)</span></p>
+                            }
+                            @if (Model.Title_Staff != "")
+                            {
+                                <p><span class="lab_DarkBlue">●</span> @("事工團：")<span style="font-weight:bold">@(Model.Title_Staff)</span></p>
+                            }
+                            @if (Model.Title_Teacher != "")
+                            {
+                                <p><span class="lab_DarkBlue">●</span> @("講師：")<span style="font-weight:bold">@(Model.Title_Teacher)</span></p>
+                            }
                         </div>
                     </div>
+
                     @if (Model.c_MyClass.Count > 0)
                     {
-                        <div class="col-lg-6 col-12">
-                            <div class="card p-4 m-2">
-                                <div class="card-body">
-                                    <h4 class="lab_info mb-3">上課中</h4>
-                                    @foreach (var M in Model.c_MyClass)
-                                    {
-                                        <p><span class="lab_DarkBlue">●</span> <a href="@M.Url">@M.Title</a></p>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    @if (Model.MuGroup.Title != "")
-                    {
-                        <div class="col-lg-6 col-12">
-                            <div class="card p-4 m-2">
-                                <div class="card-body">
-                                    <h4 class="lab_info mb-3">我的小組</h4>
-                                    <p><span class="lab_DarkBlue">●</span> <span class="lab_info">@Model.MuGroup.Title</span></p>
-                                    <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會日：@Model.MuGroup.Date</p>
-                                    <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會時間：@Model.MuGroup.Time</p>
-                                    <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會地點：@Model.MuGroup.Address</p>
-                                </div>
-                            </div>
-                        </div>
-                    }
 
-                    <div class="col-lg-6 col-12">
                         <div class="card p-4 m-2">
                             <div class="card-body">
-                                <h4 class="lab_info mb-3">小組長園地</h4>
-
+                                <h4 class="lab_info mb-3">上課中課程</h4>
+                                @foreach (var M in Model.c_MyClass)
+                                {
+                                    <p><span class="lab_DarkBlue">●</span> <a href="@M.Url">@M.Title</a></p>
+                                }
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-6 col-12">
+
+                    }
+                    @if (Model.MyGroup.Title != "")
+                    {
+
+                        <div class="card p-4 m-2">
+                            <div class="card-body">
+                                <h4 class="lab_info mb-3">我的小組</h4>
+                                <p><span class="lab_DarkBlue">●</span> <span class="lab_info">@Model.MyGroup.Title</span></p>
+                                <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會日：@Model.MyGroup.Date</p>
+                                <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會時間：@Model.MyGroup.Time</p>
+                                <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會地點：@Model.MyGroup.Address</p>
+                            </div>
+                        </div>
+
+                    }
+                    @if (Model.MyGroups.Count > 0)
+                    {
+
+                        <div class="card p-4 m-2">
+                            <div class="card-body">
+                                <h4 class="lab_info mb-3">小組長專區</h4>
+                                @foreach (var M in Model.MyGroups)
+                                {
+                                    <div class="row">
+                                        <div class="col">
+                                            <p><span class="lab_DarkBlue">●</span> <span class="lab_info">@M.Title</span></p>
+                                            <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會日：@M.Date</p>
+                                            <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會時間：@M.Time</p>
+                                            <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會地點：@M.Address</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    }
+
+                    @if (Model.c_Teacher.Count > 0)
+                    {
                         <div class="card p-4 m-2">
                             <div class="card-body">
                                 <h4 class="lab_info mb-3">講師專區</h4>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-12">
-                        <div class="card p-4 m-2">
-                            <div class="card-body">
-                                <h4 class="lab_info mb-3">屬靈健檢表</h4>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-12">
-                        <div class="card p-4 m-2">
-                            <div class="card-body">
-                                <h4 class="lab_info mb-3">會友卡</h4>
-                                @if (Model.bFriendFlag)//顯示會友卡
+                                @foreach (var M in Model.c_Teacher)
                                 {
-                                    <section class="section w-100">
-                                        <div style="position:relative">
-                                            <img src="/Areas/Web/Content/Img/MemberCard.png" style="border: 2px solid #999; -webkit-border-radius: 25px; -moz-border-radius: 25px; border-radius: 25px;" />
-                                            <span style="position:absolute;top:140px; left:20px;"><b>@(Model.Name)</b></span>
-                                        </div>
-                                    </section>
+                                    <p><span class="lab_DarkBlue">●</span> <a href="@M.Url">@M.Title</a></p>
                                 }
                             </div>
                         </div>
+                    }
+
+                    <div class="card p-4 m-2">
+                        <div class="card-body">
+                            <h4 class="lab_info mb-3">屬靈健檢表</h4>
+                            <form id="form1" method="post" novalidate>
+                                <table class="table table_RWDStyle">
+                                    <tr class="Bgn">
+                                        <td>日期</td>
+                                        <td>是否主日</td>
+                                        <td>當周靈修(QT)次數</td>
+                                    </tr>
+                                    @for (int i = 0; i < Model.SL_Spiritual.Count; i++)
+                                    {
+                                        var SL = Model.SL_Spiritual[i];
+                                        if (SL.Value == "")
+                                        {
+                                            <tr>
+                                                <td>@SL.Text</td>
+                                                <td align="center">
+                                                    <input id="hid_@(i)" name="hid_@(i)" type="hidden" value="@SL.Text" />
+                                                    <input id="cbox_@(i)" name="cbox_@(i)" type="checkbox" class="form-check-input" />
+                                                </td>
+                                                <td align="center">
+                                                    <input id="txb_@(i)" name="txb_@(i)" type="number" value="@SL.Value" class="form-control d-inline" min="0" style="width:100px;" />
+                                                </td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td>@SL.Text</td>
+                                                <td>@(SL.Selected ? "V" : "")</td>
+                                                <td>@SL.Value</td>
+                                            </tr>
+                                        }
+                                    }
+                                </table>
+                                @if (Model.SL_Spiritual.Count(q => q.Value == "") > 0)
+                                {
+                                    <button class="btn btn-success" type="submit">儲存</button>
+                                }
+                            </form>
+                        </div>
                     </div>
+
+                    @if (Model.bFriendFlag)//顯示會友卡
+                    {
+                        <div class="card p-4 m-2">
+                            <div class="card-body">
+                                <h4 class="lab_info mb-3">會友卡</h4>
+
+                                <section class="section w-100">
+                                    <div style="position:relative">
+                                        <img src="/Areas/Web/Content/Img/MemberCard.png" style="border: 2px solid #999; -webkit-border-radius: 25px; -moz-border-radius: 25px; border-radius: 25px;" />
+                                        <span style="position:absolute;top:140px; left:20px;"><b>@(Model.Name)</b></span>
+                                    </div>
+                                </section>
+
+                            </div>
+                        </div>
+                    }
                 </div>
-
-
-
-
-
-
-
-
-
             </section>
         </div>
     }

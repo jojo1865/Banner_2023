@@ -192,6 +192,9 @@ namespace Banner
     partial void InsertToken_Check(Token_Check instance);
     partial void UpdateToken_Check(Token_Check instance);
     partial void DeleteToken_Check(Token_Check instance);
+    partial void InsertAccount_Spiritual(Account_Spiritual instance);
+    partial void UpdateAccount_Spiritual(Account_Spiritual instance);
+    partial void DeleteAccount_Spiritual(Account_Spiritual instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -650,6 +653,14 @@ namespace Banner
 			}
 		}
 		
+		public System.Data.Linq.Table<Account_Spiritual> Account_Spiritual
+		{
+			get
+			{
+				return this.GetTable<Account_Spiritual>();
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.sp_GetOI2List")]
 		public ISingleResult<sp_GetOI2ListResult> sp_GetOI2List([global::System.Data.Linq.Mapping.ParameterAttribute(Name="ACID", DbType="Int")] System.Nullable<int> aCID)
 		{
@@ -757,6 +768,8 @@ namespace Banner
 		
 		private EntitySet<OrganizeInfo> _OrganizeInfo;
 		
+		private EntitySet<Account_Spiritual> _Account_Spiritual;
+		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -834,6 +847,7 @@ namespace Banner
 			this._M_Staff_Account = new EntitySet<M_Staff_Account>(new Action<M_Staff_Account>(this.attach_M_Staff_Account), new Action<M_Staff_Account>(this.detach_M_Staff_Account));
 			this._Order_Header = new EntitySet<Order_Header>(new Action<Order_Header>(this.attach_Order_Header), new Action<Order_Header>(this.detach_Order_Header));
 			this._OrganizeInfo = new EntitySet<OrganizeInfo>(new Action<OrganizeInfo>(this.attach_OrganizeInfo), new Action<OrganizeInfo>(this.detach_OrganizeInfo));
+			this._Account_Spiritual = new EntitySet<Account_Spiritual>(new Action<Account_Spiritual>(this.attach_Account_Spiritual), new Action<Account_Spiritual>(this.detach_Account_Spiritual));
 			OnCreated();
 		}
 		
@@ -1578,6 +1592,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Account_Spiritual", Storage="_Account_Spiritual", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<Account_Spiritual> Account_Spiritual
+		{
+			get
+			{
+				return this._Account_Spiritual;
+			}
+			set
+			{
+				this._Account_Spiritual.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -1797,6 +1824,18 @@ namespace Banner
 		}
 		
 		private void detach_OrganizeInfo(OrganizeInfo entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_Account_Spiritual(Account_Spiritual entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_Account_Spiritual(Account_Spiritual entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -20485,6 +20524,205 @@ namespace Banner
 					this._SaveACID = value;
 					this.SendPropertyChanged("SaveACID");
 					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Account_Spiritual")]
+	public partial class Account_Spiritual : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _ASID;
+		
+		private int _ACID;
+		
+		private int _QTCt;
+		
+		private System.DateTime _QTDate;
+		
+		private System.DateTime _CreDate;
+		
+		private EntityRef<Account> _Account;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnASIDChanging(int value);
+    partial void OnASIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnQTCtChanging(int value);
+    partial void OnQTCtChanged();
+    partial void OnQTDateChanging(System.DateTime value);
+    partial void OnQTDateChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    #endregion
+		
+		public Account_Spiritual()
+		{
+			this._Account = default(EntityRef<Account>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ASID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int ASID
+		{
+			get
+			{
+				return this._ASID;
+			}
+			set
+			{
+				if ((this._ASID != value))
+				{
+					this.OnASIDChanging(value);
+					this.SendPropertyChanging();
+					this._ASID = value;
+					this.SendPropertyChanged("ASID");
+					this.OnASIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QTCt", DbType="Int NOT NULL")]
+		public int QTCt
+		{
+			get
+			{
+				return this._QTCt;
+			}
+			set
+			{
+				if ((this._QTCt != value))
+				{
+					this.OnQTCtChanging(value);
+					this.SendPropertyChanging();
+					this._QTCt = value;
+					this.SendPropertyChanged("QTCt");
+					this.OnQTCtChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_QTDate", DbType="DateTime NOT NULL")]
+		public System.DateTime QTDate
+		{
+			get
+			{
+				return this._QTDate;
+			}
+			set
+			{
+				if ((this._QTDate != value))
+				{
+					this.OnQTDateChanging(value);
+					this.SendPropertyChanging();
+					this._QTDate = value;
+					this.SendPropertyChanged("QTDate");
+					this.OnQTDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Account_Spiritual", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.Account_Spiritual.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.Account_Spiritual.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
 				}
 			}
 		}

@@ -45,7 +45,7 @@
                                 {
                                     if (OI.cPTs.Count(q => q.cPs.Count() > 0) > 0)
                                     {
-                                        sAct_OI = Index_OI == 0 ? "show active" : "";
+                                        sAct_OI = Index_OI == 0 ? "active show" : "";
 
                                         <button class="nav-link nav-link-tab @sAct_OI" id="nav-OI-tab-@OI.OIID" data-bs-toggle="tab" data-bs-target="#nav-OI-place-@OI.OIID" type="button" role="tab" aria-controls="nav-OI-place-@OI.OIID" aria-selected="@(Index_OI==0)">
                                             <h5 class="header font-bold">@OI.OITitle</h5>
@@ -66,6 +66,7 @@
                                     {
                                         int Index_OP = 0;
                                         string sAct_OP = "";
+                                        sAct_OI = Index_OI == 0 ? "active show" : "";
                                         <div class="tab-pane pt-2 fade @sAct_OI" id="nav-OI-place-@OI.OIID" role="tabpanel" aria-labelledby="nav-OI-tab-@OI.OIID" tabindex="@Index_OI">
                                             <!--交易方式-開始-->
 
@@ -77,7 +78,7 @@
                                                         {
                                                             if (cPT.cPs.Count > 0)
                                                             {
-                                                                sAct_OP = Index_OP == 0 ? "active" : "";
+                                                                sAct_OP = Index_OP == 0 ? "active show" : "";
 
                                                                 <button class="nav-link nav-link-tab @sAct_OP" id="nav-OP-tab-@OI.OIID-@cPT.PTID" data-bs-toggle="tab" data-bs-target="#nav-OP-place-@OI.OIID-@cPT.PTID" type="button" role="tab" aria-controls="nav-OP-place-@OI.OIID-@cPT.PTID" aria-selected="@(Index_OP==0)">
                                                                     <h5 class="header font-bold">@cPT.PayTitle</h5></button>
@@ -96,7 +97,7 @@
                                                     {
                                                         if (cPT.cPs.Count > 0)
                                                         {
-                                                            sAct_OP = Index_OP == 0 ? "show active" : "";
+                                                            sAct_OP = Index_OP == 0 ? "active show" : "";
 
                                                             <div class="tab-pane fade @sAct_OP" id="nav-OP-place-@OI.OIID-@cPT.PTID" role="tabpanel" aria-labelledby="nav-OP-tab-@OI.OIID-@cPT.PTID" tabindex="@Index_OP">
                                                                 <!--購物車商品內容 起始-->

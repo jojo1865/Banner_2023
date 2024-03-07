@@ -44,6 +44,7 @@
       <Association Name="Account_M_Staff_Account" Member="M_Staff_Account" ThisKey="ACID" OtherKey="ACID" Type="M_Staff_Account" />
       <Association Name="Account_Order_Header" Member="Order_Header" ThisKey="ACID" OtherKey="ACID" Type="Order_Header" />
       <Association Name="Account_OrganizeInfo" Member="OrganizeInfo" ThisKey="ACID" OtherKey="ACID" Type="OrganizeInfo" />
+      <Association Name="Account_Account_Spiritual" Member="Account_Spiritual" ThisKey="ACID" OtherKey="ACID" Type="Account_Spiritual" />
     </Type>
   </Table>
   <Table Name="dbo.ZipCode" Member="ZipCode">
@@ -901,6 +902,16 @@
       <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Account_Spiritual" Member="Account_Spiritual">
+    <Type Name="Account_Spiritual">
+      <Column Name="ASID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="QTCt" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="QTDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="Account_Account_Spiritual" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

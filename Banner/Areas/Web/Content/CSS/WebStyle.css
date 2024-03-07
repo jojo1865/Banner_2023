@@ -174,10 +174,11 @@ main {
     max-height: 245px;
     overflow: hidden;
 }
+
 .spanCordNo {
     color: white;
     background-color: red;
-    text-align:center;
+    text-align: center;
     -webkit-border-radius: 15px;
     -moz-border-radius: 15px;
     border-radius: 15px;
@@ -185,9 +186,11 @@ main {
     margin-top: -10px;
     position: fixed;
     z-index: 10;
-    height:29px;
-    width:29px;
+    height: 29px;
+    width: 29px;
 }
+
+
 /*======================================================手機板======================================================*/
 @media(max-width:992px) {
     .left-area {
@@ -261,19 +264,22 @@ main {
         display: block;
     }
 
-    .container_phone{
-        padding:0px;
+    .container_phone {
+        padding: 0px;
     }
 
     .header-nav .header-item:first-child {
         gap: calc(100% - 50px) !important;
     }
-    .li_TopMenu_UserData{
-        display:block;
+
+    .li_TopMenu_UserData {
+        display: block;
     }
-}
 
-
+    .card-columns {
+        column-count: 1;
+    }
+    }
 /*======================================================桌機板======================================================*/
 @media(min-width:992px) {
     .img_Login_logo {
@@ -314,6 +320,10 @@ main {
     .li_TopMenu_UserData {
         display: none;
     }
+    .card-columns {
+        column-count: 2;
+    }
+    
 }
 /*課程選購首頁-左右調整設定*/
 @media(min-width:1840px) {
@@ -325,7 +335,6 @@ main {
         margin-right: 120px;
     }
 }
-
 /*======================================================彩色圈圈外框======================================================*/
 /**
  * `@property` is required for the animation to work.
@@ -338,7 +347,6 @@ main {
     initial-value: 0deg;
     syntax: "<angle>";
 }
-
 /**
  * To animate the gradient, we set the custom property to 1 full
  * rotation. The animation starts at the default value of `0deg`.
@@ -348,7 +356,6 @@ main {
         --bg-angle: 360deg;
     }
 }
-
 
 .article {
     /* add the animation, but pause it by default */
@@ -387,4 +394,3 @@ main {
     padding: 1rem;
     width: min(400px, 90vw);
 }
-
