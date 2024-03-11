@@ -110,60 +110,61 @@ namespace Banner.Areas.Admin.Controllers
             cTL.Rs = new List<cTableRow>();
 
             var Ns = DC.Account.Where(q => !q.DeleteFlag);
+            #region 後台全職同工可檢視旌旗資料判斷
+            {
+                if (ACID != 1)
+                {
+                    var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                    if (MOI2 == null)//他沒有全部的權限
+                    {
+                        MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 2 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                        if (MOI2 == null)//他沒有看未入組的會員權限=需要依據他的旌旗角色篩選
+                        {
+                            MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                            if (MOI2 == null)//不具備旌旗的權限
+                            {
+                                Ns = Ns.Where(q => q.ACID == 0);
+                            }
+                            else
+                            {
+                                var OI8_ACIDs = from q in (from q in DC.M_OI2_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag)
+                                                           join p in GetMOIAC(8, 0, 0)
+                                                           on q.OIID equals p.OrganizeInfo.OI2_ID
+                                                           select p)
+                                                group q by new { q.ACID } into g
+                                                select new { g.Key.ACID };
+
+                                Ns = from q in OI8_ACIDs
+                                     join p in Ns
+                                     on q.ACID equals p.ACID
+                                     select p;
+                            }
+                        }
+                        else
+                        {
+                            var M_ACIDs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CreDate != q.JoinDate && q.OIID > 0)
+                                          group q by new { q.ACID } into g
+                                          select new { g.Key.ACID };
+                            var ACIDs = from q in Ns
+                                        group q by new { q.ACID } into g
+                                        select new { g.Key.ACID };
+                            Ns = from q in ACIDs.Except(M_ACIDs)
+                                 join p in Ns
+                                 on q.ACID equals p.ACID
+                                 select p;
+                        }
+                    }
+                }
+
+            }
+            #endregion
+
             switch (iType)
             {
                 case 1://成人
                     {
                         cTL.NowURL = "/Admin/AccountSet/Account_Aldult_List";
                         Ns = Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.Birthday != q.CreDate);
-                        #region 後台全職同工可檢視旌旗資料判斷
-                        {
-                            if (ACID != 1)
-                            {
-                                var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
-                                if (MOI2 == null)//他沒有全部的權限
-                                {
-                                    MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 2 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
-                                    if (MOI2 == null)//他沒有看未入組的會員權限=需要依據他的旌旗角色篩選
-                                    {
-                                        MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
-                                        if (MOI2 == null)//不具備旌旗的權限
-                                        {
-                                            Ns = Ns.Where(q => q.ACID == 0);
-                                        }
-                                        else
-                                        {
-                                            var OI8_ACIDs = from q in (from q in DC.M_OI2_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag)
-                                                                       join p in GetMOIAC(8, 0, 0)
-                                                                       on q.OIID equals p.OrganizeInfo.OI2_ID
-                                                                       select p)
-                                                            group q by new { q.ACID } into g
-                                                            select new { g.Key.ACID };
-
-                                            Ns = from q in OI8_ACIDs
-                                                 join p in Ns
-                                                 on q.ACID equals p.ACID
-                                                 select p;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        var M_ACIDs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CreDate != q.JoinDate && q.OIID > 0)
-                                                      group q by new { q.ACID } into g
-                                                      select new { g.Key.ACID };
-                                        var ACIDs = from q in Ns
-                                                    group q by new { q.ACID } into g
-                                                    select new { g.Key.ACID };
-                                        Ns = from q in ACIDs.Except(M_ACIDs)
-                                             join p in Ns
-                                             on q.ACID equals p.ACID
-                                             select p;
-                                    }
-                                }
-                            }
-
-                        }
-                        #endregion
                     }
                     break;
 
@@ -171,27 +172,6 @@ namespace Banner.Areas.Admin.Controllers
                     {
                         cTL.NowURL = "/Admin/AccountSet/Account_Childen_List";
                         Ns = Ns.Where(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
-
-                        if (ACID != 1)
-                        {
-                            var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
-                            if (MOI2 == null)//他沒有全部的權限
-                            {
-                                var MLIDs = (from q in DC.M_OI2_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag)
-                                             join p in DC.Meeting_Location_Set.Where(q => !q.DeleteFlag && q.SetType == 0)
-                                             on q.OIID equals p.OIID
-                                             select new { p.MLID }).GroupBy(q => q.MLID);
-                                var MLs = (from q in MLIDs
-                                           join p in DC.M_ML_Account.Where(q => !q.DeleteFlag)
-                                           on q.Key equals p.MLID
-                                           select p).GroupBy(q => q.ACID);
-                                Ns = from q in MLs
-                                     join p in Ns
-                                     on q.Key equals p.ACID
-                                     select p;
-                            }
-                        }
-
                     }
                     break;
 
@@ -208,31 +188,6 @@ namespace Banner.Areas.Admin.Controllers
                                       select q;
                         var AIDs = (Ns.Select(q => q.ACID)).Except(M_OI_As.Where(q => q.OIID > 1 && q.JoinDate != q.CreDate).Select(q => q.ACID));
 
-                        //再依據管理者管理旌旗過濾主日聚會點所在旌旗
-                        #region 後台全職同工可檢視旌旗資料判斷
-                        if (ACID != 1)
-                        {
-                            var MOI2 = (from q in DC.M_OI2_Account.Where(q => q.ACID == ACID)
-                                        join p in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SetType == 0)
-                                        on q.OIID equals p.OIID
-                                        select p).GroupBy(q => q.MLID).Select(q => q.Key);
-
-                            var MLID_Gs = (from q in DC.M_ML_Account.Where(q => !q.DeleteFlag)
-                                           join p in MOI2
-                                           on q.MLID equals p
-                                           select q).GroupBy(q => q.ACID).Select(q => q.Key);
-
-                            AIDs = from q in AIDs
-                                   join p in MLID_Gs
-                                   on q equals p
-                                   select q;
-                        }
-                        #endregion
-
-                        Ns = (from q in AIDs
-                              join p in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge)
-                              on q equals p.ACID
-                              select p);
                     }
                     break;
 
@@ -243,10 +198,10 @@ namespace Banner.Areas.Admin.Controllers
                         //Ns = Ns.Where(q => q.BaptizedType == 0);//小朋友可以受洗
 
                         //小朋友不在受洗名單範圍內,且不考慮未入組名單
-                        Ns = from q in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.BaptizedType == 0)
+                        /*Ns = from q in Ns.Where(q => DT.Year - q.Birthday.Year > iChildAge && q.BaptizedType == 0)
                              join p in GetMOIAC().Where(q => q.OIID > 1).GroupBy(q => q.ACID).Select(q => q.Key)
                              on q.ACID equals p
-                             select q;
+                             select q;*/
                         //排除未被指定受洗日期的會員
                         Ns = from q in DC.Baptized.Where(q => !q.ImplementFlag && !q.DeleteFlag && q.BaptismDate != q.CreDate).GroupBy(q => q.ACID).Select(q => q.Key)
                              join p in Ns
@@ -262,55 +217,25 @@ namespace Banner.Areas.Admin.Controllers
                              join p in DC.M_Role_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 2).GroupBy(q => q.ACID).Select(q => q.Key)
                              on q.ACID equals p
                              select q;
+                    }
+                    break;
 
-                        #region 後台全職同工可檢視旌旗資料判斷
-                        {
-                            if (ACID != 1)
-                            {
-                                var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
-                                if (MOI2 == null)//他沒有全部的權限
-                                {
-                                    MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 2 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
-                                    if (MOI2 == null)//他沒有看未入組的會員權限=需要依據他的旌旗角色篩選
-                                    {
-                                        MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
-                                        if (MOI2 == null)//不具備旌旗的權限
-                                        {
-                                            Ns = Ns.Where(q => q.ACID == 0);
-                                        }
-                                        else
-                                        {
-                                            var OI8_ACIDs = from q in (from q in DC.M_OI2_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag)
-                                                                       join p in GetMOIAC(8, 0, 0)
-                                                                       on q.OIID equals p.OrganizeInfo.OI2_ID
-                                                                       select p)
-                                                            group q by new { q.ACID } into g
-                                                            select new { g.Key.ACID };
+                case 6://申請轉換小組
+                    {
+                        cTL.NowURL = "/Admin/AccountSet/Account_GroupOrder_List";
+                        var COIGs = from q in DC.Change_OI_Order.Where(q => !q.DeleteFlag)
+                                    group q by new { q.ACID } into g
+                                    select new { g.Key.ACID, MaxID = g.Max(q => q.COIOID) };
+                        var GOIs = from q in COIGs
+                                   join p in DC.Change_OI_Order.Where(q => !q.DeleteFlag)
+                                   on q.MaxID equals p.COIOID
+                                   select p;
 
-                                            Ns = from q in OI8_ACIDs
-                                                 join p in Ns
-                                                 on q.ACID equals p.ACID
-                                                 select p;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        var M_ACIDs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.CreDate != q.JoinDate && q.OIID > 0)
-                                                      group q by new { q.ACID } into g
-                                                      select new { g.Key.ACID };
-                                        var ACIDs = from q in Ns
-                                                    group q by new { q.ACID } into g
-                                                    select new { g.Key.ACID };
-                                        Ns = from q in ACIDs.Except(M_ACIDs)
-                                             join p in Ns
-                                             on q.ACID equals p.ACID
-                                             select p;
-                                    }
-                                }
-                            }
+                        Ns = from q in Ns
+                             join p in GOIs
+                             on q.ACID equals p.ACID
+                             select q;
 
-                        }
-                        #endregion
                     }
                     break;
             }
@@ -373,6 +298,8 @@ namespace Banner.Areas.Admin.Controllers
                 {
                     case 1://成人
                     case 5://按立會友
+                    case 2://兒童
+                    case 6://申請轉換小組
                         {
                             if (FC.Get("ddl_Baptized") != "0")
                                 Ns = from q in Ns
@@ -380,9 +307,6 @@ namespace Banner.Areas.Admin.Controllers
                                      on q.ACID equals p
                                      select q;
                         }
-                        break;
-
-                    case 2://兒童
                         break;
 
                     case 3://新人
@@ -503,6 +427,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 case 1://成人
                 case 5://按立會友
+                case 2://兒童
                     TopTitles.Add(new cTableCell { Title = "選擇", WidthPX = 50 });
                     TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
                     TopTitles.Add(new cTableCell { Title = "牧區" });
@@ -515,14 +440,14 @@ namespace Banner.Areas.Admin.Controllers
                     TopTitles.Add(new cTableCell { Title = "行動電話" });
                     break;
 
-                case 2://兒童
+                /*
                     TopTitles.Add(new cTableCell { Title = "選擇", WidthPX = 50 });
                     TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
                     TopTitles.Add(new cTableCell { Title = "姓名" });
                     TopTitles.Add(new cTableCell { Title = "性別", WidthPX = 50 });
                     TopTitles.Add(new cTableCell { Title = "受洗狀態" });
                     TopTitles.Add(new cTableCell { Title = "主日聚會點" });
-                    break;
+                    break;*/
 
                 case 3://新人
                     TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
@@ -543,6 +468,15 @@ namespace Banner.Areas.Admin.Controllers
                     TopTitles.Add(new cTableCell { Title = "小組名稱" });
                     TopTitles.Add(new cTableCell { Title = "預定受洗日期" });
                     break;
+
+                case 6://申請轉換小組
+                    TopTitles.Add(new cTableCell { Title = "選擇", WidthPX = 100 });
+                    TopTitles.Add(new cTableCell { Title = "姓名" });
+                    TopTitles.Add(new cTableCell { Title = "原始小組" });
+                    TopTitles.Add(new cTableCell { Title = "新申請小組" });
+                    TopTitles.Add(new cTableCell { Title = "申請日期" });
+                    TopTitles.Add(new cTableCell { Title = "目前狀態" });
+                    break;
             }
 
 
@@ -557,10 +491,12 @@ namespace Banner.Areas.Admin.Controllers
                 var Cons = DC.Contect.Where(q => q.TargetType == 2 && q.ContectType == 1 && q.TargetID == N.ACID).OrderByDescending(q => q.CID);
                 string CellPhone = Cons.Count() > 0 ? string.Join(",", Cons.Select(q => q.ContectValue)) : "--";
                 cTableRow cTR = new cTableRow();
+                cTR.SortNo = N.ACID;
                 switch (iType)
                 {
                     case 1://成人
                     case 5://按立會友
+                    case 2://兒童
                         {
                             cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
                             if (iType == 1)
@@ -635,7 +571,7 @@ namespace Banner.Areas.Admin.Controllers
                         }
                         break;
 
-                    case 2://兒童
+                    /*case 2://兒童
                         {
                             cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
                             cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Childen_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
@@ -666,6 +602,7 @@ namespace Banner.Areas.Admin.Controllers
 
                         }
                         break;
+                        */
 
                     case 3://新人
                         {
@@ -755,6 +692,39 @@ namespace Banner.Areas.Admin.Controllers
                             cTR.Cs.Add(new cTableCell { Value = M != null ? M.OrganizeInfo.Title : "" });
                             //預定受洗日期
                             cTR.Cs.Add(new cTableCell { Value = sBaptismDate });
+                        }
+                        break;
+
+                    case 6://申請轉換小組
+                        {
+
+                            var COI = DC.Change_OI_Order.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.COIOID).FirstOrDefault();
+                            if (COI.Order_Type == 0)
+                                TopTitles.Add(new cTableCell { Type = "checkbox", ControlName = "cbox_"});//選擇
+                            else
+                                TopTitles.Add(new cTableCell { Value = "" });//選擇
+                            TopTitles.Add(new cTableCell { Value = N.Name_First + N.Name_Last });//姓名
+                            TopTitles.Add(new cTableCell { Value = string.Join("/", GetOITitles(COI.From_OIID, 3)) });//原始小組
+                            TopTitles.Add(new cTableCell { Value = string.Join("/", GetOITitles(COI.To_OIID, 3)) });//新申請小組
+                            TopTitles.Add(new cTableCell { Value = COI.CreDate.ToString(DateTimeFormat) });//申請日期
+                            string sType = "";
+                            switch (COI.Order_Type)
+                            {
+                                case 0: { sType = "等待審核中"; } break;
+                                case 1: { sType = "已直接入組"; } break;
+                                case 2: {
+                                        var MOI = DC.M_OI_Account.FirstOrDefault(q => q.ACID == N.ACID && q.OIID == COI.To_OIID);
+                                        if(MOI!=null)
+                                        {
+                                            if(MOI.ActiveFlag)
+                                                sType = "已許可並已落戶";
+                                            else
+                                                sType = "已許可,等待落戶";
+                                        }
+                                    } break;
+                                case 3: { sType = "已駁回"; } break;
+                            }
+                            TopTitles.Add(new cTableCell { Value = sType });
                         }
                         break;
                 }
@@ -1697,9 +1667,9 @@ namespace Banner.Areas.Admin.Controllers
                 else
                     DC.SubmitChanges();
                 //領夜
-                if(N.AC.NightLeaderFlag)
+                if (N.AC.NightLeaderFlag)
                 {
-                    if(!DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 24 && q.ACID == ID))
+                    if (!DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 24 && q.ACID == ID))
                     {
                         M_Role_Account MRA = new M_Role_Account
                         {
@@ -1721,7 +1691,7 @@ namespace Banner.Areas.Admin.Controllers
                 else
                 {
                     var MRA = DC.M_Role_Account.FirstOrDefault(q => q.RID == 24 && q.ACID == ID);
-                    if(MRA!=null)
+                    if (MRA != null)
                     {
                         MRA.ActiveFlag = false;
                         MRA.UpdDate = DT;
@@ -2214,6 +2184,26 @@ namespace Banner.Areas.Admin.Controllers
                 SetAlert("手洗日期指定完成", 1, "/Admin/AccountSet/Account_Baptized_List/0");
             }
             return View(N);
+        }
+        #endregion
+        #region 牧養名單-轉組申請列表
+        [HttpGet]
+        public ActionResult Account_GroupOrder_List()
+        {
+            GetViewBag();
+            cAccount_List cAL = sAccount_Aldult_List(null);
+            cAL.cTL = GetAccountTable(6, null);
+
+            return View(cAL);
+        }
+        [HttpPost]
+        public ActionResult Account_GroupOrder_List(FormCollection FC)
+        {
+            GetViewBag();
+            cAccount_List cAL = sAccount_Aldult_List(FC);
+            cAL.cTL = GetAccountTable(6, FC);
+
+            return View(cAL);
         }
         #endregion
         #region 按立-列表

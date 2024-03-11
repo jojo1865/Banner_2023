@@ -1,0 +1,82 @@
+﻿@model Banner.Areas.Admin.Controllers.AccountSetController.cAccount_List
+@{
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        <form method="post" id="form1">
+            @if (Model != null)
+            {
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-xxl-6 col">
+                                @Html.Action("_OrganizeFilter", "Include", new { OID = Model.OID, OTitle = Model.OTitle, LockFlag = true })
+                            </div>
+                            <div class="col-xxl-6 col">
+                                @Html.Action("_PhoneNoFilter", "Include", new { PhoneNo = Model.CellPhone, PhoneTitle = "輸入手機號碼", ZID = Model.CellPhoneZipID })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-12">
+                                @Html.TextBox("txb_Name", @Model.Name, new { @class = "form-control form-control-lg input-underline", @placeholder = "姓名關鍵字" })
+                            </div>
+                            <div class="col-xxl-auto col-lg-6 col-12">
+                                <div class="form-control-lg">
+                                    <label>性別：</label>
+                                    @Html.RadioButton("rbl_Sex", 0, (Model.Sex == 0), new { @class = "form-check-input" })
+                                    @Html.Label("全部")
+                                    @Html.RadioButton("rbl_Sex", 1, (Model.Sex == 1), new { @class = "form-check-input" })
+                                    @Html.Label("男")
+                                    @Html.RadioButton("rbl_Sex", 2, (Model.Sex == 2), new { @class = "form-check-input" })
+                                    @Html.Label("女")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xxl-6 col">
+                                @Html.CheckBox("cbox_PoorFlag", Model.bPoorFlag, new { @class = "form-check-input" })
+                                @Html.Label("中低收入戶")
+                            </div>
+                            <div class="col-xxl-6 col">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="search-form-section">
+                        <div class="d-flex justify-content-end">
+                            <a href="javascript:;" onclick="document.getElementById('form1').submit();" name="a_Filter" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                        </div>
+                    </div>
+
+                    <div class="search-form-section">
+                        
+                        <div class="d-flex justify-content-end">
+                            <select class="form-select" name="ddl_Type">
+                                <option value="-1">請選擇</option>
+                                <option value="1">審核通過,並直接入組</option>
+                                <option value="2">審核通過,需由小組長落戶</option>
+                                <option value="3">駁回</option>
+                                <option value="4">刪除選擇</option>
+                            </select>
+                            <a href="javascript:;" onclick="document.getElementById('form1').submit();" name="a_Save" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>送出</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div class="table-container">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                    </div>
+                </div>
+            }
+
+        </form>
+    </div>
+</div>
+

@@ -16,7 +16,6 @@ namespace Banner.Areas.Web.Controllers
         #region 會員中心-首頁
         public class cAccountPlace_Index
         {
-
             public string Name = "";
             public string Title_OI = "";
             public string Title_Staff = "";
@@ -28,6 +27,8 @@ namespace Banner.Areas.Web.Controllers
             public List<cMenu> c_Teacher = new List<cMenu>();
 
             public List<SelectListItem> SL_Spiritual = new List<SelectListItem>();
+            public string sChangeOI = "";//申請更換小組進度
+            public bool bShowChange = false;
         }
         public class GroupData
         {
@@ -249,6 +250,26 @@ namespace Banner.Areas.Web.Controllers
                 #endregion
                 //會友卡
                 N.bFriendFlag = DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.RID == 2);
+                //申請新小組進度
+                N.bShowChange = false;
+                /*N.bShowChange = AC.GroupType != "無意願";
+                var COI = DC.Change_OI_Order.Where(q => q.ACID == AC.ACID && !q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
+                if (COI != null)
+                {
+                    var OI_From = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == COI.From_OIID);
+                    var OI_To = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == COI.To_OIID);
+                    N.sChangeOI = "已於" + COI.CreDate.ToString(DateTimeFormat) + "提出" + (COI.From_OIID == 1 ? "" : "由" + OI_From.Title + OI_From.Organize.Title) + "轉換至" + OI_To.Title + OI_To.Organize.Title + "，目前狀態為：";
+                    if (COI.Order_Type == 0)
+                        N.sChangeOI += "審核中";
+                    else if (COI.Order_Type == 1)
+                        N.sChangeOI += "審核通過，等待落戶";
+                    else if (COI.Order_Type == 2)
+                        N.sChangeOI += "審核通過，已加入小組";
+                    else
+                        N.sChangeOI += "已駁回";
+
+                    N.bShowChange = true;
+                }*/
             }
             else
                 SetAlert("遺失登入訊息,請重新登入", 4, "/Web/Home/Index");
@@ -1572,7 +1593,58 @@ namespace Banner.Areas.Web.Controllers
         }
 
         #endregion
-
+        #region 申請換組
+        [HttpGet]
+        public string AddChangeGroup()
+        {
+            Error = "";
+            ACID = GetACID();
+            int OIID = GetQueryStringInInt("GID");
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OID == 8 && q.OIID == OIID && q.ActiveFlag && !q.DeleteFlag);
+            if (OI == null)
+                Error = "此小組不存在";
+            else if (ACID < 0)
+                Error = "請先登入會員";
+            else
+            {
+                var COI = DC.Change_OI_Order.FirstOrDefault(q => q.ACID == ACID && q.To_OIID == OIID && !q.DeleteFlag);
+                if (COI != null)
+                {
+                    if (COI.Order_Type == 0)
+                        Error = "您已提出過申請,請靜待審核通知";
+                    else if (COI.Order_Type == 1)
+                        Error = "您已提出過申請已通過審核,請靜待小組長執行落戶";
+                    else if (COI.Order_Type == 2)
+                        Error = "您已為小組成員";
+                    else
+                        Error = "您的申請已被駁回";
+                }
+                else
+                {
+                    var M = DC.M_OI_Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.OrganizeInfo.OID == 8);
+                    if (M != null)
+                        if (M.OIID == OIID && M.JoinDate != M.CreDate)
+                            Error = "您不能對申請加入您目前已經加入的小組";
+                    if (Error == "")
+                    {
+                        COI = new Change_OI_Order();
+                        COI.ACID = ACID;
+                        COI.From_OIID = M != null ? M.OIID : 1;
+                        COI.To_OIID = OI.OIID;
+                        COI.Order_Type = 0;
+                        COI.DeleteFlag = false;
+                        COI.CreDate = DT;
+                        COI.UpdDate = DT;
+                        COI.SaveACID = ACID;
+                        DC.Change_OI_Order.InsertOnSubmit(COI);
+                        DC.SubmitChanges();
+                        Error = "OK";
+                    }
+                }
+            }
+            return Error;
+        }
+        #endregion
     }
 }
 

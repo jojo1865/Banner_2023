@@ -65,6 +65,15 @@
                                 <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會日：@Model.MyGroup.Date</p>
                                 <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會時間：@Model.MyGroup.Time</p>
                                 <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會地點：@Model.MyGroup.Address</p>
+                                @if (Model.bShowChange)
+                                {
+                                    <p>
+                                        <button type="button" id="but_ShowPopup" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#popup_ChangeGroup">
+                                            更換小組申請
+                                        </button>
+                                    </p>
+                                    <p>@Model.sChangeOI</p>
+                                }
                             </div>
                         </div>
 
@@ -169,3 +178,28 @@
         </div>
     }
 </div>
+<script>
+    function ChangeGroupID() {
+        var GID = document.getElementById('txb_GroupID').value;
+        $.ajax({
+            url: '/Web/AccountPlace/AddChangeGroup?GID=' + GID,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                if (res == 'OK') {
+                    Swal.fire({
+                        icon: 'success',
+                        html: '您的申請已提出,請靜待審核'
+                    }).then((result) => { if (result.isConfirmed) { location.reload(); } });;
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        html: res
+                    });
+                }
+            },
+            error: function (err) { console.log(err) },
+        });
+    }
+</script>

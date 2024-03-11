@@ -71,5 +71,26 @@
     @Html.Action("_AlertMsg", "Include")
     <script src="/Areas/Web/Content/js/WebJavascript.js"></script>
 
+
+    <!-- 顯示申請小組 -->
+    <div class="modal fade" id="popup_ChangeGroup" tabindex="-1" aria-labelledby="popup_ChangeGroup_Label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="popup_ChangeGroup_Label">更換小組</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    欲申請的小組編號：
+                    <input id="txb_GroupID" class="form-control" type="number" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="but_ClosePopup">關閉視窗</button>
+                    <button type="button" class="btn btn-primary" onclick="ChangeGroupID();">提出申請</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 </body>
 </html>

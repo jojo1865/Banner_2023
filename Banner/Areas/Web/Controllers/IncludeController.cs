@@ -167,9 +167,25 @@ namespace Banner.Areas.Web.Controllers
             //是否有加入事工團
             var MSAs = DC.M_Staff_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.Staff.ActiveFlag && !q.Staff.DeleteFlag).ToList();
             bool bStaffFlag = MSAs.Count() > 0;//是否有加入事工團
+            //是否為講師
             bool bTeacherFlag = false;
             if (AC != null)
-                bTeacherFlag = AC.TeacherFlag;//是否為講師
+                bTeacherFlag = AC.TeacherFlag;
+            //是否為區長以上
+            bool bLeadeeFlag = false;
+            var Os = GetO();
+            var O7 = Os.First(q => q.OID == 7);
+            if (AC != null)
+            {
+                if (DC.M_O_Account.Any(q => q.ACID == AC.ACID && !q.DeleteFlag && q.OID == 7))//先確定有案例到區長
+                {
+                    var OIS = from q in DC.OrganizeInfo.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag).ToList()
+                              join p in Os.Where(q => q.SortNo <= O7.SortNo).ToList()
+                              on q.OID equals p.OID
+                              select q;
+                    bLeadeeFlag = OIS.Count() > 0;
+                }
+            }
 
             Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == (bGroupLeaderFlag ? 2 : 1) || q.MenuType == (bStaffFlag ? 3 : 1) || q.MenuType == (bTeacherFlag ? 4 : 1)).OrderBy(q => q.SortNo);
 
@@ -205,19 +221,23 @@ namespace Banner.Areas.Web.Controllers
                             ImgUrl = M.ImgURL,
                             SortNo = M.SortNo,
                             SelectFlag = M.URL.StartsWith(ThisController) && OI.OIID == OIID,
-                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, OI.OIID, 0)
+                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, bLeadeeFlag, OI.OIID, 0)
                         };
                         cM.Items.Add(cM1);
                     }
                     cMs.Add(cM);
                 }
-                else if (M.MenuType == 4 && bTeacherFlag)
+                else if (M.MenuType == 4 && bTeacherFlag)//講師限定選單,非講師則過濾
                 {
 
-                }//講師限定選單,非講師則過濾
+                }
+                else if (M.MenuType == 5 && bLeadeeFlag)//區長以上職分限定選單
+                {
+
+                }
                 else
                 {
-                    cM.Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, OIID, 0);
+                    cM.Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, bLeadeeFlag, OIID, 0);
                     cMs.Add(cM);
                 }
             }
@@ -227,7 +247,7 @@ namespace Banner.Areas.Web.Controllers
             return PartialView(cMs);
         }
 
-        private List<cMenu> GetSubItem(int MID, bool bGroupLeaderFlag, bool bStaffFlag, bool bTeacherFlag, int OIID, int SID)
+        private List<cMenu> GetSubItem(int MID, bool bGroupLeaderFlag, bool bStaffFlag, bool bTeacherFlag, bool bLeaderFlag, int OIID, int SID)
         {
             ACID = GetACID();
             string NowShortPath = GetThisAction().Replace("_Edit", "").Replace("_List", "").Replace("_Info", "").Replace("_Remove", "");
@@ -237,6 +257,18 @@ namespace Banner.Areas.Web.Controllers
             q.ActiveFlag &&
             !q.DeleteFlag &&
             (q.MenuType == 1 || q.MenuType == (bGroupLeaderFlag ? 2 : 1) || q.MenuType == (bStaffFlag ? 3 : 1) || q.MenuType == (bTeacherFlag ? 4 : 1))).OrderBy(q => q.SortNo); ;
+
+            List<OrganizeInfo> OIs = new List<OrganizeInfo>();
+            if (bLeaderFlag)
+            {
+                var Os = GetO();
+                var O7 = Os.First(q => q.OID == 7);
+                var OI_s = (from q in DC.OrganizeInfo.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag).ToList()
+                            join p in Os.Where(q => q.SortNo <= O7.SortNo).ToList()
+                            on q.OID equals p.OID
+                            select new { OI = q,SortNo=p.SortNo }) ;
+                OIs = OI_s.OrderBy(q => q.SortNo).ThenBy(q => q.OI.OID).ThenBy(q => q.OI.OIID).Select(q => q.OI).ToList();
+            }
 
             foreach (var M in Ms)
             {
@@ -258,12 +290,12 @@ namespace Banner.Areas.Web.Controllers
                             ImgUrl = "",
                             SortNo = j++,
                             SelectFlag = false,
-                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, OIID, S.Key.SID)
+                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, bLeaderFlag, OIID, S.Key.SID)
                         };
                         Items.Add(cM);
                     }
                 }
-                else if (M.MenuType == 4 && bTeacherFlag)
+                else if (M.MenuType == 4 && bTeacherFlag)//講師限定選單,非講師則過濾
                 {
                     var MPTs = from q in DC.M_Product_Teacher.Where(q => q.Product.ActiveFlag && !q.Product.DeleteFlag && q.Product_Class.ActiveFlag && !q.Product_Class.DeleteFlag)
                                join p in DC.Teacher.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID)
@@ -294,7 +326,7 @@ namespace Banner.Areas.Web.Controllers
                                 ImgUrl = "",
                                 SortNo = MPT.PCID,
                                 SelectFlag = false,
-                                Items = new List<cMenu>() 
+                                Items = new List<cMenu>()
                                 {
                                     new cMenu{
                                         Title = "上課打卡",
@@ -304,7 +336,7 @@ namespace Banner.Areas.Web.Controllers
                                         SelectFlag = false,
                                         Items = new List<cMenu>()
                                     },
-                                    new cMenu { 
+                                    new cMenu {
                                         Title = "學生管理",
                                         Url = "/Web/Teacher/Student_List/" + MPT.PCID,
                                         ImgUrl = "",
@@ -318,7 +350,42 @@ namespace Banner.Areas.Web.Controllers
                         }
                     }
                     Items.Add(cM);
-                }//講師限定選單,非講師則過濾
+                }
+                else if (M.MenuType == 5 && bLeaderFlag)//是否為區長以上
+                {
+                    int i = 0;
+                    foreach(var OI in OIs)
+                    {
+                        cMenu cM_ = new cMenu
+                        {
+                            Title = OI.Title+OI.Organize.Title,
+                            Url = "",
+                            ImgUrl = "",
+                            SortNo = i++,
+                            SelectFlag = false,
+                            Items = new List<cMenu>()
+                                {
+                                    new cMenu{
+                                        Title = "小組員調動",
+                                        Url = "/Web/LeaderPlace/Move_People/" + OI.OIID,
+                                        ImgUrl = "",
+                                        SortNo = 0,
+                                        SelectFlag = false,
+                                        Items = new List<cMenu>()
+                                    },
+                                    new cMenu {
+                                        Title = "底下組織調動",
+                                        Url = "/Web/LeaderPlace/Move_OrganizeInfo/" + OI.OIID,
+                                        ImgUrl = "",
+                                        SortNo = 1,
+                                        SelectFlag = false,
+                                        Items = new List<cMenu>()
+                                    }
+                                }
+                        };
+                        cM.Items.Add(cM_);
+                    }
+                }
                 else
                 {
                     cMenu cM = new cMenu
@@ -329,7 +396,7 @@ namespace Banner.Areas.Web.Controllers
                         ImgUrl = M.ImgURL,
                         SortNo = M.SortNo,
                         SelectFlag = M.URL.StartsWith(ThisController) || M.URL.StartsWith(NowShortPath) || CM_ != null,
-                        Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, OIID, SID)
+                        Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, bLeaderFlag, OIID, SID)
                     };
                     if (OIID > 0)
                         cM.Url += "/" + OIID;

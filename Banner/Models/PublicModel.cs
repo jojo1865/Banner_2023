@@ -151,7 +151,7 @@ namespace Banner.Models
         public string ClassTeacher_Name { get; set; } = "請搜尋";//講師搜尋按鈕顯示文字或是老師姓名
 
         public List<cClassCellTime> cCCTs { get; set; } = new List<cClassCellTime>();//上課時間
-        public int PCID {  get; set; } = 0;//實際班級ID
+        public int PCID { get; set; } = 0;//實際班級ID
         public int TID { get; set; } = 0;//老師ID M_Product_Teacher->MID
 
         public int OrderCt { get; set; } = 0;//訂購人數
@@ -164,6 +164,14 @@ namespace Banner.Models
         public string ClassDate { get; set; } = "";//上課日期
         public string STime { get; set; } = "";//起始時間
         public string ETime { get; set; } = "";//結束時間
-        public int JoinCt {  get; set; } = 0;//打卡人數
+        public int JoinCt { get; set; } = 0;//打卡人數
+    }
+
+    public class cOrgnaizeCell
+    {
+        public int OID { get; set; } = 0;
+        public int SortNo { get; set; } = 0;
+        public string Title { get; set; } = "";
+        public string JobTitle { get; set; } = "";
     }
 }

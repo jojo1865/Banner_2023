@@ -195,6 +195,9 @@ namespace Banner
     partial void InsertAccount_Spiritual(Account_Spiritual instance);
     partial void UpdateAccount_Spiritual(Account_Spiritual instance);
     partial void DeleteAccount_Spiritual(Account_Spiritual instance);
+    partial void InsertChange_OI_Order(Change_OI_Order instance);
+    partial void UpdateChange_OI_Order(Change_OI_Order instance);
+    partial void DeleteChange_OI_Order(Change_OI_Order instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -661,6 +664,14 @@ namespace Banner
 			}
 		}
 		
+		public System.Data.Linq.Table<Change_OI_Order> Change_OI_Order
+		{
+			get
+			{
+				return this.GetTable<Change_OI_Order>();
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.sp_GetOI2List")]
 		public ISingleResult<sp_GetOI2ListResult> sp_GetOI2List([global::System.Data.Linq.Mapping.ParameterAttribute(Name="ACID", DbType="Int")] System.Nullable<int> aCID)
 		{
@@ -770,6 +781,8 @@ namespace Banner
 		
 		private EntitySet<Account_Spiritual> _Account_Spiritual;
 		
+		private EntityRef<Change_OI_Order> _Change_OI_Order;
+		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -848,6 +861,7 @@ namespace Banner
 			this._Order_Header = new EntitySet<Order_Header>(new Action<Order_Header>(this.attach_Order_Header), new Action<Order_Header>(this.detach_Order_Header));
 			this._OrganizeInfo = new EntitySet<OrganizeInfo>(new Action<OrganizeInfo>(this.attach_OrganizeInfo), new Action<OrganizeInfo>(this.detach_OrganizeInfo));
 			this._Account_Spiritual = new EntitySet<Account_Spiritual>(new Action<Account_Spiritual>(this.attach_Account_Spiritual), new Action<Account_Spiritual>(this.detach_Account_Spiritual));
+			this._Change_OI_Order = default(EntityRef<Change_OI_Order>);
 			OnCreated();
 		}
 		
@@ -1602,6 +1616,35 @@ namespace Banner
 			set
 			{
 				this._Account_Spiritual.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Change_OI_Order", Storage="_Change_OI_Order", ThisKey="ACID", OtherKey="COIOID", IsUnique=true, IsForeignKey=false)]
+		public Change_OI_Order Change_OI_Order
+		{
+			get
+			{
+				return this._Change_OI_Order.Entity;
+			}
+			set
+			{
+				Change_OI_Order previousValue = this._Change_OI_Order.Entity;
+				if (((previousValue != value) 
+							|| (this._Change_OI_Order.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Change_OI_Order.Entity = null;
+						previousValue.Account = null;
+					}
+					this._Change_OI_Order.Entity = value;
+					if ((value != null))
+					{
+						value.Account = this;
+					}
+					this.SendPropertyChanged("Change_OI_Order");
+				}
 			}
 		}
 		
@@ -15210,6 +15253,10 @@ namespace Banner
 		
 		private EntitySet<Product> _Product;
 		
+		private EntitySet<Change_OI_Order> _Change_OI_Order_From;
+		
+		private EntitySet<Change_OI_Order> _Change_OI_Order_To;
+		
 		private EntityRef<Account> _Account;
 		
 		private EntityRef<Organize> _Organize;
@@ -15256,6 +15303,8 @@ namespace Banner
 			this._M_Staff_Account = new EntitySet<M_Staff_Account>(new Action<M_Staff_Account>(this.attach_M_Staff_Account), new Action<M_Staff_Account>(this.detach_M_Staff_Account));
 			this._PayType = new EntitySet<PayType>(new Action<PayType>(this.attach_PayType), new Action<PayType>(this.detach_PayType));
 			this._Product = new EntitySet<Product>(new Action<Product>(this.attach_Product), new Action<Product>(this.detach_Product));
+			this._Change_OI_Order_From = new EntitySet<Change_OI_Order>(new Action<Change_OI_Order>(this.attach_Change_OI_Order_From), new Action<Change_OI_Order>(this.detach_Change_OI_Order_From));
+			this._Change_OI_Order_To = new EntitySet<Change_OI_Order>(new Action<Change_OI_Order>(this.attach_Change_OI_Order_To), new Action<Change_OI_Order>(this.detach_Change_OI_Order_To));
 			this._Account = default(EntityRef<Account>);
 			this._Organize = default(EntityRef<Organize>);
 			OnCreated();
@@ -15627,6 +15676,32 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Change_OI_Order", Storage="_Change_OI_Order_From", ThisKey="OIID", OtherKey="From_OIID")]
+		public EntitySet<Change_OI_Order> Change_OI_Order_From
+		{
+			get
+			{
+				return this._Change_OI_Order_From;
+			}
+			set
+			{
+				this._Change_OI_Order_From.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Change_OI_Order1", Storage="_Change_OI_Order_To", ThisKey="OIID", OtherKey="To_OIID")]
+		public EntitySet<Change_OI_Order> Change_OI_Order_To
+		{
+			get
+			{
+				return this._Change_OI_Order_To;
+			}
+			set
+			{
+				this._Change_OI_Order_To.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_OrganizeInfo", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
 		public Account Account
 		{
@@ -15785,6 +15860,30 @@ namespace Banner
 		{
 			this.SendPropertyChanging();
 			entity.OrganizeInfo = null;
+		}
+		
+		private void attach_Change_OI_Order_From(Change_OI_Order entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo = this;
+		}
+		
+		private void detach_Change_OI_Order_From(Change_OI_Order entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo = null;
+		}
+		
+		private void attach_Change_OI_Order_To(Change_OI_Order entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo1 = this;
+		}
+		
+		private void detach_Change_OI_Order_To(Change_OI_Order entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo1 = null;
 		}
 	}
 	
@@ -20723,6 +20822,383 @@ namespace Banner
 						this._ACID = default(int);
 					}
 					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Change_OI_Order")]
+	public partial class Change_OI_Order : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _COIOID;
+		
+		private int _ACID;
+		
+		private int _From_OIID;
+		
+		private int _To_OIID;
+		
+		private int _Order_Type;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<OrganizeInfo> _OrganizeInfo;
+		
+		private EntityRef<OrganizeInfo> _OrganizeInfo1;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnCOIOIDChanging(int value);
+    partial void OnCOIOIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnFrom_OIIDChanging(int value);
+    partial void OnFrom_OIIDChanged();
+    partial void OnTo_OIIDChanging(int value);
+    partial void OnTo_OIIDChanged();
+    partial void OnOrder_TypeChanging(int value);
+    partial void OnOrder_TypeChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Change_OI_Order()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
+			this._OrganizeInfo1 = default(EntityRef<OrganizeInfo>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_COIOID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int COIOID
+		{
+			get
+			{
+				return this._COIOID;
+			}
+			set
+			{
+				if ((this._COIOID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnCOIOIDChanging(value);
+					this.SendPropertyChanging();
+					this._COIOID = value;
+					this.SendPropertyChanged("COIOID");
+					this.OnCOIOIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_From_OIID", DbType="Int NOT NULL")]
+		public int From_OIID
+		{
+			get
+			{
+				return this._From_OIID;
+			}
+			set
+			{
+				if ((this._From_OIID != value))
+				{
+					if (this._OrganizeInfo.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnFrom_OIIDChanging(value);
+					this.SendPropertyChanging();
+					this._From_OIID = value;
+					this.SendPropertyChanged("From_OIID");
+					this.OnFrom_OIIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_To_OIID", DbType="Int NOT NULL")]
+		public int To_OIID
+		{
+			get
+			{
+				return this._To_OIID;
+			}
+			set
+			{
+				if ((this._To_OIID != value))
+				{
+					if (this._OrganizeInfo1.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnTo_OIIDChanging(value);
+					this.SendPropertyChanging();
+					this._To_OIID = value;
+					this.SendPropertyChanged("To_OIID");
+					this.OnTo_OIIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Order_Type", DbType="Int NOT NULL")]
+		public int Order_Type
+		{
+			get
+			{
+				return this._Order_Type;
+			}
+			set
+			{
+				if ((this._Order_Type != value))
+				{
+					this.OnOrder_TypeChanging(value);
+					this.SendPropertyChanging();
+					this._Order_Type = value;
+					this.SendPropertyChanged("Order_Type");
+					this.OnOrder_TypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Change_OI_Order", Storage="_Account", ThisKey="COIOID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.Change_OI_Order = null;
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.Change_OI_Order = this;
+						this._COIOID = value.ACID;
+					}
+					else
+					{
+						this._COIOID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Change_OI_Order", Storage="_OrganizeInfo", ThisKey="From_OIID", OtherKey="OIID", IsForeignKey=true)]
+		public OrganizeInfo OrganizeInfo
+		{
+			get
+			{
+				return this._OrganizeInfo.Entity;
+			}
+			set
+			{
+				OrganizeInfo previousValue = this._OrganizeInfo.Entity;
+				if (((previousValue != value) 
+							|| (this._OrganizeInfo.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._OrganizeInfo.Entity = null;
+						previousValue.Change_OI_Order_From.Remove(this);
+					}
+					this._OrganizeInfo.Entity = value;
+					if ((value != null))
+					{
+						value.Change_OI_Order_From.Add(this);
+						this._From_OIID = value.OIID;
+					}
+					else
+					{
+						this._From_OIID = default(int);
+					}
+					this.SendPropertyChanged("OrganizeInfo");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Change_OI_Order1", Storage="_OrganizeInfo1", ThisKey="To_OIID", OtherKey="OIID", IsForeignKey=true)]
+		public OrganizeInfo OrganizeInfo1
+		{
+			get
+			{
+				return this._OrganizeInfo1.Entity;
+			}
+			set
+			{
+				OrganizeInfo previousValue = this._OrganizeInfo1.Entity;
+				if (((previousValue != value) 
+							|| (this._OrganizeInfo1.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._OrganizeInfo1.Entity = null;
+						previousValue.Change_OI_Order_To.Remove(this);
+					}
+					this._OrganizeInfo1.Entity = value;
+					if ((value != null))
+					{
+						value.Change_OI_Order_To.Add(this);
+						this._To_OIID = value.OIID;
+					}
+					else
+					{
+						this._To_OIID = default(int);
+					}
+					this.SendPropertyChanged("OrganizeInfo1");
 				}
 			}
 		}

@@ -2752,21 +2752,46 @@ namespace Banner
         }
         //取得某小組上面全部組織名稱
         
-        public List<string> GetOITitles(int OIID)
+        public List<string> GetOITitles(int OIID,int Cut = 5)
         {
             List<string> S = new List<string>();
-
-            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID && q.OID==8 && !q.DeleteFlag);
+            if(Cut>0)
+            {
+                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID && q.OID == 8 && !q.DeleteFlag);
+                do
+                {
+                    S.Add(OI.Title + OI.Organize.Title);
+                    Cut--;
+                    if (OI.ParentID > 0)
+                        OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID && !q.DeleteFlag);
+                    else
+                        break;
+                } while (OI != null);
+            }
+            return S;
+        }
+        //取得旌旗組織由樹幹至樹枝的排序
+        public List<cOrgnaizeCell> GetO()
+        {
+            List<cOrgnaizeCell> Os = new List<cOrgnaizeCell>();
+            var Os_ = DC.Organize.Where(q => !q.DeleteFlag).ToList();
+            var O_ = Os_.FirstOrDefault(q => q.ParentID == 0);
+            int i = 0;
             do
             {
-                S.Add(OI.Title + OI.Organize.Title);
-                if (OI.ParentID > 0)
-                    OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID && !q.DeleteFlag);
-                else
-                    break;
-            } while (OI != null);
+                cOrgnaizeCell c = new cOrgnaizeCell
+                {
+                    OID = O_.OID,
+                    SortNo = i++,
+                    Title = O_.Title,
+                    JobTitle = O_.JobTitle
+                };
+                Os.Add(c);
+                O_ = Os_.FirstOrDefault(q => q.ParentID == O_.OID);
+            }
+            while (O_ != null);
 
-            return S;
+            return Os;
         }
 
         //取得全部組織組織下拉選單
