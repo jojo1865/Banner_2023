@@ -521,7 +521,8 @@
                     <div class="form-card">
                         <div class="row">
                             <div class="col-12 pt-2">
-                                @Html.CheckBox("cbox_ActiveFlag", Model.AC.ActiveFlag, new { @class = "form-check-input" })<label>帳戶啟用</label>
+                                @Html.CheckBox("cbox_ActiveFlag", Model.AC.ActiveFlag, new { @class = "form-check-input" })
+                                <label for="cbox_ActiveFlag">帳戶啟用</label>
                             </div>
                         </div>
                         @if (Model.bShowBackUsedAreaFlag)
@@ -530,7 +531,7 @@
                                 <div class="col-12 pt-2">
                                     @if (Model.bFriendFlag)
                                     {
-                                        @Html.CheckBox("cbox_BackUsedFlag", Model.AC.BackUsedFlag, new { @class = "form-check-input" })<label for="cbox_BackUsedFlag">後台權限</label> 
+                                        @Html.CheckBox("cbox_BackUsedFlag", Model.AC.BackUsedFlag, new { @class = "form-check-input" })<label for="cbox_BackUsedFlag">後台權限</label>
                                     }
                                     else
                                     {
@@ -549,6 +550,18 @@
                                 else
                                 {
                                     @Html.CheckBox("cbox_TeacherFlag", Model.AC.TeacherFlag, new { @class = "form-check-input", @disabled = "true" })<label class="lab_gray">講師權限(無會友資格)</label>
+                                }
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 pt-2">
+                                @if (Model.bNightLeaderFlag)
+                                {
+                                    @Html.CheckBox("cbox_NightLeaderFlag", Model.AC.NightLeaderFlag, new { @class = "form-check-input" })<label for="cbox_NightLeaderFlag">領夜同工</label>
+                                }
+                                else
+                                {
+                                    @Html.CheckBox("cbox_NightLeaderFlag", Model.AC.NightLeaderFlag, new { @class = "form-check-input", @disabled = "true" })<label class="lab_gray">領夜同工(無小組)</label>
                                 }
                             </div>
                         </div>
@@ -671,8 +684,10 @@
         var iCheck2 = box2.checked ? 1 : 0;
         var box3 = document.getElementById('cbox_TeacherFlag');
         var iCheck3 = box3.checked ? 1 : 0;
+        var box4 = document.getElementById('cbox_NightLeaderFlag');
+        var iCheck4 = box4.checked ? 1 : 0;
         $.ajax({
-            url: '/Admin/AccountSet/SaveAcctFlag/' + ACID + '?Act=' + iCheck1 + '&Bac=' + iCheck2 + '&Tea=' + iCheck3,
+            url: '/Admin/AccountSet/SaveAcctFlag/' + ACID + '?Act=' + iCheck1 + '&Bac=' + iCheck2 + '&Tea=' + iCheck3 + '&Nig=' + iCheck4,
             method: 'GET',
             dataType: 'text'
 

@@ -1364,9 +1364,16 @@ namespace Banner.Areas.Admin.Controllers
             #region 資料庫資料帶入
             var Ns = DC.Coupon_Header.Where(q => !q.DeleteFlag);
             if (c.sKey != "")
-                Ns = Ns.Where(q => q.Product.Title.Contains(c.sKey));
+                Ns = from q in Ns
+                     join p in DC.Product.Where(q => q.Title.Contains(c.sKey))
+                     on q.PID equals p.PID
+                     select q;
             if (CCID > 0)
-                Ns = Ns.Where(q => q.Product.Course.CCID == CCID);
+                Ns = from q in Ns
+                join p in DC.Course.Where(q => q.CCID == CCID)
+                on q.CID equals p.CID
+                select q;
+            //Ns = Ns.Where(q => q.Product.Course.CCID == CCID);
             if (c.ActiveType >= 0)
                 Ns = Ns.Where(q => q.ActiveFlag == (c.ActiveType == 1));
 
@@ -1374,19 +1381,27 @@ namespace Banner.Areas.Admin.Controllers
             var OI2s = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
             if (OI2s.Any())
             {
-                var OI2_1 = OI2s.FirstOrDefault(q => q.OIID == 1);
+                var OI2_1 = OI2s.FirstOrDefault(q => q.OIID == 1);//是否有檢視全部旌旗的權限?
                 if (OI2_1 == null)
                 {
-                    Ns = from q in Ns
+                    var Ps_ = from q in OI2s.Where(q => q.OIID > 2)
+                           join p in DC.Product.Where(q => !q.DeleteFlag)
+                           on q.OIID equals p.OIID
+                           select p;
+                    Ns = from q in Ns.Where(q => q.PID > 0)
+                         join p in Ps_.GroupBy(q => q.PID)
+                         on q.PID equals p.Key
+                         select q;
+                    /*Ns = from q in Ns
                          join p in OI2s.Where(q => q.OIID > 2)
                          on q.Product.OIID equals p.OIID
-                         select q;
+                         select q;*/
                 }
             }
             else if (ACID == 1) { }
             else//沒有旌旗權限~暫時就乾脆都先不給看好了
             {
-                Ns = Ns.Where(q => q.Product.OIID == 1);
+                Ns = Ns.Where(q => q.CHID == 0);
             }
 
             var TopTitles = new List<cTableCell>();
@@ -1395,7 +1410,6 @@ namespace Banner.Areas.Admin.Controllers
             TopTitles.Add(new cTableCell { Title = "課程名稱" });
             TopTitles.Add(new cTableCell { Title = "可用期間" });
             TopTitles.Add(new cTableCell { Title = "折價金額" });
-            TopTitles.Add(new cTableCell { Title = "適用職分" });
             TopTitles.Add(new cTableCell { Title = "分配名單" });
             TopTitles.Add(new cTableCell { Title = "啟用狀態" });
 
@@ -1407,21 +1421,23 @@ namespace Banner.Areas.Admin.Controllers
             foreach (var N_ in Ns)
             {
                 cTableRow cTR = new cTableRow();
+                var Cou = DC.Course.FirstOrDefault(q => q.CID == N_.CID);
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/Coupon_Edit/" + N_.CHID, Target = "_self", Value = "編輯" });//編輯
-                cTR.Cs.Add(new cTableCell { Value = "【" + N_.Product.Course.Course_Category.Code + "】" + N_.Product.Course.Course_Category.Title });//課程分類
-                cTR.Cs.Add(new cTableCell { Value = N_.Product.Course.Title + " " + N_.Product.SubTitle });//課程名稱
+
+                if (Cou != null)
+                    cTR.Cs.Add(new cTableCell { Value = "【" + Cou.Course_Category.Code + "】" + Cou.Course_Category.Title });//課程分類
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "" });//課程分類
+               //cTR.Cs.Add(new cTableCell { Value = "【" + N_.Product.Course.Course_Category.Code + "】" + N_.Product.Course.Course_Category.Title });//課程分類
+
+                var P = DC.Product.FirstOrDefault(q => q.PID == N_.PID);
+                if(P!=null)
+                    cTR.Cs.Add(new cTableCell { Value = P.Course.Title + " " + P.SubTitle });//課程名稱
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "" });
                 cTR.Cs.Add(new cTableCell { Value = (N_.SDateTime.ToString(DateTimeFormat) + "<br/>↕<br/>" + N_.EDateTime.ToString(DateTimeFormat)) });//可用期間
                 cTR.Cs.Add(new cTableCell { Value = (N_.Price_Cut.ToString()) });//折價金額
-                if (N_.OID == -1)
-                    cTR.Cs.Add(new cTableCell { Value = "自行匯入" });//適用職分
-                else if (N_.OID == 0)
-                    cTR.Cs.Add(new cTableCell { Value = "全體會友" });//適用職分
-                else
-                {
-                    var O = DC.Organize.FirstOrDefault(q => q.OID == N_.OID);
-                    cTR.Cs.Add(new cTableCell { Value = (O != null ? O.JobTitle : "") });//適用職分
-                }
-
+                
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/Coupon_Account_List/" + N_.CHID, Target = "_self", Value = "檢視名單(" + N_.Coupon_Account.Count(q => !q.DeleteFlag) + ")" });//分配名單
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "已啟用" : "已關閉" });//啟用狀態
                 c.cTL.Rs.Add(SetTableCellSortNo(cTR));
@@ -1447,6 +1463,8 @@ namespace Banner.Areas.Admin.Controllers
         public class cCoupon_Edit
         {
             public Coupon_Header CH = new Coupon_Header();
+            public List<SelectListItem> CC_SL = new List<SelectListItem>();
+            public List<SelectListItem> C_SL = new List<SelectListItem>();
             public List<SelectListItem> P_SL = new List<SelectListItem>();
             public List<SelectListItem> O_SL = new List<SelectListItem>();
         }
@@ -1455,7 +1473,7 @@ namespace Banner.Areas.Admin.Controllers
             cCoupon_Edit c = new cCoupon_Edit();
             #region 物件初始化
             ACID = GetACID();
-            var Ps = DC.Product.Where(q => !q.DeleteFlag);
+            /*var Ps = DC.Product.Where(q => !q.DeleteFlag);
             //旌旗權限檢視門檻設置
             var OI2s = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
             if (OI2s.Any())
@@ -1474,12 +1492,33 @@ namespace Banner.Areas.Admin.Controllers
             {
                 Ps = Ps.Where(q => q.OIID == 1);
             }
-            foreach (var P in Ps.OrderByDescending(q => q.CreDate))
-                c.P_SL.Add(new SelectListItem { Text = "【" + P.Course.Title + "】" + P.SubTitle, Value = P.PID.ToString() });
-            if (Ps.Count() > 0)
-                c.P_SL[0].Selected = true;
-            else
-                Error += "請先建立商品";
+            var Cous = (from q in DC.Course.Where(q => !q.DeleteFlag && !q.Course_Category.DeleteFlag)
+                       join p in Ps.GroupBy(q => q.CID)
+                       on q.CID equals p.Key
+                       select q).ToList();
+            var CCs = (from q in Cous
+                      group q by new { q.CCID, q.Course_Category.Title } into g
+                      select new { g.Key.CCID, g.Key.Title }).OrderBy(q=>q.Title).ToList();
+            for(int i=0;i<CCs.Count;i++)
+            {
+                c.CC_SL.Add(new SelectListItem { Text = CCs[i].Title , Value = CCs[i].CCID.ToString(), Selected = i == 0 });
+                if (i == 0)
+                {
+                    var Cs = Cous.Where(q => q.CCID == CCs[i].CCID).OrderBy(q=>q.Title).ToList();
+                    for (int j = 0; j < Cs.Count; j++)
+                    {
+                        c.C_SL.Add(new SelectListItem { Text = Cs[j].Title, Value = Cs[j].CID.ToString(), Selected =j == 0 });
+                        if(j == 0)
+                        {
+                            c.P_SL.Add(new SelectListItem { Text = "請選擇", Value = "-1", Selected = true }) ;
+
+                            var Ps_ = Ps.Where(q => q.CID == Cs[j].CID).OrderBy(q => q.Title).ToList();
+                            for(int k=0;k<Ps_.Count;k++)
+                                c.P_SL.Add(new SelectListItem { Text = Ps_[k].SubTitle, Value = Ps_[k].PID.ToString() });
+                        }
+                    }  
+                }
+            }
 
             var Os = DC.Organize.Where(q => q.JobTitle != "" && q.ActiveFlag && !q.DeleteFlag);
             c.O_SL.Add(new SelectListItem { Text = "會員", Value = "-1" });
@@ -1549,6 +1588,8 @@ namespace Banner.Areas.Admin.Controllers
                 c.CH.SaveACID = ACID;
             }
             #endregion
+
+            */
             return c;
         }
         [HttpGet]
@@ -1566,7 +1607,7 @@ namespace Banner.Areas.Admin.Controllers
                 SetAlert(Error, 2);
             else
             {
-                if (c.CH.CHID == 0)
+                /*if (c.CH.CHID == 0)
                 {
                     c.CH.CreDate = c.CH.UpdDate;
                     DC.Coupon_Header.InsertOnSubmit(c.CH);
@@ -1715,7 +1756,7 @@ namespace Banner.Areas.Admin.Controllers
                     DC.Coupon_Account.InsertAllOnSubmit(CAs_New);
                 DC.SubmitChanges();
 
-                SetAlert("存檔完成", 1, "/Admin/StoreSet/Coupon_List");
+                SetAlert("存檔完成", 1, "/Admin/StoreSet/Coupon_List");*/
             }
             return View(c);
         }
@@ -1730,7 +1771,7 @@ namespace Banner.Areas.Admin.Controllers
         public cCoupon_Account_List GetCoupon_Account_List(int ID, FormCollection FC)
         {
             cCoupon_Account_List c = new cCoupon_Account_List();
-
+            /*
             #region 物件初始化
 
             #region 前端資料帶入
@@ -1820,6 +1861,8 @@ namespace Banner.Areas.Admin.Controllers
             }
             if (Error != "")
                 SetAlert(Error, 2, "/Admin/StoreSet/Coupon_List");
+           
+            */
             #endregion
             return c;
         }

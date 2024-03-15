@@ -868,7 +868,7 @@ namespace Banner
         {
             return $"{TS:hh\\:mm}";
         }
-        public DateTime ChangeTimeSpanToDateTime(DateTime DT_,TimeSpan TS)
+        public DateTime ChangeTimeSpanToDateTime(DateTime DT_, TimeSpan TS)
         {
             return Convert.ToDateTime(DT.ToString(DateFormat) + " " + GetTimeSpanToString(TS) + ":00");
         }
@@ -2751,11 +2751,11 @@ namespace Banner
             return OIs;
         }
         //取得某小組上面全部組織名稱
-        
-        public List<string> GetOITitles(int OIID,int Cut = 5)
+
+        public List<string> GetOITitles(int OIID, int Cut = 5)
         {
             List<string> S = new List<string>();
-            if(Cut>0)
+            if (Cut > 0)
             {
                 var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID && q.OID == 8 && !q.DeleteFlag);
                 do
@@ -2947,41 +2947,69 @@ namespace Banner
         }
         public int[] GetPrice(int ACID, Product P)
         {
-            int[] iReturn = new int[3] { 0, 0, 0 };//價格類別,最終價格,折價劵ID
-            var CA = (from q in DC.Coupon_Account.Where(q => q.ACID == ACID && q.Coupon_Header.PID == P.PID && !q.DeleteFlag && q.ActiveFlag && q.OPID == 0 && q.OHID == 0 && q.Coupon_Header.ActiveFlag && !q.Coupon_Header.DeleteFlag && q.Coupon_Header.SDateTime <= DT && q.Coupon_Header.EDateTime >= DT)
-                      join p in DC.M_OI_Account.Where(q => q.ACID == ACID)
-                      on q.Coupon_Header.OID equals p.OrganizeInfo.OID
-                      select q).FirstOrDefault();
-            int Price_Cut = CA != null ? CA.Coupon_Header.Price_Cut : 0;
-            bool bEarly = false;//早鳥日期判定
-            if (P.SDate_Early.Date >= P.CreDate.Date && P.SDate_Early.Date >= DT.Date)//有早鳥起始日,且今天在起始日之後
+            int[] iReturn = new int[3] { 0, P.Price_Basic, 0 };//價格類別,最終價格,折價劵ID,職分/事工團等適用原因ID
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
+            if (iReturn[1] > 0)//非0元課程
             {
-                if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
-                    bEarly = true;
-                else if (P.EDate_Early.Date < P.CreDate.Date)//沒有早鳥結束日
-                    bEarly = true;
-            }
-            else if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
-                bEarly = true;
-
-            if (P.Price_Basic > 0)
-            {
-                if (P.Price_Basic + Price_Cut <= P.Price_Early && CA != null)
+                var CHs = DC.Coupon_Header.Where(q =>
+                                    (q.PID == P.PID || (q.PID == 0 && q.CID == P.CID)) &&
+                                    !q.DeleteFlag && q.ActiveFlag &&
+                                    ((q.SDateTime <= DT && q.EDateTime >= DT) || (q.SDateTime == q.CreDate && q.EDateTime == q.CreDate))//不限時
+                                    );
+                #region 過濾折價劵適用旌旗
+                CHs = CHs.Where(q => q.M_OI_Coupon.Any(p => p.OIID == P.OIID));
+                #endregion
+                #region 檢查職分(就職才算,案例不算
+                var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
+                var CH_s = from q in OIs
+                           join p in CHs.Where(q => q.Target_Type == 1)
+                           on q.OIID equals p.Target_ID
+                           select p;
+                FilterCouponPrice(CH_s.ToList(), ref iReturn, P);
+                #endregion
+                #region 檢查事工團
+                CH_s = from q in DC.M_Staff_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID)
+                       join p in CHs.Where(q => q.Target_Type == 2)
+                       on q.OIID equals p.Target_ID
+                       select p;
+                FilterCouponPrice(CH_s.ToList(), ref iReturn, P);
+                #endregion
+                #region 檢查指定名單
+                CH_s = CHs.Where(q => q.Target_Type == 5 && q.Coupon_Account.Any(p => p.ACID == ACID && p.OHID == 0 && p.OPID == 0 && !p.DeleteFlag && p.ActiveFlag));
+                FilterCouponPrice(CH_s.ToList(), ref iReturn, P);
+                #endregion
+                #region 檢查新生
+                var OHs = DC.Order_Header.Where(q => q.ACID == AC.ACID && q.Order_Type > 0);//有交易過就不會是用新生價,新生只能用一次
+                if (OHs.Count() == 0)
                 {
-                    iReturn[0] = 2;
-                    iReturn[1] = P.Price_Basic + Price_Cut > 0 ? P.Price_Basic + Price_Cut : 0;
-                    iReturn[2] = CA.CAID;
+                    CH_s = CHs.Where(q => q.Target_Type == 3 && AC.CreDate.AddDays(q.Life_Cut).Date <= DT.Date);
+                    FilterCouponPrice(CH_s.ToList(), ref iReturn, P);
                 }
-                else if (P.Price_Early < P.Price_Basic && bEarly && P.Price_Early > 0)
+                #endregion
+                #region 檢查領夜
+                if (AC.NightLeaderFlag)
+                {
+                    CH_s = CHs.Where(q => q.Target_Type == 4);
+                    FilterCouponPrice(CH_s.ToList(), ref iReturn, P);
+                }
+                #endregion
+                #region 檢查早鳥
+                bool bEarly = false;//早鳥日期判定
+                if (P.SDate_Early.Date >= P.CreDate.Date && P.SDate_Early.Date >= DT.Date)//有早鳥起始日,且今天在起始日之後
+                {
+                    if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
+                        bEarly = true;
+                    else if (P.EDate_Early.Date < P.CreDate.Date)//沒有早鳥結束日
+                        bEarly = true;
+                }
+                else if (P.EDate_Early.Date >= P.CreDate.Date && P.EDate_Early.Date <= DT.Date)//有早鳥結束日,且今天在結束日之前
+                    bEarly = true;
+                if (bEarly && P.Price_Early < iReturn[1])
                 {
                     iReturn[0] = 1;
                     iReturn[1] = P.Price_Early;
                 }
-                else
-                {
-                    iReturn[0] = 0;
-                    iReturn[1] = P.Price_Basic;
-                }
+                #endregion
             }
             else//免費課程
             {
@@ -2990,7 +3018,88 @@ namespace Banner
             }
             return iReturn;
         }
+        //檢查折價劵與目前金額誰低
+        private void FilterCouponPrice(List<Coupon_Header> CH_s, ref int[] iReturn, Product P)
+        {
+            foreach (var CH in CH_s)
+            {
+                switch (CH.Price_Type)
+                {
+                    case 0://扣錢
+                        if (P.Price_Basic + CH.Price_Cut < iReturn[1])
+                        {
+                            iReturn[0] = 2;
+                            iReturn[1] = P.Price_Basic + CH.Price_Cut;
+                            iReturn[2] = CH.CHID;
+                        }
+                        break;
+                    case 1: //指定金額
+                        if (CH.Price_Cut < iReturn[1])
+                        {
+                            iReturn[0] = 2;
+                            iReturn[1] = CH.Price_Cut;
+                            iReturn[2] = CH.CHID;
+                        }
+                        break;
+                    case 2:
+                        {
+                            iReturn[0] = 2;
+                            iReturn[1] = 0;
+                            iReturn[2] = CH.CHID;
+                        }
+                        break;
+                }
+            }
+        }
+        //取得折價原因的文字
+        public string GetCouponNote(Coupon_Header CH)
+        {
+            string Note = "";
+            if (CH != null)
+            {
+                //1:職分/2:事工團/3:新生/4:領夜同工/5:指定名單
+                switch (CH.Target_Type)
+                {
+                    case 1:
+                        var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == CH.Target_ID);
+                        if (OI != null)
+                        {
+                            Note = "擔任" + OI.Title + OI.Organize.Title + "的" + OI.Organize.JobTitle;
+                        }
+                        break;
 
+                    case 2:
+                        var MSA = DC.M_Staff_Account.FirstOrDefault(q => q.SID == CH.Target_ID);
+                        if (MSA != null)
+                        {
+                            Note = "於" + MSA.Staff.Staff_Category.Title + MSA.Staff.Title + "擔任團員";
+                        }
+                        break;
+
+                    case 3:
+                        {
+                            Note = "新生";
+                        }
+                        break;
+
+                    case 4:
+                        {
+                            Note = "擔任領夜同工";
+                        }
+                        break;
+
+                    case 5:
+                        {
+                            Note = "被指定允許折價";
+                        }
+                        break;
+                }
+            }
+
+
+            return Note;
+        }
+        //寄信給小組長
         public void SendMailToGroupLeader(string JoinName, int OILeaderID, string Title)
         {
             if (OILeaderID > 0)
@@ -3044,15 +3153,23 @@ namespace Banner
                 foreach (var OP in OH.Order_Product)
                 {
                     int[] iPrice = GetPrice(OH.ACID, OP.Product);
+                    string sNote = "";
+                    if (iPrice[2] > 0)
+                    {
+                        var CH = DC.Coupon_Header.FirstOrDefault(q => q.CHID == iPrice[2]);
+                        sNote = GetCouponNote(CH);
+                    }
+
                     Order_Product OP_ = new Order_Product
                     {
                         Order_Header = OH_0,
                         Product = OP.Product,
                         Product_Class = OP.Product_Class,
-                        CAID = iPrice[2],
+                        CHID = iPrice[2],
                         Price_Basic = OP.Product.Price_Basic,
                         Price_Finally = iPrice[1],
                         Price_Type = iPrice[0],
+                        Price_Note = sNote,
                         Graduation_Flag = true,
                         Graduation_ACID = 0,
                         Graduation_Date = DT,
@@ -3102,15 +3219,22 @@ namespace Banner
                 foreach (var OP in OH.Order_Product)
                 {
                     int[] iPrice = GetPrice(OH.ACID, OP.Product);
+                    string sNote = "";
+                    if (iPrice[2] > 0)
+                    {
+                        var CH = DC.Coupon_Header.FirstOrDefault(q => q.CHID == iPrice[2]);
+                        sNote = GetCouponNote(CH);
+                    }
                     Order_Product OP_ = new Order_Product
                     {
                         Order_Header = OH_0,
                         Product = OP.Product,
                         Product_Class = OP.Product_Class,
-                        CAID = iPrice[2],
+                        CHID = iPrice[2],
                         Price_Basic = OP.Product.Price_Basic,
                         Price_Finally = iPrice[1],
                         Price_Type = iPrice[0],
+                        Price_Note = sNote,
                         Graduation_Flag = true,
                         Graduation_ACID = 0,
                         Graduation_Date = DT,

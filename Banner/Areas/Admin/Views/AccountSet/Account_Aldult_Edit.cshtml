@@ -508,12 +508,8 @@
                         <div class="form-card">
                             <div class="row">
                                 <div class="col-12 pt-2">
-                                    <label>帳戶啟用</label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 pt-2">
                                     @Html.CheckBox("cbox_ActiveFlag", Model.AC.ActiveFlag, new { @class = "form-check-input" })
+                                    <label for="cbox_ActiveFlag">帳戶啟用</label>
                                 </div>
                             </div>
                             @if (Model.bShowBackUsedAreaFlag)
@@ -546,7 +542,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-12 pt-2">
-                                    @if (Model.bNeightLeaderFlag)
+                                    @if (Model.bNightLeaderFlag)
                                     {
                                         @Html.CheckBox("cbox_NightLeaderFlag", Model.AC.NightLeaderFlag, new { @class = "form-check-input" })<label for="cbox_NightLeaderFlag">領夜同工</label>
                                     }

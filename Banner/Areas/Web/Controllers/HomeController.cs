@@ -44,16 +44,21 @@ namespace Banner.Areas.Web.Controllers
             {
                 if (GetACID() <= 0)
                 {
-                    /*LogInAC(1);
-                    SetBrowserData("UserName", "系統管理員");
-                    */
+                    //LogInAC(1);
+                    //SetBrowserData("UserName", "系統管理員");
+                    
                     //LogInAC(443);
                     //SetBrowserData("UserName", "江晨旭");
-                    LogInAC(8197);
-                    SetBrowserData("UserName", "JOJO");
+
+                    //LogInAC(8197);
+                    //SetBrowserData("UserName", "JOJO");
+
                     //LogInAC(2213);
                     //SetBrowserData("UserName", "劉冠廷");
 
+                    //測試區長功能
+                    LogInAC(746);
+                    SetBrowserData("UserName", "柯佳慧"); 
                     Response.Redirect("/Web/Home/Index");
                 }
             }
@@ -676,7 +681,7 @@ namespace Banner.Areas.Web.Controllers
                                 Order_Header = OH,
                                 Product = P,
                                 PCID = PC != null ? PC.PCID : 0,
-                                CAID = iPrice[2],
+                                CHID = iPrice[2],
                                 Price_Basic = P.Price_Basic,
                                 Price_Finally = iPrice[1],
                                 Price_Type = iPrice[0],
@@ -712,15 +717,22 @@ namespace Banner.Areas.Web.Controllers
                         DC.Order_Header.InsertOnSubmit(OH);
                         DC.SubmitChanges();
 
+                        string sNote = "";
+                        if (iPrice[2]>0)
+                        {
+                            var CH = DC.Coupon_Header.FirstOrDefault(q => q.CHID == iPrice[2]);
+                            sNote = GetCouponNote(CH);
+                        }
                         Order_Product OP = new Order_Product
                         {
                             OHID = OH.OHID,
                             PID = P.PID,
                             PCID = PC != null ? PC.PCID : 0,
-                            CAID = iPrice[2],
+                            CHID = iPrice[2],
                             Price_Basic = P.Price_Basic,
                             Price_Finally = iPrice[1],
                             Price_Type = iPrice[0],
+                            Price_Note = sNote,
                             Graduation_Flag = true,
                             Graduation_ACID = 0,
                             Graduation_Date = DT,

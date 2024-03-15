@@ -429,7 +429,7 @@ namespace Banner.Areas.Admin.Controllers
                 case 5://按立會友
                 case 2://兒童
                     TopTitles.Add(new cTableCell { Title = "選擇", WidthPX = 50 });
-                    TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
+                    TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 200 });
                     TopTitles.Add(new cTableCell { Title = "牧區" });
                     TopTitles.Add(new cTableCell { Title = "督區" });
                     TopTitles.Add(new cTableCell { Title = "區" });
@@ -499,15 +499,19 @@ namespace Banner.Areas.Admin.Controllers
                     case 2://兒童
                         {
                             cTR.Cs.Add(new cTableCell { Type = "checkbox", Value = "false", ControlName = "cbox_S" + N.ACID, CSS = "form-check-input cbox_S" });//選擇
-                            if (iType == 1)
+                            cTableCell cTC = new cTableCell();
+                            cTC.cTCs = new List<cTableCell>();
+                            if (iType == 1 || iType == 2)
                             {
                                 if (ACID == 1)
-                                    cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_self", Value = "編輯" });//編輯
+                                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Edit/" + N.ACID, Target = "_self", Value = "編輯" });//編輯
                                 else
-                                    cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
+                                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_self", Value = "檢視" });//檢視
                             }
-                            else
-                                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Emtitle_Edit/" + N.ACID, Target = "_self", Value = "按立" });//檢視
+                            if (iType == 1 || iType == 5)
+                                cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Emtitle_Edit/" + N.ACID, Target = "_self", Value = "按立" });//檢視
+                            cTR.Cs.Add(cTC);
+
                             var OI_8 = GetMOIAC(8, 0, N.ACID).FirstOrDefault(q => q.JoinDate != q.CreDate);//確定有入組再列
                             if (OI_8 != null)
                             {
@@ -700,7 +704,7 @@ namespace Banner.Areas.Admin.Controllers
 
                             var COI = DC.Change_OI_Order.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.COIOID).FirstOrDefault();
                             if (COI.Order_Type == 0)
-                                TopTitles.Add(new cTableCell { Type = "checkbox", ControlName = "cbox_"});//選擇
+                                TopTitles.Add(new cTableCell { Type = "checkbox", ControlName = "cbox_" });//選擇
                             else
                                 TopTitles.Add(new cTableCell { Value = "" });//選擇
                             TopTitles.Add(new cTableCell { Value = N.Name_First + N.Name_Last });//姓名
@@ -712,16 +716,18 @@ namespace Banner.Areas.Admin.Controllers
                             {
                                 case 0: { sType = "等待審核中"; } break;
                                 case 1: { sType = "已直接入組"; } break;
-                                case 2: {
+                                case 2:
+                                    {
                                         var MOI = DC.M_OI_Account.FirstOrDefault(q => q.ACID == N.ACID && q.OIID == COI.To_OIID);
-                                        if(MOI!=null)
+                                        if (MOI != null)
                                         {
-                                            if(MOI.ActiveFlag)
+                                            if (MOI.ActiveFlag)
                                                 sType = "已許可並已落戶";
                                             else
                                                 sType = "已許可,等待落戶";
                                         }
-                                    } break;
+                                    }
+                                    break;
                                 case 3: { sType = "已駁回"; } break;
                             }
                             TopTitles.Add(new cTableCell { Value = sType });
@@ -794,7 +800,7 @@ namespace Banner.Areas.Admin.Controllers
 
             public bool bFriendFlag = false;//是否為會友
 
-            public bool bNeightLeaderFlag = false;//是否為領夜同工
+            public bool bNightLeaderFlag = false;//是否為領夜同工
         }
         //家庭樹
         public class cFamily
@@ -1002,7 +1008,7 @@ namespace Banner.Areas.Admin.Controllers
             N.bShowBackUsedAreaFlag = CheckAdmin(GetACID());
             //領夜同工
             //N.bJob24Flag = DC.M_Role_Account.Any(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 24 && q.ACID == ID);
-            N.bNeightLeaderFlag = GetMOIAC(8, 0, ID).Count() > 0;
+            N.bNightLeaderFlag = GetMOIAC(8, 0, ID).Count() > 0;
             //按立歷史
             var OAHs = DC.M_O_Account.Where(q => q.ACID == ID);
             #region 建立按立資料
@@ -1286,41 +1292,6 @@ namespace Banner.Areas.Admin.Controllers
                         }
                         break;
                 }
-
-
-
-                /*var MOIACs = GetMOIAC(0, 0, ID);
-                if (MOIACs.Count() == 0)
-                    N.JoinGroupType = 0;
-                else
-                {
-                    var Js = DC.JoinGroupWish.Where(q => q.ACID == ID).ToList();
-                    var MOIAC = MOIACs.OrderByDescending(q => q.MID).First();
-                    if (MOIAC.OIID == 1)
-                    {
-                        N.JoinGroupType = 1;
-                        foreach (var cJGW in N.cJGWs)
-                        {
-                            var JGW = Js.FirstOrDefault(q => q.JoinType == cJGW.JoinType && q.SortNo == cJGW.SortNo);
-                            cJGW.JGW = JGW;
-                            if (JGW != null)
-                            {
-                                if (!cJGW.SelectFalg)
-                                    cJGW.SelectFalg = cJGW.JGW.WeeklyNo > 0 && cJGW.JGW.TimeNo > 0;
-                                cJGW.ddl_Weekly.ddlList.ForEach(q => q.Selected = false);
-                                cJGW.ddl_Weekly.ddlList.First(q => q.Value == cJGW.JGW.WeeklyNo.ToString()).Selected = true;
-                                cJGW.ddl_Time.ddlList.ForEach(q => q.Selected = false);
-                                cJGW.ddl_Time.ddlList.First(q => q.Value == cJGW.JGW.TimeNo.ToString()).Selected = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        N.JoinGroupType = 2;
-                       
-                    }
-
-                }*/
                 #endregion
                 #region 家庭狀況
                 var Fs = N.AC.Family.Where(q => !q.DeleteFlag).ToList();
@@ -1767,12 +1738,14 @@ namespace Banner.Areas.Admin.Controllers
             int iActiveFlag = GetQueryStringInInt("Act");
             int iBackUserFlag = GetQueryStringInInt("Bac");
             int iTeacherFlag = GetQueryStringInInt("Tea");
+            int iNightLeaderFlag = GetQueryStringInInt("Nig");
             var N = DC.Account.FirstOrDefault(q => q.ACID == ID);
             if (N != null)
             {
                 N.ActiveFlag = iActiveFlag == 1;
                 N.BackUsedFlag = iBackUserFlag == 1;
                 N.TeacherFlag = iTeacherFlag == 1;
+                N.NightLeaderFlag = iNightLeaderFlag == 1;
                 N.UpdDate = DT;
                 N.SaveACID = ACID;
                 DC.SubmitChanges();

@@ -108,7 +108,7 @@ namespace Banner.Areas.Web.Controllers
                     if (Meet != null)
                     {
                         N.MyGroup.Date = sWeeks[Meet.WeeklyNo];
-                        N.MyGroup.Time = Meet.TimeNo + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
+                        N.MyGroup.Time =sTimeSpans[ Meet.TimeNo] + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
                         N.MyGroup.Address = Meet.Meeting_Location.Title;
                         var Loc = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == Meet.MLSID);
                         if (Loc != null)
@@ -131,7 +131,7 @@ namespace Banner.Areas.Web.Controllers
                     if (Meet != null)
                     {
                         G.Date = sWeeks[Meet.WeeklyNo];
-                        G.Time = Meet.TimeNo + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
+                        G.Time = sTimeSpans[Meet.TimeNo] + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
                         G.Address = Meet.Meeting_Location.Title;
                         var Loc = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == Meet.MLSID);
                         if (Loc != null)

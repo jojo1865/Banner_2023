@@ -187,7 +187,12 @@ namespace Banner.Areas.Web.Controllers
                 }
             }
 
-            Ms = Ms.Where(q => q.MenuType == 1 || q.MenuType == (bGroupLeaderFlag ? 2 : 1) || q.MenuType == (bStaffFlag ? 3 : 1) || q.MenuType == (bTeacherFlag ? 4 : 1)).OrderBy(q => q.SortNo);
+            Ms = Ms.Where(q => q.MenuType == 1 || 
+            q.MenuType == (bGroupLeaderFlag ? 2 : 1) || 
+            q.MenuType == (bStaffFlag ? 3 : 1) || 
+            q.MenuType == (bTeacherFlag ? 4 : 1) || 
+            q.MenuType == (bLeadeeFlag ? 5 : 1)
+            ).OrderBy(q => q.SortNo);
 
             int OIID = GetOIID();
             //int SID = GetSID();
@@ -233,7 +238,8 @@ namespace Banner.Areas.Web.Controllers
                 }
                 else if (M.MenuType == 5 && bLeadeeFlag)//區長以上職分限定選單
                 {
-
+                    cM.Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, bLeadeeFlag, OIID, 0);
+                    cMs.Add(cM);
                 }
                 else
                 {
@@ -256,7 +262,12 @@ namespace Banner.Areas.Web.Controllers
             var Ms = DC.Menu.Where(q => q.ParentID == MID &&
             q.ActiveFlag &&
             !q.DeleteFlag &&
-            (q.MenuType == 1 || q.MenuType == (bGroupLeaderFlag ? 2 : 1) || q.MenuType == (bStaffFlag ? 3 : 1) || q.MenuType == (bTeacherFlag ? 4 : 1))).OrderBy(q => q.SortNo); ;
+            (q.MenuType == 1 || 
+            q.MenuType == (bGroupLeaderFlag ? 2 : 1) ||
+            q.MenuType == (bStaffFlag ? 3 : 1) || 
+            q.MenuType == (bTeacherFlag ? 4 : 1) ||
+            q.MenuType == (bLeaderFlag ? 5 : 1)
+            )).OrderBy(q => q.SortNo); ;
 
             List<OrganizeInfo> OIs = new List<OrganizeInfo>();
             if (bLeaderFlag)
@@ -354,7 +365,17 @@ namespace Banner.Areas.Web.Controllers
                 else if (M.MenuType == 5 && bLeaderFlag)//是否為區長以上
                 {
                     int i = 0;
-                    foreach(var OI in OIs)
+                    cMenu cM = new cMenu
+                    {
+                        MenuID = M.MID,
+                        Title = M.Title,
+                        Url = M.URL,
+                        ImgUrl = M.ImgURL,
+                        SortNo = M.SortNo,
+                        SelectFlag = M.URL.StartsWith(ThisController) || M.URL.StartsWith(NowShortPath) || CM_ != null,
+                        Items = new List<cMenu>()
+                    };
+                    foreach (var OI in OIs)
                     {
                         cMenu cM_ = new cMenu
                         {
@@ -385,6 +406,7 @@ namespace Banner.Areas.Web.Controllers
                         };
                         cM.Items.Add(cM_);
                     }
+                    Items.Add(cM);
                 }
                 else
                 {
@@ -820,10 +842,8 @@ namespace Banner.Areas.Web.Controllers
         {
             ACID = GetACID();
 
-            var CA = (from q in DC.Coupon_Account.Where(q => q.ACID == ACID && q.Coupon_Header.PID == P.PID && !q.DeleteFlag && q.ActiveFlag && q.OPID == 0 && q.OHID == 0 && q.Coupon_Header.ActiveFlag && !q.Coupon_Header.DeleteFlag && q.Coupon_Header.SDateTime <= DT && q.Coupon_Header.EDateTime >= DT)
-                      join p in DC.M_OI_Account.Where(q => q.ACID == ACID)
-                      on q.Coupon_Header.OID equals p.OrganizeInfo.OID
-                      select q).FirstOrDefault();
+
+
             int[] iPrice = GetPrice(ACID, P);
 
             var PCTs = DC.Product_ClassTime.Where(q => q.Product_Class.ActiveFlag && !q.Product_Class.DeleteFlag && q.Product_Class.PID == P.PID);
