@@ -362,7 +362,7 @@ namespace Banner.Areas.Web.Controllers
                     }
                     Items.Add(cM);
                 }
-                else if (M.MenuType == 5 && bLeaderFlag)//是否為區長以上
+                else if (M.MenuType == 5 && bLeaderFlag)//是否為區長以上=申請專區
                 {
                     int i = 0;
                     cMenu cM = new cMenu
@@ -375,37 +375,19 @@ namespace Banner.Areas.Web.Controllers
                         SelectFlag = M.URL.StartsWith(ThisController) || M.URL.StartsWith(NowShortPath) || CM_ != null,
                         Items = new List<cMenu>()
                     };
-                    foreach (var OI in OIs)
+                    /*foreach (var OI in OIs)
                     {
                         cMenu cM_ = new cMenu
                         {
-                            Title = OI.Title+OI.Organize.Title,
+                            Title = OI.Title + OI.Organize.Title,
                             Url = "",
                             ImgUrl = "",
                             SortNo = i++,
                             SelectFlag = false,
-                            Items = new List<cMenu>()
-                                {
-                                    new cMenu{
-                                        Title = "小組員調動",
-                                        Url = "/Web/LeaderPlace/Move_People/" + OI.OIID,
-                                        ImgUrl = "",
-                                        SortNo = 0,
-                                        SelectFlag = false,
-                                        Items = new List<cMenu>()
-                                    },
-                                    new cMenu {
-                                        Title = "底下組織調動",
-                                        Url = "/Web/LeaderPlace/Move_OrganizeInfo/" + OI.OIID,
-                                        ImgUrl = "",
-                                        SortNo = 1,
-                                        SelectFlag = false,
-                                        Items = new List<cMenu>()
-                                    }
-                                }
+                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, bLeaderFlag, 0, 0)
                         };
                         cM.Items.Add(cM_);
-                    }
+                    }*/
                     Items.Add(cM);
                 }
                 else

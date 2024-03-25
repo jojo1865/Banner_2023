@@ -1,0 +1,39 @@
+﻿@model Banner.Areas.Web.Controllers.LeaderPlaceController.cGetMove_People
+@{
+    ViewBag.Title = "Move_People";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="container">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">會友異動</a></li>
+            </ol>
+        </nav>
+
+
+        <div class="container-lg">
+            <form method="post" id="form1">
+                <div class="row">
+
+                    <div class="col-12 col-lg-auto col-form-label-lg">會友</div>
+                    <div class="col-12 col-lg-auto">
+                        @Html.TextBox("txb_ACID", Model.ACID == 0 ? "" : Model.ACID, new { @class = "form-control form-control-lg", @placeholder = "請輸入會友ID", type = "number", min = "0" })
+                    </div>
+                    <div class="col-12 col-lg-auto col-form-label-lg"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div class="col-12 col-lg-auto col-form-label-lg">小組</div>
+                    <div class="col-12 col-lg-auto">
+                        @Html.TextBox("txb_OIID", Model.OIID == 0 ? "" : Model.OIID, new { @class = "form-control form-control-lg", @placeholder = "請輸入小組ID", type = "number", min = "0" })
+                    </div>
+                    <div class="col-12 col-lg-auto"><button type="submit" class="btn btn-primary">送出</button></div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+

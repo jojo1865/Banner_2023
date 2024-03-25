@@ -681,7 +681,7 @@ namespace Banner.Areas.Web.Controllers
                                 Order_Header = OH,
                                 Product = P,
                                 PCID = PC != null ? PC.PCID : 0,
-                                CHID = iPrice[2],
+                                CRID = iPrice[3],
                                 Price_Basic = P.Price_Basic,
                                 Price_Finally = iPrice[1],
                                 Price_Type = iPrice[0],
@@ -720,15 +720,15 @@ namespace Banner.Areas.Web.Controllers
                         string sNote = "";
                         if (iPrice[2]>0)
                         {
-                            var CH = DC.Coupon_Header.FirstOrDefault(q => q.CHID == iPrice[2]);
-                            sNote = GetCouponNote(CH);
+                            var CR = DC.Coupon_Rool.FirstOrDefault(q => q.CHID == iPrice[2]);
+                            sNote = GetCouponNote(CR);
                         }
                         Order_Product OP = new Order_Product
                         {
                             OHID = OH.OHID,
                             PID = P.PID,
                             PCID = PC != null ? PC.PCID : 0,
-                            CHID = iPrice[2],
+                            CRID = iPrice[3],
                             Price_Basic = P.Price_Basic,
                             Price_Finally = iPrice[1],
                             Price_Type = iPrice[0],

@@ -2904,6 +2904,20 @@ namespace Banner
 
             return MAs;
         }
+
+        //取得該會友具有的最大職分
+        public OrganizeInfo GetTopOrganizeInfo(int ACID)
+        {
+            OrganizeInfo OI = null;
+            var Os = GetO();
+            foreach(var O in Os.OrderBy(q=>q.SortNo))
+            {
+                OI = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == O.OID && q.ACID == ACID).OrderByDescending(q=>q.OIID).FirstOrDefault();
+                if(OI!=null)
+                    break;
+            }
+            return OI;
+        }
         //取得地址的字串
         public string GetLocationString(Location L)
         {
@@ -2947,7 +2961,8 @@ namespace Banner
         }
         public int[] GetPrice(int ACID, Product P)
         {
-            int[] iReturn = new int[3] { 0, P.Price_Basic, 0 };//價格類別,最終價格,折價劵ID,職分/事工團等適用原因ID
+            int[] iReturn = new int[4] { 0, P.Price_Basic, 0, 0 };//價格類別,最終價格,折價劵ID,折價券適用規則ID
+
             var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID);
             if (iReturn[1] > 0)//非0元課程
             {
@@ -2956,41 +2971,45 @@ namespace Banner
                                     !q.DeleteFlag && q.ActiveFlag &&
                                     ((q.SDateTime <= DT && q.EDateTime >= DT) || (q.SDateTime == q.CreDate && q.EDateTime == q.CreDate))//不限時
                                     );
+                var CRs = from q in CHs
+                          join p in DC.Coupon_Rool.Where(q => q.CHID > 0)
+                          on q.CHID equals p.CHID
+                          select p;
                 #region 過濾折價劵適用旌旗
-                CHs = CHs.Where(q => q.M_OI_Coupon.Any(p => p.OIID == P.OIID));
+                //CRs = CRs.Where(q => );
                 #endregion
                 #region 檢查職分(就職才算,案例不算
                 var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
-                var CH_s = from q in OIs
-                           join p in CHs.Where(q => q.Target_Type == 1)
+                var CR_s = from q in OIs
+                           join p in CRs.Where(q => q.Target_Type == 1)
                            on q.OIID equals p.Target_ID
                            select p;
-                FilterCouponPrice(CH_s.ToList(), ref iReturn, P);
+                FilterCouponPrice(CR_s.ToList(), ref iReturn, P);
                 #endregion
                 #region 檢查事工團
-                CH_s = from q in DC.M_Staff_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID)
-                       join p in CHs.Where(q => q.Target_Type == 2)
+                CR_s = from q in DC.M_Staff_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID)
+                       join p in CRs.Where(q => q.Target_Type == 2)
                        on q.OIID equals p.Target_ID
                        select p;
-                FilterCouponPrice(CH_s.ToList(), ref iReturn, P);
+                FilterCouponPrice(CR_s.ToList(), ref iReturn, P);
                 #endregion
                 #region 檢查指定名單
-                CH_s = CHs.Where(q => q.Target_Type == 5 && q.Coupon_Account.Any(p => p.ACID == ACID && p.OHID == 0 && p.OPID == 0 && !p.DeleteFlag && p.ActiveFlag));
-                FilterCouponPrice(CH_s.ToList(), ref iReturn, P);
+                CR_s = CRs.Where(q => q.Target_Type == 5 && q.Coupon_Header.Coupon_Account.Any(p => p.ACID == ACID && p.OHID == 0 && p.OPID == 0 && !p.DeleteFlag && p.ActiveFlag));
+                FilterCouponPrice(CR_s.ToList(), ref iReturn, P);
                 #endregion
                 #region 檢查新生
                 var OHs = DC.Order_Header.Where(q => q.ACID == AC.ACID && q.Order_Type > 0);//有交易過就不會是用新生價,新生只能用一次
                 if (OHs.Count() == 0)
                 {
-                    CH_s = CHs.Where(q => q.Target_Type == 3 && AC.CreDate.AddDays(q.Life_Cut).Date <= DT.Date);
-                    FilterCouponPrice(CH_s.ToList(), ref iReturn, P);
+                    CR_s = CRs.Where(q => q.Target_Type == 3 && AC.CreDate.AddDays(q.Coupon_Header.Life_Cut).Date <= DT.Date);
+                    FilterCouponPrice(CR_s.ToList(), ref iReturn, P);
                 }
                 #endregion
                 #region 檢查領夜
                 if (AC.NightLeaderFlag)
                 {
-                    CH_s = CHs.Where(q => q.Target_Type == 4);
-                    FilterCouponPrice(CH_s.ToList(), ref iReturn, P);
+                    CR_s = CRs.Where(q => q.Target_Type == 4);
+                    FilterCouponPrice(CR_s.ToList(), ref iReturn, P);
                 }
                 #endregion
                 #region 檢查早鳥
@@ -3019,49 +3038,52 @@ namespace Banner
             return iReturn;
         }
         //檢查折價劵與目前金額誰低
-        private void FilterCouponPrice(List<Coupon_Header> CH_s, ref int[] iReturn, Product P)
+        private void FilterCouponPrice(List<Coupon_Rool> CR_s, ref int[] iReturn, Product P)
         {
-            foreach (var CH in CH_s)
+            foreach (var CR in CR_s)
             {
-                switch (CH.Price_Type)
+                switch (CR.Price_Type)
                 {
                     case 0://扣錢
-                        if (P.Price_Basic + CH.Price_Cut < iReturn[1])
+                        if (P.Price_Basic + CR.Price_Cut < iReturn[1])
                         {
                             iReturn[0] = 2;
-                            iReturn[1] = P.Price_Basic + CH.Price_Cut;
-                            iReturn[2] = CH.CHID;
+                            iReturn[1] = P.Price_Basic + CR.Price_Cut;
+                            iReturn[2] = CR.CHID;
+                            iReturn[3] = CR.CRID;
                         }
                         break;
                     case 1: //指定金額
-                        if (CH.Price_Cut < iReturn[1])
+                        if (CR.Price_Cut < iReturn[1])
                         {
                             iReturn[0] = 2;
-                            iReturn[1] = CH.Price_Cut;
-                            iReturn[2] = CH.CHID;
+                            iReturn[1] = CR.Price_Cut;
+                            iReturn[2] = CR.CHID;
+                            iReturn[3] = CR.CRID;
                         }
                         break;
                     case 2:
                         {
                             iReturn[0] = 2;
                             iReturn[1] = 0;
-                            iReturn[2] = CH.CHID;
+                            iReturn[2] = CR.CHID;
+                            iReturn[3] = CR.CRID;
                         }
                         break;
                 }
             }
         }
         //取得折價原因的文字
-        public string GetCouponNote(Coupon_Header CH)
+        public string GetCouponNote(Coupon_Rool CR)
         {
             string Note = "";
-            if (CH != null)
+            if (CR != null)
             {
                 //1:職分/2:事工團/3:新生/4:領夜同工/5:指定名單
-                switch (CH.Target_Type)
+                switch (CR.Target_Type)
                 {
                     case 1:
-                        var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == CH.Target_ID);
+                        var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == CR.Target_ID);
                         if (OI != null)
                         {
                             Note = "擔任" + OI.Title + OI.Organize.Title + "的" + OI.Organize.JobTitle;
@@ -3069,7 +3091,7 @@ namespace Banner
                         break;
 
                     case 2:
-                        var MSA = DC.M_Staff_Account.FirstOrDefault(q => q.SID == CH.Target_ID);
+                        var MSA = DC.M_Staff_Account.FirstOrDefault(q => q.SID == CR.Target_ID);
                         if (MSA != null)
                         {
                             Note = "於" + MSA.Staff.Staff_Category.Title + MSA.Staff.Title + "擔任團員";
@@ -3156,8 +3178,8 @@ namespace Banner
                     string sNote = "";
                     if (iPrice[2] > 0)
                     {
-                        var CH = DC.Coupon_Header.FirstOrDefault(q => q.CHID == iPrice[2]);
-                        sNote = GetCouponNote(CH);
+                        var CR = DC.Coupon_Rool.FirstOrDefault(q => q.CHID == iPrice[3]);
+                        sNote = GetCouponNote(CR);
                     }
 
                     Order_Product OP_ = new Order_Product
@@ -3165,7 +3187,7 @@ namespace Banner
                         Order_Header = OH_0,
                         Product = OP.Product,
                         Product_Class = OP.Product_Class,
-                        CHID = iPrice[2],
+                        CRID = iPrice[2],
                         Price_Basic = OP.Product.Price_Basic,
                         Price_Finally = iPrice[1],
                         Price_Type = iPrice[0],
@@ -3222,15 +3244,15 @@ namespace Banner
                     string sNote = "";
                     if (iPrice[2] > 0)
                     {
-                        var CH = DC.Coupon_Header.FirstOrDefault(q => q.CHID == iPrice[2]);
-                        sNote = GetCouponNote(CH);
+                        var CR = DC.Coupon_Rool.FirstOrDefault(q => q.CRID == iPrice[3]);
+                        sNote = GetCouponNote(CR);
                     }
                     Order_Product OP_ = new Order_Product
                     {
                         Order_Header = OH_0,
                         Product = OP.Product,
                         Product_Class = OP.Product_Class,
-                        CHID = iPrice[2],
+                        CRID = iPrice[3],
                         Price_Basic = OP.Product.Price_Basic,
                         Price_Finally = iPrice[1],
                         Price_Type = iPrice[0],

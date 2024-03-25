@@ -355,7 +355,7 @@ namespace Banner.Areas.Web.Controllers
             public int Price_Type = 0;
             public int Price_Basic = 0;
             public int Price_New = 0;
-            public int CHID = 0;
+            public int CRID = 0;
             public ListSelect LS = new ListSelect();
         }
 
@@ -403,7 +403,7 @@ namespace Banner.Areas.Web.Controllers
                 cP.Price_Basic = OP.Product.Price_Basic;
                 cP.Price_Type = iPrice[0];
                 cP.Price_New = iPrice[1];
-                cP.CHID = iPrice[2];
+                cP.CRID = iPrice[3];
                 cP.LS = new ListSelect();
                 cP.LS.Title = "開課班別";
                 cP.LS.ControlName = "rbl_Class_" + OP.Product.PID;
@@ -556,13 +556,14 @@ namespace Banner.Areas.Web.Controllers
                                     var cP_ = c.cOIs.First(q => q.OIID == OIID).cPTs.First(q => q.PTID == PTID).cPs.First(q => q.OPID == OP_.OPID);
                                     OP_.Order_Header = OH;
                                     OP_.PCID = iPCID;
-                                    OP_.CHID = cP_.CHID;
+                                    OP_.CRID = cP_.CRID;
                                     OP_.Price_Basic = cP_.Price_Basic;
                                     OP_.Price_Finally = cP_.Price_New;
-                                    OP_.Price_Type = cP_.CHID > 0 ? 2 : (cP_.Price_Basic == cP_.Price_New ? 0 : 1);
+                                    OP_.Price_Type = cP_.CRID > 0 ? 2 : (cP_.Price_Basic == cP_.Price_New ? 0 : 1);
                                     DC.SubmitChanges();
                                 }
                             }
+
                             if (OH.Order_Product.Count() > 0)
                                 OH.TotalPrice = OH.Order_Product.Sum(q => q.Price_Finally);
 
@@ -806,7 +807,7 @@ namespace Banner.Areas.Web.Controllers
                     cP.Price_Basic = OP_.Product.Price_Basic;
                     cP.Price_Type = OP_.Price_Type;
                     cP.Price_New = OP_.Price_Finally;
-                    cP.CHID = OP_.CHID;
+                    cP.CRID = OP_.CRID;
                     cP.LS = new ListSelect();
                     cP.LS.Title = "開課班別";
                     cP.LS.ControlName = "rbl_Class_" + OP_.Product.PID;
@@ -952,7 +953,7 @@ namespace Banner.Areas.Web.Controllers
                         cP.Price_Basic = OP_.Product.Price_Basic;
                         cP.Price_Type = OP_.Price_Type;
                         cP.Price_New = OP_.Price_Finally;
-                        cP.CHID = OP_.CHID;
+                        cP.CRID = OP_.CRID;
                         cP.LS = new ListSelect();
                         cP.LS.Title = "開課班別";
                         cP.LS.ControlName = "rbl_Class_" + OP_.Product.PID;
@@ -1230,7 +1231,7 @@ namespace Banner.Areas.Web.Controllers
                         cP.Price_Basic = OP_.Product.Price_Basic;
                         cP.Price_Type = OP_.Price_Type;
                         cP.Price_New = OP_.Price_Finally;
-                        cP.CHID = OP_.CHID;
+                        cP.CRID = OP_.CRID;
                         cP.LS = new ListSelect();
                         cP.LS.Title = "開課班別";
                         cP.LS.ControlName = "rbl_Class_" + OP_.Product.PID;

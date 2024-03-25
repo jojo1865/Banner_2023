@@ -748,6 +748,8 @@
     <Content Include="Areas\Web\Views\MyClass\MyJoinClassHistory_List.cshtml" />
     <Content Include="Areas\Web\Views\MyClass\MyGraduationHistory_List.cshtml" />
     <Content Include="Areas\Admin\Views\AccountSet\Account_GroupOrder_List.cshtml" />
+    <Content Include="Areas\Web\Views\LeaderPlace\Move_People.cshtml" />
+    <Content Include="Areas\Web\Views\LeaderPlace\Move_OrganizeInfo.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -790,7 +792,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Areas\Web\Views\LeaderPlace\" />
     <Folder Include="Files\Coupon\" />
     <Folder Include="Files\Product\" />
     <Folder Include="Photo\Product\" />

@@ -1409,7 +1409,6 @@ namespace Banner.Areas.Admin.Controllers
             TopTitles.Add(new cTableCell { Title = "課程分類" });
             TopTitles.Add(new cTableCell { Title = "課程名稱" });
             TopTitles.Add(new cTableCell { Title = "可用期間" });
-            TopTitles.Add(new cTableCell { Title = "折價金額" });
             TopTitles.Add(new cTableCell { Title = "分配名單" });
             TopTitles.Add(new cTableCell { Title = "啟用狀態" });
 
@@ -1436,7 +1435,6 @@ namespace Banner.Areas.Admin.Controllers
                 else
                     cTR.Cs.Add(new cTableCell { Value = "" });
                 cTR.Cs.Add(new cTableCell { Value = (N_.SDateTime.ToString(DateTimeFormat) + "<br/>↕<br/>" + N_.EDateTime.ToString(DateTimeFormat)) });//可用期間
-                cTR.Cs.Add(new cTableCell { Value = (N_.Price_Cut.ToString()) });//折價金額
                 
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/Coupon_Account_List/" + N_.CHID, Target = "_self", Value = "檢視名單(" + N_.Coupon_Account.Count(q => !q.DeleteFlag) + ")" });//分配名單
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "已啟用" : "已關閉" });//啟用狀態

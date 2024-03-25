@@ -1,0 +1,64 @@
+﻿@model Banner.Areas.Web.Controllers.LeaderPlaceController.cGetMove_OrganizeInfo
+@{
+    ViewBag.Title = "Move_People";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="container">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">牧養組織異動</a></li>
+            </ol>
+        </nav>
+
+
+        <div class="container-lg">
+            <form method="post" id="form1">
+                <div class="row">
+                    <div class="col-12 col-lg-auto">
+                        @foreach (var O in Model.LS_Left_O.ddlList)
+                        {
+                            <Label class="btn btn-info mb-2" style="width:80px;" >@O.Text</Label><br />
+                        }
+                    </div>
+                    <div class="col-12 col-lg-auto">
+                        <div class="row">
+                            <div class="col-12 col-lg-auto">
+                                @Html.DropDownList(Model.LS_Target_Left_O.ControlName,Model.LS_Target_Left_O.ddlList,new {@class= "form-select form-select-lg", onchange= "GetUPOTitle(this.value);" })
+                            </div>
+                            <div class="col-12 col-lg-auto">
+                                @Html.TextBox("txb_Old_OIID", Model.Old_OIID == 0 ? "" : Model.Old_OIID, new { @class = "form-control form-control-lg", @placeholder = "請輸入轉出組織ID", type = "number", min = "0" })
+                            </div>
+                            <div class="col-12 col-lg-auto col-form-label-lg"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="col-12 col-lg-auto col-form-label-lg" id="div_NewTitle">
+                                @Model.Title
+                            </div>
+                            <div class="col-12 col-lg-auto">
+                                @Html.TextBox("txb_New_OIID", Model.New_OIID == 0 ? "" : Model.New_OIID, new { @class = "form-control form-control-lg", @placeholder = "請輸入轉入組織ID", type = "number", min = "0" })
+                            </div>
+                            <div class="col-12 col-lg-auto"><button type="submit" class="btn btn-primary">送出</button></div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function GetUPOTitle(OID) {
+
+        $.ajax({
+            url: '/Web/LeaderPlace/GetUPOTitle?OID=' + OID,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                document.getElementById("div_NewTitle").innerHTML = res;
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
+</script>

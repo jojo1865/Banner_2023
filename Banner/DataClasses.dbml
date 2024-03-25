@@ -190,29 +190,6 @@
       <Association Name="Coupon_Header_Coupon_Account" Member="Coupon_Header" ThisKey="CHID" OtherKey="CHID" Type="Coupon_Header" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.Coupon_Header" Member="Coupon_Header">
-    <Type Name="Coupon_Header">
-      <Column Name="CHID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Code" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
-      <Column Name="Price_Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Price_Cut" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="SDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="EDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="Life_Cut" Storage="_Lift_Cut" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Target_Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Target_ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Coupon_Header_Coupon_Account" Member="Coupon_Account" ThisKey="CHID" OtherKey="CHID" Type="Coupon_Account" />
-      <Association Name="Coupon_Header_M_OI_Coupon" Member="M_OI_Coupon" ThisKey="CHID" OtherKey="CHID" Type="M_OI_Coupon" />
-    </Type>
-  </Table>
   <Table Name="dbo.Course" Member="Course">
     <Type Name="Course">
       <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -660,7 +637,7 @@
       <Column Name="OHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="PCID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="CHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CRID" Storage="_CHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="Price_Basic" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="Price_Finally" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="Price_Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
@@ -944,8 +921,42 @@
       <Column Name="MID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="CHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Coupon_Header_M_OI_Coupon" Member="Coupon_Header" ThisKey="CHID" OtherKey="CHID" Type="Coupon_Header" IsForeignKey="true" />
       <Association Name="OrganizeInfo_M_OI_Coupon" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
+      <Association Name="Coupon_Header_M_OI_Coupon" Member="Coupon_Header" ThisKey="CHID" OtherKey="CHID" Type="Coupon_Header" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Coupon_Rool" Member="Coupon_Rool">
+    <Type Name="Coupon_Rool">
+      <Column Name="CRID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="CHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SortNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Code" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="Price_Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Price_Cut" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Target_Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Target_ID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Coupon_Header_Coupon_Rool" Member="Coupon_Header" ThisKey="CHID" OtherKey="CHID" Type="Coupon_Header" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Coupon_Header" Member="Coupon_Header">
+    <Type Name="Coupon_Header">
+      <Column Name="CHID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="CID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Code" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="SDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="EDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Life_Cut" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Coupon_Header_Coupon_Account" Member="Coupon_Account" ThisKey="CHID" OtherKey="CHID" Type="Coupon_Account" />
+      <Association Name="Coupon_Header_M_OI_Coupon" Member="M_OI_Coupon" ThisKey="CHID" OtherKey="CHID" Type="M_OI_Coupon" />
+      <Association Name="Coupon_Header_Coupon_Rool" Member="Coupon_Rool" ThisKey="CHID" OtherKey="CHID" Type="Coupon_Rool" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">
