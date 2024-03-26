@@ -424,6 +424,7 @@ namespace Banner.Areas.Admin.Controllers
 
             public string JoinDate { get; set; }
             public string LeaderFlag { get; set; }
+            public string SubLeaderFlag { get; set; }
         }
         [HttpGet]
         public string GetStaffAccountList(int OIID, int SID, string Name = "", bool BUFlag = false)//取得 旌旗+事工團+同工 名單
@@ -431,98 +432,13 @@ namespace Banner.Areas.Admin.Controllers
             return JsonConvert.SerializeObject(GetStaffACList(OIID, SID, Name, BUFlag));
         }
         #endregion
-        #region 各事工團主責名單管理
-        public class cStaffAccount_List
-        {
-            public cTableList cTL = new cTableList();
-        }
-
+        #region 各事工團名單管理
+        
         [HttpGet]
         public ActionResult StaffAccount_List(int ID)
         {
             GetViewBag();
-            ACID = GetACID();
-            ViewBag.SID = ID;
-            ViewBag.Child = "false";
-            var SA = DC.M_Staff_Account.FirstOrDefault(q => q.SID == ID && q.ACID == ACID && !q.DeleteFlag);
-            if(SA!=null)
-            {
-                ViewBag.OIID = SA.OIID;
-                if (SA.Staff.ChildrenFlag)
-                    ViewBag.Child = "true";
-            }
-            else
-            ViewBag.OIID = 0;
-            cStaffAccount_List c = new cStaffAccount_List();
-            c.cTL = new cTableList();
-            c.cTL.Rs = new List<cTableRow>();
-            var Ss = GetStaffACList(0, ID, "", false);
-            int i = 1;
-            foreach (var S in Ss)
-            {
-                cTableRow R = new cTableRow();
-                R.SortNo = i++;
-                if (S.LeaderFlag == "V")
-                    R.CSS = "tr_Leader";
-                R.Cs.Add(new cTableCell { Value = "cbox_Staff_" + S.MID });
-                R.Cs.Add(new cTableCell { Value = S.ACID.ToString() });
-                R.Cs.Add(new cTableCell { Value = S.Name });
-                R.Cs.Add(new cTableCell { Value = S.GroupName });
-                R.Cs.Add(new cTableCell { Value = S.Contect });
-                R.Cs.Add(new cTableCell { Value = S.JoinDate });
-                R.Cs.Add(new cTableCell { Value = S.LeaderFlag });
-                c.cTL.Rs.Add(R);
-            }
-
-            return View(c);
-        }
-
-        public List<cSAL> GetStaffACList(int OIID, int SID, string Name, bool BUFlag)
-        {
-
-            var Ns = DC.M_Staff_Account.Where(q => !q.DeleteFlag && q.ActiveFlag);
-            if (BUFlag)//只搜尋同工
-            {
-                Ns = from q in Ns
-                     join p in DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag).GroupBy(q => q.ACID).Select(q => q.Key)
-                     on q.ACID equals p
-                     select q;
-            }
-            if (OIID > 0)//限定旌旗
-                Ns = Ns.Where(q => q.OIID == OIID);
-            if (SID > 0)//限定事工團
-                Ns = Ns.Where(q => q.SID == SID);
-            if (!string.IsNullOrEmpty(Name))//姓名
-                Ns = Ns.Where(q => (q.Account.Name_First + q.Account.Name_Last).Contains(Name));
-
-            List<cSAL> Ns_ = new List<cSAL>();
-            foreach (var N in Ns)
-            {
-                cSAL c = new cSAL();
-                c.OIID = N.OIID;
-                c.OI2Title = N.OrganizeInfo.Title + N.OrganizeInfo.Organize.Title;
-                c.SCID = N.Staff.SCID;
-                c.SCTitle = N.Staff.Staff_Category.Title;
-                c.SID = N.SID;
-                c.STitle = (N.Staff.ChildrenFlag ? "[兒童]" : "") + N.Staff.Title;
-
-                c.MID = N.MID;
-                c.ACID = N.ACID;
-                c.Name = N.Account.Name_First + N.Account.Name_Last;
-                var Ms = GetMOIAC(8, 0, N.ACID);
-
-                c.GroupName = Ms.Count() > 0 ? string.Join(",", Ms.Select(q => q.OrganizeInfo.Title + q.OrganizeInfo.Organize.Title).ToArray()) : "";
-                var C = DC.Contect.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == N.ACID && q.ContectType == 1);
-                c.Contect = C != null ? C.ContectValue : "--";
-
-                c.JoinDate = N.JoinDate.ToString(DateFormat);
-                c.LeaderFlag = N.LeaderFlag ? "V" : "";
-
-                Ns_.Add(c);
-            }
-
-            Ns_ = Ns_.OrderBy(q => q.OIID).ThenBy(q => q.SCID).ThenBy(q => q.SID).ThenByDescending(q => q.LeaderFlag).ToList();
-            return Ns_;
+            return View(GetStaffAccount_List(ID));
         }
         #endregion
     }

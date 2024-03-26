@@ -106,14 +106,13 @@
                     </table>
 
                 </div>
-                <b>2.指定事功團</b><br />
+                <b>2.指定事工團</b><br />
                 事工團類別：
                 @Html.DropDownList("ddl_StaffCategory_Add", Model.ddl_Category, new { @class = "form-select form-select-lg", @onchange = "SelectStaff(this.value,'ddl_Staff_Add');" })
                 事工團：
                 <select class="form-select form-select-lg" id="ddl_Staff_Add" name="ddl_Staff_Add">
                     <option value="0">請先選擇類別</option>
                 </select>
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary btn-lg btn-submit btn-round m-2" data-bs-dismiss="modal">取消</button>
@@ -199,6 +198,7 @@
                         str += "<td>" + r[i].Contect + "</td>";
                         str += "<td>" + r[i].JoinDate + "</td>";
                         str += "<td>" + r[i].LeaderFlag + "</td>";
+                        str += "<td>" + r[i].SubLeaderFlag + "</td>";
                         str += "</tr>";
 
                         table.innerHTML += str;

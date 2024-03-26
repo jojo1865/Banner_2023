@@ -48,10 +48,10 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (GetACID() <= 0)
                 {
-                    LogInAC(1);
-                    SetBrowserData("UserName", "系統管理者");
-                    //LogInAC(8197);
-                    //SetBrowserData("UserName", "JOJO");
+                    //LogInAC(1);
+                    //SetBrowserData("UserName", "系統管理者");
+                    LogInAC(8197);
+                    SetBrowserData("UserName", "JOJO");
                     SetAlert("", 1, "/Admin/Home/Index");
                 }
             }
@@ -734,6 +734,7 @@ namespace Banner.Areas.Admin.Controllers
             public int ACID { get; set; }
             public string Name { get; set; }
             public string GroupName { get; set; }
+            public string Child { get; set; }
         }
         /// <summary>
         /// 取得會員搜尋列表
@@ -757,7 +758,8 @@ namespace Banner.Areas.Admin.Controllers
 
                 foreach (var AC in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
                 {
-                    cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "" };
+                    var OI = DC.M_OI_Account.FirstOrDefault(q => q.ACID == AC.ACID && q.ActiveFlag && !q.DeleteFlag && q.OrganizeInfo.OID == 8);
+                    cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = (OI != null ? OI.OrganizeInfo.Title + OI.OrganizeInfo.Organize.Title : ""), Child = (CheckChild(AC.Birthday) ? "兒童" : "成人") };
                     //if (!BackendFlag)
                     //    N.Name = CutName(N.Name);
                     Ns.Add(N);
@@ -803,10 +805,11 @@ namespace Banner.Areas.Admin.Controllers
 
                 foreach (var AC in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
                 {
-                    cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "" };
+                    cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "", Child = "" };
                     var M_ACs = Ms_.Where(q => q.ACID == AC.ACID);
                     foreach (var M in M_ACs)
                         N.GroupName += (N.GroupName == "" ? "" : ",") + M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title;
+                    N.Child = CheckChild(AC.Birthday) ? "兒童" : "成人";
                     Ns.Add(N);
                 }
             }
@@ -923,6 +926,7 @@ namespace Banner.Areas.Admin.Controllers
                                             OIID = ID2,
                                             ACID = iACID,
                                             LeaderFlag = false,
+                                            SubLeaderFlag = false,
                                             JoinDate = DT,
                                             LeaveDate = DT,
                                             ActiveFlag = true,
@@ -1095,7 +1099,8 @@ namespace Banner.Areas.Admin.Controllers
                 R.Messages.Add("請選擇會員ID");
             if (Ms.Count(q => q.LeaderFlag) > 0)
                 R.Messages.Add("所選名單包含主責,請先移除主責權限後再行移除");
-
+            if (Ms.Count(q => q.SubLeaderFlag) > 0)
+                R.Messages.Add("所選名單包含代職主責,請先移除代職主責權限後再行移除");
             if (R.Messages.Count() == 0)
             {
                 foreach (var MSA in Ms)
@@ -1104,6 +1109,41 @@ namespace Banner.Areas.Admin.Controllers
                     MSA.LeaderFlag = false;
                     MSA.ActiveFlag = false;
                     MSA.DeleteFlag = true;
+                    MSA.UpdDate = DT;
+                    MSA.SaveACID = ACID;
+                    DC.SubmitChanges();
+                }
+            }
+
+            return JsonConvert.SerializeObject(R);
+        }
+        #endregion
+        #region 事工團移除團員
+        public string SubLeaderACFromStaff(string IDs, int SID)
+        {
+            BasicResponse R = new BasicResponse();
+            ACID = GetACID();
+            string[] sIDs = IDs.Split(',');
+            List<int> MIDs = new List<int>();
+            for (int i = 0; i < sIDs.Length; i++)
+            {
+                int iMID = 0;
+                if (int.TryParse(sIDs[i], out iMID))
+                    MIDs.Add(iMID);
+            }
+            var Ms = (from q in DC.M_Staff_Account.Where(q => !q.DeleteFlag && q.SID == SID).ToList()
+                      join p in MIDs
+                      on q.MID equals p
+                      select q).ToList();
+
+            if (Ms.Count() == 0)
+                R.Messages.Add("請選擇會員ID");
+
+            if (R.Messages.Count() == 0)
+            {
+                foreach (var MSA in Ms)
+                {
+                    MSA.SubLeaderFlag = true;
                     MSA.UpdDate = DT;
                     MSA.SaveACID = ACID;
                     DC.SubmitChanges();

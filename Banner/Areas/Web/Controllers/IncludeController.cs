@@ -287,7 +287,7 @@ namespace Banner.Areas.Web.Controllers
 
                 if (bStaffFlag && M.MID == 61)//主責專區特製
                 {
-                    var Ss = from q in DC.M_Staff_Account.Where(q => q.ACID == ACID && q.LeaderFlag && q.ActiveFlag && !q.DeleteFlag && q.Staff.ActiveFlag && !q.Staff.DeleteFlag)
+                    var Ss = from q in DC.M_Staff_Account.Where(q => q.ACID == ACID && (q.LeaderFlag || q.SubLeaderFlag) && q.ActiveFlag && !q.DeleteFlag && q.Staff.ActiveFlag && !q.Staff.DeleteFlag)
                              group q by new { q.Staff.SID, q.Staff.Title, SCTitle = q.Staff.Staff_Category.Title, OTitle = q.OrganizeInfo.Organize.Title, OITitle = q.OrganizeInfo.Title, OIID = q.OIID, OID = q.OrganizeInfo.OID } into g
                              select g;
                     int j = 0;
@@ -301,7 +301,7 @@ namespace Banner.Areas.Web.Controllers
                             ImgUrl = "",
                             SortNo = j++,
                             SelectFlag = false,
-                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, bLeaderFlag, OIID, S.Key.SID)
+                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, bLeaderFlag, S.Key.OIID, S.Key.SID)
                         };
                         Items.Add(cM);
                     }
@@ -375,19 +375,6 @@ namespace Banner.Areas.Web.Controllers
                         SelectFlag = M.URL.StartsWith(ThisController) || M.URL.StartsWith(NowShortPath) || CM_ != null,
                         Items = new List<cMenu>()
                     };
-                    /*foreach (var OI in OIs)
-                    {
-                        cMenu cM_ = new cMenu
-                        {
-                            Title = OI.Title + OI.Organize.Title,
-                            Url = "",
-                            ImgUrl = "",
-                            SortNo = i++,
-                            SelectFlag = false,
-                            Items = GetSubItem(M.MID, bGroupLeaderFlag, bStaffFlag, bTeacherFlag, bLeaderFlag, 0, 0)
-                        };
-                        cM.Items.Add(cM_);
-                    }*/
                     Items.Add(cM);
                 }
                 else

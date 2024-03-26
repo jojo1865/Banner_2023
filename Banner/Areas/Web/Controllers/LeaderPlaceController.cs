@@ -1,7 +1,9 @@
 ﻿using Banner.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
@@ -68,10 +70,10 @@ namespace Banner.Areas.Web.Controllers
                         Error += "此會友不存在<br/>";
                     else
                     {
-                        var MOIA = DC.M_Role_Account.FirstOrDefault(q => q.ACID == AC.ACID && q.RID == 2 && q.ActiveFlag && !q.DeleteFlag);//是否為會友
+                        /*var MOIA = DC.M_Role_Account.FirstOrDefault(q => q.ACID == AC.ACID && q.RID == 2 && q.ActiveFlag && !q.DeleteFlag);//是否為會友
                         if (MOIA == null)
                             Error += "此會員尚未成為會友<br/>";
-                        else
+                        else*/
                         {
                             var OI8s = OIs.Where(q => q.OID == 8);
                             var OI8 = (from q in OIs.Where(q => q.OID == 8)
@@ -97,6 +99,8 @@ namespace Banner.Areas.Web.Controllers
                         SetAlert(Error, 2);
                     else
                     {
+                        string sLog = DT.ToString(DateTimeFormat) + " 前台" + ACID + "由";
+
                         //移除該小組名單
                         var MOI = DC.M_OI_Account.FirstOrDefault(q => q.OIID == Old_OIID && q.ACID == c.ACID && q.ActiveFlag && !q.DeleteFlag);
                         if (MOI != null)
@@ -106,7 +110,10 @@ namespace Banner.Areas.Web.Controllers
                             MOI.UpdDate = DT;
                             MOI.SaveACID = ACID;
                             DC.SubmitChanges();
+
+                            sLog += MOI.OIID + "(" + MOI.OrganizeInfo.Title + ")";
                         }
+                        sLog += "轉換至";
                         MOI = new M_OI_Account
                         {
                             OrganizeInfo = OI,
@@ -121,7 +128,9 @@ namespace Banner.Areas.Web.Controllers
                         };
                         DC.M_OI_Account.InsertOnSubmit(MOI);
                         DC.SubmitChanges();
+                        sLog += MOI.OIID + "(" + MOI.OrganizeInfo.Title + ")";
 
+                        SaveLog(sLog, "組員轉換", AC.ACID.ToString());
                         SetAlert("此會友已更換小組完成", 1);
                     }
                 }
@@ -201,7 +210,7 @@ namespace Banner.Areas.Web.Controllers
                     }
                     #endregion
                     #region 前端載入
-                    if(FC!=null)
+                    if (FC != null)
                     {
                         c.Old_OID = Convert.ToInt32(FC.Get(c.LS_Target_Left_O.ControlName));
                         c.LS_Target_Left_O.ddlList.ForEach(q => q.Selected = false);
@@ -228,9 +237,9 @@ namespace Banner.Areas.Web.Controllers
                             Error += "此組織不在您的管轄範圍內,您無法更動<br/>";
                         //再檢查右邊
                         if (!OIs.Any(q => q.OID == c.New_OID && q.OIID == c.New_OIID))
-                            Error += "目標"+ c.Title + "不在您的管轄範圍內,您無法更動<br/>";
+                            Error += "目標" + c.Title + "不在您的管轄範圍內,您無法更動<br/>";
 
-                        
+
 
                         if (Error != "")
                             SetAlert(Error, 2);
@@ -239,10 +248,10 @@ namespace Banner.Areas.Web.Controllers
                             string From = "";
                             string To = "";
                             var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == c.Old_OIID);
-                            if(OI!=null)
+                            if (OI != null)
                             {
                                 var OI_F = DC.OrganizeInfo.First(q => q.OIID == OI.ParentID);
-                                From = OI_F.Title+ OI_F.Organize.Title;
+                                From = OI_F.Title + OI_F.Organize.Title;
 
                                 var OI_T = DC.OrganizeInfo.First(q => q.OIID == c.New_OIID);
                                 To = OI_T.Title + OI_T.Organize.Title;
@@ -252,7 +261,9 @@ namespace Banner.Areas.Web.Controllers
                                 OI.SaveACID = ACID;
                                 DC.SubmitChanges();
                             }
+                            string sLog = DT.ToString(DateTimeFormat) + " 前台" + ACID + "將" + From + "轉移至" + To;
 
+                            SaveLog(sLog, "組織轉換", OI.OIID.ToString());
                             SetAlert(OI.Title + OI.Organize.Title + "由" + From + "至" + To + "搬移完成", 1);
                         }
                     }

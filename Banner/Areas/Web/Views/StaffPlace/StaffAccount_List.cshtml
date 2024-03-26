@@ -1,86 +1,96 @@
 ﻿@model Banner.PublicClass.cStaffAccount_List
 @{
-    ViewBag.Title = "OI_Staff_List";
-    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+    ViewBag.Title = "Event_List";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
 }
 
-<div class="main-container">
-    <div class="header-container">
-        <div class="header-left-border"></div>
-        <h5 class="header font-bold">@ViewBag._Title</h5>
-        <input type="hidden" id="txb_SID" value="@ViewBag.SID" />
-        <input type="hidden" id="txb_OIID" value="@ViewBag.OIID" />
-        <input type="hidden" id="txb_Child" value="@ViewBag.Child" />
-    </div>
-    <div class="body-container">
-        @if (Model != null)
-        {
-            <div class="search-form">
-                <div class="search-form-section">
-                    <div class="row">
-                        <div class="col-lg-6 col-12">
-                            <label>姓名</label>
-                            @Html.TextBox("txb_Name", "", new { @class = "form-control form-control-lg" })
-                        </div>
+<div class="body-container container_phone">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">團員管理</a></li>
+                
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">@Html.Raw(ViewBag._StaffTitle) - 團員管理</h5>
+            <input type="hidden" id="txb_SID" value="@ViewBag.SID" />
+            <input type="hidden" id="txb_OIID" value="@ViewBag.OIID" />
+            <input type="hidden" id="txb_Child" value="@ViewBag.Child" />
+        </div>
+        @Html.Action("_GroupTopMenu", "Include")
+        <div class="container-lg">
+            @if (Model != null)
+            {
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-lg-6 col-12">
+                                <label>姓名</label>
+                                @Html.TextBox("txb_Name", "", new { @class = "form-control form-control-lg" })
+                            </div>
 
-                        <div class="col-lg-6 col-12">
-                            <div class="col-lg-6 col-12 text-lg-end text-center pt-4">
-                                <a href="javascript:;" onclick="Search();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                            <div class="col-lg-6 col-12">
+                                <div class="col-lg-6 col-12 text-lg-end text-center pt-4">
+                                    <a href="javascript:;" onclick="Search();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="table-container">
-                <div class="card p-2">
-                    <div class="row" id="div_Control">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary btn-lg btn-submit btn-round m-2" data-bs-toggle="modal" data-bs-target="#AddAccount">
-                                新增團員
-                            </button>
-                            <a a href="javascript:;" onclick="SubLeaderAC()" class="btn btn-primary btn-lg btn-submit btn-round m-2">設為代職主責</a>
-                            <a a href="javascript:;" onclick="RemoveAC()" class="btn btn-primary btn-lg btn-submit btn-round m-2">移除團員</a>
+                <div class="table-container">
+                    <div class="card p-2">
+                        <div class="row" id="div_Control">
+                            <div class="col">
+                                <button type="button" class="btn btn-primary btn-lg btn-submit btn-round m-2" data-bs-toggle="modal" data-bs-target="#AddAccount">
+                                    新增團員
+                                </button>
+                                <a a href="javascript:;" onclick="RemoveAC()" class="btn btn-primary btn-lg btn-submit btn-round m-2">移除團員</a>
+
+                            </div>
 
                         </div>
+                        <table class="table_RWDStyle table">
+                            <thead>
+                                <tr class="Bgn">
+                                    <th></th>
+                                    <th>會員ID</th>
+                                    <th>姓名</th>
+                                    <th>所屬小組</th>
+                                    <th>手機</th>
+                                    <th>加入日期</th>
+                                    <th>主責</th>
+                                    <th>代職主責</th>
+                                </tr>
 
-                    </div>
-                    <table class="table_RWDStyle table">
-                        <thead>
-                            <tr class="Bgn">
-                                <th></th>
-                                <th>會員ID</th>
-                                <th>姓名</th>
-                                <th>所屬小組</th>
-                                <th>手機</th>
-                                <th>加入日期</th>
-                                <th>主責</th>
-                                <th>代職主責</th>
-                            </tr>
-
-                        </thead>
-                        <tbody id="tbody_main">
-                            @if (Model.cTL != null)
-                            {
-                                foreach (var R in Model.cTL.Rs.OrderBy(q => q.SortNo))
+                            </thead>
+                            <tbody id="tbody_main">
+                                @if (Model.cTL != null)
                                 {
-                                    <tr class="@R.CSS">
-                                        <td><input type="checkbox" id="@R.Cs[0].Value" name="cbox_Staff" class="form-check-input" /></td>
-                                        <td>@R.Cs[1].Value</td>
-                                        <td>@R.Cs[2].Value</td>
-                                        <td>@R.Cs[3].Value</td>
-                                        <td>@R.Cs[4].Value</td>
-                                        <td>@R.Cs[5].Value</td>
-                                        <td>@R.Cs[6].Value</td>
-                                        <td>@R.Cs[7].Value</td>
-                                    </tr>
+                                    foreach (var R in Model.cTL.Rs.OrderBy(q => q.SortNo))
+                                    {
+                                        <tr class="@R.CSS">
+                                            <td><input type="checkbox" id="@R.Cs[0].Value" name="cbox_Staff" class="form-check-input" /></td>
+                                            <td>@R.Cs[1].Value</td>
+                                            <td>@R.Cs[2].Value</td>
+                                            <td>@R.Cs[3].Value</td>
+                                            <td>@R.Cs[4].Value</td>
+                                            <td>@R.Cs[5].Value</td>
+                                            <td>@R.Cs[6].Value</td>
+                                            <td>@R.Cs[7].Value</td>
+                                        </tr>
+                                    }
                                 }
-                            }
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 </div>
 <!-- Modal -->
@@ -189,7 +199,7 @@
             if (but != null) { but.classList.add("btn-loading"); }
             $('#div_Table').addClass('div_dark_gray');
             $.ajax({
-                url: '/Admin/Home/GetAccountList?Name=' + Name + '&OIID=' + OIID + '&Type=' + (Child ? '1' : '3'),
+                url: '/Admin/Home/GetAccountList?Name=' + Name + '&OIID=' + OIID + '&Type=' + (Child=='true' ? '1' : '3'),
                 method: 'GET',
                 dataType: 'text',
                 success: function (res) {
@@ -237,7 +247,7 @@
 
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                location.href = '/Admin/StaffSet/StaffAccount_List/' + SID;
+                                location.href = '/Web/StaffPlace/StaffAccount_List?SID=' + SID + "&OIID=" + OIID;
                             }
                             else {
                                 Swal.close();
@@ -307,39 +317,6 @@
             error: function (err) { console.log(err) },
         })
     }
-
-    //設為代職主責
-    function SubLeaderAC() {
-        var SID = $('#txb_SID').val();
-        var IDs = GetSelect('cbox_Staff');
-        $.ajax({
-            url: '/Admin/Home/SubLeaderACFromStaff?IDs=' + IDs + '&SID=' + SID,
-            method: 'GET',
-            dataType: 'text',
-            success: function (res) {
-                var r = JSON.parse(res);
-                if (r.Messages.length == 0) {
-                    Swal.fire({
-                        icon: 'success',
-                        html: '代職主責指定完成'
-                    });
-
-                    Search();
-                }
-                else {
-                    var str = '';
-                    for (i = 0; i < r.Messages.length; i++) {
-                        str += (str == '' ? '' : '<br/>') + r.Messages[i];
-                    }
-                    Swal.fire({
-                        icon: 'error',
-                        html: str
-                    });
-                }
-            },
-            error: function (err) { console.log(err) },
-        })
-    }
 </script>
 <style>
 
@@ -350,6 +327,7 @@
     .tr_End td {
         border-top: double 2px #CCC;
     }
+
     .div_dark_gray {
         background-color: rgba(0, 0, 0, .3);
         z-index: 2000;
@@ -359,3 +337,4 @@
             display: none;
         }
 </style>
+

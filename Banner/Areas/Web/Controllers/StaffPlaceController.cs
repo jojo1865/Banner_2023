@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using static Banner.Areas.Admin.Controllers.StaffSetController;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -688,6 +689,15 @@ namespace Banner.Areas.Web.Controllers
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
             return View(GetMyStaffEvnet_List(FC));
+        }
+
+        #endregion
+        #region 團員管理
+        [HttpGet]
+        public ActionResult StaffAccount_List(int SID,int OIID)
+        {
+            GetViewBag();
+            return View(GetStaffAccount_List(SID));
         }
 
         #endregion

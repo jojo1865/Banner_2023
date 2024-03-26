@@ -192,7 +192,7 @@ main {
 
 .modal-backdrop {
     --bs-backdrop-opacity:0.2;
-    /*position:unset;*/
+    position:unset !important;
 }
 /*======================================================手機板======================================================*/
 @media(max-width:992px) {

@@ -569,6 +569,9 @@ namespace Banner.Areas.Admin.Controllers
             public string L_str = "";
             public List<SelectListItem> PList = new List<SelectListItem>();
             public List<PayType> PTList = new List<PayType>();
+
+            public int Old_BusinessType = 0;
+
         }
         public class OIListSelect
         {
@@ -617,6 +620,22 @@ namespace Banner.Areas.Admin.Controllers
                     DC.OrganizeInfo.InsertOnSubmit(cIE.OI);
                 }
                 DC.SubmitChanges();
+
+                //外展存紀錄
+                if( cIE.Old_BusinessType != cIE.OI.BusinessType)
+                {
+                    string sLog = DT.ToString(DateTimeFormat) + " 後台" + ACID + "將" + cIE.OI.Title;
+                    var MAs = DC.M_OI_Account.Where(q => q.OIID == OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q=>q.JoinDate);
+                    if (cIE.OI.BusinessType == 0)
+                        sLog += "移除外展,當下組員名單(" + MAs.Count() + "):[";
+                    else
+                        sLog += "設定為外展,當下組員名單(" + MAs.Count() + "):[";
+
+                    sLog += string.Join(",", MAs.Select(q =>"{\"ACID\"="+q.ACID+",\"Name\"=\""+ q.Account.Name_First + q.Account.Name_Last + "\"}"));
+                    sLog += "]";
+                    SaveLog(sLog, "外展小組", OIID.ToString());
+                }
+
                 if (OID <= 2)
                 {
                     cIE.C.TargetType = 1;
@@ -716,6 +735,7 @@ namespace Banner.Areas.Admin.Controllers
                     SetAlert("查無資料,請重新操作", 2, "/Admin/OrganizeSet/Organize_Info_List/" + OID + "/0");
                 else
                 {
+                    cIE.Old_BusinessType = cIE.OI.BusinessType;
                     #region 主管列表
                     cIE.ACList = new List<SelectListItem>();
                     cIE.ACList.Add(new SelectListItem { Text = AC0.Name_First + AC0.Name_Last, Value = AC0.ACID.ToString(), Selected = AC0.ACID == cIE.OI.ACID });

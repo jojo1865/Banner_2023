@@ -750,6 +750,7 @@
     <Content Include="Areas\Admin\Views\AccountSet\Account_GroupOrder_List.cshtml" />
     <Content Include="Areas\Web\Views\LeaderPlace\Move_People.cshtml" />
     <Content Include="Areas\Web\Views\LeaderPlace\Move_OrganizeInfo.cshtml" />
+    <Content Include="Areas\Web\Views\StaffPlace\StaffAccount_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -793,6 +794,9 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Files\Coupon\" />
+    <Folder Include="Files\Log\外展小組\" />
+    <Folder Include="Files\Log\組員轉換\" />
+    <Folder Include="Files\Log\組織轉換\" />
     <Folder Include="Files\Product\" />
     <Folder Include="Photo\Product\" />
     <Folder Include="Views\API_Get\" />

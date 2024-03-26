@@ -33,6 +33,7 @@ using OfficeOpenXml.ConditionalFormatting.Contracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+using static Banner.Areas.Admin.Controllers.StaffSetController;
 
 
 namespace Banner
@@ -2910,10 +2911,10 @@ namespace Banner
         {
             OrganizeInfo OI = null;
             var Os = GetO();
-            foreach(var O in Os.OrderBy(q=>q.SortNo))
+            foreach (var O in Os.OrderBy(q => q.SortNo))
             {
-                OI = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == O.OID && q.ACID == ACID).OrderByDescending(q=>q.OIID).FirstOrDefault();
-                if(OI!=null)
+                OI = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == O.OID && q.ACID == ACID).OrderByDescending(q => q.OIID).FirstOrDefault();
+                if (OI != null)
                     break;
             }
             return OI;
@@ -3276,6 +3277,29 @@ namespace Banner
             #endregion
 
         }
+        //寫入Log
+        public void SaveLog(string LogNote, string ForderName, string FileName)
+        {
+            string OldNote = "";
+            string sPath = "/Files/Log/" + ForderName + "/" + FileName + ".txt";
+            if (System.IO.File.Exists(Server.MapPath(sPath)))
+            {
+                StreamReader SR = new StreamReader(Server.MapPath(sPath));
+                OldNote = SR.ReadToEnd();
+                SR.Close();
+            }
+
+            StreamWriter SW = new StreamWriter(Server.MapPath("/Files/Log/" + ForderName + "/" + FileName + ".txt"));
+            SW.WriteLine(LogNote);
+            SW.Write(OldNote);
+            SW.Close();
+        }
+
+        //檢查是否為兒童
+        public bool CheckChild(DateTime BD)
+        {
+            return DT < BD.AddYears(iChildAge);
+        }
         #endregion
 
         #region 金流
@@ -3314,6 +3338,97 @@ namespace Banner
             }
 
 
+        }
+        #endregion
+        #region 事工團
+        public class cStaffAccount_List
+        {
+            public cTableList cTL = new cTableList();
+        }
+        public cStaffAccount_List GetStaffAccount_List(int SID)
+        {
+            ACID = GetACID();
+            ViewBag.SID = SID;
+            ViewBag.Child = "false";
+            var SA = DC.M_Staff_Account.FirstOrDefault(q => q.SID == SID && q.ACID == ACID && !q.DeleteFlag);
+            if (SA != null)
+            {
+                ViewBag.OIID = SA.OIID;
+                ViewBag._StaffTitle = "[" + SA.OrganizeInfo.Title + SA.OrganizeInfo.Organize.Title + "] " + SA.Staff.Staff_Category.Title + "-" + SA.Staff.Title;
+                if (SA.Staff.ChildrenFlag)
+                    ViewBag.Child = "true";
+            }
+            else
+                ViewBag.OIID = 0;
+            cStaffAccount_List c = new cStaffAccount_List();
+            c.cTL = new cTableList();
+            c.cTL.Rs = new List<cTableRow>();
+            var Ss = GetStaffACList(0, SID, "", false);
+            int i = 1;
+            foreach (var S in Ss)
+            {
+                cTableRow R = new cTableRow();
+                R.SortNo = i++;
+                if (S.LeaderFlag == "V")
+                    R.CSS = "tr_Leader";
+                R.Cs.Add(new cTableCell { Value = "cbox_Staff_" + S.MID });
+                R.Cs.Add(new cTableCell { Value = S.ACID.ToString() });
+                R.Cs.Add(new cTableCell { Value = S.Name });
+                R.Cs.Add(new cTableCell { Value = S.GroupName });
+                R.Cs.Add(new cTableCell { Value = S.Contect });
+                R.Cs.Add(new cTableCell { Value = S.JoinDate });
+                R.Cs.Add(new cTableCell { Value = S.LeaderFlag });
+                R.Cs.Add(new cTableCell { Value = S.SubLeaderFlag });
+                c.cTL.Rs.Add(R);
+            }
+            return c;
+        }
+        public List<cSAL> GetStaffACList(int OIID, int SID, string Name, bool BUFlag)
+        {
+
+            var Ns = DC.M_Staff_Account.Where(q => !q.DeleteFlag && q.ActiveFlag);
+            if (BUFlag)//只搜尋同工
+            {
+                Ns = from q in Ns
+                     join p in DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag).GroupBy(q => q.ACID).Select(q => q.Key)
+                     on q.ACID equals p
+                     select q;
+            }
+            if (OIID > 0)//限定旌旗
+                Ns = Ns.Where(q => q.OIID == OIID);
+            if (SID > 0)//限定事工團
+                Ns = Ns.Where(q => q.SID == SID);
+            if (!string.IsNullOrEmpty(Name))//姓名
+                Ns = Ns.Where(q => (q.Account.Name_First + q.Account.Name_Last).Contains(Name));
+
+            List<cSAL> Ns_ = new List<cSAL>();
+            foreach (var N in Ns)
+            {
+                cSAL c = new cSAL();
+                c.OIID = N.OIID;
+                c.OI2Title = N.OrganizeInfo.Title + N.OrganizeInfo.Organize.Title;
+                c.SCID = N.Staff.SCID;
+                c.SCTitle = N.Staff.Staff_Category.Title;
+                c.SID = N.SID;
+                c.STitle = (N.Staff.ChildrenFlag ? "[兒童]" : "") + N.Staff.Title;
+
+                c.MID = N.MID;
+                c.ACID = N.ACID;
+                c.Name = N.Account.Name_First + N.Account.Name_Last;
+                var Ms = GetMOIAC(8, 0, N.ACID);
+
+                c.GroupName = Ms.Count() > 0 ? string.Join(",", Ms.Select(q => q.OrganizeInfo.Title + q.OrganizeInfo.Organize.Title).ToArray()) : "";
+                var C = DC.Contect.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == N.ACID && q.ContectType == 1);
+                c.Contect = C != null ? C.ContectValue : "--";
+
+                c.JoinDate = N.JoinDate.ToString(DateFormat);
+                c.LeaderFlag = N.LeaderFlag ? "V" : "";
+                c.SubLeaderFlag = N.SubLeaderFlag ? "V" : "";
+                Ns_.Add(c);
+            }
+
+            Ns_ = Ns_.OrderBy(q => q.OIID).ThenBy(q => q.SCID).ThenBy(q => q.SID).ThenByDescending(q => q.LeaderFlag).ToList();
+            return Ns_;
         }
         #endregion
     }

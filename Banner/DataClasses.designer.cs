@@ -123,9 +123,6 @@ namespace Banner
     partial void InsertM_Role_Menu(M_Role_Menu instance);
     partial void UpdateM_Role_Menu(M_Role_Menu instance);
     partial void DeleteM_Role_Menu(M_Role_Menu instance);
-    partial void InsertM_Staff_Account(M_Staff_Account instance);
-    partial void UpdateM_Staff_Account(M_Staff_Account instance);
-    partial void DeleteM_Staff_Account(M_Staff_Account instance);
     partial void InsertMeeting_Location(Meeting_Location instance);
     partial void UpdateMeeting_Location(Meeting_Location instance);
     partial void DeleteMeeting_Location(Meeting_Location instance);
@@ -204,6 +201,9 @@ namespace Banner
     partial void InsertCoupon_Header(Coupon_Header instance);
     partial void UpdateCoupon_Header(Coupon_Header instance);
     partial void DeleteCoupon_Header(Coupon_Header instance);
+    partial void InsertM_Staff_Account(M_Staff_Account instance);
+    partial void UpdateM_Staff_Account(M_Staff_Account instance);
+    partial void DeleteM_Staff_Account(M_Staff_Account instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -478,14 +478,6 @@ namespace Banner
 			}
 		}
 		
-		public System.Data.Linq.Table<M_Staff_Account> M_Staff_Account
-		{
-			get
-			{
-				return this.GetTable<M_Staff_Account>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Meeting_Location> Meeting_Location
 		{
 			get
@@ -694,6 +686,14 @@ namespace Banner
 			}
 		}
 		
+		public System.Data.Linq.Table<M_Staff_Account> M_Staff_Account
+		{
+			get
+			{
+				return this.GetTable<M_Staff_Account>();
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.sp_GetOI2List")]
 		public ISingleResult<sp_GetOI2ListResult> sp_GetOI2List([global::System.Data.Linq.Mapping.ParameterAttribute(Name="ACID", DbType="Int")] System.Nullable<int> aCID)
 		{
@@ -799,11 +799,11 @@ namespace Banner
 		
 		private EntitySet<M_Role_Account> _M_Role_Account;
 		
-		private EntitySet<M_Staff_Account> _M_Staff_Account;
-		
 		private EntitySet<Order_Header> _Order_Header;
 		
 		private EntitySet<OrganizeInfo> _OrganizeInfo;
+		
+		private EntitySet<M_Staff_Account> _M_Staff_Account;
 		
     #region 擴充性方法定義
     partial void OnLoaded();
@@ -881,9 +881,9 @@ namespace Banner
 			this._M_OI2_Account = new EntitySet<M_OI2_Account>(new Action<M_OI2_Account>(this.attach_M_OI2_Account), new Action<M_OI2_Account>(this.detach_M_OI2_Account));
 			this._M_OJT_Account = new EntitySet<M_OJT_Account>(new Action<M_OJT_Account>(this.attach_M_OJT_Account), new Action<M_OJT_Account>(this.detach_M_OJT_Account));
 			this._M_Role_Account = new EntitySet<M_Role_Account>(new Action<M_Role_Account>(this.attach_M_Role_Account), new Action<M_Role_Account>(this.detach_M_Role_Account));
-			this._M_Staff_Account = new EntitySet<M_Staff_Account>(new Action<M_Staff_Account>(this.attach_M_Staff_Account), new Action<M_Staff_Account>(this.detach_M_Staff_Account));
 			this._Order_Header = new EntitySet<Order_Header>(new Action<Order_Header>(this.attach_Order_Header), new Action<Order_Header>(this.detach_Order_Header));
 			this._OrganizeInfo = new EntitySet<OrganizeInfo>(new Action<OrganizeInfo>(this.attach_OrganizeInfo), new Action<OrganizeInfo>(this.detach_OrganizeInfo));
+			this._M_Staff_Account = new EntitySet<M_Staff_Account>(new Action<M_Staff_Account>(this.attach_M_Staff_Account), new Action<M_Staff_Account>(this.detach_M_Staff_Account));
 			OnCreated();
 		}
 		
@@ -1631,19 +1631,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_Staff_Account", Storage="_M_Staff_Account", ThisKey="ACID", OtherKey="ACID")]
-		public EntitySet<M_Staff_Account> M_Staff_Account
-		{
-			get
-			{
-				return this._M_Staff_Account;
-			}
-			set
-			{
-				this._M_Staff_Account.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Order_Header", Storage="_Order_Header", ThisKey="ACID", OtherKey="ACID")]
 		public EntitySet<Order_Header> Order_Header
 		{
@@ -1667,6 +1654,19 @@ namespace Banner
 			set
 			{
 				this._OrganizeInfo.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_Staff_Account", Storage="_M_Staff_Account", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<M_Staff_Account> M_Staff_Account
+		{
+			get
+			{
+				return this._M_Staff_Account;
+			}
+			set
+			{
+				this._M_Staff_Account.Assign(value);
 			}
 		}
 		
@@ -1870,18 +1870,6 @@ namespace Banner
 			entity.Account = null;
 		}
 		
-		private void attach_M_Staff_Account(M_Staff_Account entity)
-		{
-			this.SendPropertyChanging();
-			entity.Account = this;
-		}
-		
-		private void detach_M_Staff_Account(M_Staff_Account entity)
-		{
-			this.SendPropertyChanging();
-			entity.Account = null;
-		}
-		
 		private void attach_Order_Header(Order_Header entity)
 		{
 			this.SendPropertyChanging();
@@ -1901,6 +1889,18 @@ namespace Banner
 		}
 		
 		private void detach_OrganizeInfo(OrganizeInfo entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_M_Staff_Account(M_Staff_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_M_Staff_Account(M_Staff_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -11350,455 +11350,6 @@ namespace Banner
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.M_Staff_Account")]
-	public partial class M_Staff_Account : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _MID;
-		
-		private int _OIID;
-		
-		private int _SID;
-		
-		private int _ACID;
-		
-		private bool _LeaderFlag;
-		
-		private System.DateTime _JoinDate;
-		
-		private System.DateTime _LeaveDate;
-		
-		private bool _ActiveFlag;
-		
-		private bool _DeleteFlag;
-		
-		private System.DateTime _CreDate;
-		
-		private System.DateTime _UpdDate;
-		
-		private int _SaveACID;
-		
-		private EntityRef<Account> _Account;
-		
-		private EntityRef<OrganizeInfo> _OrganizeInfo;
-		
-		private EntityRef<Staff> _Staff;
-		
-    #region 擴充性方法定義
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnMIDChanging(int value);
-    partial void OnMIDChanged();
-    partial void OnOIIDChanging(int value);
-    partial void OnOIIDChanged();
-    partial void OnSIDChanging(int value);
-    partial void OnSIDChanged();
-    partial void OnACIDChanging(int value);
-    partial void OnACIDChanged();
-    partial void OnLeaderFlagChanging(bool value);
-    partial void OnLeaderFlagChanged();
-    partial void OnJoinDateChanging(System.DateTime value);
-    partial void OnJoinDateChanged();
-    partial void OnLeaveDateChanging(System.DateTime value);
-    partial void OnLeaveDateChanged();
-    partial void OnActiveFlagChanging(bool value);
-    partial void OnActiveFlagChanged();
-    partial void OnDeleteFlagChanging(bool value);
-    partial void OnDeleteFlagChanged();
-    partial void OnCreDateChanging(System.DateTime value);
-    partial void OnCreDateChanged();
-    partial void OnUpdDateChanging(System.DateTime value);
-    partial void OnUpdDateChanged();
-    partial void OnSaveACIDChanging(int value);
-    partial void OnSaveACIDChanged();
-    #endregion
-		
-		public M_Staff_Account()
-		{
-			this._Account = default(EntityRef<Account>);
-			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
-			this._Staff = default(EntityRef<Staff>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int MID
-		{
-			get
-			{
-				return this._MID;
-			}
-			set
-			{
-				if ((this._MID != value))
-				{
-					this.OnMIDChanging(value);
-					this.SendPropertyChanging();
-					this._MID = value;
-					this.SendPropertyChanged("MID");
-					this.OnMIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int NOT NULL")]
-		public int OIID
-		{
-			get
-			{
-				return this._OIID;
-			}
-			set
-			{
-				if ((this._OIID != value))
-				{
-					if (this._OrganizeInfo.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnOIIDChanging(value);
-					this.SendPropertyChanging();
-					this._OIID = value;
-					this.SendPropertyChanged("OIID");
-					this.OnOIIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SID", DbType="Int NOT NULL")]
-		public int SID
-		{
-			get
-			{
-				return this._SID;
-			}
-			set
-			{
-				if ((this._SID != value))
-				{
-					if (this._Staff.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnSIDChanging(value);
-					this.SendPropertyChanging();
-					this._SID = value;
-					this.SendPropertyChanged("SID");
-					this.OnSIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
-		public int ACID
-		{
-			get
-			{
-				return this._ACID;
-			}
-			set
-			{
-				if ((this._ACID != value))
-				{
-					if (this._Account.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnACIDChanging(value);
-					this.SendPropertyChanging();
-					this._ACID = value;
-					this.SendPropertyChanged("ACID");
-					this.OnACIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LeaderFlag", DbType="Bit NOT NULL")]
-		public bool LeaderFlag
-		{
-			get
-			{
-				return this._LeaderFlag;
-			}
-			set
-			{
-				if ((this._LeaderFlag != value))
-				{
-					this.OnLeaderFlagChanging(value);
-					this.SendPropertyChanging();
-					this._LeaderFlag = value;
-					this.SendPropertyChanged("LeaderFlag");
-					this.OnLeaderFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JoinDate", DbType="DateTime NOT NULL")]
-		public System.DateTime JoinDate
-		{
-			get
-			{
-				return this._JoinDate;
-			}
-			set
-			{
-				if ((this._JoinDate != value))
-				{
-					this.OnJoinDateChanging(value);
-					this.SendPropertyChanging();
-					this._JoinDate = value;
-					this.SendPropertyChanged("JoinDate");
-					this.OnJoinDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LeaveDate", DbType="DateTime NOT NULL")]
-		public System.DateTime LeaveDate
-		{
-			get
-			{
-				return this._LeaveDate;
-			}
-			set
-			{
-				if ((this._LeaveDate != value))
-				{
-					this.OnLeaveDateChanging(value);
-					this.SendPropertyChanging();
-					this._LeaveDate = value;
-					this.SendPropertyChanged("LeaveDate");
-					this.OnLeaveDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
-		public bool ActiveFlag
-		{
-			get
-			{
-				return this._ActiveFlag;
-			}
-			set
-			{
-				if ((this._ActiveFlag != value))
-				{
-					this.OnActiveFlagChanging(value);
-					this.SendPropertyChanging();
-					this._ActiveFlag = value;
-					this.SendPropertyChanged("ActiveFlag");
-					this.OnActiveFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
-		public bool DeleteFlag
-		{
-			get
-			{
-				return this._DeleteFlag;
-			}
-			set
-			{
-				if ((this._DeleteFlag != value))
-				{
-					this.OnDeleteFlagChanging(value);
-					this.SendPropertyChanging();
-					this._DeleteFlag = value;
-					this.SendPropertyChanged("DeleteFlag");
-					this.OnDeleteFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
-		public System.DateTime CreDate
-		{
-			get
-			{
-				return this._CreDate;
-			}
-			set
-			{
-				if ((this._CreDate != value))
-				{
-					this.OnCreDateChanging(value);
-					this.SendPropertyChanging();
-					this._CreDate = value;
-					this.SendPropertyChanged("CreDate");
-					this.OnCreDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
-		public System.DateTime UpdDate
-		{
-			get
-			{
-				return this._UpdDate;
-			}
-			set
-			{
-				if ((this._UpdDate != value))
-				{
-					this.OnUpdDateChanging(value);
-					this.SendPropertyChanging();
-					this._UpdDate = value;
-					this.SendPropertyChanged("UpdDate");
-					this.OnUpdDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
-		public int SaveACID
-		{
-			get
-			{
-				return this._SaveACID;
-			}
-			set
-			{
-				if ((this._SaveACID != value))
-				{
-					this.OnSaveACIDChanging(value);
-					this.SendPropertyChanging();
-					this._SaveACID = value;
-					this.SendPropertyChanged("SaveACID");
-					this.OnSaveACIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_Staff_Account", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
-		public Account Account
-		{
-			get
-			{
-				return this._Account.Entity;
-			}
-			set
-			{
-				Account previousValue = this._Account.Entity;
-				if (((previousValue != value) 
-							|| (this._Account.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Account.Entity = null;
-						previousValue.M_Staff_Account.Remove(this);
-					}
-					this._Account.Entity = value;
-					if ((value != null))
-					{
-						value.M_Staff_Account.Add(this);
-						this._ACID = value.ACID;
-					}
-					else
-					{
-						this._ACID = default(int);
-					}
-					this.SendPropertyChanged("Account");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_M_Staff_Account", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
-		public OrganizeInfo OrganizeInfo
-		{
-			get
-			{
-				return this._OrganizeInfo.Entity;
-			}
-			set
-			{
-				OrganizeInfo previousValue = this._OrganizeInfo.Entity;
-				if (((previousValue != value) 
-							|| (this._OrganizeInfo.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._OrganizeInfo.Entity = null;
-						previousValue.M_Staff_Account.Remove(this);
-					}
-					this._OrganizeInfo.Entity = value;
-					if ((value != null))
-					{
-						value.M_Staff_Account.Add(this);
-						this._OIID = value.OIID;
-					}
-					else
-					{
-						this._OIID = default(int);
-					}
-					this.SendPropertyChanged("OrganizeInfo");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Staff_M_Staff_Account", Storage="_Staff", ThisKey="SID", OtherKey="SID", IsForeignKey=true)]
-		public Staff Staff
-		{
-			get
-			{
-				return this._Staff.Entity;
-			}
-			set
-			{
-				Staff previousValue = this._Staff.Entity;
-				if (((previousValue != value) 
-							|| (this._Staff.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Staff.Entity = null;
-						previousValue.M_Staff_Account.Remove(this);
-					}
-					this._Staff.Entity = value;
-					if ((value != null))
-					{
-						value.M_Staff_Account.Add(this);
-						this._SID = value.SID;
-					}
-					else
-					{
-						this._SID = default(int);
-					}
-					this.SendPropertyChanged("Staff");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Meeting_Location")]
 	public partial class Meeting_Location : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -15478,13 +15029,13 @@ namespace Banner
 		
 		private EntitySet<M_OJT_Account> _M_OJT_Account;
 		
-		private EntitySet<M_Staff_Account> _M_Staff_Account;
-		
 		private EntitySet<PayType> _PayType;
 		
 		private EntitySet<Product> _Product;
 		
 		private EntitySet<M_OI_Coupon> _M_OI_Coupon;
+		
+		private EntitySet<M_Staff_Account> _M_Staff_Account;
 		
 		private EntityRef<Account> _Account;
 		
@@ -15531,10 +15082,10 @@ namespace Banner
 			this._M_OI_Account = new EntitySet<M_OI_Account>(new Action<M_OI_Account>(this.attach_M_OI_Account), new Action<M_OI_Account>(this.detach_M_OI_Account));
 			this._M_OI2_Account = new EntitySet<M_OI2_Account>(new Action<M_OI2_Account>(this.attach_M_OI2_Account), new Action<M_OI2_Account>(this.detach_M_OI2_Account));
 			this._M_OJT_Account = new EntitySet<M_OJT_Account>(new Action<M_OJT_Account>(this.attach_M_OJT_Account), new Action<M_OJT_Account>(this.detach_M_OJT_Account));
-			this._M_Staff_Account = new EntitySet<M_Staff_Account>(new Action<M_Staff_Account>(this.attach_M_Staff_Account), new Action<M_Staff_Account>(this.detach_M_Staff_Account));
 			this._PayType = new EntitySet<PayType>(new Action<PayType>(this.attach_PayType), new Action<PayType>(this.detach_PayType));
 			this._Product = new EntitySet<Product>(new Action<Product>(this.attach_Product), new Action<Product>(this.detach_Product));
 			this._M_OI_Coupon = new EntitySet<M_OI_Coupon>(new Action<M_OI_Coupon>(this.attach_M_OI_Coupon), new Action<M_OI_Coupon>(this.detach_M_OI_Coupon));
+			this._M_Staff_Account = new EntitySet<M_Staff_Account>(new Action<M_Staff_Account>(this.attach_M_Staff_Account), new Action<M_Staff_Account>(this.detach_M_Staff_Account));
 			this._Account = default(EntityRef<Account>);
 			this._Organize = default(EntityRef<Organize>);
 			OnCreated();
@@ -15893,19 +15444,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_M_Staff_Account", Storage="_M_Staff_Account", ThisKey="OIID", OtherKey="OIID")]
-		public EntitySet<M_Staff_Account> M_Staff_Account
-		{
-			get
-			{
-				return this._M_Staff_Account;
-			}
-			set
-			{
-				this._M_Staff_Account.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_PayType", Storage="_PayType", ThisKey="OIID", OtherKey="OIID")]
 		public EntitySet<PayType> PayType
 		{
@@ -15942,6 +15480,19 @@ namespace Banner
 			set
 			{
 				this._M_OI_Coupon.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_M_Staff_Account", Storage="_M_Staff_Account", ThisKey="OIID", OtherKey="OIID")]
+		public EntitySet<M_Staff_Account> M_Staff_Account
+		{
+			get
+			{
+				return this._M_Staff_Account;
+			}
+			set
+			{
+				this._M_Staff_Account.Assign(value);
 			}
 		}
 		
@@ -16093,18 +15644,6 @@ namespace Banner
 			entity.OrganizeInfo = null;
 		}
 		
-		private void attach_M_Staff_Account(M_Staff_Account entity)
-		{
-			this.SendPropertyChanging();
-			entity.OrganizeInfo = this;
-		}
-		
-		private void detach_M_Staff_Account(M_Staff_Account entity)
-		{
-			this.SendPropertyChanging();
-			entity.OrganizeInfo = null;
-		}
-		
 		private void attach_PayType(PayType entity)
 		{
 			this.SendPropertyChanging();
@@ -16136,6 +15675,18 @@ namespace Banner
 		}
 		
 		private void detach_M_OI_Coupon(M_OI_Coupon entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo = null;
+		}
+		
+		private void attach_M_Staff_Account(M_Staff_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo = this;
+		}
+		
+		private void detach_M_Staff_Account(M_Staff_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.OrganizeInfo = null;
@@ -21793,6 +21344,479 @@ namespace Banner
 		{
 			this.SendPropertyChanging();
 			entity.Coupon_Header = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.M_Staff_Account")]
+	public partial class M_Staff_Account : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _MID;
+		
+		private int _OIID;
+		
+		private int _SID;
+		
+		private int _ACID;
+		
+		private bool _LeaderFlag;
+		
+		private bool _SubLeaderFlag;
+		
+		private System.DateTime _JoinDate;
+		
+		private System.DateTime _LeaveDate;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<OrganizeInfo> _OrganizeInfo;
+		
+		private EntityRef<Staff> _Staff;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnMIDChanging(int value);
+    partial void OnMIDChanged();
+    partial void OnOIIDChanging(int value);
+    partial void OnOIIDChanged();
+    partial void OnSIDChanging(int value);
+    partial void OnSIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnLeaderFlagChanging(bool value);
+    partial void OnLeaderFlagChanged();
+    partial void OnSubLeaderFlagChanging(bool value);
+    partial void OnSubLeaderFlagChanged();
+    partial void OnJoinDateChanging(System.DateTime value);
+    partial void OnJoinDateChanged();
+    partial void OnLeaveDateChanging(System.DateTime value);
+    partial void OnLeaveDateChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public M_Staff_Account()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
+			this._Staff = default(EntityRef<Staff>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int MID
+		{
+			get
+			{
+				return this._MID;
+			}
+			set
+			{
+				if ((this._MID != value))
+				{
+					this.OnMIDChanging(value);
+					this.SendPropertyChanging();
+					this._MID = value;
+					this.SendPropertyChanged("MID");
+					this.OnMIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int NOT NULL")]
+		public int OIID
+		{
+			get
+			{
+				return this._OIID;
+			}
+			set
+			{
+				if ((this._OIID != value))
+				{
+					if (this._OrganizeInfo.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOIIDChanging(value);
+					this.SendPropertyChanging();
+					this._OIID = value;
+					this.SendPropertyChanged("OIID");
+					this.OnOIIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SID", DbType="Int NOT NULL")]
+		public int SID
+		{
+			get
+			{
+				return this._SID;
+			}
+			set
+			{
+				if ((this._SID != value))
+				{
+					if (this._Staff.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnSIDChanging(value);
+					this.SendPropertyChanging();
+					this._SID = value;
+					this.SendPropertyChanged("SID");
+					this.OnSIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LeaderFlag", DbType="Bit NOT NULL")]
+		public bool LeaderFlag
+		{
+			get
+			{
+				return this._LeaderFlag;
+			}
+			set
+			{
+				if ((this._LeaderFlag != value))
+				{
+					this.OnLeaderFlagChanging(value);
+					this.SendPropertyChanging();
+					this._LeaderFlag = value;
+					this.SendPropertyChanged("LeaderFlag");
+					this.OnLeaderFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SubLeaderFlag", DbType="Bit NOT NULL")]
+		public bool SubLeaderFlag
+		{
+			get
+			{
+				return this._SubLeaderFlag;
+			}
+			set
+			{
+				if ((this._SubLeaderFlag != value))
+				{
+					this.OnSubLeaderFlagChanging(value);
+					this.SendPropertyChanging();
+					this._SubLeaderFlag = value;
+					this.SendPropertyChanged("SubLeaderFlag");
+					this.OnSubLeaderFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JoinDate", DbType="DateTime NOT NULL")]
+		public System.DateTime JoinDate
+		{
+			get
+			{
+				return this._JoinDate;
+			}
+			set
+			{
+				if ((this._JoinDate != value))
+				{
+					this.OnJoinDateChanging(value);
+					this.SendPropertyChanging();
+					this._JoinDate = value;
+					this.SendPropertyChanged("JoinDate");
+					this.OnJoinDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LeaveDate", DbType="DateTime NOT NULL")]
+		public System.DateTime LeaveDate
+		{
+			get
+			{
+				return this._LeaveDate;
+			}
+			set
+			{
+				if ((this._LeaveDate != value))
+				{
+					this.OnLeaveDateChanging(value);
+					this.SendPropertyChanging();
+					this._LeaveDate = value;
+					this.SendPropertyChanged("LeaveDate");
+					this.OnLeaveDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_Staff_Account", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.M_Staff_Account.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.M_Staff_Account.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_M_Staff_Account", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
+		public OrganizeInfo OrganizeInfo
+		{
+			get
+			{
+				return this._OrganizeInfo.Entity;
+			}
+			set
+			{
+				OrganizeInfo previousValue = this._OrganizeInfo.Entity;
+				if (((previousValue != value) 
+							|| (this._OrganizeInfo.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._OrganizeInfo.Entity = null;
+						previousValue.M_Staff_Account.Remove(this);
+					}
+					this._OrganizeInfo.Entity = value;
+					if ((value != null))
+					{
+						value.M_Staff_Account.Add(this);
+						this._OIID = value.OIID;
+					}
+					else
+					{
+						this._OIID = default(int);
+					}
+					this.SendPropertyChanged("OrganizeInfo");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Staff_M_Staff_Account", Storage="_Staff", ThisKey="SID", OtherKey="SID", IsForeignKey=true)]
+		public Staff Staff
+		{
+			get
+			{
+				return this._Staff.Entity;
+			}
+			set
+			{
+				Staff previousValue = this._Staff.Entity;
+				if (((previousValue != value) 
+							|| (this._Staff.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Staff.Entity = null;
+						previousValue.M_Staff_Account.Remove(this);
+					}
+					this._Staff.Entity = value;
+					if ((value != null))
+					{
+						value.M_Staff_Account.Add(this);
+						this._SID = value.SID;
+					}
+					else
+					{
+						this._SID = default(int);
+					}
+					this.SendPropertyChanged("Staff");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 	
