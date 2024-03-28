@@ -174,4 +174,11 @@ namespace Banner.Models
         public string Title { get; set; } = "";
         public string JobTitle { get; set; } = "";
     }
+
+    public class cLogNote
+    {
+        public DateTime CreDate = new DateTime();
+        public string LogNote = "";
+        public int SortNo = 0;
+    }
 }

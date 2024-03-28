@@ -27,6 +27,7 @@ namespace Banner.Areas.Admin.Controllers
                 .Replace("ProductClass_BatchEdit", "Product_List")
                 .Replace("ProductClass_JoinList", "Product_List")
                 .Replace("_Edit", "_List")
+                .Replace("Organize_Info_Account_List", "Organize_Info_List")
                 .Replace("ProductClass_", "Product_")
                 .Replace("ProductClassTeacher_", "Product_")
                 .Replace("ProductAllowAccount_", "Product_").Split('?')[0];
@@ -569,6 +570,18 @@ namespace Banner.Areas.Admin.Controllers
         #endregion
         #region 會員搜尋彈出視窗
         public PartialViewResult _SearchAccount()
+        {
+            return PartialView();
+        }
+        #endregion
+        #region 組織(轉人)搜尋彈出視窗
+        public PartialViewResult _SearchOrganizeInfo_AC()
+        {
+            return PartialView();
+        }
+        #endregion
+        #region 組織(轉組織)搜尋彈出視窗
+        public PartialViewResult _SearchOrganizeInfo_OI()
         {
             return PartialView();
         }

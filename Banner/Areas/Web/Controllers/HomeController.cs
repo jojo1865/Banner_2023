@@ -8,6 +8,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Web.Helpers;
 using System.Drawing;
+using static Banner.Areas.Admin.Controllers.HomeController;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -794,6 +795,200 @@ namespace Banner.Areas.Web.Controllers
             Error = "OK";
             ChangeOrder();//未完成交易的商品塞回購物車
             return Error;
+        }
+        #endregion
+        #region 前台搜尋會員列表
+
+        /// <summary>
+        /// 取得會員搜尋列表
+        /// </summary>
+        /// <param name="Name">姓名關鍵字</param>
+        /// <param name="OIID">限制所屬旌旗</param>
+        /// <param name="Type">-1:不限制/0:成人會員/1:兒童會員/2:全職同工/3:成人會友/4:講師</param>
+        /// <returns></returns>
+        [HttpGet]
+        public string GetAccountList(string Name, int OIID, int Type)
+        {
+            List<cAC> Ns = new List<cAC>();
+
+
+            var ACs = DC.Account.Where(q => q.ActiveFlag && !q.DeleteFlag);
+            if (Name != "")
+                ACs = ACs.Where(q => (q.Name_First + q.Name_Last).Contains(Name));
+            if (Type == 1)//小孩就年齡限制12歲(含)以下,不限小組
+            {
+                ACs = ACs.Where(q => DT.Year - q.Birthday.Year <= iChildAge && q.Birthday != q.CreDate);
+
+                foreach (var AC in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
+                {
+                    var OI = DC.M_OI_Account.FirstOrDefault(q => q.ACID == AC.ACID && q.ActiveFlag && !q.DeleteFlag && q.OrganizeInfo.OID == 8);
+                    cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = (OI != null ? OI.OrganizeInfo.Title + OI.OrganizeInfo.Organize.Title : ""), Child = (CheckChild(AC.Birthday) ? "兒童" : "成人") };
+                    //if (!BackendFlag)
+                    //    N.Name = CutName(N.Name);
+                    Ns.Add(N);
+                }
+            }
+            else
+            {
+                if (Type == -1)
+                {
+                    var Ls = new List<OrganizeInfo>();
+                    var MOIs = from q in GetThisOIsFromTree(ref Ls, OIID).Where(q => q.OID == 8).ToList()
+                               join p in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList()
+                               on q.OIID equals p.OIID
+                               select p;
+                    ACs = from q in MOIs.GroupBy(q => q.ACID).ToList().AsQueryable()
+                          join p in ACs
+                          on q.Key equals p.ACID
+                          select p;
+                }
+                else
+                {
+                    if (OIID > 0)//隸屬哪個旌旗(兒童不查例外)
+                    {
+                        ACs = from q in ACs
+                              join p in DC.M_OI_Account.Where(q => q.ActiveFlag &&
+                                                          !q.DeleteFlag &&
+                                                          q.OrganizeInfo.ActiveFlag &&
+                                                          !q.OrganizeInfo.DeleteFlag &&
+                                                          q.OrganizeInfo.OI2_ID == OIID).GroupBy(q => q.ACID)
+                              on q.ACID equals p.Key
+                              select q;
+                    }
+                }
+                if (Type == 2)//全職同工
+                {
+                    ACs = ACs.Where(q => q.BackUsedFlag);
+                }
+                else if (Type == 3)//成人會友(會友卡)
+                {
+                    ACs = from q in ACs
+                          join p in DC.M_Role_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 2)
+                          on q.ACID equals p.ACID
+                          select q;
+                }
+                else if (Type == 4)//講師
+                {
+                    ACs = from q in ACs
+                          join p in DC.Teacher.Where(q => q.ActiveFlag && !q.DeleteFlag)
+                          on q.ACID equals p.ACID
+                          select q;
+                }
+
+                //所屬小組資料
+                var Ms_ = (from q in DC.M_OI_Account.Where(q => q.OrganizeInfo.OID == 8).ToList()
+                           join p in ACs.ToList()
+                           on q.ACID equals p.ACID
+                           select q).ToList();
+
+                foreach (var AC in ACs.OrderBy(q => q.Name_First).ThenBy(q => q.Name_Last))
+                {
+                    cAC N = new cAC { ACID = AC.ACID, Name = AC.Name_First + AC.Name_Last, GroupName = "", Child = "" };
+                    var M_ACs = Ms_.Where(q => q.ACID == AC.ACID);
+                    foreach (var M in M_ACs)
+                        N.GroupName += (N.GroupName == "" ? "" : ",") + M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title;
+                    N.Child = CheckChild(AC.Birthday) ? "兒童" : "成人";
+                    Ns.Add(N);
+                }
+            }
+            return JsonConvert.SerializeObject(Ns);
+        }
+        #endregion
+        #region 前臺主管管轄的小組清單(人換組)
+        [HttpGet]
+        public string GetACChangeOIList(string KeyTitle, int OID)
+        {
+            ACID = GetACID();
+            string sReturn = "";
+            if (ACID == 1)
+            {
+                var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == OID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                           select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                sReturn = JsonConvert.SerializeObject(OIs);
+            }
+            else
+            {
+                var OS = GetO();
+                var MyOIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID).ToList();
+
+                var Gs = from q in OS
+                         join p in MyOIs
+                         on q.OID equals p.OID
+                         select new { q.SortNo, OI = p };
+                OrganizeInfo MyOI = new OrganizeInfo();
+                if (Gs.Count() > 0)
+                    MyOI = Gs.OrderBy(q => q.SortNo).First().OI;
+
+                if(MyOI.OIID>0)
+                {
+
+                }
+
+
+                /*
+                if (MyOIs.Any(q => q.OIID == 1))
+                {
+                    var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == OID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                               select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                    sReturn = JsonConvert.SerializeObject(OIs);
+                }
+                else
+                {
+                    var OIs = (from q in MOIs
+                               join p in DC.OrganizeInfo.Where(q => q.OID == OID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                               on q.OIID equals p.OI2_ID
+                               select new { value = p.OIID, Text = p.Title + p.Organize.Title + (p.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                    sReturn = JsonConvert.SerializeObject(OIs);
+                }
+                */
+            }
+
+            return sReturn;
+        }
+        #endregion
+        #region 前台主者管轄的小組清單(組換組)
+        [HttpGet]
+        public string GetOIChangeOIList(string KeyTitle, int OID)
+        {
+            ACID = GetACID();
+            string sReturn = "";
+            var O = DC.Organize.FirstOrDefault(q => q.OID == OID && !q.DeleteFlag);
+            if (O != null)
+            {
+                if (ACID == 1)
+                {
+                    var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == O.ParentID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                               select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                    sReturn = JsonConvert.SerializeObject(OIs);
+                }
+                else
+                {
+                    var MOIs = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
+                    if (MOIs.Any(q => q.OIID == 1))
+                    {
+                        var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == O.ParentID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                                   select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                        sReturn = JsonConvert.SerializeObject(OIs);
+                    }
+                    else
+                    {
+                        var OIs = (from q in MOIs
+                                   join p in DC.OrganizeInfo.Where(q => q.OID == O.ParentID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                                   on q.OIID equals p.OI2_ID
+                                   select new { value = p.OIID, Text = p.Title + p.Organize.Title + (p.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                        sReturn = JsonConvert.SerializeObject(OIs);
+                    }
+
+                }
+            }
+
+            return sReturn;
         }
         #endregion
     }

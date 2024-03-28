@@ -15,9 +15,20 @@ a {
     text-decoration: none;
 }
 
+input[type=radio] {
+    border: 2px solid #999;
+}
+
+input[type=checkbox] {
+    border: 2px solid #999;
+}
+
 .bn-theme .table button.disabled {
     color: #282828;
     opacity: 1;
+}
+.form-control {
+    border: 2px solid #999;
 }
 
 .div_UserMenu {
@@ -191,8 +202,17 @@ main {
 }
 
 .modal-backdrop {
-    --bs-backdrop-opacity:0.2;
-    position:unset !important;
+    --bs-backdrop-opacity: 0.2;
+    position: unset !important;
+}
+
+.table_Index {
+    border: 2px solid #999;
+    border-collapse: collapse;
+}
+.table_Index td{
+    border: 2px solid #999;
+
 }
 /*======================================================手機板======================================================*/
 @media(max-width:992px) {
@@ -282,7 +302,7 @@ main {
     .card-columns {
         column-count: 1;
     }
-    }
+}
 /*======================================================桌機板======================================================*/
 @media(min-width:992px) {
     .img_Login_logo {
@@ -323,10 +343,10 @@ main {
     .li_TopMenu_UserData {
         display: none;
     }
+
     .card-columns {
         column-count: 2;
     }
-    
 }
 /*課程選購首頁-左右調整設定*/
 @media(min-width:1840px) {

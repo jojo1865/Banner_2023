@@ -847,5 +847,18 @@ namespace Banner.Areas.Web.Controllers
         }
 
         #endregion
+
+        #region 會員搜尋彈出視窗
+        public PartialViewResult _SearchAccount()
+        {
+            return PartialView();
+        }
+        #endregion
+        #region 組織(轉組織)搜尋彈出視窗
+        public PartialViewResult _SearchOrganizeInfo_AC()
+        {
+            return PartialView();
+        }
+        #endregion
     }
 }

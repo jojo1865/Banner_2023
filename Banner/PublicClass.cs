@@ -34,6 +34,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using static Banner.Areas.Admin.Controllers.StaffSetController;
+using System.Text.Json.Nodes;
 
 
 namespace Banner
@@ -3293,6 +3294,44 @@ namespace Banner
             SW.WriteLine(LogNote);
             SW.Write(OldNote);
             SW.Close();
+        }
+        //讀取Log
+        public List<cLogNote> ReadLog(string ForderName, string FileName)
+        {
+            List<cLogNote> cs = new List<cLogNote>();
+            string sPath = "/Files/Log/" + ForderName + "/" + FileName + ".txt";
+            if (System.IO.File.Exists(Server.MapPath(sPath)))
+            {
+                StreamReader SR = new StreamReader(Server.MapPath(sPath));
+                string sData = "";
+                int i = 0;
+                do
+                {
+                    sData = SR.ReadLine();
+                    if (string.IsNullOrEmpty(sData))
+                        break;
+                    else
+                    {
+                        if(sData.Split(' ').Length>2)
+                        {
+                            DateTime DT__ = DT;
+                            string sDate = sData.Split(' ')[0] + " " + sData.Split(' ')[1] + " ";
+                            if (DateTime.TryParse(sDate, out DT__))
+                                cs.Add(new cLogNote { CreDate = DT__, LogNote = sData.Replace(sDate, ""), SortNo = i });
+                            else
+                                cs.Add(new cLogNote { CreDate = DT, LogNote = sData, SortNo = i });
+                        }
+                        else
+                            cs.Add(new cLogNote { CreDate = DT, LogNote = sData, SortNo = i });
+
+                        i++;
+                    }
+                } while (true);
+
+                SR.Close();
+            }
+
+            return cs;
         }
 
         //檢查是否為兒童

@@ -169,6 +169,7 @@ namespace Banner.Areas.Web.Controllers
                  *3.若今天是3/5 周二,則顯示列表為3/2 2/24 2/17....
                  *4:多一個送出存檔的按鈕
                  *5:當周靈修(QT)次數 為純數字,送出後不能改
+                 *2024/3/28 改為無視主日聚會,就是固定每周日
                 */
                 //查資料前先更新
                 if (FC != null)
@@ -182,7 +183,7 @@ namespace Banner.Areas.Web.Controllers
                             bool bCheck = GetViewCheckBox(FC.Get("cbox_" + i));
                             string sValue = FC.Get("txb_" + i);
                             int iCt = 0;
-                            if (bCheck && int.TryParse(sValue, out iCt))//有打勾或是有數字
+                            if (bCheck && int.TryParse(sValue, out iCt))//有打勾 且 有數字
                             {
                                 Account_Spiritual AS = new Account_Spiritual();
                                 AS.Account = AC;
@@ -203,10 +204,10 @@ namespace Banner.Areas.Web.Controllers
                 }
 
 
-                DateTime MaxDate = Convert.ToDateTime("2020/1/1");//最後一次主日應該是哪天
+                /*DateTime MaxDate = Convert.ToDateTime("2020/1/1");//最後一次主日應該是哪天
                 var ASs = DC.Account_Spiritual.Where(q => q.ACID == ACID);
                 //DateTime OldDate = AS.Count() > 0 ? AS.Max(q => q.QTDate) : MaxDate;//有紀錄的屬靈表最後是哪天
-
+                
                 var MLS = (from q in DC.M_ML_Account.Where(q => q.ACID == ACID && !q.DeleteFlag)
                            join p in DC.Meeting_Location_Set.Where(q => q.SetType == 0 && q.ActiveFlag && !q.DeleteFlag)
                            on q.MLID equals p.MLID
@@ -246,6 +247,28 @@ namespace Banner.Areas.Web.Controllers
                             N.SL_Spiritual.Add(SL);
                         }
                     }
+                }*/
+                DateTime MaxDate = DT.AddDays(-1* ((int)DT.DayOfWeek));//最近一個星期天
+                var ASs = DC.Account_Spiritual.Where(q => q.ACID == ACID).ToList();
+                for (int i = 0; i < 10; i++)
+                {
+                    DateTime DT_ = MaxDate.AddDays(i * -7).Date;
+                    var AS = ASs.FirstOrDefault(q => q.QTDate == DT_);
+
+                    SelectListItem SL = new SelectListItem();
+                    SL.Text = DT_.ToString(DateFormat);
+                    if (AS != null)
+                    {
+                        SL.Value = AS.QTCt.ToString();
+                        SL.Selected = true;
+                    }
+                    else
+                    {
+                        SL.Value = "";
+                        SL.Selected = false;
+                    }
+
+                    N.SL_Spiritual.Add(SL);
                 }
                 #endregion
                 //會友卡

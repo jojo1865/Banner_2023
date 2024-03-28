@@ -2,6 +2,7 @@
 using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
@@ -15,7 +16,7 @@ using System.Web.Mvc;
 using System.Web.Security.AntiXss;
 using System.Web.UI.WebControls;
 using static Banner.Areas.Admin.Controllers.AccountSetController;
-using static Banner.Areas.Admin.Controllers.OrganizeSetController;
+using static Banner.Areas.Admin.Controllers.AccountSetController;
 
 namespace Banner.Areas.Admin.Controllers
 {
@@ -2249,5 +2250,920 @@ namespace Banner.Areas.Admin.Controllers
         }
         #endregion
 
+
+        #region 牧養組織與職分-列表
+        public class cOrganize_Info_List
+        {
+            public int OID = 0;
+            public string OTitle = "";
+            public cTableList cTL = new cTableList();
+            public string sAddURL = "";
+
+        }
+        private cOrganize_Info_List GetOrganize_Info_List(int OID, int OIID, FormCollection FC)
+        {
+            ACID = GetACID();
+            string sKey = "";
+            if (FC != null)
+            {
+                sKey = FC.Get("txb_OTitle");
+                OID = Convert.ToInt32(FC.Get("ddl_O"));
+            }
+            else if (ACID != 1 && OID < 2)//非Admin,故須限制使用範圍,初始組織為"旌旗"
+            {
+                OID = 2;
+            }
+            //檢查目前組織OID跟OIID是否對的上,對不上表示使用的搜尋,把OIID歸零處理
+            if (OIID > 0)
+            {
+                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ParentID == OIID && q.OID == OID && !q.DeleteFlag);
+                if (OI == null)
+                    OIID = 0;
+            }
+
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+
+            cOrganize_Info_List cOL = new cOrganize_Info_List();
+            cOL.sAddURL = "/Admin/AccountSet/Organize_Info_Edit/" + OID + "/" + OIID + "/0";
+            cOL.OID = OID;
+            cOL.OTitle = sKey;
+
+            cOL.cTL = new cTableList();
+            cOL.cTL.Title = "";
+            cOL.cTL.NowPage = iNowPage;
+            cOL.cTL.NowURL = "/Admin/AccountSet/Organize_Info_List/" + OID + "/" + OIID;
+            cOL.cTL.NumCut = iNumCut;
+            cOL.cTL.Rs = new List<cTableRow>();
+
+            string ParentTitle = "上層名稱";
+            string NowTitle = "本層名稱";
+            string NextTitle = "下層名稱";
+            int POID = 0, NOID = 0;
+
+            var O_ = DC.Organize.FirstOrDefault(q => q.OID == OID);
+            if (O_ != null)
+            {
+                NowTitle = O_.Title;
+                var O_Up = DC.Organize.FirstOrDefault(q => q.OID == O_.ParentID && !q.DeleteFlag);
+                if (O_Up != null)
+                {
+                    POID = O_Up.OID;
+                    ParentTitle = O_Up.Title;
+                }
+                else
+                    ParentTitle = "";
+
+                var O_Next = DC.Organize.FirstOrDefault(q => q.ParentID == OID && !q.DeleteFlag);
+                if (O_Next != null)
+                {
+                    NOID = O_Next.OID;
+                    NextTitle = O_Next.Title;
+                }
+                else
+                    NextTitle = "";
+            }
+
+            #region 搜尋內容
+            var Ns_ = DC.OrganizeInfo.Where(q => !q.DeleteFlag);
+            if (OID > 0)
+                Ns_ = Ns_.Where(q => q.OID == OID);
+            if (OIID > 0)
+                Ns_ = Ns_.Where(q => q.ParentID == OIID);
+            if (sKey != "")
+                Ns_ = Ns_.Where(q => q.Title.Contains(sKey));
+            var Ns = Ns_.ToList();
+            if (ACID != 1)//全職同工權限鎖定可以給16個旌旗,指定之後看不到其他不同的資料
+            {
+                var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                if (MOI2 == null)//他沒有全部的權限
+                {
+                    Ns = (from q in Ns
+                          join p in DC.M_OI2_Account.Where(q => q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag).ToList()
+                          on q.OI2_ID equals p.OIID
+                          select q).ToList();
+
+                    if (OID <= 2)
+                    {
+                        if (bGroup[1])//不能新增
+                            bGroup[1] = false;
+                        if (bGroup[2])//不能編輯
+                            bGroup[2] = false;
+                        if (bGroup[3])//不能刪除
+                            bGroup[3] = false;
+                        ViewBag._Power = bGroup;
+                    }
+                }
+            }
+            bool HaveOldNext = false;
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "控制", WidthPX = 100 });
+            if(OID>=3)
+                TopTitles.Add(new cTableCell { Title = "調組織", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "編號(ID)", WidthPX = 100 });
+            if (ParentTitle != "")
+                TopTitles.Add(new cTableCell { Title = ParentTitle });
+
+            TopTitles.Add(new cTableCell { Title = NowTitle });
+            if (OID == 8)
+                TopTitles.Add(new cTableCell { Title = "組員數量", WidthPX = 80 });
+            else
+            {
+                if (NextTitle != "下層名稱")
+                    TopTitles.Add(new cTableCell { Title = NextTitle + "數量", WidthPX = 100 });
+                else if (sKey == "")
+                {
+                    var COIs = from q in Ns
+                               join p in DC.OrganizeInfo.Where(q => q.OID != NOID && !q.DeleteFlag)
+                               on q.OIID equals p.ParentID
+                               select p;
+                    if (COIs.Count() > 0)
+                    {
+                        HaveOldNext = true;
+                        TopTitles.Add(new cTableCell { Title = "舊下層", WidthPX = 100 });
+                    }
+                    else
+                        TopTitles.Add(new cTableCell { Title = "--", WidthPX = 120 });
+                }
+                TopTitles.Add(new cTableCell { Title = "新增下層", WidthPX = 120 });
+            }
+            TopTitles.Add(new cTableCell { Title = "職分主管", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "狀態", WidthPX = 120 });
+
+            cOL.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+
+            cOL.cTL.TotalCt = Ns.Count();
+            cOL.cTL.MaxNum = GetMaxNum(cOL.cTL.TotalCt, cOL.cTL.NumCut);
+            Ns = Ns.OrderBy(q => q.OID).ThenByDescending(q => q.CreDate).Skip((iNowPage - 1) * cOL.cTL.NumCut).Take(cOL.cTL.NumCut).ToList();
+
+            foreach (var N in Ns)
+            {
+
+                var NP = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == N.ParentID);
+                cTableRow cTR = new cTableRow();
+                if (bGroup[0])
+                {
+                    if (bGroup[2])
+                        cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Organize_Info_Edit/" + N.OID + "/" + N.ParentID + "/" + N.OIID, Target = "_self", Value = "編輯" });//
+                    else
+                        cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Organize_Info_Edit/" + N.OID + "/" + N.ParentID + "/" + N.OIID, Target = "_self", Value = "檢視" });//
+                }
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "" });//控制
+
+                if (OID >= 3)
+                {
+                    cTR.Cs.Add(new cTableCell { Type = "activebutton", URL = "ShowPopupOI(" + N.OIID + ","+N.OID+", '變更上層組織', '', '');", CSS = "btn btn-primary btn_Table_Gray btn-round btn_Basic", Value = "調組織" });//換組
+                }
+
+
+                    cTR.Cs.Add(new cTableCell { Value = N.OIID.ToString() });//編號(ID)
+                if (ParentTitle != "")
+                {
+                    if (NP != null)
+                    {
+                        string sTitle = (NP.OID == POID ? NP.Title + NP.Organize.Title : "[" + NP.Title + NP.Organize.Title + "]");
+                        cTR.Cs.Add(new cTableCell { Type = "link", URL = "/Admin/AccountSet/Organize_Info_List/" + NP.OID + "/" + NP.ParentID, Target = "_self", Value = sTitle });//
+                    }
+                    else
+                        cTR.Cs.Add(new cTableCell { Value = "" });//上層名稱
+                }
+                cTR.Cs.Add(new cTableCell { Value = N.Title + N.Organize.Title + (N.BusinessType == 1 ? "(外展)" : "") });//本層名稱
+                if (OID != 8)
+                {
+                    var RightOIs = DC.OrganizeInfo.Where(q => !q.DeleteFlag && q.ParentID == N.OIID && q.OID == NOID).ToList();
+                    var NextOIs = DC.OrganizeInfo.Where(q => !q.DeleteFlag && q.ParentID == N.OIID && q.OID != NOID).ToList();
+
+                    if (RightOIs.Count > 0)//新下層已有資料
+                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/AccountSet/Organize_Info_List/" + NOID + "/" + N.OIID, Value = RightOIs.Count.ToString() });//下層組織
+                    else if (sKey == "")
+                        cTR.Cs.Add(new cTableCell { Value = "0" });
+                    if (HaveOldNext)
+                    {
+                        if (NextOIs.Count > 0)//舊下層仍有資料
+                            cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "", URL = "/Admin/AccountSet/Organize_Info_List/" + NextOIs[0].OID + "/" + N.OIID, Value = NextOIs.Count.ToString() });//下層組織
+                        else
+                            cTR.Cs.Add(new cTableCell { Value = "0" });
+                    }
+
+                    //if (bGroup[1])
+                    cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "btn_Basic_W", URL = "/Admin/AccountSet/Organize_Info_Edit/" + NOID + "/" + N.OIID + "/0", Value = "新增" + NextTitle });
+                    //else
+                    //    cTR.Cs.Add(new cTableCell { Value = "" });
+                }
+                else
+                {
+                    int Ct = GetMOIAC(0, N.OIID, 0).Count();
+                    if (Ct == 0)//沒有新成員
+                        cTR.Cs.Add(new cTableCell { Value = "0" });//等待分發名單中
+                    else
+                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_black", CSS = "", URL = "/Admin/AccountSet/Organize_Info_Account_List?OID=" + N.OID + "&OIID=" + N.OIID, Value = "(" + Ct + ")" });//組員數量
+                }
+                if (OID < 3)
+                    cTR.Cs.Add(new cTableCell { Value = "" });//職分主管
+                else
+                    cTR.Cs.Add(new cTableCell { Value = (N.Account.Name_First + N.Account.Name_Last) });//職分主管
+
+                if (N.ActiveFlag)
+                    cTR.Cs.Add(new cTableCell { Value = "啟用", CSS = "btn btn-outline-success", Type = "activebutton", URL = (bGroup[2] ? "ChangeActive(this,'OrganizeInfo'," + N.OIID + ")" : "javascript:alert('無修改權限')") });//狀態
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "停用", CSS = "btn btn-outline-danger", Type = "activebutton", URL = (bGroup[2] ? "ChangeActive(this,'OrganizeInfo'," + N.OIID + ")" : "javascript:alert('無修改權限')") });//狀態
+
+                cOL.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+
+            #endregion
+            return cOL;
+        }
+        [HttpGet]
+        public ActionResult Organize_Info_List(int OID, int ID)
+        {
+            GetViewBag();
+            return View(GetOrganize_Info_List(OID, ID, null));
+        }
+        [HttpPost]
+        public ActionResult Organize_Info_List(int OID, int ID, FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetOrganize_Info_List(OID, ID, FC));
+        }
+        #endregion
+        #region 牧養組織與職分-新增/編輯/刪除
+        public class cOrganize_Info_Edit
+        {
+            public OrganizeInfo OI = new OrganizeInfo();
+            public List<SelectListItem> ACList = new List<SelectListItem>();
+            public List<SelectListItem> dUPOIList = new List<SelectListItem>();
+            public Contect C = new Contect();
+            public Location L = new Location();
+            public string sUPOIList = "";
+            public string C_str = "";
+            public string L_str = "";
+            public List<SelectListItem> PList = new List<SelectListItem>();
+            public List<PayType> PTList = new List<PayType>();
+
+            public int Old_BusinessType = 0;
+            public string BusinessNote = "";//外展紀錄
+            public List<SelectListItem> ChangeList = new List<SelectListItem>();
+        }
+        public class OIListSelect
+        {
+            public string ControlName = "";
+            public int SortNo = 0;
+            public List<SelectListItem> OIList = new List<SelectListItem>();
+        }
+
+        public ActionResult Organize_Info_Edit(int OID, int PID, int OIID)
+        {
+            GetViewBag();
+            ChangeTitle(OIID == 0);
+            return View(ReSetOrganizeInfo(OID, PID, OIID, null));
+        }
+        [HttpPost]
+
+        public ActionResult Organize_Info_Edit(int OID, int PID, int OIID, FormCollection FC)
+        {
+            GetViewBag();
+            ChangeTitle(OIID == 0);
+            cOrganize_Info_Edit cIE = ReSetOrganizeInfo(OID, PID, OIID, FC);
+
+            if (cIE.OI.Title == "")
+                Error = "請輸入組織名稱";
+            else if (cIE.OI.DeleteFlag)//刪除
+            {
+                var OI = DC.OrganizeInfo.FirstOrDefault(q => !q.DeleteFlag && q.ParentID == cIE.OI.OIID);
+                if (OI != null)
+                    Error = "請先移除此組織下的組織資料後再行刪除";
+                else
+                {
+                    var G = DC.M_OI_Account.FirstOrDefault(q => q.OIID == cIE.OI.OIID);
+                    if (G != null)
+                        Error = "請先移除此組織下的名單後再行刪除";
+                }
+            }
+            if (Error != "")
+                SetAlert(Error, 2);
+            else
+            {
+                cIE.OI.UpdDate = DT;
+                if (OIID == 0)
+                {
+                    cIE.OI.DeleteFlag = false;
+                    cIE.OI.CreDate = cIE.OI.UpdDate;
+                    DC.OrganizeInfo.InsertOnSubmit(cIE.OI);
+                }
+                DC.SubmitChanges();
+
+                //外展存紀錄
+                if (cIE.Old_BusinessType != cIE.OI.BusinessType)
+                {
+                    string sLog = DT.ToString(DateTimeFormat) + " 後台" + ACID + "將" + cIE.OI.Title;
+                    var MAs = DC.M_OI_Account.Where(q => q.OIID == OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.JoinDate);
+                    if (cIE.OI.BusinessType == 0)
+                        sLog += "移除外展,當下組員名單(" + MAs.Count() + "):";
+                    else
+                        sLog += "設定為外展,當下組員名單(" + MAs.Count() + "):";
+
+                    sLog += string.Join(",", MAs.Select(q => q.Account.Name_First + q.Account.Name_Last + "(" + q.ACID + ")"));
+                    SaveLog(sLog, "外展小組", OIID.ToString());
+                }
+
+                if (OID <= 2)
+                {
+                    cIE.C.TargetType = 1;
+                    cIE.C.TargetID = cIE.OI.OIID;
+                    cIE.C.ContectType = 0;
+                    cIE.C.CheckFlag = false;
+                    cIE.C.CreDate = DT;
+                    cIE.C.CheckDate = DT;
+                    if (cIE.C.CID == 0)
+                        DC.Contect.InsertOnSubmit(cIE.C);
+                    DC.SubmitChanges();
+
+                    cIE.L.TargetType = 1;
+                    cIE.L.TargetID = cIE.OI.OIID;
+                    if (cIE.L.LID == 0)
+                        DC.Location.InsertOnSubmit(cIE.L);
+                    DC.SubmitChanges();
+                }
+
+                if (cIE.OI.DeleteFlag || !cIE.OI.ActiveFlag)//若組織被關閉則移除相關權限
+                {
+                    var MOI2s = GetMOI2AC(cIE.OI.OIID);
+                    foreach (var MOI2 in MOI2s)
+                    {
+                        MOI2.ActiveFlag = cIE.OI.ActiveFlag;
+                        MOI2.DeleteFlag = cIE.OI.DeleteFlag;
+                        MOI2.UpdDate = DT;
+                        MOI2.SaveACID = ACID;
+                        DC.SubmitChanges();
+                    }
+                }
+
+                if (OID == 1)
+                {
+                    foreach (var PT in cIE.PTList)
+                    {
+                        if (PT.PTID == 0)
+                        {
+                            PT.OIID = cIE.OI.OIID;
+                            DC.PayType.InsertOnSubmit(PT);
+                            DC.SubmitChanges();
+                        }
+                        else
+                        {
+                            PT.UpdDate = DT;
+                            PT.SaveACID = ACID;
+                            DC.SubmitChanges();
+                        }
+                    }
+                }
+
+
+                PID = cIE.OI.ParentID;
+                SetAlert((OIID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/AccountSet/Organize_Info_List/" + OID + "/" + PID);
+            }
+            return View(cIE);
+        }
+
+        private cOrganize_Info_Edit ReSetOrganizeInfo(int OID, int PID, int OIID, FormCollection FC)
+        {
+
+            cOrganize_Info_Edit cIE = new cOrganize_Info_Edit();
+
+            #region 物件初始化
+
+            for (int i = 0; i < sPayType.Length; i++)
+                cIE.PList.Add(new SelectListItem { Text = sPayType[i], Value = i.ToString() });
+
+            #endregion
+            #region 權限調整-牧養部的人來改組織須限制不能改協會與旌旗
+            if (ACID != 1)//全職同工權限鎖定可以給16個旌旗,指定之後看不到其他不同的資料
+            {
+                var MOI2 = DC.M_OI2_Account.FirstOrDefault(q => q.OIID == 1 && q.ACID == ACID && !q.DeleteFlag && q.ActiveFlag);
+                if (MOI2 == null)//他沒有全部的權限
+                {
+                    if (OID <= 2)
+                    {
+                        if (bGroup[1])//不能新增
+                            bGroup[1] = false;
+                        if (bGroup[2])//不能編輯
+                            bGroup[2] = false;
+                        if (bGroup[3])//不能刪除
+                            bGroup[3] = false;
+                        ViewBag._Power = bGroup;
+                    }
+                }
+            }
+            #endregion
+            var ACs = from q in DC.M_O_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == OID && !q.Account.DeleteFlag)
+                      group q by new { q.ACID, q.Account.Name_First, q.Account.Name_Last } into g
+                      select new { g.Key.ACID, Name = g.Key.Name_First + g.Key.Name_Last };
+            var AC0 = DC.Account.First(q => q.ACID == 1);
+            if (OIID > 0)//更新
+            {
+                cIE.OI = DC.OrganizeInfo.FirstOrDefault(q => q.OID == OID && q.OIID == OIID && !q.DeleteFlag);
+                if (cIE.OI == null)
+                    SetAlert("查無資料,請重新操作", 2, "/Admin/AccountSet/Organize_Info_List/" + OID + "/0");
+                else
+                {
+                    cIE.Old_BusinessType = cIE.OI.BusinessType;
+                    #region 主管列表
+                    cIE.ACList = new List<SelectListItem>();
+                    cIE.ACList.Add(new SelectListItem { Text = AC0.Name_First + AC0.Name_Last, Value = AC0.ACID.ToString(), Selected = AC0.ACID == cIE.OI.ACID });
+                    cIE.ACList.AddRange(from q in ACs.OrderBy(q => q.Name)
+                                        select new SelectListItem { Text = "(" + q.ACID + ")" + q.Name, Value = q.ACID.ToString(), Selected = q.ACID == cIE.OI.ACID });
+
+                    if (cIE.ACList.Count > 0)
+                    {
+                        if (cIE.ACList.FirstOrDefault(q => q.Selected) == null)
+                            cIE.ACList[0].Selected = true;
+                    }
+
+                    #endregion
+                    #region 上層--文字版
+                    var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == cIE.OI.ParentID);
+                    while (OI != null)
+                    {
+                        cIE.sUPOIList = OI.Title + OI.Organize.Title + (cIE.sUPOIList == "" ? "" : "/" + cIE.sUPOIList);
+                        OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID);
+                    }
+                    #endregion
+                    #region 上層--下拉選單
+
+                    var OP_ = DC.Organize.FirstOrDefault(q => q.OID == cIE.OI.Organize.ParentID);
+                    var OIP_ = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == cIE.OI.ParentID);
+                    if (OP_ != null && OIP_ != null)
+                    {
+                        if (OP_.OID != OIP_.OID)//層級不對,要選擇新層級
+                        {
+                            var OICs = DC.OrganizeInfo.Where(q => q.OID == OP_.OID && !q.DeleteFlag);
+                            if (OICs.Count() > 0)
+                            {
+                                foreach (var OIC in OICs)
+                                    cIE.dUPOIList.Add(new SelectListItem { Text = OIC.Title, Value = OIC.OIID.ToString() });
+                                cIE.dUPOIList[0].Selected = true;
+                            }
+                        }
+                        else//層級對,所以要可以換
+                        {
+                            var OIPs__ = DC.OrganizeInfo.Where(q => q.ParentID == OIP_.ParentID && q.ActiveFlag && !q.DeleteFlag);
+                            foreach (var OIP__ in OIPs__)
+                                cIE.ChangeList.Add(new SelectListItem { Text = OIP__.Title + OIP__.Organize.Title, Value = OIP__.OIID.ToString(), Selected = OIP__.OIID == cIE.OI.ParentID });
+
+                        }
+
+                    }
+
+                    #endregion
+                    #region 查聚會點
+                    var MLS = DC.Meeting_Location_Set.FirstOrDefault(q => q.SetType == 1 && q.OIID == cIE.OI.OIID && q.ActiveFlag && !q.DeleteFlag);
+                    if (MLS != null)
+                    {
+                        #region 地址
+                        var L = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MLSID);
+                        if (L != null)
+                        {
+                            cIE.L = L;
+                            cIE.L_str = GetLocationString(L);
+                        }
+                        else
+                            cIE.L = new Location { ZID = 10 };
+
+                        #endregion
+                        #region 電話
+                        var C = DC.Contect.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == MLS.MLSID);
+                        if (C != null)
+                        {
+                            cIE.C = C;
+
+                            if (C.ZID > 0)
+                            {
+                                var Z = DC.ZipCode.FirstOrDefault(q => q.ZID == C.ZID);
+                                cIE.C_str = (Z != null ? (Z.Title + "(" + Z.Code + ")") : "") + C.ContectValue;
+                            }
+                        }
+                        else
+                            cIE.C = new Contect { ZID = 10, ContectType = 0, ContectValue = "" };
+                        #endregion
+                    }
+                    else
+                    {
+                        if (DC.Contect.Count(q => q.TargetID == cIE.OI.OIID && q.ContectType == 0 && q.TargetType == 1) > 1)
+                        {
+                            int MaxID = DC.Contect.Where(q => q.TargetID == cIE.OI.OIID && q.ContectType == 0 && q.TargetType == 1).Max(q => q.CID);
+                            DC.Contect.DeleteAllOnSubmit(DC.Contect.Where(q => q.TargetID == cIE.OI.OIID && q.ContectType == 0 && q.TargetType == 1 && q.CID != MaxID));
+                            DC.SubmitChanges();
+                        }
+                        if (DC.Location.Count(q => q.TargetID == cIE.OI.OIID && q.TargetType == 1) > 1)
+                        {
+                            int MaxID = DC.Location.Where(q => q.TargetID == cIE.OI.OIID && q.TargetType == 1).Max(q => q.LID);
+                            DC.Location.DeleteAllOnSubmit(DC.Location.Where(q => q.TargetID == cIE.OI.OIID && q.TargetType == 1 && q.LID != MaxID));
+                            DC.SubmitChanges();
+                        }
+
+                        cIE.C = DC.Contect.FirstOrDefault(q => q.TargetID == cIE.OI.OIID && q.ContectType == 0 && q.TargetType == 1);
+                        cIE.L = DC.Location.FirstOrDefault(q => q.TargetID == cIE.OI.OIID && q.TargetType == 1);
+                        if (cIE.C == null)
+                            cIE.C = new Contect { ZID = 10, ContectType = 0, ContectValue = "" };
+                        if (cIE.L == null)
+                            cIE.L = new Location { ZID = 10, Address = "" };
+                    }
+                    #endregion
+                    #region 付款方式
+                    var PLs = DC.PayType.Where(q => q.OIID == OIID && !q.DeleteFlag).ToList();
+                    if (PLs.Count() == 0)
+                    {
+                        for (int i = 0; i < sPayType.Length; i++)
+                        {
+                            PayType PT = new PayType
+                            {
+                                OrganizeInfo = cIE.OI,
+                                PayTypeID = i,
+                                Title = "",
+                                Note = "",
+                                TargetURL = "",
+                                BackURL = "",
+                                MerchantID = "",
+                                HashKey = "",
+                                HashIV = "",
+                                PayKey1 = "",
+                                PayKey2 = "",
+                                PayKey3 = "",
+                                PayKey4 = "",
+                                PayKey5 = "",
+                                ActiveFlag = false,
+                                DeleteFlag = false,
+                                CreDate = DT,
+                                UpdDate = DT,
+                            };
+                            cIE.PTList.Add(PT);
+                        }
+                    }
+                    else
+                        cIE.PTList = PLs;
+                    for (int i = 0; i < sPayType.Length; i++)
+                    {
+                        var PL = PLs.FirstOrDefault(q => q.PayTypeID == i);
+                        if (PL != null)
+                            cIE.PList.First(q => q.Value == i.ToString()).Selected = PL.ActiveFlag;
+                    }
+                    #endregion
+                    #region 顯示外展紀錄
+                    var Cs = ReadLog("外展小組", OIID.ToString());
+                    if (Cs.Count > 0)
+                    {
+                        cIE.BusinessNote = string.Join("<br/>", Cs.OrderByDescending(q => q.CreDate).ThenByDescending(q => q.SortNo).Select(q => q.CreDate.ToString(DateTimeFormat) + " " + q.LogNote));
+                    }
+                    #endregion
+                }
+            }
+            else//新增
+            {
+                var O = DC.Organize.FirstOrDefault(q => q.OID == OID && !q.DeleteFlag);
+                if (O == null)
+                    SetAlert("查無資料,請重新操作", 2, "/Admin/AccountSet/Organize_Map_List/0");
+                else
+                {
+                    cIE.OI = new OrganizeInfo();
+                    cIE.OI.Organize = O;
+                    cIE.OI.ParentID = PID;
+                    cIE.OI.ActiveFlag = true;
+                    cIE.OI.BusinessType = 0;
+                    cIE.OI.OI2_ID = 0;
+                    #region 上層--文字版
+                    var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == cIE.OI.ParentID);
+                    while (OI != null)
+                    {
+                        cIE.sUPOIList = OI.Title + OI.Organize.Title + (cIE.sUPOIList == "" ? "" : "/" + cIE.sUPOIList);
+                        if (OI.OID == 2)
+                            cIE.OI.OI2_ID = OI.OIID;
+                        OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID);
+                    }
+                    #endregion
+                    #region 主管
+
+                    cIE.ACList = new List<SelectListItem>();
+                    cIE.ACList.Add(new SelectListItem { Text = AC0.Name_First + AC0.Name_Last, Value = AC0.ACID.ToString() });
+                    foreach (var A in ACs.OrderBy(q => q.Name))
+                        cIE.ACList.Add(new SelectListItem { Value = A.ACID.ToString(), Text = A.Name });
+                    cIE.ACList[0].Selected = true;
+
+                    #endregion
+                    #region 地址/電話
+                    cIE.C = new Contect { ZID = 10, ContectType = 0, ContectValue = "" };
+                    cIE.L = new Location { ZID = 10, Address = "" };
+                    #endregion
+                    #region 付款方式
+                    for (int i = 0; i < sPayType.Length; i++)
+                    {
+                        PayType PT = new PayType
+                        {
+                            OrganizeInfo = cIE.OI,
+                            PayTypeID = i,
+                            Title = "",
+                            Note = "",
+                            TargetURL = "",
+                            BackURL = "",
+                            MerchantID = "",
+                            HashKey = "",
+                            HashIV = "",
+                            PayKey1 = "",
+                            PayKey2 = "",
+                            PayKey3 = "",
+                            PayKey4 = "",
+                            PayKey5 = "",
+                            ActiveFlag = false,
+                            DeleteFlag = false,
+                            CreDate = DT,
+                            UpdDate = DT,
+                        };
+                        cIE.PTList.Add(PT);
+                    }
+                    #endregion
+                }
+            }
+            cIE.OI.SaveACID = ACID;
+            if (FC != null)
+            {
+                cIE.OI.Title = FC.Get("txb_Title");
+                cIE.OI.ACID = Convert.ToInt32(FC.Get("ddl_ACID"));
+                cIE.OI.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
+                cIE.OI.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
+                cIE.OI.BusinessType = GetViewCheckBox(FC.Get("cbox_Business")) ? 1 : 0;
+                if (!string.IsNullOrEmpty(FC.Get("ddl_UPOIList")))
+                {
+                    cIE.dUPOIList.ForEach(q => q.Selected = false);
+                    cIE.dUPOIList.First(q => q.Value == FC.Get("ddl_UPOIList")).Selected = true;
+                    cIE.OI.ParentID = Convert.ToInt32(FC.Get("ddl_UPOIList"));
+                }
+                if (!string.IsNullOrEmpty(FC.Get("ddl_ChangeList")))
+                {
+                    cIE.ChangeList.ForEach(q => q.Selected = false);
+                    cIE.ChangeList.First(q => q.Value == FC.Get("ddl_ChangeList")).Selected = true;
+                    cIE.OI.ParentID = Convert.ToInt32(FC.Get("ddl_ChangeList"));
+                }
+
+                if (cIE.OI.OID <= 2)
+                {
+                    cIE.C.ContectValue = FC.Get("txb_PhoneNo");
+                    cIE.C.ZID = Convert.ToInt32(FC.Get("ddl_PhoneZip"));
+
+                    if (FC.Get("ddl_Zip0") == "10")
+                    {
+                        cIE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip2"));
+                        cIE.L.Address = FC.Get("txb_Address0");
+                    }
+                    else if (FC.Get("ddl_Zip0") == "2")
+                    {
+                        cIE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip3"));
+                        cIE.L.Address = FC.Get("txb_Address1_1") + "\n" + FC.Get("txb_Address1_2");
+                    }
+                    else
+                    {
+                        cIE.L.ZID = Convert.ToInt32(FC.Get("ddl_Zip0"));
+                        cIE.L.Address = FC.Get("txb_Address2");
+                    }
+
+                }
+                for (int i = 0; i < sPayType.Length; i++)
+                {
+                    var PL = cIE.PTList.FirstOrDefault(q => q.PayTypeID == i);
+                    if (PL != null)
+                    {
+                        PL.ActiveFlag = GetViewCheckBox(FC.Get("cbox_PayType_" + i));
+                        switch (i)
+                        {
+                            case 1://信用卡
+                            case 2://ATM
+                                {
+                                    PL.Title = FC.Get("txb_PayType_Title");
+                                    PL.MerchantID = FC.Get("txb_PayType_MerchantID");
+                                    PL.HashKey = FC.Get("txb_PayType_HashKey");
+                                    PL.HashIV = FC.Get("txb_PayType_HashIV");
+                                    PL.TargetURL = FC.Get("txb_PayType_TargetURL");
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+
+            return cIE;
+        }
+
+
+        #endregion
+        #region 牧養組織與職分-成員列表
+
+        private cTableList GetOrganize_Info_Account_List(int OID, int OIID, FormCollection FC)
+        {
+            cTableList cTL = new cTableList();
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            string sKey = FC != null ? FC.Get("txb_Key") : "";
+            ViewBag._Key = sKey;
+            cTL = new cTableList();
+            cTL.Title = "";
+            cTL.NowPage = iNowPage;
+            cTL.NowURL = "/Admin/AccountSet/Organize_Info_Account_List/" + OID + "/" + OIID;
+            cTL.NumCut = iNumCut;
+            cTL.Rs = new List<cTableRow>();
+
+            int LeaderACID = 0;
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OIID && q.OID == OID && !q.DeleteFlag);
+            if (OI != null)
+            {
+                ViewBag._Title = OI.Title + OI.Organize.Title + (OI.BusinessType == 1 ? "(外展)" : "") + " 成員列表";
+                LeaderACID = OI.ACID;
+            }
+            var Ns = DC.M_OI_Account.Where(q => !q.DeleteFlag && q.OIID == OIID && !q.Account.DeleteFlag);
+            if (!string.IsNullOrEmpty(sKey))
+                Ns = Ns.Where(q => (q.Account.Name_First + q.Account.Name_Last).Contains(sKey));
+
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "會員資料", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "換組", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "組員ID", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "會員ID", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "姓名" });
+            TopTitles.Add(new cTableCell { Title = "加入日期" });
+            //TopTitles.Add(new cTableCell { Title = "離開日期" });
+            TopTitles.Add(new cTableCell { Title = "職務" });
+            TopTitles.Add(new cTableCell { Title = "受洗狀態" });
+
+            cTL.Rs.Add(SetTableRowTitle(TopTitles));
+
+            cTL.TotalCt = Ns.Count();
+            cTL.MaxNum = GetMaxNum(cTL.TotalCt, cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.OrganizeInfo.ACID == q.ACID).ThenByDescending(q => q.MID).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut);
+            foreach (var N in Ns)
+            {
+                cTableRow cTR = new cTableRow();
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_black", Value = "編輯" });//會員資料
+                if(N.OrganizeInfo.ACID == N.ACID) 
+                    cTR.Cs.Add(new cTableCell { Value = "" });
+                else
+                    cTR.Cs.Add(new cTableCell { Type = "activebutton", URL = "ShowPopupOI(" + N.ACID + ",8, '搜尋小組', '', '');", CSS = "btn btn-primary btn_Table_Gray btn-round btn_Basic", Value = "換組" });//換組
+                
+                    
+
+                cTR.Cs.Add(new cTableCell { Value = N.MID.ToString() });//組員ID
+                cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() });//會員ID
+                cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });//姓名
+                if (N.JoinDate == N.CreDate)
+                {
+                    cTR.Cs.Add(new cTableCell { Value = N.JoinDate.ToString(DateFormat) + "加入,未落戶" });//加入日期
+                    //cTR.Cs.Add(new cTableCell { Value = "" });//離開日期
+                }
+                else
+                {
+                    cTR.Cs.Add(new cTableCell { Value = N.JoinDate.ToString(DateFormat) + "已落戶" });//加入日期
+                                                                                                   //cTR.Cs.Add(new cTableCell { Value = N.LeaveDate == N.CreDate ? "" : N.LeaveDate.ToString(DateFormat) });//離開日期
+                }
+                if (N.OrganizeInfo.ACID == N.ACID)
+                    cTR.Cs.Add(new cTableCell { Value = "小組長", CSS = "btn btn-outline-success" });//職務
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "" });//職務
+
+                var B = DC.Baptized.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.BaptismDate).FirstOrDefault();
+                if (B == null)
+                    cTR.Cs.Add(new cTableCell { Value = "未受洗" });//受洗狀態
+                else if (B.ImplementFlag)
+                    cTR.Cs.Add(new cTableCell { Value = "已於" + B.BaptismDate.ToLongDateString() + "受洗" });//受洗狀態
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "預計於" + B.BaptismDate.ToLongDateString() + "受洗" });//受洗狀態
+                cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+            return cTL;
+        }
+
+        public ActionResult Organize_Info_Account_List(int OID, int OIID)
+        {
+            GetViewBag();
+            return View(GetOrganize_Info_Account_List(OID, OIID, null));
+        }
+        [HttpPost]
+        public ActionResult Organize_Info_Account_List(int OID, int OIID, FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetOrganize_Info_Account_List(OID, OIID, FC));
+        }
+        #endregion
+        #region 牧養組織與職分-匯出全部
+        public ActionResult Organize_Info_Print()
+        {
+            GetViewBag();
+            var Os = DC.Organize.Where(q => !q.DeleteFlag);
+            var Os_All = Os.ToList();
+            var OIs_All = (from q in DC.OrganizeInfo.Where(q => !q.DeleteFlag)
+                           join p in Os
+                           on q.OID equals p.OID
+                           select q).ToList();
+
+            int XCt = 0;
+            ArrayList AL = new ArrayList();
+            ArrayList ALS = new ArrayList();
+            var O = Os_All.FirstOrDefault(q => q.ParentID == 0);
+            while (O != null)
+            {
+                XCt++;
+                ALS.Add(O.Title);
+                if (!string.IsNullOrEmpty(O.JobTitle))
+                    ALS.Add(O.JobTitle);
+                O = Os_All.FirstOrDefault(q => q.ParentID == O.OID);
+            };
+            AL.Add((string[])ALS.ToArray(typeof(string)));
+
+            var OIs = OIs_All.Where(q => q.OID == 8);
+            int YCt = OIs.Count();
+            OITable[,] T = new OITable[XCt, YCt];
+            int Y = 0, X = XCt - 1;
+
+
+
+
+            foreach (var OI in OIs.OrderBy(q => q.ParentID))
+            {
+                T[X, Y] = new OITable
+                {
+                    OID = OI.OID,
+                    OIID = OI.OIID,
+                    POID = OI.Organize.ParentID,
+                    POIID = OI.ParentID,
+                    Title = OI.Title + OI.Organize.Title,
+                    ACName = string.IsNullOrEmpty(OI.Organize.JobTitle) ? "" : OI.Account.Name_First + OI.Account.Name_Last,
+                    ActiceFlag = OI.ActiveFlag
+                };
+                Y++;
+            }
+            var O8 = Os_All.First(q => q.OID == 8);
+
+            Y = 0;
+            X--;
+
+            for (int j = X; j >= 0; j--)
+            {
+                for (int i = 0; i < YCt; i++)
+                {
+                    if (T[j + 1, i] != null)
+                    {
+                        var OI = OIs_All.FirstOrDefault(q => q.OIID == T[j + 1, i].POIID && q.OID == T[j + 1, i].POID);
+                        if (OI != null)
+                        {
+                            T[j, i] = new OITable
+                            {
+                                OID = OI.OID,
+                                OIID = OI.OIID,
+                                POID = OI.Organize.ParentID,
+                                POIID = OI.ParentID,
+                                Title = OI.Title + OI.Organize.Title,
+                                ACName = string.IsNullOrEmpty(OI.Organize.JobTitle) ? "" : OI.Account.Name_First + OI.Account.Name_Last,
+                                ActiceFlag = OI.ActiveFlag
+                            };
+                        }
+                    }
+                }
+
+            }
+
+
+            for (int j = 0; j < YCt; j++)
+            {
+                ALS = new ArrayList();
+                for (int i = 0; i < XCt; i++)
+                {
+                    if (T[i, j] != null)
+                    {
+                        ALS.Add(T[i, j].Title);
+                        if (!string.IsNullOrEmpty(T[i, j].ACName))
+                            ALS.Add(T[i, j].ACName);
+                    }
+                    else
+                    {
+                        ALS.Add("--");
+                        ALS.Add("--");
+                    }
+                }
+                AL.Add((string[])ALS.ToArray(typeof(string)));
+            }
+
+            WriteExcelFromString("組織與職分管理列表", AL);
+            SetAlert("已完成匯出", 1);
+            return View();
+        }
+        private class OITable
+        {
+            public int OID = 0;
+            public int OIID = 0;
+            public int POID = 0;
+            public int POIID = 0;
+            public string Title = "";
+            public string ACName = "";
+            public bool ActiceFlag = false;
+        }
+
+
+        #endregion
     }
 }

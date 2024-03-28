@@ -571,6 +571,7 @@ namespace Banner.Areas.Admin.Controllers
             public List<PayType> PTList = new List<PayType>();
 
             public int Old_BusinessType = 0;
+            public string BusinessNote = "";
 
         }
         public class OIListSelect
@@ -627,12 +628,11 @@ namespace Banner.Areas.Admin.Controllers
                     string sLog = DT.ToString(DateTimeFormat) + " 後台" + ACID + "將" + cIE.OI.Title;
                     var MAs = DC.M_OI_Account.Where(q => q.OIID == OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q=>q.JoinDate);
                     if (cIE.OI.BusinessType == 0)
-                        sLog += "移除外展,當下組員名單(" + MAs.Count() + "):[";
+                        sLog += "移除外展,當下組員名單(" + MAs.Count() + "):";
                     else
-                        sLog += "設定為外展,當下組員名單(" + MAs.Count() + "):[";
+                        sLog += "設定為外展,當下組員名單(" + MAs.Count() + "):";
 
-                    sLog += string.Join(",", MAs.Select(q =>"{\"ACID\"="+q.ACID+",\"Name\"=\""+ q.Account.Name_First + q.Account.Name_Last + "\"}"));
-                    sLog += "]";
+                    sLog += string.Join(",", MAs.Select(q => q.Account.Name_First + q.Account.Name_Last + "(" + q.ACID + ")"));
                     SaveLog(sLog, "外展小組", OIID.ToString());
                 }
 
@@ -869,6 +869,13 @@ namespace Banner.Areas.Admin.Controllers
                             cIE.PList.First(q => q.Value == i.ToString()).Selected = PL.ActiveFlag;
                     }
                     #endregion
+                    #region 顯示外展紀錄
+                    var Cs = ReadLog("外展小組", OIID.ToString());
+                    if (Cs.Count > 0)
+                    {
+                        cIE.BusinessNote = string.Join("<br/>", Cs.OrderByDescending(q => q.CreDate).ThenByDescending(q => q.SortNo).Select(q => q.CreDate.ToString(DateTimeFormat) + " " + q.LogNote));
+                    }
+                    #endregion
                 }
             }
             else//新增
@@ -1051,12 +1058,12 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });//姓名
                 if (N.JoinDate == N.CreDate)
                 {
-                    cTR.Cs.Add(new cTableCell { Value = "未落戶" });//加入日期
+                    cTR.Cs.Add(new cTableCell { Value = N.JoinDate.ToString(DateFormat) + "加入,未落戶" });//加入日期
                     cTR.Cs.Add(new cTableCell { Value = "" });//離開日期
                 }
                 else
                 {
-                    cTR.Cs.Add(new cTableCell { Value = N.JoinDate.ToString(DateFormat) });//加入日期
+                    cTR.Cs.Add(new cTableCell { Value = N.JoinDate.ToString(DateFormat) + "已落戶" });//加入日期
                     cTR.Cs.Add(new cTableCell { Value = N.LeaveDate == N.CreDate ? "" : N.LeaveDate.ToString(DateFormat) });//離開日期
                 }
                 if (N.OrganizeInfo.ACID == N.ACID)

@@ -23,8 +23,9 @@ namespace Banner.Areas.Web.Controllers
         #region 會友異動
         public class cGetMove_People
         {
-            public int ACID = 0;
-            public int OIID = 0;
+            public int ACID = 0;//輸入的ACID
+            public int OIID = 0;//要被轉去的小組ID
+            public int MyOIID = 0;//管理者的組織ID
         }
         public cGetMove_People GetMove_People(FormCollection FC)
         {
@@ -53,7 +54,11 @@ namespace Banner.Areas.Web.Controllers
                             select new { OIs = p, SortNo = q.SortNo }).ToList();
                 if (OIs_.Count == 0)
                     SetAlert("您並未具備區長以上職分,不能使用本功能", 2, "/Web/Home/Index");
-                else if (FC != null)
+                else
+                    c.MyOIID = OIs_.OrderBy(q => q.SortNo).First().OIs.OIID;
+
+
+                if (FC != null)
                 {
                     //取得轄下所有組織
                     var OIs_1 = OIs_.OrderBy(q => q.SortNo).First();

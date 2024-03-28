@@ -48,10 +48,10 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (GetACID() <= 0)
                 {
-                    //LogInAC(1);
-                    //SetBrowserData("UserName", "系統管理者");
-                    LogInAC(8197);
-                    SetBrowserData("UserName", "JOJO");
+                    LogInAC(1);
+                    SetBrowserData("UserName", "系統管理者");
+                    //LogInAC(8197);
+                    //SetBrowserData("UserName", "JOJO");
                     SetAlert("", 1, "/Admin/Home/Index");
                 }
             }
@@ -402,6 +402,156 @@ namespace Banner.Areas.Admin.Controllers
                       select new { value = q.OIID, Text = q.Title };
 
             return JsonConvert.SerializeObject(OIs);
+        }
+        #endregion
+        #region 後臺管理者管轄的小組清單(人換組)
+        [HttpGet]
+        public string GetACChangeOIList(string KeyTitle, int OID)
+        {
+            ACID = GetACID();
+            string sReturn = "";
+            if (ACID == 1)
+            {
+                var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == OID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                           select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                sReturn = JsonConvert.SerializeObject(OIs);
+            }
+            else
+            {
+                var MOIs = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
+                if (MOIs.Any(q => q.OIID == 1))
+                {
+                    var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == OID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                               select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                    sReturn = JsonConvert.SerializeObject(OIs);
+                }
+                else
+                {
+                    var OIs = (from q in MOIs
+                               join p in DC.OrganizeInfo.Where(q => q.OID == OID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                               on q.OIID equals p.OI2_ID
+                               select new { value = p.OIID, Text = p.Title + p.Organize.Title + (p.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                    sReturn = JsonConvert.SerializeObject(OIs);
+                }
+
+            }
+
+            return sReturn;
+        }
+        #endregion
+        #region 後臺管理者管轄的某層組織清單(組換組)
+        [HttpGet]
+        public string GetOIChangeOIList(string KeyTitle, int OID)
+        {
+            ACID = GetACID();
+            string sReturn = "";
+            var O = DC.Organize.FirstOrDefault(q => q.OID == OID && !q.DeleteFlag);
+            if(O!=null)
+            {
+                if (ACID == 1)
+                {
+                    var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == O.ParentID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                               select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                    sReturn = JsonConvert.SerializeObject(OIs);
+                }
+                else
+                {
+                    var MOIs = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
+                    if (MOIs.Any(q => q.OIID == 1))
+                    {
+                        var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == O.ParentID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                                   select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                        sReturn = JsonConvert.SerializeObject(OIs);
+                    }
+                    else
+                    {
+                        var OIs = (from q in MOIs
+                                   join p in DC.OrganizeInfo.Where(q => q.OID == O.ParentID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                                   on q.OIID equals p.OI2_ID
+                                   select new { value = p.OIID, Text = p.Title + p.Organize.Title + (p.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                        sReturn = JsonConvert.SerializeObject(OIs);
+                    }
+
+                }
+            }
+            
+
+            return sReturn;
+        }
+        #endregion
+        #region 小組員換組
+        [HttpGet]
+        public string ACChangeOI(int ACID, int OIID, int OID)
+        {
+            Error = "";
+            int UID = GetACID();
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == OIID && q.OID == OID);
+            if (AC == null)
+                Error += "此會員不存在<br/>";
+            if (OI == null)
+                Error += "此小組不存在<br/>";
+            if (Error == "")
+            {
+                var MOIs = DC.M_OI_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag);
+                foreach (var MOI in MOIs)
+                {
+                    MOI.ActiveFlag = false;
+                    MOI.DeleteFlag = true;
+                    MOI.LeaveDate = DT;
+                    MOI.UpdDate = DT;
+                    MOI.SaveACID = UID;
+                    DC.SubmitChanges();
+                }
+
+                M_OI_Account M = new M_OI_Account
+                {
+                    OrganizeInfo = OI,
+                    Account = AC,
+                    JoinDate = DT,
+                    LeaveDate = DT,
+                    ActiveFlag = true,
+                    DeleteFlag = false,
+                    CreDate = DT,
+                    UpdDate = DT,
+                    SaveACID = UID,
+                };
+                DC.M_OI_Account.InsertOnSubmit(M);
+                DC.SubmitChanges();
+
+                Error = "OK";
+            }
+            return Error;
+        }
+        #endregion
+        #region 組織換老爸
+        [HttpGet]
+        public string OIChangeParent(int ThisOIID, int OIID, int OID)
+        {
+            Error = "";
+            int UID = GetACID();
+            var O = DC.Organize.FirstOrDefault(q => q.OID == OID && !q.DeleteFlag);
+            var OI_Basic = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == ThisOIID && !q.DeleteFlag);
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == OIID && q.OID == O.ParentID);
+            if (OI_Basic == null)
+                Error += "此組織不存在<br/>";
+            if (OI == null)
+                Error += "目標組織不存在<br/>";
+            if (Error == "")
+            {
+                OI_Basic.ParentID = OI.OIID;
+                OI_Basic.UpdDate = DT;
+                OI_Basic.SaveACID = UID;
+                DC.SubmitChanges();
+                Error = "OK";
+            }
+            return Error;
         }
         #endregion
         #region 用關鍵字查組織

@@ -60,8 +60,8 @@
 
                         <div class="card p-4 m-2">
                             <div class="card-body">
-                                <h4 class="lab_info mb-3">我的小組</h4>
-                                <p><span class="lab_DarkBlue">●</span> <span class="lab_info">@Model.MyGroup.Title</span></p>
+                                <h4 class="lab_DarkBlue mb-3">我的小組</h4>
+                                <p><span class="lab_DarkBlue">●</span> <span class="lab_DarkBlue">@Model.MyGroup.Title</span></p>
                                 <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會日：@Model.MyGroup.Date</p>
                                 <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會時間：@Model.MyGroup.Time</p>
                                 <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會地點：@Model.MyGroup.Address</p>
@@ -83,12 +83,12 @@
 
                         <div class="card p-4 m-2">
                             <div class="card-body">
-                                <h4 class="lab_info mb-3">小組長專區</h4>
+                                <h4 class="lab_DarkBlue mb-3">小組長專區</h4>
                                 @foreach (var M in Model.MyGroups)
                                 {
                                     <div class="row">
                                         <div class="col">
-                                            <p><span class="lab_DarkBlue">●</span> <span class="lab_info">@M.Title</span></p>
+                                            <p><span class="lab_DarkBlue">●</span> <span class="lab_DarkBlue">@M.Title</span></p>
                                             <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會日：@M.Date</p>
                                             <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會時間：@M.Time</p>
                                             <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會地點：@M.Address</p>
@@ -104,7 +104,7 @@
                     {
                         <div class="card p-4 m-2">
                             <div class="card-body">
-                                <h4 class="lab_info mb-3">講師專區</h4>
+                                <h4 class="lab_DarkBlue mb-3">講師專區</h4>
                                 @foreach (var M in Model.c_Teacher)
                                 {
                                     <p><span class="lab_DarkBlue">●</span> <a href="@M.Url">@M.Title</a></p>
@@ -115,39 +115,42 @@
 
                     <div class="card p-4 m-2">
                         <div class="card-body">
-                            <h4 class="lab_info mb-3">屬靈健檢表</h4>
+                            <h4 class="lab_DarkBlue mb-3">屬靈健檢表</h4>
                             <form id="form1" method="post" novalidate>
-                                <table class="table table_RWDStyle">
-                                    <tr class="Bgn">
-                                        <td>日期</td>
-                                        <td>是否主日</td>
-                                        <td>當周靈修(QT)次數</td>
-                                    </tr>
-                                    @for (int i = 0; i < Model.SL_Spiritual.Count; i++)
-                                    {
-                                        var SL = Model.SL_Spiritual[i];
-                                        if (SL.Value == "")
+                                <table class="table table_RWDStyle table_Index">
+                                    <tbody>
+                                        <tr class="Bgn" style="background-color:unset;">
+                                            <td><label class="lab_DarkBlue">日期</label></td>
+                                            <td><label class="lab_DarkBlue">是否主日</label><br />(是, 請打V)</td>
+                                            <td><label class="lab_DarkBlue">當周靈修(QT)次數</label><br />(請填數字)</td>
+                                        </tr>
+                                        @for (int i = 0; i < Model.SL_Spiritual.Count; i++)
                                         {
-                                            <tr>
-                                                <td>@SL.Text</td>
-                                                <td align="center">
-                                                    <input id="hid_@(i)" name="hid_@(i)" type="hidden" value="@SL.Text" />
-                                                    <input id="cbox_@(i)" name="cbox_@(i)" type="checkbox" class="form-check-input" />
-                                                </td>
-                                                <td align="center">
-                                                    <input id="txb_@(i)" name="txb_@(i)" type="number" value="@SL.Value" class="form-control d-inline" min="0" style="width:100px;" />
-                                                </td>
-                                            </tr>
+                                            var SL = Model.SL_Spiritual[i];
+                                            if (SL.Value == "")
+                                            {
+                                                <tr>
+                                                    <td>@SL.Text</td>
+                                                    <td align="center">
+                                                        <input id="hid_@(i)" name="hid_@(i)" type="hidden" value="@SL.Text" />
+                                                        <input id="cbox_@(i)" name="cbox_@(i)" type="checkbox" class="form-check-input" />
+                                                    </td>
+                                                    <td align="center">
+                                                        <input id="txb_@(i)" name="txb_@(i)" type="number" value="@SL.Value" class="form-control d-inline" min="0" max="50" style="width:100px;" />
+                                                    </td>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td>@SL.Text</td>
+                                                    <td>@(SL.Selected ? "V" : "")</td>
+                                                    <td>@SL.Value</td>
+                                                </tr>
+                                            }
                                         }
-                                        else
-                                        {
-                                            <tr>
-                                                <td>@SL.Text</td>
-                                                <td>@(SL.Selected ? "V" : "")</td>
-                                                <td>@SL.Value</td>
-                                            </tr>
-                                        }
-                                    }
+                                    </tbody>
+
                                 </table>
                                 @if (Model.SL_Spiritual.Count(q => q.Value == "") > 0)
                                 {
@@ -161,7 +164,7 @@
                     {
                         <div class="card p-4 m-2">
                             <div class="card-body">
-                                <h4 class="lab_info mb-3">會友卡</h4>
+                                <h4 class="lab_DarkBlue mb-3">會友卡</h4>
 
                                 <section class="section w-100">
                                     <div style="position:relative">

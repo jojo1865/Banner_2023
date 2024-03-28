@@ -1,0 +1,151 @@
+﻿<button type="button" id="but_ShowPopup" class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#popup_SearchAC">
+    搜尋
+</button>
+<!-- Modal -->
+<div class="modal fade" id="popup_SearchAC" tabindex="-1" aria-labelledby="popup_SearchAC_Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="popup_SearchAC_Label">搜尋小組</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-8">
+                        <input id="txb_Title" class="form-control" />
+                        <input id="txb_SaveControl" type="hidden" />
+                        <input id="txb_ShowControl" type="hidden" />
+                        <input id="txb_ThisOIID" type="hidden" />
+                        <input id="txb_OID" type="hidden" />
+                    </div>
+                    <div class="col-4">
+                        <a href="javascript:;" onclick="SearchName(this);" class="btn btn-primary">搜尋</a>
+                    </div>
+                </div>
+                <div class="row" style="max-height: 300px; overflow-x: scroll; overflow-y:hidden;">
+                    <div class="col">
+                        <div style="height:auto; overflow-y:scroll" id="div_Table" class="p-1 div_dark_gray">
+
+                            <table class="table_RWDStyle table">
+                                <thead>
+                                    <tr class="Bgn">
+                                        <th></th>
+                                        <th>組織ID</th>
+                                        <th>組織名稱</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody_Add">
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="but_ClosePopup">關閉視窗</button>
+                <button type="button" class="btn btn-primary" onclick="SetID();">確定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //顯示彈跳視窗
+    function ShowPopupOI(ThisOIID,OID,Title, SaveControl,ShowControl) {
+        document.getElementById("txb_ThisOIID").value = ThisOIID;
+        document.getElementById("txb_OID").value = OID;
+        document.getElementById("txb_SaveControl").value = SaveControl;
+        document.getElementById("txb_ShowControl").value = ShowControl;
+        document.getElementById('popup_SearchAC_Label').innerHTML = Title;
+        document.getElementById("but_ShowPopup").click();
+    }
+    //送出
+    function SetID() {
+        var SaveC = document.getElementById("txb_SaveControl").value;
+        var ShowC = document.getElementById("txb_ShowControl").value;
+        var ThisOIID = document.getElementById("txb_ThisOIID").value;
+        var OID = document.getElementById("txb_OID").value;
+        var Total_Obj = document.getElementsByName("rad_OI");
+        for (var i = 0; i < Total_Obj.length; i++) {
+            if (Total_Obj[i].checked) {
+                if (SaveC == "" && ShowC == "") {
+                    $.ajax({
+                        url: '/Admin/Home/OIChangeParent?ThisOIID=' + ThisOIID + '&OIID=' + Total_Obj[i].value + '&OID='+OID,
+                        method: 'GET',
+                        dataType: 'text',
+                        success: function (res) {
+                            if (res == 'OK') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    html: "變更上層組織完成",
+                                }).then((result) => {
+                                    location.reload();
+                                });
+                            }
+                            else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    html: res
+                                });
+                            }
+                            
+                        },
+                        error: function (err) { console.log(err) },
+                    })
+                }
+                else {
+                    if (SaveC != "") {
+                        if (document.getElementById(SaveC) != null) {
+                            document.getElementById(SaveC).value = Total_Obj[i].value;
+                        }
+                    }
+                    if (ShowC != "") {
+                        if (document.getElementById(ShowC) != null) {
+                            document.getElementById(ShowC).innerHTML = Total_Obj[i].title;
+                        }
+                    }
+                }
+                
+                
+            }
+        }
+        document.getElementById("but_ClosePopup").click();
+    }
+    //取得搜尋結果
+    function SearchName(but) {
+        var KeyTitle = document.getElementById('txb_Title').value;
+        var OID = document.getElementById("txb_OID").value;
+        var table = $('#tbody_Add')[0];
+        table.innerHTML = "";
+        if (KeyTitle == "") { alert("請輸入組織名稱"); }
+        else {
+            if (but != null) { but.classList.add("btn-loading"); }
+            $('#div_Table').addClass('div_dark_gray');
+            $.ajax({
+                url: '/Admin/Home/GetOIChangeOIList?KeyTitle=' + KeyTitle + "&OID="+OID,
+                method: 'GET',
+                dataType: 'text',
+                success: function (res) {
+                    var r = JSON.parse(res);
+                    if (r.length == 0) { table.innerHTML = "<tr><td colspan='4'>搜尋沒有結果</td></tr>"; }
+                    else {
+                        for (i = 0; i < r.length; i++) {
+                            var str = "<tr>";
+                                //只能單選
+                            str += "<td><input type=\"radio\" id=\"rad_OI_" + r[i].value + "\" name='rad_OI' class=\"form-check-input\" value=\"" + r[i].value + "\" title=\"" + r[i].Text +"\" /></td>";
+                            str += "<td>" + r[i].value + "</td>";
+                            str += "<td>" + r[i].Text + "</td>";
+                            str += "</tr>";
+
+                            table.innerHTML += str;
+                        }
+                    }
+                    if (but != null) { but.classList.remove("btn-loading"); }
+                    $('#div_Table').removeClass('div_dark_gray');
+
+                },
+                error: function (err) { console.log(err) },
+            })
+        }
+    }
+</script>

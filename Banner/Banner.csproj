@@ -224,6 +224,7 @@
     <Compile Include="Areas\Web\Controllers\TeacherController.cs" />
     <Compile Include="Areas\Web\WebAreaRegistration.cs" />
     <Compile Include="Controllers\API_GetController.cs" />
+    <Compile Include="Controllers\IncludeController.cs" />
     <Compile Include="Controllers\StarHomeController.cs" />
     <Compile Include="DataClasses.cs">
       <DependentUpon>DataClasses.dbml</DependentUpon>
@@ -751,6 +752,13 @@
     <Content Include="Areas\Web\Views\LeaderPlace\Move_People.cshtml" />
     <Content Include="Areas\Web\Views\LeaderPlace\Move_OrganizeInfo.cshtml" />
     <Content Include="Areas\Web\Views\StaffPlace\StaffAccount_List.cshtml" />
+    <Content Include="Areas\Admin\Views\AccountSet\Organize_Info_List.cshtml" />
+    <Content Include="Areas\Admin\Views\AccountSet\Organize_Info_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\AccountSet\Organize_Info_Account_List.cshtml" />
+    <Content Include="Areas\Admin\Views\Include\_SearchOrganizeInfo_AC.cshtml" />
+    <Content Include="Areas\Admin\Views\Include\_SearchOrganizeInfo_OI.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_SearchAccount.cshtml" />
+    <Content Include="Areas\Web\Views\Include\_SearchOrganizeInfo_AC.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -800,6 +808,7 @@
     <Folder Include="Files\Product\" />
     <Folder Include="Photo\Product\" />
     <Folder Include="Views\API_Get\" />
+    <Folder Include="Views\Include\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

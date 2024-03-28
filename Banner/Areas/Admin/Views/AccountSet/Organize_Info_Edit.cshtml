@@ -1,4 +1,4 @@
-﻿@model Banner.Areas.Admin.Controllers.OrganizeSetController.cOrganize_Info_Edit
+﻿@model Banner.Areas.Admin.Controllers.AccountSetController.cOrganize_Info_Edit
 @{
     ViewBag.Title = "Organize_Info_Edit";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
@@ -35,6 +35,13 @@
                                         <div class="form-group">
                                             <label>新上層組織<span>*</span></label>
                                             @Html.DropDownList("ddl_UPOIList", Model.dUPOIList, new { @class = "form-select form-select-lg" })
+                                        </div>
+                                    }
+                                    @if (Model.ChangeList.Count > 0)
+                                    {
+                                        <div class="form-group">
+                                            <label>改掛對象<span>*</span></label>
+                                            @Html.DropDownList("ddl_ChangeList", Model.ChangeList, new { @class = "form-select form-select-lg" })
                                         </div>
                                     }
                                     <div class="form-group">
