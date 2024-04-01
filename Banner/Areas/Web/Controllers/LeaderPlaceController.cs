@@ -37,7 +37,7 @@ namespace Banner.Areas.Web.Controllers
             if (FC != null)
             {
                 c.ACID = Convert.ToInt32(FC.Get("txb_ACID"));
-                c.OIID = Convert.ToInt32(FC.Get("txb_OIID"));
+                c.OIID = Convert.ToInt32(FC.Get("txb_GroupOIID"));
             }
             #region 檢查輸入
             if (ACID == 0)
@@ -112,6 +112,7 @@ namespace Banner.Areas.Web.Controllers
                         {
                             MOI.ActiveFlag = false;
                             MOI.LeaveDate = DT;
+                            MOI.LeaveUID = ACID;
                             MOI.UpdDate = DT;
                             MOI.SaveACID = ACID;
                             DC.SubmitChanges();
@@ -124,7 +125,9 @@ namespace Banner.Areas.Web.Controllers
                             OrganizeInfo = OI,
                             Account = AC,
                             JoinDate = DT,
+                            JoinUID = ACID,
                             LeaveDate = DT,
+                            LeaveUID = 0,
                             ActiveFlag = true,
                             DeleteFlag = false,
                             CreDate = DT,
@@ -167,6 +170,7 @@ namespace Banner.Areas.Web.Controllers
             public int New_OIID = 0;
             public int Old_OIID = 0;
             public string Title = "";
+            public int MyOIID = 0;
         }
         public cGetMove_OrganizeInfo GetMove_OrganizeInfo(FormCollection FC)
         {
@@ -190,6 +194,7 @@ namespace Banner.Areas.Web.Controllers
                     SetAlert("您並未具備區督以上職分,不能使用本功能", 2, "/Web/Home/Index");
                 else
                 {
+                    c.MyOIID = OIs_.OrderBy(q => q.SortNo).First().OIs.OIID;
                     #region 初始化
                     c.LS_Left_O.ControlName = "rbl_Left_O";
                     c.LS_Left_O.ddlList = new List<SelectListItem>();
@@ -269,7 +274,7 @@ namespace Banner.Areas.Web.Controllers
                             string sLog = DT.ToString(DateTimeFormat) + " 前台" + ACID + "將" + From + "轉移至" + To;
 
                             SaveLog(sLog, "組織轉換", OI.OIID.ToString());
-                            SetAlert(OI.Title + OI.Organize.Title + "由" + From + "至" + To + "搬移完成", 1);
+                            SetAlert(OI.Title + OI.Organize.Title + "由" + From + "至" + To + "搬移完成", 1 , "/Web/LeaderPlace/Move_OrganizeInfo");
                         }
                     }
                     #endregion
@@ -300,6 +305,16 @@ namespace Banner.Areas.Web.Controllers
             var O = OS.First(q => q.OID == OID);
             var O_ = OS.Where(q => q.SortNo < O.SortNo).OrderByDescending(q => q.SortNo).First();
             return O_.Title;
+        }
+        #endregion
+        #region 找下下層與下一層組織
+        [HttpGet]
+        public string GetNextOID(int OID)
+        {
+            var OS = GetO();
+            var O = OS.First(q => q.OID == OID);
+            var O_ = OS.Where(q => q.SortNo < O.SortNo).OrderByDescending(q => q.SortNo).First();
+            return O_.OID.ToString();
         }
         #endregion
         #region 新增牧養組織與按立

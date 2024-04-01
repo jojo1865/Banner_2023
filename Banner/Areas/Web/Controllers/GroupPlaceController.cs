@@ -470,6 +470,7 @@ namespace Banner.Areas.Web.Controllers
 
                     M.ActiveFlag = false;
                     M.LeaveDate = DT;
+                    M.LeaveUID = ACID;
                     M.SaveACID = ACID;
                     DC.SubmitChanges();
 

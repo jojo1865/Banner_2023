@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Web.Helpers;
 using System.Drawing;
 using static Banner.Areas.Admin.Controllers.HomeController;
+using Banner.Models;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -58,17 +59,21 @@ namespace Banner.Areas.Web.Controllers
                     //SetBrowserData("UserName", "劉冠廷");
 
                     //測試代職主責
-                    LogInAC(6741);
-                    SetBrowserData("UserName", "何張森妹");
+                    //LogInAC(6741);
+                    //SetBrowserData("UserName", "何張森妹");
                     //測試區長功能
                     //LogInAC(746);
-                    //SetBrowserData("UserName", "柯佳慧"); 
+                    //SetBrowserData("UserName", "柯佳慧");
+
+                    LogInAC(1511);
+                    SetBrowserData("UserName", "莊懷德");
+
                     Response.Redirect("/Web/Home/Index");
                 }
             }
             TempData["login"] = "";
             TempData["pw"] = "";
-            
+
             return View();
         }
         [HttpPost]
@@ -499,7 +504,7 @@ namespace Banner.Areas.Web.Controllers
                                 else if (OP.Order_Header.Order_Type == 2)
                                     Error += "此課程您已經買過了<br/>";
                             }
-                            if(Error=="")
+                            if (Error == "")
                             {
                                 //人數限制檢查
                                 //有買這個商品且結帳完成的正常訂單,統計每個班級的人數
@@ -507,7 +512,7 @@ namespace Banner.Areas.Web.Controllers
                                              group q by new { q.PCID } into g
                                              select new { g.Key.PCID, Ct = g.Count() }).ToList();
 
-                                var PCs = DC.Product_Class.Where(q => q.PID == PID && !q.DeleteFlag && q.Product_ClassTime.Count()>0).OrderBy(q => q.PCID).ToList();
+                                var PCs = DC.Product_Class.Where(q => q.PID == PID && !q.DeleteFlag && q.Product_ClassTime.Count() > 0).OrderBy(q => q.PCID).ToList();
                                 if (PCs.Count() > 0)//有班級可以上
                                 {
                                     //先檢查限制名額的
@@ -540,7 +545,7 @@ namespace Banner.Areas.Web.Controllers
                                     if (PCID == 0)//沒班級再檢查不限名額的
                                     {
                                         var PCT_0s = from q in PCs.Where(q => q.PeopleCt == 0).ToList()
-                                                     join p in DC.Product_ClassTime.Where(q=>q.Product_Class.PID==PID).ToList()
+                                                     join p in DC.Product_ClassTime.Where(q => q.Product_Class.PID == PID).ToList()
                                                      on q.PCID equals p.PCID
                                                      select p;
                                         if (PCT_0s.Count() > 0)
@@ -554,7 +559,7 @@ namespace Banner.Areas.Web.Controllers
                                 else
                                     Error += "目前沒有班級可以上課<br/>";
                             }
-                            
+
 
                         }
                     }
@@ -722,7 +727,7 @@ namespace Banner.Areas.Web.Controllers
                         DC.SubmitChanges();
 
                         string sNote = "";
-                        if (iPrice[2]>0)
+                        if (iPrice[2] > 0)
                         {
                             var CR = DC.Coupon_Rool.FirstOrDefault(q => q.CHID == iPrice[2]);
                             sNote = GetCouponNote(CR);
@@ -911,7 +916,6 @@ namespace Banner.Areas.Web.Controllers
             {
                 var OS = GetO();
                 var MyOIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID).ToList();
-
                 var Gs = from q in OS
                          join p in MyOIs
                          on q.OID equals p.OID
@@ -920,30 +924,17 @@ namespace Banner.Areas.Web.Controllers
                 if (Gs.Count() > 0)
                     MyOI = Gs.OrderBy(q => q.SortNo).First().OI;
 
-                if(MyOI.OIID>0)
+                if (MyOI.OIID > 0)
                 {
+                    List<OrganizeInfo> OIs = new List<OrganizeInfo>();
+                    OIs = GetThisOIsFromTree(ref OIs, MyOI.OIID);
 
+                    OIs = OIs.Where(q => q.OID == 8 && q.Title.Contains(KeyTitle)).ToList();
+                    var OIs_ = from q in OIs
+                               select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") };
+                    sReturn = JsonConvert.SerializeObject(OIs_.OrderBy(q => q.Text));
                 }
 
-
-                /*
-                if (MyOIs.Any(q => q.OIID == 1))
-                {
-                    var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == OID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
-                               select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
-
-                    sReturn = JsonConvert.SerializeObject(OIs);
-                }
-                else
-                {
-                    var OIs = (from q in MOIs
-                               join p in DC.OrganizeInfo.Where(q => q.OID == OID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
-                               on q.OIID equals p.OI2_ID
-                               select new { value = p.OIID, Text = p.Title + p.Organize.Title + (p.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
-
-                    sReturn = JsonConvert.SerializeObject(OIs);
-                }
-                */
             }
 
             return sReturn;
@@ -960,35 +951,59 @@ namespace Banner.Areas.Web.Controllers
             {
                 if (ACID == 1)
                 {
-                    var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == O.ParentID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                    var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == OID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
                                select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
 
                     sReturn = JsonConvert.SerializeObject(OIs);
                 }
                 else
                 {
-                    var MOIs = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
-                    if (MOIs.Any(q => q.OIID == 1))
-                    {
-                        var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == O.ParentID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
-                                   select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+                    var OS = GetO();
+                    var MyOIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID).ToList();
+                    var Gs = from q in OS
+                             join p in MyOIs
+                             on q.OID equals p.OID
+                             select new { q.SortNo, OI = p };
+                    OrganizeInfo MyOI = new OrganizeInfo();
+                    if (Gs.Count() > 0)
+                        MyOI = Gs.OrderBy(q => q.SortNo).First().OI;
 
-                        sReturn = JsonConvert.SerializeObject(OIs);
-                    }
-                    else
-                    {
-                        var OIs = (from q in MOIs
-                                   join p in DC.OrganizeInfo.Where(q => q.OID == O.ParentID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
-                                   on q.OIID equals p.OI2_ID
-                                   select new { value = p.OIID, Text = p.Title + p.Organize.Title + (p.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+                    List<OrganizeInfo> OIs = new List<OrganizeInfo>();
+                    OIs = GetThisOIsFromTree(ref OIs, MyOI.OIID);
 
-                        sReturn = JsonConvert.SerializeObject(OIs);
-                    }
 
+                    var OIs_ = (from q in OIs.Where(q => q.OID == O.OID && q.ActiveFlag && !q.DeleteFlag && (string.IsNullOrEmpty(KeyTitle) ? true : q.Title.Contains(KeyTitle)))
+                                select new { value = q.OIID, Text = q.Title + q.Organize.Title + (q.BusinessType == 1 ? "(外展)" : "") }).OrderBy(q => q.Text);
+
+                    sReturn = JsonConvert.SerializeObject(OIs_);
                 }
             }
 
             return sReturn;
+        }
+        #endregion
+        #region 組織換老爸
+        [HttpGet]
+        public string OIChangeParent(int ThisOIID, int OIID, int OID)
+        {
+            Error = "";
+            int UID = GetACID();
+            var O = DC.Organize.FirstOrDefault(q => q.OID == OID && !q.DeleteFlag);
+            var OI_Basic = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == ThisOIID && !q.DeleteFlag);
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == OIID && q.OID == O.ParentID);
+            if (OI_Basic == null)
+                Error += "此組織不存在<br/>";
+            if (OI == null)
+                Error += "目標組織不存在<br/>";
+            if (Error == "")
+            {
+                OI_Basic.ParentID = OI.OIID;
+                OI_Basic.UpdDate = DT;
+                OI_Basic.SaveACID = UID;
+                DC.SubmitChanges();
+                Error = "OK";
+            }
+            return Error;
         }
         #endregion
     }

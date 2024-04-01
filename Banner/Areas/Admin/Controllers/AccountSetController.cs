@@ -1944,7 +1944,9 @@ namespace Banner.Areas.Admin.Controllers
                                 OIID = OI.OIID,
                                 ACID = AC.ACID,
                                 JoinDate = DT,
+                                JoinUID = ACID,
                                 LeaveDate = DT,
+                                LeaveUID = 0,
                                 ActiveFlag = true,
                                 DeleteFlag = false,
                                 CreDate = DT,
@@ -1972,7 +1974,9 @@ namespace Banner.Areas.Admin.Controllers
                                     OIID = OI.OIID,
                                     ACID = AC.ACID,
                                     JoinDate = DT,
+                                    JoinUID = ACID,
                                     LeaveDate = DT,
+                                    LeaveUID = 0,
                                     ActiveFlag = true,
                                     DeleteFlag = false,
                                     CreDate = DT,
@@ -2358,7 +2362,7 @@ namespace Banner.Areas.Admin.Controllers
             bool HaveOldNext = false;
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "控制", WidthPX = 100 });
-            if(OID>=3)
+            if (OID >= 3)
                 TopTitles.Add(new cTableCell { Title = "調組織", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "編號(ID)", WidthPX = 100 });
             if (ParentTitle != "")
@@ -2413,11 +2417,11 @@ namespace Banner.Areas.Admin.Controllers
 
                 if (OID >= 3)
                 {
-                    cTR.Cs.Add(new cTableCell { Type = "activebutton", URL = "ShowPopupOI(" + N.OIID + ","+N.OID+", '變更上層組織', '', '');", CSS = "btn btn-primary btn_Table_Gray btn-round btn_Basic", Value = "調組織" });//換組
+                    cTR.Cs.Add(new cTableCell { Type = "activebutton", URL = "ShowPopupOI(" + N.OIID + "," + N.OID + ", '變更上層組織', '', '');", CSS = "btn btn-primary btn_Table_Gray btn-round btn_Basic", Value = "調組織" });//換組
                 }
 
 
-                    cTR.Cs.Add(new cTableCell { Value = N.OIID.ToString() });//編號(ID)
+                cTR.Cs.Add(new cTableCell { Value = N.OIID.ToString() });//編號(ID)
                 if (ParentTitle != "")
                 {
                     if (NP != null)
@@ -2566,6 +2570,21 @@ namespace Banner.Areas.Admin.Controllers
 
                     sLog += string.Join(",", MAs.Select(q => q.Account.Name_First + q.Account.Name_Last + "(" + q.ACID + ")"));
                     SaveLog(sLog, "外展小組", OIID.ToString());
+
+                    Log_BusinessType_Header LH = new Log_BusinessType_Header();
+                    LH.OrganizeInfo = cIE.OI;
+                    LH.StartFalg = cIE.OI.BusinessType != 0;
+                    LH.CreDate = DT;
+                    LH.CreACID = ACID;
+
+                    foreach (var A in cIE.OI.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.JoinDate))
+                    {
+                        Log_BusinessType_Account LA = new Log_BusinessType_Account();
+                        LA.Log_BusinessType_Header = LH;
+                        LA.Account = A.Account;
+                    }
+                    DC.Log_BusinessType_Header.InsertOnSubmit(LH);
+                    DC.SubmitChanges();
                 }
 
                 if (OID <= 2)
@@ -2810,11 +2829,14 @@ namespace Banner.Areas.Admin.Controllers
                     }
                     #endregion
                     #region 顯示外展紀錄
-                    var Cs = ReadLog("外展小組", OIID.ToString());
+                    /*var Cs = ReadLog("外展小組", OIID.ToString());
                     if (Cs.Count > 0)
                     {
                         cIE.BusinessNote = string.Join("<br/>", Cs.OrderByDescending(q => q.CreDate).ThenByDescending(q => q.SortNo).Select(q => q.CreDate.ToString(DateTimeFormat) + " " + q.LogNote));
-                    }
+                    }*/
+                    var LHs = DC.Log_BusinessType_Header.Where(q => q.OIID == cIE.OI.OIID).OrderBy(q => q.CreDate);
+                    foreach (var LH in LHs)
+                        cIE.BusinessNote += LH.CreDate.ToString(DateTimeFormat) + " " + (LH.StartFalg ? "開始外展" : "結束外展") + ",當下組員數:" + LH.Log_BusinessType_Account.Count() + "<br/>";
                     #endregion
                 }
             }
@@ -3001,12 +3023,12 @@ namespace Banner.Areas.Admin.Controllers
             {
                 cTableRow cTR = new cTableRow();
                 cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_black", Value = "編輯" });//會員資料
-                if(N.OrganizeInfo.ACID == N.ACID) 
+                if (N.OrganizeInfo.ACID == N.ACID)
                     cTR.Cs.Add(new cTableCell { Value = "" });
                 else
                     cTR.Cs.Add(new cTableCell { Type = "activebutton", URL = "ShowPopupOI(" + N.ACID + ",8, '搜尋小組', '', '');", CSS = "btn btn-primary btn_Table_Gray btn-round btn_Basic", Value = "換組" });//換組
-                
-                    
+
+
 
                 cTR.Cs.Add(new cTableCell { Value = N.MID.ToString() });//組員ID
                 cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() });//會員ID

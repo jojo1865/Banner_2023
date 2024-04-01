@@ -21,23 +21,27 @@
                     <div class="col-12 col-lg-auto">
                         @foreach (var O in Model.LS_Left_O.ddlList)
                         {
-                            <Label class="btn btn-info mb-2" style="width:80px;" >@O.Text</Label><br />
+                            <Label class="btn btn-info mb-2" style="width:80px;">@O.Text</Label><br />
                         }
                     </div>
                     <div class="col-12 col-lg-auto">
                         <div class="row">
                             <div class="col-12 col-lg-auto">
-                                @Html.DropDownList(Model.LS_Target_Left_O.ControlName,Model.LS_Target_Left_O.ddlList,new {@class= "form-select form-select-lg", onchange= "GetUPOTitle(this.value);" })
+                                @Html.DropDownList(Model.LS_Target_Left_O.ControlName, Model.LS_Target_Left_O.ddlList, new { @class = "form-select form-select-lg", onchange = "GetUPOTitle(this.value);" })
                             </div>
                             <div class="col-12 col-lg-auto">
-                                @Html.TextBox("txb_Old_OIID", Model.Old_OIID == 0 ? "" : Model.Old_OIID, new { @class = "form-control form-control-lg", @placeholder = "請輸入轉出組織ID", type = "number", min = "0" })
+                                @Html.TextBox("txb_Old_OIID", Model.Old_OIID == 0 ? "" : Model.Old_OIID, new { @class = "form-control form-control-lg", @placeholder = "請輸入轉出組織ID", type = "hidden", min = "0" })
+                                <input id="hid_Old_OID" type="hidden" value="@Model.Old_OID" />
+                                <a id="but_Select_Old_OIID" href="javascript:;" class="btn btn-info mt-1" onclick="ShowPopup('old');">搜尋轉出組織</a>
                             </div>
                             <div class="col-12 col-lg-auto col-form-label-lg"><i class="fa-solid fa-arrow-right"></i></div>
                             <div class="col-12 col-lg-auto col-form-label-lg" id="div_NewTitle">
                                 @Model.Title
                             </div>
                             <div class="col-12 col-lg-auto">
-                                @Html.TextBox("txb_New_OIID", Model.New_OIID == 0 ? "" : Model.New_OIID, new { @class = "form-control form-control-lg", @placeholder = "請輸入轉入組織ID", type = "number", min = "0" })
+                                @Html.TextBox("txb_New_OIID", Model.New_OIID == 0 ? "" : Model.New_OIID, new { @class = "form-control form-control-lg", @placeholder = "請輸入轉入組織ID", type = "hidden", min = "0" })
+                                <input id="hid_New_OID" type="hidden" value="@Model.New_OID" />
+                                <a id="but_Select_New_OIID" href="javascript:;" class="btn btn-info mt-1" onclick="ShowPopup('new');">搜尋轉入組織</a>
                             </div>
                             <div class="col-12 col-lg-auto"><button type="submit" class="btn btn-primary">送出</button></div>
                         </div>
@@ -50,7 +54,7 @@
 </div>
 <script>
     function GetUPOTitle(OID) {
-
+        document.getElementById('hid_Old_OID').value = OID;
         $.ajax({
             url: '/Web/LeaderPlace/GetUPOTitle?OID=' + OID,
             method: 'GET',
@@ -60,5 +64,29 @@
             },
             error: function (err) { console.log(err) },
         })
+
+        $.ajax({
+            url: '/Web/LeaderPlace/GetNextOID?OID=' + OID,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                document.getElementById('hid_New_OID').value = res;
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
+
+    function ShowPopup(Type) {
+        if (Type == "old") {
+            var OID = document.getElementById('hid_Old_OID').value;
+            ShowPopupOI(@Model.MyOIID, OID, '搜尋轉出組織', 'txb_Old_OIID', 'but_Select_Old_OIID');
+        }
+        else {
+            var OID = document.getElementById('hid_New_OID').value;
+            ShowPopupOI(@Model.MyOIID, OID, '搜尋轉入組織', 'txb_New_OIID', 'but_Select_New_OIID');
+        }
+
+
     }
 </script>
+@Html.Action("_SearchOrganizeInfo_OI", "Include")

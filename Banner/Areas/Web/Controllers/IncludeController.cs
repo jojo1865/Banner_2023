@@ -855,7 +855,7 @@ namespace Banner.Areas.Web.Controllers
         }
         #endregion
         #region 組織(轉組織)搜尋彈出視窗
-        public PartialViewResult _SearchOrganizeInfo_AC()
+        public PartialViewResult _SearchOrganizeInfo_OI()
         {
             return PartialView();
         }

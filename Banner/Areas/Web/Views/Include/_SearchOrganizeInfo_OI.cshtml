@@ -57,6 +57,8 @@
         document.getElementById("txb_SaveControl_OI").value = SaveControl;
         document.getElementById("txb_ShowControl_OI").value = ShowControl;
         document.getElementById('popup_SearchOI_Label').innerHTML = Title;
+        document.getElementById("txb_Title_OI").value = '';
+        document.getElementById("tbody_Add_OI").innerHTML = '';
         document.getElementById("but_ShowPopupOI").click();
     }
     //送出
@@ -122,7 +124,7 @@
             if (but != null) { but.classList.add("btn-loading"); }
             $('#div_Table_OI').addClass('div_dark_gray');
             $.ajax({
-                url: '/Web/Home/GetACChangeOIList?KeyTitle=' + KeyTitle + "&OID="+OID,
+                url: '/Web/Home/GetOIChangeOIList?KeyTitle=' + KeyTitle + "&OID="+OID,
                 method: 'GET',
                 dataType: 'text',
                 success: function (res) {

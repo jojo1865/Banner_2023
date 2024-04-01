@@ -102,7 +102,11 @@ main {
 }
 
 .lab_DarkBlue {
-    color: var(--bs-secondary);
+    color: #1B2D75;
+}
+
+.lab_ContextBlue {
+    color: #176FCB;
 }
 
 .div_NoDataMsg {

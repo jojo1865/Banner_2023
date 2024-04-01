@@ -46,7 +46,7 @@
 
                         <div class="card p-4 m-2">
                             <div class="card-body">
-                                <h4 class="lab_info mb-3">上課中課程</h4>
+                                <h4 class="lab_ContextBlue mb-3">上課中課程</h4>
                                 @foreach (var M in Model.c_MyClass)
                                 {
                                     <p><span class="lab_DarkBlue">●</span> <a href="@M.Url">@M.Title</a></p>
@@ -60,8 +60,8 @@
 
                         <div class="card p-4 m-2">
                             <div class="card-body">
-                                <h4 class="lab_DarkBlue mb-3">我的小組</h4>
-                                <p><span class="lab_DarkBlue">●</span> <span class="lab_DarkBlue">@Model.MyGroup.Title</span></p>
+                                <h4 class="lab_ContextBlue mb-3">我的小組</h4>
+                                <p><span class="lab_ContextBlue" style="font-size:12px">●</span> <span class="lab_ContextBlue">@Model.MyGroup.Title</span></p>
                                 <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會日：@Model.MyGroup.Date</p>
                                 <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會時間：@Model.MyGroup.Time</p>
                                 <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會地點：@Model.MyGroup.Address</p>
@@ -83,12 +83,12 @@
 
                         <div class="card p-4 m-2">
                             <div class="card-body">
-                                <h4 class="lab_DarkBlue mb-3">小組長專區</h4>
+                                <h4 class="lab_ContextBlue mb-3">小組長專區</h4>
                                 @foreach (var M in Model.MyGroups)
                                 {
                                     <div class="row">
                                         <div class="col">
-                                            <p><span class="lab_DarkBlue">●</span> <span class="lab_DarkBlue">@M.Title</span></p>
+                                            <p><span class="lab_ContextBlue" style="font-size:12px">●</span> <span class="lab_ContextBlue">@M.Title</span></p>
                                             <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會日：@M.Date</p>
                                             <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會時間：@M.Time</p>
                                             <p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>聚會地點：@M.Address</p>
@@ -104,7 +104,7 @@
                     {
                         <div class="card p-4 m-2">
                             <div class="card-body">
-                                <h4 class="lab_DarkBlue mb-3">講師專區</h4>
+                                <h4 class="lab_ContextBlue mb-3">講師專區</h4>
                                 @foreach (var M in Model.c_Teacher)
                                 {
                                     <p><span class="lab_DarkBlue">●</span> <a href="@M.Url">@M.Title</a></p>
@@ -115,7 +115,7 @@
 
                     <div class="card p-4 m-2">
                         <div class="card-body">
-                            <h4 class="lab_DarkBlue mb-3">屬靈健檢表</h4>
+                            <h4 class="lab_ContextBlue mb-3">屬靈健檢表</h4>
                             <form id="form1" method="post" novalidate>
                                 <table class="table table_RWDStyle table_Index">
                                     <tbody>
@@ -127,35 +127,25 @@
                                         @for (int i = 0; i < Model.SL_Spiritual.Count; i++)
                                         {
                                             var SL = Model.SL_Spiritual[i];
-                                            if (SL.Value == "")
-                                            {
-                                                <tr>
-                                                    <td>@SL.Text</td>
-                                                    <td align="center">
-                                                        <input id="hid_@(i)" name="hid_@(i)" type="hidden" value="@SL.Text" />
-                                                        <input id="cbox_@(i)" name="cbox_@(i)" type="checkbox" class="form-check-input" />
-                                                    </td>
-                                                    <td align="center">
-                                                        <input id="txb_@(i)" name="txb_@(i)" type="number" value="@SL.Value" class="form-control d-inline" min="0" max="50" style="width:100px;" />
-                                                    </td>
-                                                </tr>
-                                            }
-                                            else
-                                            {
-                                                <tr>
-                                                    <td>@SL.Text</td>
-                                                    <td>@(SL.Selected ? "V" : "")</td>
-                                                    <td>@SL.Value</td>
-                                                </tr>
-                                            }
+                                            <tr>
+                                                <td>@SL.Text</td>
+                                                <td align="center">
+                                                    <input id="hid_@(i)" name="hid_@(i)" type="hidden" value="@SL.Text" />
+                                                    <input id="cbox_@(i)" name="cbox_@(i)" type="checkbox" class="form-check-input" @(SL.Selected ? "checked=\"checked\"" : "") ) />
+                                                </td>
+                                                <td align="center">
+                                                    <input id="txb_@(i)" name="txb_@(i)" type="number" value="@SL.Value" class="form-control d-inline" oninput="if(value>100)value=100;if(value<0)value=0" style="width:100px;" />
+                                                </td>
+                                            </tr>
+
                                         }
                                     </tbody>
 
                                 </table>
-                                @if (Model.SL_Spiritual.Count(q => q.Value == "") > 0)
-                                {
-                                    <button class="btn btn-success" type="submit">儲存</button>
-                                }
+
+
+                                <button class="btn btn-success" type="submit">儲存</button>
+
                             </form>
                         </div>
                     </div>
@@ -164,15 +154,13 @@
                     {
                         <div class="card p-4 m-2">
                             <div class="card-body">
-                                <h4 class="lab_DarkBlue mb-3">會友卡</h4>
-
+                                <h4 class="lab_ContextBlue mb-3">會友卡</h4>
                                 <section class="section w-100">
-                                    <div style="position:relative">
-                                        <img src="/Areas/Web/Content/Img/MemberCard.png" style="border: 2px solid #999; -webkit-border-radius: 25px; -moz-border-radius: 25px; border-radius: 25px;" />
+                                    <div style="position: relative; ">
+                                        <img src="/Areas/Web/Content/Img/MemberCard.png" class="black-shadow CircleBorder_25" />
                                         <span style="position:absolute;top:140px; left:20px;"><b>@(Model.Name)</b></span>
                                     </div>
                                 </section>
-
                             </div>
                         </div>
                     }
@@ -205,4 +193,19 @@
             error: function (err) { console.log(err) },
         });
     }
+
 </script>
+<style>
+
+    /* 區塊陰影及高光效果 */
+    .black-shadow {
+        box-shadow: 6px 6px 16px rgba(0,0,0,0.3);
+    }
+
+    .CircleBorder_25 {
+        border: 0px solid #FFF;
+        -webkit-border-radius: 25px;
+        -moz-border-radius: 25px;
+        border-radius: 25px;
+    }
+</style>

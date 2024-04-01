@@ -505,6 +505,7 @@ namespace Banner.Areas.Admin.Controllers
                     MOI.ActiveFlag = false;
                     MOI.DeleteFlag = true;
                     MOI.LeaveDate = DT;
+                    MOI.LeaveUID = UID;
                     MOI.UpdDate = DT;
                     MOI.SaveACID = UID;
                     DC.SubmitChanges();
@@ -515,7 +516,9 @@ namespace Banner.Areas.Admin.Controllers
                     OrganizeInfo = OI,
                     Account = AC,
                     JoinDate = DT,
+                    JoinUID = UID,
                     LeaveDate = DT,
+                    LeaveUID = 0,
                     ActiveFlag = true,
                     DeleteFlag = false,
                     CreDate = DT,

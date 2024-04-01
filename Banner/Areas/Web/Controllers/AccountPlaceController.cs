@@ -103,12 +103,12 @@ namespace Banner.Areas.Web.Controllers
                     List<string> sList = GetOITitles(MOI8.OIID);
                     sList = (sList.Take(5)).ToList();
                     sList.Reverse();
-                    N.MyGroup.Title = string.Join("-", sList) + "(#" + MOI8.OIID + ")";
+                    N.MyGroup.Title = string.Join("/", sList) + "(#" + MOI8.OIID + ")";
                     var Meet = DC.Meeting_Location_Set.FirstOrDefault(q => q.OIID == MOI8.OIID && q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag);
                     if (Meet != null)
                     {
                         N.MyGroup.Date = sWeeks[Meet.WeeklyNo];
-                        N.MyGroup.Time =sTimeSpans[ Meet.TimeNo] + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
+                        N.MyGroup.Time = sTimeSpans[Meet.TimeNo] + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
                         N.MyGroup.Address = Meet.Meeting_Location.Title;
                         var Loc = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == Meet.MLSID);
                         if (Loc != null)
@@ -126,7 +126,7 @@ namespace Banner.Areas.Web.Controllers
                     List<string> sList = GetOITitles(OI.OIID);
                     sList = (sList.Take(5)).ToList();
                     sList.Reverse();
-                    G.Title = string.Join("-", sList) + "(#" + OI.OIID + ")";
+                    G.Title = string.Join("/", sList) + "(#" + OI.OIID + ")";
                     var Meet = DC.Meeting_Location_Set.FirstOrDefault(q => q.OIID == OI.OIID && q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag);
                     if (Meet != null)
                     {
@@ -174,7 +174,6 @@ namespace Banner.Areas.Web.Controllers
                 //查資料前先更新
                 if (FC != null)
                 {
-                    int iCheckCt = 0;
                     for (int i = 0; i < 10; i++)
                     {
                         if (!string.IsNullOrEmpty(FC.Get("hid_" + i)))
@@ -183,72 +182,37 @@ namespace Banner.Areas.Web.Controllers
                             bool bCheck = GetViewCheckBox(FC.Get("cbox_" + i));
                             string sValue = FC.Get("txb_" + i);
                             int iCt = 0;
-                            if (bCheck && int.TryParse(sValue, out iCt))//有打勾 且 有數字
-                            {
-                                Account_Spiritual AS = new Account_Spiritual();
-                                AS.Account = AC;
-                                AS.QTCt = iCt;
-                                AS.QTDate = DT_;
-                                AS.CreDate = DT;
-                                DC.Account_Spiritual.InsertOnSubmit(AS);
-                                DC.SubmitChanges();
+                            int.TryParse(sValue, out iCt);
 
-                                iCheckCt++;
-                            }
-                        }
-                    }
-                    if (iCheckCt > 0)
-                        SetAlert("有勾選主日的屬靈健檢表已記錄", 1);
-                    else
-                        SetAlert("屬靈健檢表紀錄失敗", 2);
-                }
-
-
-                /*DateTime MaxDate = Convert.ToDateTime("2020/1/1");//最後一次主日應該是哪天
-                var ASs = DC.Account_Spiritual.Where(q => q.ACID == ACID);
-                //DateTime OldDate = AS.Count() > 0 ? AS.Max(q => q.QTDate) : MaxDate;//有紀錄的屬靈表最後是哪天
-                
-                var MLS = (from q in DC.M_ML_Account.Where(q => q.ACID == ACID && !q.DeleteFlag)
-                           join p in DC.Meeting_Location_Set.Where(q => q.SetType == 0 && q.ActiveFlag && !q.DeleteFlag)
-                           on q.MLID equals p.MLID
-                           select p).FirstOrDefault();
-                if (MLS != null)
-                {
-                    DateTime DT_Max = DT;
-                    for (int i = 0; i < 7; i++)//找到距離最近的主日聚會日
-                    {
-                        int iDay = Convert.ToInt32(DT.AddDays(i * -1).DayOfWeek);
-                        if (iDay == MLS.WeeklyNo)
-                        {
-                            DT_Max = DT.AddDays(i * -1).Date;
-                            break;
-                        }
-                    }
-                    if (DT_Max != DT)
-                    {
-                        for (int i = 0; i < 10; i++)
-                        {
-                            DateTime DT_ = DT_Max.AddDays(i * -7).Date;
-                            var AS = ASs.FirstOrDefault(q => q.QTDate == DT_);
-
-                            SelectListItem SL = new SelectListItem();
-                            SL.Text = DT_.ToString(DateFormat);
+                            var AS = DC.Account_Spiritual.FirstOrDefault(q => q.ACID == AC.ACID && q.QTDate.Date == DT_.Date);
                             if (AS != null)
                             {
-                                SL.Value = AS.QTCt.ToString();
-                                SL.Selected = true;
+                                AS.QTFlag = bCheck;
+                                AS.QTCt = iCt;
+                                AS.UpdDate = DT;
+                                DC.SubmitChanges();
                             }
                             else
                             {
-                                SL.Value = "";
-                                SL.Selected = false;
+                                AS = new Account_Spiritual();
+                                AS.Account = AC;
+                                AS.QTFlag = bCheck;
+                                AS.QTCt = iCt;
+                                AS.QTDate = DT_;
+                                AS.CreDate = DT;
+                                AS.UpdDate = DT;
+                                DC.Account_Spiritual.InsertOnSubmit(AS);
+                                DC.SubmitChanges();
                             }
-
-                            N.SL_Spiritual.Add(SL);
                         }
                     }
-                }*/
-                DateTime MaxDate = DT.AddDays(-1* ((int)DT.DayOfWeek));//最近一個星期天
+
+                    SetAlert("屬靈健檢表已記錄", 1);
+
+                }
+
+
+                DateTime MaxDate = DT.AddDays(-1 * ((int)DT.DayOfWeek));//最近一個星期天
                 var ASs = DC.Account_Spiritual.Where(q => q.ACID == ACID).ToList();
                 for (int i = 0; i < 10; i++)
                 {
@@ -260,7 +224,7 @@ namespace Banner.Areas.Web.Controllers
                     if (AS != null)
                     {
                         SL.Value = AS.QTCt.ToString();
-                        SL.Selected = true;
+                        SL.Selected = AS.QTFlag;
                     }
                     else
                     {
@@ -846,7 +810,9 @@ namespace Banner.Areas.Web.Controllers
                             OrganizeInfo = OI,
                             Account = N.AC,
                             JoinDate = DT,
+                            JoinUID = N.AC.ACID,
                             LeaveDate = DT,
+                            LeaveUID = 0,
                             ActiveFlag = true,
                             DeleteFlag = false,
                             CreDate = DT,

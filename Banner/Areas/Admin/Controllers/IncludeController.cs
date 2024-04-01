@@ -58,9 +58,8 @@ namespace Banner.Areas.Admin.Controllers
                              on q.RID equals p.RID
                              select q;
                     Ms.Items = GetMenu(Rs.ToList(), sURL, 0);
-
-                    //事功團主責補充
-                    if(DC.M_Staff_Account.Any(q=>q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.LeaderFlag))
+                    //事功團主責
+                    if (DC.M_Staff_Account.Any(q=>q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.LeaderFlag))
                     {
                         var Menu_2 = Ms.Items.FirstOrDefault(q => q.MenuID == 2);
                         if (Menu_2 == null)
@@ -100,8 +99,9 @@ namespace Banner.Areas.Admin.Controllers
 
                         if (!Menu_2.Items.Any(q => q.Url == "/Admin/StaffSet/OI_Staff_List") && sURL.Contains("OI_Staff_List") && Menu_2.Items.Count > 0)
                             SetAlert("", 1, Menu_2.Items[0].Url);
-                        Ms.Items.Add(Menu_2);
+                        //Ms.Items.Add(Menu_2);
                     }
+
                 }
             }
             if (Ms.Items == null)

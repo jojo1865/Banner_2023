@@ -27,7 +27,7 @@
                     <div class="col-12 col-lg-auto col-form-label-lg"><i class="fa-solid fa-arrow-right"></i></div>
                     <div class="col-12 col-lg-auto col-form-label-lg">小組</div>
                     <div class="col-12 col-lg-auto">
-                        @Html.TextBox("txb_GroupOIID", Model.OIID, new { @class = "form-control form-control-lg", @placeholder = "請輸入小組ID", type = "number", min = "0" })
+                        @Html.TextBox("txb_GroupOIID", Model.OIID, new { @class = "form-control form-control-lg", @placeholder = "請輸入小組ID", type = "hidden", min = "0" })
                         <a id="but_SelectOIID" href="javascript:;" class="btn btn-info mt-1" onclick="ShowPopupOI(@Model.OIID,8, '搜尋小組', 'txb_GroupOIID', 'but_SelectOIID');">搜尋小組</a>
                     </div>
                     <div class="col-12 col-lg-auto"><button type="submit" class="btn btn-primary">送出</button></div>
