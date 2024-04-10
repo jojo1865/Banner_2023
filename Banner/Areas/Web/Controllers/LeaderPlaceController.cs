@@ -8,11 +8,13 @@ using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
+using static Banner.Areas.Web.Controllers.LeaderPlaceController;
 
 namespace Banner.Areas.Web.Controllers
 {
     public class LeaderPlaceController : PublicClass
     {
+
         // GET: Web/LeaderPlace
         public ActionResult Index()
         {
@@ -274,7 +276,7 @@ namespace Banner.Areas.Web.Controllers
                             string sLog = DT.ToString(DateTimeFormat) + " 前台" + ACID + "將" + From + "轉移至" + To;
 
                             SaveLog(sLog, "組織轉換", OI.OIID.ToString());
-                            SetAlert(OI.Title + OI.Organize.Title + "由" + From + "至" + To + "搬移完成", 1 , "/Web/LeaderPlace/Move_OrganizeInfo");
+                            SetAlert(OI.Title + OI.Organize.Title + "由" + From + "至" + To + "搬移完成", 1, "/Web/LeaderPlace/Move_OrganizeInfo");
                         }
                     }
                     #endregion
@@ -317,8 +319,344 @@ namespace Banner.Areas.Web.Controllers
             return O_.OID.ToString();
         }
         #endregion
-        #region 新增牧養組織與按立
-        //New_OrganizeInfo
+        #region 會友查詢與轉領夜-列表
+        public class cGetSet_LeadTheNight_List
+        {
+            public cTableList cTL = new cTableList();
+            public string GroupTitle = "";
+            public string ACName = "";
+            public int MyOIID = 0;
+        }
+        public cGetSet_LeadTheNight_List GetSet_LeadTheNight_List(FormCollection FC)
+        {
+            cGetSet_LeadTheNight_List c = new cGetSet_LeadTheNight_List();
+            ACID = GetACID();
+            var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID).ToList();
+            Error = "";
+            #region 物件初始化
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            c.cTL.Title = "小組名單";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
+            if (FC != null)
+            {
+                c.GroupTitle = FC.Get("txb_GroupTitle");
+                c.ACName = FC.Get("txb_ACName");
+            }
+            #endregion
+
+            if (ACID == 0)
+                SetAlert("請先登入", 2, "/Web/Home/Login");
+            else if (OIs.Count() == 0)
+                SetAlert("您並非組織中的領導人員,不能使用本功能", 2, "/Web/Home/Index");
+            else
+            {
+                var OS = GetO();
+                var O = OS.FirstOrDefault(q => q.JobTitle == "區長");
+                var OIs_ = (from q in OS.Where(q => q.SortNo <= O.SortNo)
+                            join p in OIs
+                            on q.OID equals p.OID
+                            select new { OIs = p, SortNo = q.SortNo }).ToList();
+                if (OIs_.Count == 0)
+                    SetAlert("您並未具備區長以上職分,不能使用本功能", 2, "/Web/Home/Index");
+                else
+                {
+                    c.MyOIID = OIs_.OrderBy(q => q.SortNo).First().OIs.OIID;
+
+                    //取得轄下所有組織
+                    var OIs_1 = OIs_.OrderBy(q => q.SortNo).First();
+                    OIs = GetThisOIsFromTree(ref OIs, OIs_1.OIs.OIID);
+                    OIs = (from q in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList()
+                           join p in OIs.GroupBy(q => q.OIID).ToList()
+                           on q.OIID equals p.Key
+                           select q).ToList();
+                    //篩選小組
+                    if (!string.IsNullOrEmpty(c.GroupTitle))
+                        OIs = OIs.Where(q => q.Title == c.GroupTitle && q.OID == 8).ToList();
+                    //取得轄下小組員
+                    var OI_ACs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList()
+                                 join p in OIs.Where(q => q.OID == 8).ToList()
+                                 on q.OIID equals p.OIID
+                                 select q;
+                    //篩選具會友資格
+                    var ACs_1 = from q in DC.M_Role_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && (q.RID == 2 || q.RID == 24)).ToList()
+                                join p in OI_ACs
+                                on q.ACID equals p.ACID
+                                select new { q.ACID };
+                    //篩選被案例的人
+                    var ACs_2 = from q in DC.M_O_Account.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList()
+                                join p in OI_ACs
+                                on q.ACID equals p.ACID
+                                select new { q.ACID };
+                    //會友或領夜 排除被案立(小組長椅上)的人
+                    var ACs_3 = ACs_1.Except(ACs_2);
+
+                    //篩選會友名單
+                    var Ns = (from q in DC.Account.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList()
+                              join p in ACs_3.GroupBy(q => q.ACID)
+                              on q.ACID equals p.Key
+                              select q).ToList();
+                    if (!string.IsNullOrEmpty(c.ACName))
+                        Ns = Ns.Where(q => (q.Name_First + q.Name_Last).Contains(c.ACName) || q.ACID.ToString() == c.ACName).ToList();
+
+                    var TopTitles = new List<cTableCell>();
+
+                    TopTitles.Add(new cTableCell { Title = "會員ID", WidthPX = 100 });
+                    TopTitles.Add(new cTableCell { Title = "姓名", WidthPX = 160 });
+                    TopTitles.Add(new cTableCell { Title = "身分", WidthPX = 120 });
+                    TopTitles.Add(new cTableCell { Title = "所屬小組", WidthPX = 160 });
+                    TopTitles.Add(new cTableCell { Title = "動作" });
+
+                    c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+                    ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+                    c.cTL.TotalCt = Ns.Count();
+                    c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+                    Ns = Ns.OrderByDescending(q => q.Name_First).ThenByDescending(q => q.Name_Last).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut).ToList();
+                    //分辨會員(1)/會友(2)/領夜(24)用
+                    var Rs = (from q in Ns.GroupBy(q => q.ACID)
+                              join p in DC.M_Role_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.Role.RoleType == 0)
+                              on q.Key equals p.ACID
+                              select p).ToList();
+
+                    foreach (var N in Ns)
+                    {
+                        cTableRow cTR = new cTableRow();
+                        cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() }); //會員ID
+                        cTR.Cs.Add(new cTableCell { Value = N.Name_First + N.Name_Last }); // 姓名
+
+                        //身分
+                        #region 身分判定
+                        //檢查領夜
+                        var R_24 = Rs.FirstOrDefault(q => q.ACID == N.ACID && q.RID == 24);
+                        //檢查會友
+                        var R_2 = Rs.FirstOrDefault(q => q.ACID == N.ACID && q.RID == 2);
+
+                        if (R_24 != null)
+                            cTR.Cs.Add(new cTableCell { Value = R_24.Role.Title });
+                        else if (R_2 != null)
+                            cTR.Cs.Add(new cTableCell { Value = R_2.Role.Title });
+                        else
+                            cTR.Cs.Add(new cTableCell { Value = "會員" });
+                        #endregion
+                        //所屬小組
+                        var OI_ = OI_ACs.FirstOrDefault(q => q.ACID == N.ACID);
+                        if (OI_ != null)
+                            cTR.Cs.Add(new cTableCell { Value = OI_.OrganizeInfo.Title });
+                        else
+                            cTR.Cs.Add(new cTableCell { Value = "--" });
+
+                        cTableCell cTC = new cTableCell();
+                        cTC.cTCs.Add(new cTableCell { Type = "link", Value = "查看", Target = "_blank", CSS = "btn btn-primary", URL = "/Web/LeaderPlace/Set_LeadTheNight_Info?ID=" + N.ACID });
+                        //移除?
+                        if (R_24 != null)
+                            cTC.cTCs.Add(new cTableCell { Type = "button", Value = "取消領夜", Target = "_blank", CSS = "btn btn-warning", URL = "RemoveLeaderNight(" + N.ACID + ");" });
+                        else
+                            cTC.cTCs.Add(new cTableCell { Type = "button", Value = "設為領夜", Target = "_blank", CSS = "btn btn-success", URL = "AddLeaderNight(" + N.ACID + ");" });
+                        cTR.Cs.Add(cTC);
+                        c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+                    }
+                }
+            }
+
+            return c;
+        }
+        [HttpGet]
+        public ActionResult Set_LeadTheNight_List()
+        {
+            GetViewBag();
+            return View(GetSet_LeadTheNight_List(null));
+        }
+        [HttpPost]
+        public ActionResult Set_LeadTheNight_List(FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetSet_LeadTheNight_List(FC));
+        }
+        [HttpGet]
+        public void RemoveLeaderNight(int ACID)
+        {
+            var MR = DC.M_Role_Account.FirstOrDefault(q => q.ACID == ACID && q.RID == 24 && q.ActiveFlag);
+            if (MR != null)
+            {
+                MR.ActiveFlag = false;
+                MR.LeaveDate = DT;
+                MR.UpdDate = DT;
+                MR.SaveACID = GetACID();
+                DC.SubmitChanges();
+            }
+        }
+        [HttpGet]
+        public void AddLeaderNight(int ACID)
+        {
+            var MR = DC.M_Role_Account.FirstOrDefault(q => q.ACID == ACID && q.RID == 24);
+            if (MR != null)
+            {
+                MR.ActiveFlag = true;
+                MR.DeleteFlag = false;
+                MR.JoinDate = DT;
+                MR.LeaveDate = MR.CreDate;
+                MR.UpdDate = DT;
+                MR.SaveACID = GetACID();
+                DC.SubmitChanges();
+            }
+            else
+            {
+                MR = new M_Role_Account();
+                MR.ACID = ACID;
+                MR.RID = 24;
+                MR.JoinDate = DT;
+                MR.LeaveDate = DT;
+                MR.Note = "";
+                MR.ActiveFlag = true;
+                MR.DeleteFlag = false;
+                MR.CreDate = DT;
+                MR.UpdDate = DT;
+                MR.SaveACID = GetACID();
+                DC.M_Role_Account.InsertOnSubmit(MR);
+                DC.SubmitChanges();
+            }
+        }
         #endregion
+        #region 會友查詢與轉領夜-查看
+        public class cGetSet_LeadTheNight_Info
+        {
+            public string Name = "";//姓名
+            public string PhoneNo = "";//手機
+            public string Email = "";
+            public string BD = "";//生日
+            public string JobTitle_LN = "";//身分
+            public string GroupTitle = "";//小組
+
+            public cTableList cTL_Class = new cTableList();//課程歷程
+            public cTableList cTL_Banner = new cTableList();//牧養歷程
+        }
+
+        public cGetSet_LeadTheNight_Info GetSet_LeadTheNight_Info(int ID)
+        {
+            cGetSet_LeadTheNight_Info c = new cGetSet_LeadTheNight_Info();
+            ACID = GetACID();
+            var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID).ToList();
+
+            Error = "";
+            if (ACID == 0)
+                SetAlert("請先登入", 2, "/Web/Home/Login");
+            else if (OIs.Count() == 0)
+                SetAlert("您並非組織中的領導人員,不能使用本功能", 2, "/Web/Home/Index");
+
+            else
+            {
+                var AC = DC.Account.FirstOrDefault(q => q.ACID == ID && !q.DeleteFlag);
+
+                var OS = GetO();
+                var O = OS.FirstOrDefault(q => q.JobTitle == "區長");
+                var OIs_ = (from q in OS.Where(q => q.SortNo <= O.SortNo)
+                            join p in OIs
+                            on q.OID equals p.OID
+                            select new { OIs = p, SortNo = q.SortNo }).ToList();
+                if (OIs_.Count == 0)
+                    SetAlert("您並未具備區長以上職分,不能使用本功能", 2, "/Web/Home/Index");
+                else if (AC == null)
+                    SetAlert("此會友資料不存在", 2, "/Web/LeaderPlace/Set_LeadTheNight_List");
+                else
+                {
+                    //取得旗下組織
+                    var OIs_1 = OIs_.OrderBy(q => q.SortNo).First();
+                    OIs = GetThisOIsFromTree(ref OIs, OIs_1.OIs.OIID);
+                    OIs = (from q in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList()
+                           join p in OIs.GroupBy(q => q.OIID).ToList()
+                           on q.OIID equals p.Key
+                           select q).ToList();
+                    //取得旗下小組員
+                    var OI_ACs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag).ToList()
+                                 join p in OIs.Where(q => q.OID == 8).ToList()
+                                 on q.OIID equals p.OIID
+                                 select q;
+                    if (!OI_ACs.Any(q => q.ACID == AC.ACID))
+                        SetAlert("此會友非您旗下會友,您不能檢視資料", 2, "/Web/LeaderPlace/Set_LeadTheNight_List");
+                    else
+                    {
+                        c.Name = AC.Name_First + AC.Name_Last;
+                        c.BD = AC.Birthday != AC.CreDate ? AC.Birthday.ToString(DateFormat) : "";
+                        var OI = OI_ACs.First(q => q.ACID == AC.ACID);
+                        c.GroupTitle = OI.OrganizeInfo.Title + OI.OrganizeInfo.Organize.Title;
+                        #region 聯絡資訊
+
+                        var Cons = DC.Contect.Where(q => q.TargetID == AC.ACID && q.TargetType == 2);
+                        var Con = Cons.FirstOrDefault(q => q.ContectType == 2);
+                        if (Con != null)
+                            c.PhoneNo = Con.ContectValue;
+                        Con = Cons.FirstOrDefault(q => q.ContectType == 3);
+                        if (Con != null)
+                            c.Email = Con.ContectValue;
+                        #endregion
+                        #region 身分
+                        var Rs = DC.M_Role_Account.Where(q => q.ACID == AC.ACID);
+                        if (Rs.Any(q => q.RID == 24))
+                            c.JobTitle_LN = "領夜同工";
+                        else if (Rs.Any(q => q.RID == 2))
+                            c.JobTitle_LN = "會友";
+                        #endregion
+                        #region 課程歷程
+                        c.cTL_Class.Rs = new List<cTableRow>();
+                        c.cTL_Class.NumCut = 0;
+                        var TopTitles = new List<cTableCell>();
+
+                        TopTitles.Add(new cTableCell { Title = "結業日期", WidthPX = 120 });
+                        TopTitles.Add(new cTableCell { Title = "結業課程" });
+
+                        c.cTL_Class.Rs.Add(SetTableRowTitle(TopTitles));
+                        ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+
+                        var OPs = DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag &&
+                        q.Order_Header.Order_Type == 2 &&
+                        q.Order_Header.ACID == AC.ACID &&
+                        q.Graduation_Flag
+                            );
+                        foreach (var OP in OPs.OrderByDescending(q => q.Graduation_Date))
+                        {
+                            cTableRow cTR = new cTableRow();
+                            cTR.Cs.Add(new cTableCell { Value = OP.Graduation_Date.ToString(DateFormat) }); //結業日期
+                            cTR.Cs.Add(new cTableCell { Value = OP.Product.Title + " " + OP.Product.SubTitle }); //結業課程
+
+                            c.cTL_Class.Rs.Add(SetTableCellSortNo(cTR));
+                        }
+                        #endregion
+                        #region 牧養歷程
+                        List<cAChistry> Ls = GetHistory(AC);
+                        c.cTL_Banner.Rs = new List<cTableRow>();
+                        c.cTL_Banner.NumCut = 0;
+                        TopTitles = new List<cTableCell>();
+                        TopTitles.Add(new cTableCell { Title = "日期", WidthPX = 120 });
+                        TopTitles.Add(new cTableCell { Title = "類型", WidthPX = 160 });
+                        TopTitles.Add(new cTableCell { Title = "歷程" });
+                        
+                        c.cTL_Banner.Rs.Add(SetTableRowTitle(TopTitles));
+                        foreach (var L in Ls.OrderByDescending(q=>q.dDate))
+                        {
+                            cTableRow cTR = new cTableRow();
+                            cTR.Cs.Add(new cTableCell { Value = L.dDate.ToString(DateFormat) }); //日期
+                            cTR.Cs.Add(new cTableCell { Value = L.sType }); //類型
+                            cTR.Cs.Add(new cTableCell { Value = L.sTitle }); //歷程
+                            c.cTL_Banner.Rs.Add(SetTableCellSortNo(cTR));
+                        }
+
+                        #endregion
+                    }
+                }
+            }
+
+            return c;
+        }
+        [HttpGet]
+        public ActionResult Set_LeadTheNight_Info(int ID)
+        {
+            GetViewBag();
+            return View(GetSet_LeadTheNight_Info(ID));
+        }
+        #endregion
+
+
     }
 }

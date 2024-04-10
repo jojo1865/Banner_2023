@@ -58,9 +58,10 @@ namespace Banner.Areas.Web.Controllers
                     //LogInAC(2213);
                     //SetBrowserData("UserName", "劉冠廷");
 
-                    //測試代職主責
+                    //測試帶職主責
                     //LogInAC(6741);
                     //SetBrowserData("UserName", "何張森妹");
+
                     //測試區長功能
                     //LogInAC(746);
                     //SetBrowserData("UserName", "柯佳慧");

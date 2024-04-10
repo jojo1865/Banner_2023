@@ -1253,7 +1253,7 @@ namespace Banner.Areas.Admin.Controllers
             if (Ms.Count(q => q.LeaderFlag) > 0)
                 R.Messages.Add("所選名單包含主責,請先移除主責權限後再行移除");
             if (Ms.Count(q => q.SubLeaderFlag) > 0)
-                R.Messages.Add("所選名單包含代職主責,請先移除代職主責權限後再行移除");
+                R.Messages.Add("所選名單包含帶職主責,請先移除帶職主責權限後再行移除");
             if (R.Messages.Count() == 0)
             {
                 foreach (var MSA in Ms)

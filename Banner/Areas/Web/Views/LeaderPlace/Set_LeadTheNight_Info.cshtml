@@ -1,0 +1,95 @@
+﻿@model Banner.Areas.Web.Controllers.LeaderPlaceController.cGetSet_LeadTheNight_Info
+@{
+    ViewBag.Title = "Set_LeadTheNight_Info";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+<style>
+    .table_RWDStyle td, .table_RWDStyle th, .ACTable td {
+        text-align: left;
+    }
+</style>
+<div class="body-container container_phone">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/LeaderPlace/Move_People">異動專區</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/LeaderPlace/Set_LeadTheNight_List">會友查詢與轉領夜</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">查看組員</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">查看組員</h5>
+        </div>
+        @if (Model != null)
+        {
+            <div class="container-lg">
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h2 class="lab_DarkBlue">基本資料</h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="table ACTable">
+                            <tbody>
+                                <tr>
+                                    <td>姓名</td>
+                                    <td>@Model.Name</td>
+                                </tr>
+                                <tr>
+                                    <td>手機</td>
+                                    <td>@Model.PhoneNo</td>
+                                </tr>
+                                <tr>
+                                    <td>Email</td>
+                                    <td>@Model.Email</td>
+                                </tr>
+                                <tr>
+                                    <td>生日</td>
+                                    <td>@Model.BD</td>
+                                </tr>
+                                <tr>
+                                    <td>身分</td>
+                                    <td>@Model.JobTitle_LN</td>
+                                </tr>
+                                <tr>
+                                    <td>小組</td>
+                                    <td>@Model.GroupTitle</td>
+                                </tr>
+                            </tbody>
+
+
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h2 class="lab_DarkBlue">課程歷程</h2>
+                    </div>
+                    <div class="card-body">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL_Class ,ID="table_Class"})
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h2 class="lab_DarkBlue">牧養歷程</h2>
+                    </div>
+                    <div class="card-body">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL_Banner, ID = "table_Banner" })
+                    </div>
+                </div>
+
+                <div class="m-3 text-center">
+                    <a class="btn btn-success p-3" href="/Web/LeaderPlace/Set_LeadTheNight_List">返回</a>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>

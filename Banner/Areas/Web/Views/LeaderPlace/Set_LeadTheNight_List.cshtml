@@ -1,0 +1,125 @@
+﻿@model Banner.Areas.Web.Controllers.LeaderPlaceController.cGetSet_LeadTheNight_List
+@{
+    ViewBag.Title = "Set_LeadTheNight";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container container_phone">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/LeaderPlace/Move_People">異動專區</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">會友查詢與轉領夜</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">會友查詢與轉領夜</h5>
+        </div>
+
+        <div class="container-lg">
+            <form id="form1" method="post">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-auto">
+                                <label>小組名稱：</label>
+                                @Html.TextBox("txb_GroupTitle", Model.GroupTitle, new { @class = "form-control" })
+                            </div>
+                            <div class="col-auto">
+                                <label>會友姓名：</label>
+                                @Html.TextBox("txb_ACName", Model.ACName, new { @class = "form-control" })
+                            </div>
+                            <div class="col-auto">
+                                <label>&nbsp;</label><br />
+                                <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+<script>
+    //移除領夜
+    function RemoveLeaderNight(ACID) {
+        Swal.fire({
+            icon: 'warning',
+            html: '確定移除該會友領夜資格?',
+            showCancelButton: true,
+            confirmButtonText: '確認',
+            cancelButtonText: '取消'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Web/LeaderPlace/RemoveLeaderNight?ACID=' + ACID,
+                    method: 'GET',
+                    dataType: 'text',
+                    success: function (res) {
+
+                        Swal.fire({
+                            icon: 'success',
+                            html: '已移除資格'
+                        }).then((result) => {
+                            document.getElementById('form1').submit();
+                        });
+
+                    },
+                    error: function (err) { console.log(err) },
+                })
+
+            }
+            else {
+                Swal.close();
+                return;
+            }
+        });
+    }
+    //加入領夜
+    function AddLeaderNight(ACID) {
+        Swal.fire({
+            icon: 'warning',
+            html: '確定授予該會友領夜資格?',
+            showCancelButton: true,
+            confirmButtonText: '確認',
+            cancelButtonText: '取消'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Web/LeaderPlace/AddLeaderNight?ACID=' + ACID,
+                    method: 'GET',
+                    dataType: 'text',
+                    success: function (res) {
+                        //Swal.fire("已給予資格", "", "success");
+                        Swal.fire({
+                            icon: 'success',
+                            html: '已給予資格'
+                        }).then((result) => {
+                            document.getElementById('form1').submit();
+                        });
+
+                    },
+                    error: function (err) { console.log(err) },
+                })
+
+            }
+            else {
+                Swal.close();
+                return;
+            }
+        });
+    }
+</script>
+

@@ -47,6 +47,7 @@
       <Association Name="Account_Account_Spiritual" Member="Account_Spiritual" ThisKey="ACID" OtherKey="ACID" Type="Account_Spiritual" />
       <Association Name="Account_Log_BusinessType_Account" Member="Log_BusinessType_Account" ThisKey="ACID" OtherKey="ACID" Type="Log_BusinessType_Account" />
       <Association Name="Account_M_OI_Account" Member="M_OI_Account" ThisKey="ACID" OtherKey="ACID" Type="M_OI_Account" />
+      <Association Name="Account_Log_OrganizeInfo_ACID" Member="Log_OrganizeInfo_ACID" ThisKey="ACID" OtherKey="ACID" Type="Log_OrganizeInfo_ACID" />
     </Type>
   </Table>
   <Table Name="dbo.ZipCode" Member="ZipCode">
@@ -642,6 +643,7 @@
       <Association Name="OrganizeInfo_M_Staff_Account" Member="M_Staff_Account" ThisKey="OIID" OtherKey="OIID" Type="M_Staff_Account" />
       <Association Name="OrganizeInfo_Log_BusinessType_Header" Member="Log_BusinessType_Header" ThisKey="OIID" OtherKey="OIID" Type="Log_BusinessType_Header" />
       <Association Name="OrganizeInfo_M_OI_Account" Member="M_OI_Account" ThisKey="OIID" OtherKey="OIID" Type="M_OI_Account" />
+      <Association Name="OrganizeInfo_Log_OrganizeInfo_ACID" Member="Log_OrganizeInfo_ACID" ThisKey="OIID" OtherKey="OIID" Type="Log_OrganizeInfo_ACID" />
       <Association Name="Account_OrganizeInfo" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
       <Association Name="Organize_OrganizeInfo" Member="Organize" ThisKey="OID" OtherKey="OID" Type="Organize" IsForeignKey="true" />
     </Type>
@@ -984,6 +986,17 @@
       <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Account_M_OI_Account" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
       <Association Name="OrganizeInfo_M_OI_Account" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Log_OrganizeInfo_ACID" Member="Log_OrganizeInfo_ACID">
+    <Type Name="Log_OrganizeInfo_ACID">
+      <Column Name="LOIAID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="OIID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="JoinDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="LeaveDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="Account_Log_OrganizeInfo_ACID" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
+      <Association Name="OrganizeInfo_Log_OrganizeInfo_ACID" Member="OrganizeInfo" ThisKey="OIID" OtherKey="OIID" Type="OrganizeInfo" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

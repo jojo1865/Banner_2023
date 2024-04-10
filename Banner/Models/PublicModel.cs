@@ -181,4 +181,14 @@ namespace Banner.Models
         public string LogNote = "";
         public int SortNo = 0;
     }
+
+    public class cAChistry
+    {
+        //時間
+        public DateTime dDate { get; set; } = DateTime.Now;
+        //歷程說明
+        public string sTitle { get; set; } = "";
+        //歷程類別
+        public string sType { get; set; } = "";
+    }
 }

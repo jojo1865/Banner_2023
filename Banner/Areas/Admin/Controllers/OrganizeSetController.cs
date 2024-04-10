@@ -334,7 +334,7 @@ namespace Banner.Areas.Admin.Controllers
             //public cTableRow cOrganize = new cTableRow();
             public cTableList cTL = new cTableList();
             public string sAddURL = "";
-            
+
         }
         private cOrganize_Info_List GetOrganize_Info_List(int OID, int OIID, FormCollection FC)
         {
@@ -515,7 +515,7 @@ namespace Banner.Areas.Admin.Controllers
                     }
 
                     //if (bGroup[1])
-                        cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "btn_Basic_W", URL = "/Admin/OrganizeSet/Organize_Info_Edit/" + NOID + "/" + N.OIID + "/0", Value = "新增" + NextTitle });
+                    cTR.Cs.Add(new cTableCell { Type = "link", Target = "_self", CSS = "btn_Basic_W", URL = "/Admin/OrganizeSet/Organize_Info_Edit/" + NOID + "/" + N.OIID + "/0", Value = "新增" + NextTitle });
                     //else
                     //    cTR.Cs.Add(new cTableCell { Value = "" });
                 }
@@ -623,10 +623,10 @@ namespace Banner.Areas.Admin.Controllers
                 DC.SubmitChanges();
 
                 //外展存紀錄
-                if( cIE.Old_BusinessType != cIE.OI.BusinessType)
+                if (cIE.Old_BusinessType != cIE.OI.BusinessType)
                 {
                     string sLog = DT.ToString(DateTimeFormat) + " 後台" + ACID + "將" + cIE.OI.Title;
-                    var MAs = DC.M_OI_Account.Where(q => q.OIID == OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q=>q.JoinDate);
+                    var MAs = DC.M_OI_Account.Where(q => q.OIID == OIID && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.JoinDate);
                     if (cIE.OI.BusinessType == 0)
                         sLog += "移除外展,當下組員名單(" + MAs.Count() + "):";
                     else
@@ -902,7 +902,7 @@ namespace Banner.Areas.Admin.Controllers
                     }
                     #endregion
                     #region 主管
-                   
+
                     cIE.ACList = new List<SelectListItem>();
                     cIE.ACList.Add(new SelectListItem { Text = AC0.Name_First + AC0.Name_Last, Value = AC0.ACID.ToString() });
                     foreach (var A in ACs.OrderBy(q => q.Name))
@@ -947,7 +947,40 @@ namespace Banner.Areas.Admin.Controllers
             if (FC != null)
             {
                 cIE.OI.Title = FC.Get("txb_Title");
-                cIE.OI.ACID = Convert.ToInt32(FC.Get("ddl_ACID"));
+                int SelectACID = Convert.ToInt32(FC.Get("ddl_ACID"));
+                if (cIE.OI.ACID != SelectACID)//換主管
+                {
+                    //建立或修正舊主管紀錄
+                    var L = DC.Log_OrganizeInfo_ACID.FirstOrDefault(q => q.OIID == cIE.OI.OIID && q.ACID == cIE.OI.ACID && q.JoinDate == q.LeaveDate);
+                    if (L != null)
+                    {
+                        L.LeaveDate = DT;
+                        DC.SubmitChanges();
+                    }
+                    else
+                    {
+                        L = new Log_OrganizeInfo_ACID
+                        {
+                            Account = cIE.OI.Account,
+                            OrganizeInfo = cIE.OI,
+                            JoinDate = cIE.OI.CreDate,
+                            LeaveDate = DT
+                        };
+                        DC.Log_OrganizeInfo_ACID.InsertOnSubmit(L);
+                        DC.SubmitChanges();
+                    }
+                    //建立新主管紀錄
+                    L = new Log_OrganizeInfo_ACID
+                    {
+                        ACID = SelectACID,
+                        OrganizeInfo = cIE.OI,
+                        JoinDate = DT,
+                        LeaveDate = DT
+                    };
+                    DC.Log_OrganizeInfo_ACID.InsertOnSubmit(L);
+                    DC.SubmitChanges();
+                }
+                cIE.OI.ACID = SelectACID;
                 cIE.OI.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
                 cIE.OI.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
                 cIE.OI.BusinessType = GetViewCheckBox(FC.Get("cbox_Business")) ? 1 : 0;

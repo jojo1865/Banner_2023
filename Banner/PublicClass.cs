@@ -3312,7 +3312,7 @@ namespace Banner
                         break;
                     else
                     {
-                        if(sData.Split(' ').Length>2)
+                        if (sData.Split(' ').Length > 2)
                         {
                             DateTime DT__ = DT;
                             string sDate = sData.Split(' ')[0] + " " + sData.Split(' ')[1] + " ";
@@ -3338,6 +3338,48 @@ namespace Banner
         public bool CheckChild(DateTime BD)
         {
             return DT < BD.AddYears(iChildAge);
+        }
+        //取得牧養歷程
+        public List<cAChistry> GetHistory(Account AC)
+        {
+            List<cAChistry> Ls = new List<cAChistry>();
+            //會員註冊
+            Ls.Add(new cAChistry { sType = "註冊會員", sTitle = "註冊會員", dDate = AC.CreDate });
+            //小組歷程
+            var OIs = DC.M_OI_Account.Where(q => q.ACID == AC.ACID);
+            foreach (var OI in OIs)
+            {
+                string OITitle = OI.OrganizeInfo.Title + OI.OrganizeInfo.Organize.Title;
+                Ls.Add(new cAChistry { sType = "加入小組", sTitle = "加入" + OITitle, dDate = OI.CreDate });
+                if (OI.JoinDate != OI.CreDate)
+                    Ls.Add(new cAChistry { sType = "加入小組", sTitle = "落戶" + OITitle, dDate = OI.JoinDate });
+                if (OI.LeaveDate != OI.CreDate)
+                    Ls.Add(new cAChistry { sType = "移出小組", sTitle = "自" + OITitle + "離開", dDate = OI.LeaveDate });
+            }
+            //會友卡 領夜
+            var Rs = DC.M_Role_Account.Where(q => q.ACID == AC.ACID && (q.RID == 2 || q.RID == 24));
+            foreach (var R in Rs)
+            {
+                Ls.Add(new cAChistry { sType = R.Role.Title, sTitle = "成為" + R.Role.Title, dDate = R.JoinDate });
+                if (R.LeaveDate != R.CreDate)
+                    Ls.Add(new cAChistry { sType = R.Role.Title, sTitle = "移除" + R.Role.Title, dDate = R.LeaveDate });
+            }
+            //案立
+            var Os = DC.M_O_Account.Where(q => q.ACID == AC.ACID);
+            foreach (var O in Os)
+            {
+                Ls.Add(new cAChistry { sType = "案立", sTitle = "案立為" + O.Organize.JobTitle, dDate = O.CreDate });
+            }
+            //就職組織職分
+            var Logs = DC.Log_OrganizeInfo_ACID.Where(q => q.ACID == AC.ACID);
+            foreach (var L in Logs)
+            {
+                string OITitle = L.OrganizeInfo.Title + L.OrganizeInfo.Organize.Title;
+                Ls.Add(new cAChistry { sType = "擔任領袖", sTitle = "擔任" + OITitle + "負責人", dDate = L.JoinDate });
+                if (L.JoinDate != L.LeaveDate)
+                    Ls.Add(new cAChistry { sType = "卸任領袖", sTitle = "卸任" + OITitle + "負責人", dDate = L.LeaveDate });
+            }
+            return Ls;
         }
         #endregion
 

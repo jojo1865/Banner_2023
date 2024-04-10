@@ -39,7 +39,7 @@
                             <button type="button" class="btn btn-primary btn-lg btn-submit btn-round m-2" data-bs-toggle="modal" data-bs-target="#AddAccount">
                                 新增團員
                             </button>
-                            <a a href="javascript:;" onclick="SubLeaderAC()" class="btn btn-primary btn-lg btn-submit btn-round m-2">設為代職主責</a>
+                            <a a href="javascript:;" onclick="SubLeaderAC()" class="btn btn-primary btn-lg btn-submit btn-round m-2">設為帶職主責</a>
                             <a a href="javascript:;" onclick="RemoveAC()" class="btn btn-primary btn-lg btn-submit btn-round m-2">移除團員</a>
 
                         </div>
@@ -55,7 +55,7 @@
                                 <th>手機</th>
                                 <th>加入日期</th>
                                 <th>主責</th>
-                                <th>代職主責</th>
+                                <th>帶職主責</th>
                             </tr>
 
                         </thead>
@@ -308,7 +308,7 @@
         })
     }
 
-    //設為代職主責
+    //設為帶職主責
     function SubLeaderAC() {
         var SID = $('#txb_SID').val();
         var IDs = GetSelect('cbox_Staff');
@@ -321,7 +321,7 @@
                 if (r.Messages.length == 0) {
                     Swal.fire({
                         icon: 'success',
-                        html: '代職主責指定完成'
+                        html: '帶職主責指定完成'
                     });
 
                     Search();

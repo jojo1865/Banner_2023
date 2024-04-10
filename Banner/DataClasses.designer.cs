@@ -210,6 +210,9 @@ namespace Banner
     partial void InsertM_OI_Account(M_OI_Account instance);
     partial void UpdateM_OI_Account(M_OI_Account instance);
     partial void DeleteM_OI_Account(M_OI_Account instance);
+    partial void InsertLog_OrganizeInfo_ACID(Log_OrganizeInfo_ACID instance);
+    partial void UpdateLog_OrganizeInfo_ACID(Log_OrganizeInfo_ACID instance);
+    partial void DeleteLog_OrganizeInfo_ACID(Log_OrganizeInfo_ACID instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -716,6 +719,14 @@ namespace Banner
 			}
 		}
 		
+		public System.Data.Linq.Table<Log_OrganizeInfo_ACID> Log_OrganizeInfo_ACID
+		{
+			get
+			{
+				return this.GetTable<Log_OrganizeInfo_ACID>();
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.sp_GetOI2List")]
 		public ISingleResult<sp_GetOI2ListResult> sp_GetOI2List([global::System.Data.Linq.Mapping.ParameterAttribute(Name="ACID", DbType="Int")] System.Nullable<int> aCID)
 		{
@@ -829,6 +840,8 @@ namespace Banner
 		
 		private EntitySet<M_OI_Account> _M_OI_Account;
 		
+		private EntitySet<Log_OrganizeInfo_ACID> _Log_OrganizeInfo_ACID;
+		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -909,6 +922,7 @@ namespace Banner
 			this._Account_Spiritual = new EntitySet<Account_Spiritual>(new Action<Account_Spiritual>(this.attach_Account_Spiritual), new Action<Account_Spiritual>(this.detach_Account_Spiritual));
 			this._Log_BusinessType_Account = new EntitySet<Log_BusinessType_Account>(new Action<Log_BusinessType_Account>(this.attach_Log_BusinessType_Account), new Action<Log_BusinessType_Account>(this.detach_Log_BusinessType_Account));
 			this._M_OI_Account = new EntitySet<M_OI_Account>(new Action<M_OI_Account>(this.attach_M_OI_Account), new Action<M_OI_Account>(this.detach_M_OI_Account));
+			this._Log_OrganizeInfo_ACID = new EntitySet<Log_OrganizeInfo_ACID>(new Action<Log_OrganizeInfo_ACID>(this.attach_Log_OrganizeInfo_ACID), new Action<Log_OrganizeInfo_ACID>(this.detach_Log_OrganizeInfo_ACID));
 			OnCreated();
 		}
 		
@@ -1708,6 +1722,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Log_OrganizeInfo_ACID", Storage="_Log_OrganizeInfo_ACID", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<Log_OrganizeInfo_ACID> Log_OrganizeInfo_ACID
+		{
+			get
+			{
+				return this._Log_OrganizeInfo_ACID;
+			}
+			set
+			{
+				this._Log_OrganizeInfo_ACID.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -1951,6 +1978,18 @@ namespace Banner
 		}
 		
 		private void detach_M_OI_Account(M_OI_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_Log_OrganizeInfo_ACID(Log_OrganizeInfo_ACID entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_Log_OrganizeInfo_ACID(Log_OrganizeInfo_ACID entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -14331,6 +14370,8 @@ namespace Banner
 		
 		private EntitySet<M_OI_Account> _M_OI_Account;
 		
+		private EntitySet<Log_OrganizeInfo_ACID> _Log_OrganizeInfo_ACID;
+		
 		private EntityRef<Account> _Account;
 		
 		private EntityRef<Organize> _Organize;
@@ -14381,6 +14422,7 @@ namespace Banner
 			this._M_Staff_Account = new EntitySet<M_Staff_Account>(new Action<M_Staff_Account>(this.attach_M_Staff_Account), new Action<M_Staff_Account>(this.detach_M_Staff_Account));
 			this._Log_BusinessType_Header = new EntitySet<Log_BusinessType_Header>(new Action<Log_BusinessType_Header>(this.attach_Log_BusinessType_Header), new Action<Log_BusinessType_Header>(this.detach_Log_BusinessType_Header));
 			this._M_OI_Account = new EntitySet<M_OI_Account>(new Action<M_OI_Account>(this.attach_M_OI_Account), new Action<M_OI_Account>(this.detach_M_OI_Account));
+			this._Log_OrganizeInfo_ACID = new EntitySet<Log_OrganizeInfo_ACID>(new Action<Log_OrganizeInfo_ACID>(this.attach_Log_OrganizeInfo_ACID), new Action<Log_OrganizeInfo_ACID>(this.detach_Log_OrganizeInfo_ACID));
 			this._Account = default(EntityRef<Account>);
 			this._Organize = default(EntityRef<Organize>);
 			OnCreated();
@@ -14804,6 +14846,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Log_OrganizeInfo_ACID", Storage="_Log_OrganizeInfo_ACID", ThisKey="OIID", OtherKey="OIID")]
+		public EntitySet<Log_OrganizeInfo_ACID> Log_OrganizeInfo_ACID
+		{
+			get
+			{
+				return this._Log_OrganizeInfo_ACID;
+			}
+			set
+			{
+				this._Log_OrganizeInfo_ACID.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_OrganizeInfo", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
 		public Account Account
 		{
@@ -15007,6 +15062,18 @@ namespace Banner
 		}
 		
 		private void detach_M_OI_Account(M_OI_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo = null;
+		}
+		
+		private void attach_Log_OrganizeInfo_ACID(Log_OrganizeInfo_ACID entity)
+		{
+			this.SendPropertyChanging();
+			entity.OrganizeInfo = this;
+		}
+		
+		private void detach_Log_OrganizeInfo_ACID(Log_OrganizeInfo_ACID entity)
 		{
 			this.SendPropertyChanging();
 			entity.OrganizeInfo = null;
@@ -22381,6 +22448,246 @@ namespace Banner
 					if ((value != null))
 					{
 						value.M_OI_Account.Add(this);
+						this._OIID = value.OIID;
+					}
+					else
+					{
+						this._OIID = default(int);
+					}
+					this.SendPropertyChanged("OrganizeInfo");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Log_OrganizeInfo_ACID")]
+	public partial class Log_OrganizeInfo_ACID : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _LOIAID;
+		
+		private int _OIID;
+		
+		private int _ACID;
+		
+		private System.DateTime _JoinDate;
+		
+		private System.DateTime _LeaveDate;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<OrganizeInfo> _OrganizeInfo;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnLOIAIDChanging(int value);
+    partial void OnLOIAIDChanged();
+    partial void OnOIIDChanging(int value);
+    partial void OnOIIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnJoinDateChanging(System.DateTime value);
+    partial void OnJoinDateChanged();
+    partial void OnLeaveDateChanging(System.DateTime value);
+    partial void OnLeaveDateChanged();
+    #endregion
+		
+		public Log_OrganizeInfo_ACID()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._OrganizeInfo = default(EntityRef<OrganizeInfo>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LOIAID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int LOIAID
+		{
+			get
+			{
+				return this._LOIAID;
+			}
+			set
+			{
+				if ((this._LOIAID != value))
+				{
+					this.OnLOIAIDChanging(value);
+					this.SendPropertyChanging();
+					this._LOIAID = value;
+					this.SendPropertyChanged("LOIAID");
+					this.OnLOIAIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OIID", DbType="Int NOT NULL")]
+		public int OIID
+		{
+			get
+			{
+				return this._OIID;
+			}
+			set
+			{
+				if ((this._OIID != value))
+				{
+					if (this._OrganizeInfo.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOIIDChanging(value);
+					this.SendPropertyChanging();
+					this._OIID = value;
+					this.SendPropertyChanged("OIID");
+					this.OnOIIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JoinDate", DbType="DateTime NOT NULL")]
+		public System.DateTime JoinDate
+		{
+			get
+			{
+				return this._JoinDate;
+			}
+			set
+			{
+				if ((this._JoinDate != value))
+				{
+					this.OnJoinDateChanging(value);
+					this.SendPropertyChanging();
+					this._JoinDate = value;
+					this.SendPropertyChanged("JoinDate");
+					this.OnJoinDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LeaveDate", DbType="DateTime NOT NULL")]
+		public System.DateTime LeaveDate
+		{
+			get
+			{
+				return this._LeaveDate;
+			}
+			set
+			{
+				if ((this._LeaveDate != value))
+				{
+					this.OnLeaveDateChanging(value);
+					this.SendPropertyChanging();
+					this._LeaveDate = value;
+					this.SendPropertyChanged("LeaveDate");
+					this.OnLeaveDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Log_OrganizeInfo_ACID", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.Log_OrganizeInfo_ACID.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.Log_OrganizeInfo_ACID.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="OrganizeInfo_Log_OrganizeInfo_ACID", Storage="_OrganizeInfo", ThisKey="OIID", OtherKey="OIID", IsForeignKey=true)]
+		public OrganizeInfo OrganizeInfo
+		{
+			get
+			{
+				return this._OrganizeInfo.Entity;
+			}
+			set
+			{
+				OrganizeInfo previousValue = this._OrganizeInfo.Entity;
+				if (((previousValue != value) 
+							|| (this._OrganizeInfo.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._OrganizeInfo.Entity = null;
+						previousValue.Log_OrganizeInfo_ACID.Remove(this);
+					}
+					this._OrganizeInfo.Entity = value;
+					if ((value != null))
+					{
+						value.Log_OrganizeInfo_ACID.Add(this);
 						this._OIID = value.OIID;
 					}
 					else
