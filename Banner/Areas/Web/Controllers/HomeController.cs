@@ -55,8 +55,8 @@ namespace Banner.Areas.Web.Controllers
                     //LogInAC(8197);
                     //SetBrowserData("UserName", "JOJO");
 
-                    //LogInAC(2213);
-                    //SetBrowserData("UserName", "劉冠廷");
+                    LogInAC(2213);
+                    SetBrowserData("UserName", "劉冠廷");
 
                     //測試帶職主責
                     //LogInAC(6741);
@@ -66,8 +66,8 @@ namespace Banner.Areas.Web.Controllers
                     //LogInAC(746);
                     //SetBrowserData("UserName", "柯佳慧");
 
-                    LogInAC(1511);
-                    SetBrowserData("UserName", "莊懷德");
+                    //LogInAC(1511);
+                    //SetBrowserData("UserName", "莊懷德");
 
                     Response.Redirect("/Web/Home/Index");
                 }

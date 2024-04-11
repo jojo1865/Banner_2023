@@ -181,7 +181,7 @@ namespace Banner.Models
         public string LogNote = "";
         public int SortNo = 0;
     }
-
+    //牧養歷程物件
     public class cAChistry
     {
         //時間
@@ -190,5 +190,16 @@ namespace Banner.Models
         public string sTitle { get; set; } = "";
         //歷程類別
         public string sType { get; set; } = "";
+    }
+
+    //牧養歷程物件
+    public class cPhistry
+    {
+        //結業時間
+        public DateTime dDate { get; set; } = DateTime.Now;
+        //結業課程名稱
+        public string sTitle_P { get; set; } = "";
+        //永久課程名稱
+        public string sTitle_C { get; set; } = "";
     }
 }

@@ -97,7 +97,7 @@ namespace Banner.Areas.Web.Controllers
                 #endregion
                 #region 我的小組
                 var MOI8 = GetMOIAC(8, 0, ACID).FirstOrDefault();
-                if (MOI8 != null)
+                if (MOI8 != null && ACID > 1)
                 {
                     N.MyGroup = new GroupData();
                     List<string> sList = GetOITitles(MOI8.OIID);
@@ -120,26 +120,29 @@ namespace Banner.Areas.Web.Controllers
                 #endregion
                 #region 小組長園地
                 var OI_Leaders = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.OID == 8);
-                foreach (var OI in OI_Leaders)
+                if (ACID > 1)
                 {
-                    GroupData G = new GroupData();
-                    List<string> sList = GetOITitles(OI.OIID);
-                    sList = (sList.Take(5)).ToList();
-                    sList.Reverse();
-                    G.Title = string.Join("/", sList) + "(#" + OI.OIID + ")";
-                    var Meet = DC.Meeting_Location_Set.FirstOrDefault(q => q.OIID == OI.OIID && q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag);
-                    if (Meet != null)
+                    foreach (var OI in OI_Leaders)
                     {
-                        G.Date = sWeeks[Meet.WeeklyNo];
-                        G.Time = sTimeSpans[Meet.TimeNo] + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
-                        G.Address = Meet.Meeting_Location.Title;
-                        var Loc = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == Meet.MLSID);
-                        if (Loc != null)
+                        GroupData G = new GroupData();
+                        List<string> sList = GetOITitles(OI.OIID);
+                        sList = (sList.Take(5)).ToList();
+                        sList.Reverse();
+                        G.Title = string.Join("/", sList) + "(#" + OI.OIID + ")";
+                        var Meet = DC.Meeting_Location_Set.FirstOrDefault(q => q.OIID == OI.OIID && q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag);
+                        if (Meet != null)
                         {
-                            G.Address += " " + GetZipData(Loc.ZID) + Loc.Address;
+                            G.Date = sWeeks[Meet.WeeklyNo];
+                            G.Time = sTimeSpans[Meet.TimeNo] + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
+                            G.Address = Meet.Meeting_Location.Title;
+                            var Loc = DC.Location.FirstOrDefault(q => q.TargetType == 3 && q.TargetID == Meet.MLSID);
+                            if (Loc != null)
+                            {
+                                G.Address += " " + GetZipData(Loc.ZID) + Loc.Address;
+                            }
                         }
+                        N.MyGroups.Add(G);
                     }
-                    N.MyGroups.Add(G);
                 }
                 #endregion
                 #region 講師專區

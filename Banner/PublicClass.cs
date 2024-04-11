@@ -3340,7 +3340,7 @@ namespace Banner
             return DT < BD.AddYears(iChildAge);
         }
         //取得牧養歷程
-        public List<cAChistry> GetHistory(Account AC)
+        public List<cAChistry> GetACHistory(Account AC)
         {
             List<cAChistry> Ls = new List<cAChistry>();
             //會員註冊
@@ -3378,6 +3378,26 @@ namespace Banner
                 Ls.Add(new cAChistry { sType = "擔任領袖", sTitle = "擔任" + OITitle + "負責人", dDate = L.JoinDate });
                 if (L.JoinDate != L.LeaveDate)
                     Ls.Add(new cAChistry { sType = "卸任領袖", sTitle = "卸任" + OITitle + "負責人", dDate = L.LeaveDate });
+            }
+            return Ls;
+        }
+
+        public List<cPhistry> GetPHistory(Account AC)
+        {
+            List<cPhistry> Ls = new List<cPhistry>();
+            var OPs = DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag &&
+                        q.Order_Header.Order_Type == 2 &&
+                        q.Order_Header.ACID == AC.ACID &&
+                        q.Graduation_Flag
+                            );
+            foreach(var OP in OPs.OrderByDescending(q => q.Graduation_Date))
+            {
+                Ls.Add(new cPhistry
+                {
+                    dDate = OP.Graduation_Date,
+                    sTitle_P = OP.Product.SubTitle,
+                    sTitle_C = OP.Product.Course.Title
+                });
             }
             return Ls;
         }

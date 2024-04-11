@@ -609,22 +609,18 @@ namespace Banner.Areas.Web.Controllers
                         c.cTL_Class.Rs.Add(SetTableRowTitle(TopTitles));
                         ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
 
-                        var OPs = DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag &&
-                        q.Order_Header.Order_Type == 2 &&
-                        q.Order_Header.ACID == AC.ACID &&
-                        q.Graduation_Flag
-                            );
-                        foreach (var OP in OPs.OrderByDescending(q => q.Graduation_Date))
+                        List<cPhistry> Ls_P = GetPHistory(AC);
+                        foreach (var L in Ls_P.OrderByDescending(q => q.dDate))
                         {
                             cTableRow cTR = new cTableRow();
-                            cTR.Cs.Add(new cTableCell { Value = OP.Graduation_Date.ToString(DateFormat) }); //結業日期
-                            cTR.Cs.Add(new cTableCell { Value = OP.Product.Title + " " + OP.Product.SubTitle }); //結業課程
+                            cTR.Cs.Add(new cTableCell { Value = L.dDate.ToString(DateFormat) }); //結業日期
+                            cTR.Cs.Add(new cTableCell { Value = L.sTitle_C + " " + L.sTitle_P }); //結業課程
 
                             c.cTL_Class.Rs.Add(SetTableCellSortNo(cTR));
                         }
                         #endregion
                         #region 牧養歷程
-                        List<cAChistry> Ls = GetHistory(AC);
+                        List<cAChistry> Ls_AC = GetACHistory(AC);
                         c.cTL_Banner.Rs = new List<cTableRow>();
                         c.cTL_Banner.NumCut = 0;
                         TopTitles = new List<cTableCell>();
@@ -633,7 +629,7 @@ namespace Banner.Areas.Web.Controllers
                         TopTitles.Add(new cTableCell { Title = "歷程" });
                         
                         c.cTL_Banner.Rs.Add(SetTableRowTitle(TopTitles));
-                        foreach (var L in Ls.OrderByDescending(q=>q.dDate))
+                        foreach (var L in Ls_AC.OrderByDescending(q=>q.dDate))
                         {
                             cTableRow cTR = new cTableRow();
                             cTR.Cs.Add(new cTableCell { Value = L.dDate.ToString(DateFormat) }); //日期
