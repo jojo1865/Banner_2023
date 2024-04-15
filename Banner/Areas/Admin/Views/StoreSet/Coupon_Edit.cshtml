@@ -3,18 +3,23 @@
     ViewBag.Title = "Coupon_Edit";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
 }
+<style>
+    .table td {
+        border: 1px solid #ededee;
+    }
+</style>
 <div class="main-container">
     <div class="form-container-list">
         <div class="form-container">
             <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
             @if (Model != null)
             {
-                string DateTimeFormat = "yyyy-MM-dd HH:mm";
+                string DateFormat = "yyyy-MM-dd";
                 <form method="post" id="form1" enctype="multipart/form-data">
-                    
+
                     <div class="form-body">
                         <div class="form-card-group">
-                            <div id="personal-info" class="header-container">
+                            <div class="header-container">
                                 <div class="header-left-border"></div>
                                 <div class="header">優惠劵管理</div>
                             </div>
@@ -22,55 +27,62 @@
                                 <div class="form-group">
                                     <label>課程或商品選擇<span>*</span></label>
                                     <div class="row">
-                                        <div class="col-6">
+                                        <div class="col-4">
                                             @Html.DropDownList("ddl_CC", Model.CC_SL, new { @class = "form-select form-control-lg", onchange = "GetCourseddl(this.value);" })
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-4">
                                             @Html.DropDownList("ddl_C", Model.C_SL, new { @class = "form-select form-control-lg", onchange = "GetProductddl(this.value);" })
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-4">
                                             @Html.DropDownList("ddl_P", Model.P_SL, new { @class = "form-select form-control-lg", onchange = "GetCourse(this.value);" })
                                         </div>
                                     </div>
-                                    @Html.DropDownList("ddl_Product", Model.P_SL, new { @class = "form-select form-control-lg" })
                                 </div>
                                 <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-6 col-12">
-                                            <label>優惠起始日<span>*</span></label>
-                                            @Html.TextBox("txb_SDate", Model.CH.SDateTime.ToString(DateTimeFormat), new { @class = "form-control form-control-lg input-underline", @type = "datetime-local" })
-                                        </div>
-                                        <div class="col-lg-6 col-12">
-                                            <label>優惠結束日<span>*</span></label>
-                                            @Html.TextBox("txb_EDate", Model.CH.EDateTime.ToString(DateTimeFormat), new { @class = "form-control form-control-lg input-underline", @type = "datetime-local" })
-                                        </div>
-                                    </div>
+                                    <label>優惠劵標題<span>*</span></label>
+                                    @Html.TextBox("txb_Title", Model.CH.Title, new { @class = "form-control form-control-lg" })
                                 </div>
                                 <div class="form-group">
-                                    <label>折價金額</label>
-                                    @Html.TextBox("txb_Price_Cut", Model.CH.Price_Cut.ToString(), new
-                                    {
-                                        @class = "form-control form-control-lg",
-                                        @style = "hight:100px;",
-                                        type = "number",
-                                        min = "0"
-                                    })
+                                    <label>優惠劵有效時間<span>*</span></label>
+                                    <table>
+                                        <tr>
+                                            <td valign="top" style="width:50px;">
+                                                @Html.RadioButton("rbut_TimeType", 0, Model.CH.Life_Cut == 0, new { @class = "form-check-input" })
+                                            </td>
+                                            <td>
+                                                <div class="row">
+                                                    <div class="col-auto">
+                                                        <label>起始日</label>
+                                                        @Html.TextBox("txb_SDate", Model.CH.SDateTime.ToString(DateFormat), new { @class = "form-control form-control-lg", @type = "date" })
+                                                    </div>
+                                                    <div class="col-auto pt-4">～</div>
+                                                    <div class="col-auto">
+                                                        <label>結束日</label>
+                                                        @Html.TextBox("txb_EDate", Model.CH.EDateTime.ToString(DateFormat), new { @class = "form-control form-control-lg", @type = "date" })
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top">
+                                                @Html.RadioButton("rbut_TimeType", 1, Model.CH.Life_Cut != 0, new { @class = "form-check-input" })
+                                            </td>
+                                            <td>
+                                                <label>加入會員後幾天內(僅適用新生優惠)</label>
+                                                @Html.TextBox("txb_Life_Cut", Model.CH.Life_Cut, new { @class = "form-control form-control-lg", @type = "number" })
+                                            </td>
+                                        </tr>
+                                    </table>
+
                                 </div>
+
+
+
                                 <div class="form-group">
                                     <label>備註</label>
                                     @Html.TextArea("txb_Note", Model.CH.Note, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
                                 </div>
-                                <div class="form-group">
-                                    <label>限定職分</label>
-                                    @@if (Model.CH.CHID == 0 || Model.CH. < 0)
-                                    {
-                                        @Html.DropDownList("ddl_Organize", Model.O_SL, new { @class = "form-select form-control-lg" })
-                                    }
-                                    else
-                                    {
-                                        @Html.DropDownList("ddl_Organize", Model.O_SL, new { @class = "form-select form-control-lg", disabled = "disabled" })
-                                    }
-                                </div>
+
                                 <div class="form-group">
                                     <label>啟用狀態</label>
                                     <div class="row">
@@ -105,6 +117,193 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="form-body">
+                        <div class="header-container">
+                            <div class="header-left-border"></div>
+                            <div class="header">折價金額設置</div>
+                        </div>
+                        <div class="form-card">
+
+                            <div class="form-group">
+                                <label>限定旌旗</label>
+                                <div class="row">
+                                    @foreach (var SL in Model.O_SL)
+                                    {
+                                        <div class="col-auto">
+                                            @Html.CheckBox("cbox_OI_" + SL.Value, SL.Selected, new { @class = "form-check-input" })
+                                            @Html.Label(SL.Text, new { @class = "form-check-label" })
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>牧養職分</label>
+                                <table class="table">
+                                    <tr class="Bgn">
+                                        <th style="width:100px;">職分</th>
+                                        <th style="width:400px;">折價模式</th>
+                                        <th>折價金額</th>
+                                    </tr>
+                                    @{
+                                        var CRCs = Model.cCRCs.Where(q => q.Target_Type == 1);
+                                        foreach (var CRC in CRCs.OrderBy(q => q.SortNo))
+                                        {
+                                            string sSubID = CRC.CRID + "_" + CRC.Target_Type + "_" + CRC.Target_ID;
+                                            <tr>
+                                                <td>@CRC.Title</td>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col-auto">
+                                                            <div class="form-check form-check-inline">
+                                                                @Html.RadioButton("rbl_Price_Type_" + sSubID, 0, CRC.Price_Type == 0, new { @id = "rbl_Price_Type_" + sSubID + "_" + 0, @class = "form-check-input" })
+                                                                @Html.Label("折價", new { @class = "form-check-label", @for = "rbl_Price_Type_" + sSubID + "_" + 0 })
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <div class="form-check form-check-inline">
+                                                                @Html.RadioButton("rbl_Price_Type_" + sSubID, 1, CRC.Price_Type == 1, new { @id = "rbl_Price_Type_" + sSubID + "_" + 1, @class = "form-check-input" })
+                                                                @Html.Label("指定金額", new { @class = "form-check-label", @for = "rbl_Price_Type_" + sSubID + "_" + 1 })
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <div class="form-check form-check-inline">
+                                                                @Html.RadioButton("rbl_Price_Type_" + sSubID, 2, CRC.Price_Type == 2, new { @id = "rbl_Price_Type_" + sSubID + "_" + 2, @class = "form-check-input" })
+                                                                @Html.Label("0元", new { @class = "form-check-label", @for = "rbl_Price_Type_" + sSubID + "_" + 2 })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @Html.TextBox("txb_Price_Cut_" + sSubID, CRC.Price_Cut, new { @class = "form-control form-control-lg", @type = "number" })
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </table>
+                            </div>
+
+                            <div class="form-group">
+                                <label>事工團</label>
+                                <table class="table">
+                                    <tr class="Bgn">
+                                        <th style="width:100px;">分類</th>
+                                        <th style="width:200px;">團名</th>
+                                        <th style="width:400px;">折價模式</th>
+                                        <th>折價金額</th>
+                                    </tr>
+                                    @{
+                                        CRCs = Model.cCRCs.Where(q => q.Target_Type == 2);
+                                        int SCID = 0;
+                                        foreach (var CRC in CRCs.OrderBy(q => q.SortNo))
+                                        {
+                                            string sSubID = CRC.CRID + "_" + CRC.Target_Type + "_" + CRC.Target_ID;
+                                            int RowCtNo = 0;
+                                            if (SCID != CRC.Category_ID)
+                                            {
+                                                SCID = CRC.Category_ID;
+                                                RowCtNo = CRCs.Count(q => q.Category_ID == SCID);
+                                            }
+                                            <tr>
+                                                @if (RowCtNo == 0) { }
+                                                else if (RowCtNo == 1)
+                                                {
+                                                    <td>@CRC.Category</td>
+                                                }
+                                                else
+                                                {
+                                                    <td rowspan="@RowCtNo">@CRC.Category</td>
+                                                }
+                                                <td>@CRC.Title</td>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col-auto">
+                                                            <div class="form-check form-check-inline">
+                                                                @Html.RadioButton("rbl_Price_Type_" + sSubID, 0, CRC.Price_Type == 0, new { @id = "rbl_Price_Type_" + sSubID + "_" + 0, @class = "form-check-input" })
+                                                                @Html.Label("折價", new { @class = "form-check-label", @for = "rbl_Price_Type_" + sSubID + "_" + 0 })
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <div class="form-check form-check-inline">
+                                                                @Html.RadioButton("rbl_Price_Type_" + sSubID, 1, CRC.Price_Type == 1, new { @id = "rbl_Price_Type_" + sSubID + "_" + 1, @class = "form-check-input" })
+                                                                @Html.Label("指定金額", new { @class = "form-check-label", @for = "rbl_Price_Type_" + sSubID + "_" + 1 })
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <div class="form-check form-check-inline">
+                                                                @Html.RadioButton("rbl_Price_Type_" + sSubID, 2, CRC.Price_Type == 2, new { @id = "rbl_Price_Type_" + sSubID + "_" + 2, @class = "form-check-input" })
+                                                                @Html.Label("0元", new { @class = "form-check-label", @for = "rbl_Price_Type_" + sSubID + "_" + 2 })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @Html.TextBox("txb_Price_Cut_" + sSubID, CRC.Price_Cut, new { @class = "form-control form-control-lg", @type = "number" })
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </table>
+                            </div>
+
+                            <div class="form-group">
+                                <label>其他</label>
+                                <table class="table">
+                                    <tr class="Bgn">
+                                        <th style="width:100px;">身分</th>
+                                        <th style="width:400px;">折價模式</th>
+                                        <th>折價金額</th>
+                                        <th>名單</th>
+                                    </tr>
+                                    @{
+                                        CRCs = Model.cCRCs.Where(q => q.Target_Type == 3 || q.Target_Type == 4 || q.Target_Type == 5);
+                                        foreach (var CRC in CRCs.OrderBy(q => q.SortNo))
+                                        {
+                                            string sSubID = CRC.CRID + "_" + CRC.Target_Type + "_" + CRC.Target_ID;
+                                            <tr>
+                                                <td>
+                                                    @CRC.Title
+                                                </td>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col-auto">
+                                                            <div class="form-check form-check-inline">
+                                                                @Html.RadioButton("rbl_Price_Type_" + sSubID, 0, CRC.Price_Type == 0, new { @id = "rbl_Price_Type_" + sSubID + "_" + 0, @class = "form-check-input" })
+                                                                @Html.Label("折價", new { @class = "form-check-label", @for = "rbl_Price_Type_" + sSubID + "_" + 0 })
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <div class="form-check form-check-inline">
+                                                                @Html.RadioButton("rbl_Price_Type_" + sSubID, 1, CRC.Price_Type == 1, new { @id = "rbl_Price_Type_" + sSubID + "_" + 1, @class = "form-check-input" })
+                                                                @Html.Label("指定金額", new { @class = "form-check-label", @for = "rbl_Price_Type_" + sSubID + "_" + 1 })
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <div class="form-check form-check-inline">
+                                                                @Html.RadioButton("rbl_Price_Type_" + sSubID, 2, CRC.Price_Type == 2, new { @id = "rbl_Price_Type_" + sSubID + "_" + 2, @class = "form-check-input" })
+                                                                @Html.Label("0元", new { @class = "form-check-label", @for = "rbl_Price_Type_" + sSubID + "_" + 2 })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @Html.TextBox("txb_Price_Cut_" + sSubID, CRC.Price_Cut, new { @class = "form-control form-control-lg", @type = "number" })
+                                                </td>
+                                                <td>
+                                                    @if (CRC.Target_Type == 5)
+                                                    {
+                                                        @Html.TextBox("file_upload", "", new { @class = "form-control form-control-lg", @type = "file" })<br />
+                                                        <a href="/Files/Down/Temp_Coupon.xlsx" download>指定格式下載</a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             }
         </div>
@@ -130,20 +329,46 @@
 <script>
     /*取得課程選單*/
     function GetCourseddl(ddl) {
-        var sControlTitle = 'ddl_C';
-        var Nextddl = document.getElementById(sControlTitle);
+        var Nextddl = document.getElementById('ddl_C');
         Nextddl.innerHTML = '';
-        Nextddl.append('<option value="-1" selected>請選擇</option>');
+        //Nextddl.append('<option value="-1" selected>請選擇</option>');
         $.ajax({
-            url: '/Admin/Home/GetCourseCagegorySelect?CCID=' + ddl.value,
+            url: '/Admin/Home/GetCourseCagegorySelect?CCID=' + ddl,
             method: 'GET',
             dataType: 'json',
             success: function (res) {
                 $.each(res, function (index) {
-                    Nextddl.innerHTML += ('<option value="' + res[index].value + '">' + res[index].Text + '</option>');
                     if (index == 0) {
-                        GetCourse(res[index].value);
+                        /*GetCourse(res[index].value);*/
+                        Nextddl.innerHTML += ('<option value="' + res[index].value + '" selected>' + res[index].Text + '</option>');
+                        GetProductddl(res[index].value);
                     }
+                    else {
+                        Nextddl.innerHTML += ('<option value="' + res[index].value + '">' + res[index].Text + '</option>');
+                    }
+                });
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
+    /* */
+    function GetProductddl(ddl) {
+        var Nextddl = document.getElementById('ddl_P');
+        Nextddl.innerHTML = '';
+        Nextddl.append('<option value="0" selected>請選擇</option>');
+        $.ajax({
+            url: '/Admin/Home/GetCourseSelect?CID=' + ddl,
+            method: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                $.each(res, function (index) {
+                    if (res[index].Selected) {
+                        Nextddl.innerHTML += ('<option value="' + res[index].value + '" selected>' + res[index].Text + '</option>');
+                    }
+                    else {
+                        Nextddl.innerHTML += ('<option value="' + res[index].value + '">' + res[index].Text + '</option>');
+                    }
+
                 });
             },
             error: function (err) { console.log(err) },

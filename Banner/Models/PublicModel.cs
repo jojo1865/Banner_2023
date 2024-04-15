@@ -202,4 +202,22 @@ namespace Banner.Models
         //永久課程名稱
         public string sTitle_C { get; set; } = "";
     }
+
+    public class cCouponRoolCell
+    {
+        public string Category { get; set; } = "";
+        public string Title { get; set; } = "";
+        public int CRID { get; set; } = 0;
+        public int SortNo { get; set; } = 0;
+        public int Price_Type { get; set; } = 0;
+        public int Price_Cut { get; set; } = 0;
+        public int Target_Type { get; set; } = 0;
+        public int Target_ID { get; set; } = 0;
+        public int Category_ID { get; set; } = 0;
+    }
+
+    public class cID
+    {
+        public int ID { get; set; } = 0;
+    }
 }

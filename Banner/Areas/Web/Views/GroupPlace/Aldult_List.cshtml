@@ -24,6 +24,10 @@
             --bs-btn-padding-y: 6px;
             --bs-btn-padding-x: 24px;
         }
+
+    .btn-info, .btn-info:focus, .btn-info:hover {
+        color: white;
+    }
 </style>
 <div class="body-container container_phone">
     <div class="section-container">
@@ -69,6 +73,25 @@
                 }
             },
             error: function (err) { console.log(err) },
+        });
+    }
+    function ShowSelect(ACID) {
+        Swal.fire({
+            icon: "info",
+            title: "檢視歷程",
+            html:"請選擇您想要檢視的歷程",
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: "牧養歷程",
+            denyButtonText: "課程歷程",
+            cancelButtonText: "取消",
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                window.open('/Web/GroupPlace/History_AC/@(TempData["OIID"])?ACID=' + ACID);
+            } else if (result.isDenied) {
+                window.open('/Web/GroupPlace/History_OP/@(TempData["OIID"])?ACID=' + ACID);
+            }
         });
     }
 </script>

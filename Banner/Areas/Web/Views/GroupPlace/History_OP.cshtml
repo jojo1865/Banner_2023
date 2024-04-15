@@ -1,0 +1,36 @@
+﻿@model Banner.Models.cTableList
+@{
+    ViewBag.Title = "OPHistory";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container container_phone">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/GroupPlace/Index/@ViewBag._OIID">小組資訊</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/GroupPlace/Aldult_List">小組名單</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">課程歷程</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">@Html.Raw(TempData["GroupTitle"])</h5>
+        </div>
+        @Html.Action("_GroupTopMenu", "Include")
+        <div class="container-lg">
+            <form method="post" id="form1">
+                <h3 class="lab_DarkBlue mb-2">@Model.Title</h3>
+                @Html.Action("_TableList", "Include", new { cTL = Model })
+            </form>
+            <div class="row">
+                <div class="col m-3 text-center">
+                    <button class="btn btn-success p-3" type="button" onclick="window.close()">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

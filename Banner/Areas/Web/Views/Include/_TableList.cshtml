@@ -59,7 +59,7 @@
 
                                                     case "linkbutton"://linkbutton
                                                         {
-                                                            <a href="@C_.URL" target="@C_.Target" class="btn btn-primary btn-round btn-sm">@C_.Value</a>
+                                                            <a href="@C_.URL" target="@C_.Target" class="@(string.IsNullOrEmpty(C_.CSS) ? "btn btn-primary btn-round btn-sm" : C_.CSS)">@C_.Value</a>
                                                         }
                                                         break;
 

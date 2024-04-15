@@ -449,7 +449,7 @@ namespace Banner.Areas.Admin.Controllers
             ACID = GetACID();
             string sReturn = "";
             var O = DC.Organize.FirstOrDefault(q => q.OID == OID && !q.DeleteFlag);
-            if(O!=null)
+            if (O != null)
             {
                 if (ACID == 1)
                 {
@@ -480,7 +480,7 @@ namespace Banner.Areas.Admin.Controllers
 
                 }
             }
-            
+
 
             return sReturn;
         }
@@ -773,6 +773,28 @@ namespace Banner.Areas.Admin.Controllers
                      select new { value = q.CID, Text = q.Title };
 
             return JsonConvert.SerializeObject(Cs);
+        }
+        #endregion
+        #region 取得永久課程下商品選單
+        [HttpGet]
+        public string GetCourseSelect(int CID, int PID = 0)
+        {
+            ACID = GetACID();
+            var MOI2 = DC.M_OI2_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && (q.OIID == 1 || q.OIID > 2));
+            var Ps = DC.Product.Where(q => !q.DeleteFlag && q.ActiveFlag && q.CID == CID);
+            if (MOI2.Any(q => q.OIID == 1)) { }//全部旌旗都可以
+            else
+            {
+                Ps = from q in Ps
+                     join p in MOI2
+                     on q.OIID equals p.OIID
+                     select q;
+            }
+            List<SelectListItem> SLIs = new List<SelectListItem>();
+            SLIs.Add(new SelectListItem { Text = "請選擇", Value = "0", Selected = PID == 0 });
+            foreach (var P in Ps.OrderBy(q => q.SubTitle))
+                SLIs.Add(new SelectListItem { Text = P.SubTitle, Value = P.PID.ToString(), Selected = PID == P.PID });
+            return JsonConvert.SerializeObject(SLIs);
         }
         #endregion
         #region 取得課程內容

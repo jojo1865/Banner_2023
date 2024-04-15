@@ -624,7 +624,7 @@ namespace Banner.Areas.Web.Controllers
                         c.cTL_Banner.Rs = new List<cTableRow>();
                         c.cTL_Banner.NumCut = 0;
                         TopTitles = new List<cTableCell>();
-                        TopTitles.Add(new cTableCell { Title = "日期", WidthPX = 120 });
+                        TopTitles.Add(new cTableCell { Title = "日期", WidthPX = 160 });
                         TopTitles.Add(new cTableCell { Title = "類型", WidthPX = 160 });
                         TopTitles.Add(new cTableCell { Title = "歷程" });
                         
@@ -632,7 +632,7 @@ namespace Banner.Areas.Web.Controllers
                         foreach (var L in Ls_AC.OrderByDescending(q=>q.dDate))
                         {
                             cTableRow cTR = new cTableRow();
-                            cTR.Cs.Add(new cTableCell { Value = L.dDate.ToString(DateFormat) }); //日期
+                            cTR.Cs.Add(new cTableCell { Value = L.dDate.ToString(DateTimeFormat) }); //日期
                             cTR.Cs.Add(new cTableCell { Value = L.sType }); //類型
                             cTR.Cs.Add(new cTableCell { Value = L.sTitle }); //歷程
                             c.cTL_Banner.Rs.Add(SetTableCellSortNo(cTR));

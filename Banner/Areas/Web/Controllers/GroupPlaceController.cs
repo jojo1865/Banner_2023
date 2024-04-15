@@ -41,8 +41,9 @@ namespace Banner.Areas.Web.Controllers
                 OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OI.ParentID && q.ActiveFlag && !q.DeleteFlag && q.OID > 1);
             }
             TempData["GroupTitle"] = GroupMapTitle;
-            #endregion
 
+            #endregion
+            TempData["OIID"] = OIID;
             ViewBag._OIID = OIID;
         }
         #region 小組資訊-首頁-聚會資料
@@ -249,10 +250,10 @@ namespace Banner.Areas.Web.Controllers
             cTL.NowPage = iNowPage;
             cTL.NumCut = iNumCut;
             cTL.Rs = new List<cTableRow>();
-            
+
             var TopTitles = new List<cTableCell>();
 
-            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 300 });
+            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 200 });
             TopTitles.Add(new cTableCell { Title = "職分", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "姓名", WidthPX = 160 });
             TopTitles.Add(new cTableCell { Title = "性別", WidthPX = 50 });
@@ -276,14 +277,17 @@ namespace Banner.Areas.Web.Controllers
                     //操作
                     cTableCell cTC = new cTableCell();
                     if (N.ACID != ACID)//小組長不能移除自己
-                        cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Aldult_Remove/" + N.MID, Target = "_self", Value = "移除" });
+                        cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Aldult_Remove/" + N.MID, Target = "_self", CSS = "btn btn-danger btn-round-nocolor btn-sm mb-1", Value = "移除" });
                     else if (!DC.M_Role_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//補案立
                         EditEmtitle(ACID);
-                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Aldult_Edit/" + N.MID, Target = "_self", Value = "編輯" });
-                    if(!DC.M_Role_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//沒被按立
-                        cTC.cTCs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ");", Target = "_self", CSS = "btn btn-success btn-round-nocolor btn-sm", Value = "發卡" });
+
+                    cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Aldult_Edit/" + N.MID, Target = "_self", CSS = "btn btn-primary btn-round btn-sm mb-1", Value = "編輯" });
+                    cTC.cTCs.Add(new cTableCell { Type = "button", URL = "ShowSelect(" + N.ACID + ");", CSS = "btn btn-info btn-round-nocolor btn-sm mb-1", Value = "歷程" });
+
+                    if (!DC.M_Role_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//沒被按立
+                        cTC.cTCs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ");", Target = "_self", CSS = "btn btn-success btn-round-nocolor btn-sm mb-1", Value = "發卡" });
                     else
-                        cTC.cTCs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ");", Target = "_self", CSS = "btn btn-danger btn-round-nocolor btn-sm", Value = "收卡" });
+                        cTC.cTCs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ");", Target = "_self", CSS = "btn btn-warning btn-round-nocolor btn-sm mb-1", Value = "收卡" });
 
                     cTR.Cs.Add(cTC);
                     //職分
@@ -324,7 +328,7 @@ namespace Banner.Areas.Web.Controllers
             GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            
+
             return View(GetAldult_List(null));
         }
         [HttpPost]
@@ -333,7 +337,7 @@ namespace Banner.Areas.Web.Controllers
             GetID(ID);
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
-            
+
             return View(GetAldult_List(FC));
         }
         #endregion
@@ -344,7 +348,7 @@ namespace Banner.Areas.Web.Controllers
 
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
-            
+
             Account_Note N = new Account_Note();
             var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.MID == ID && q.OrganizeInfo.ACID == ACID);
             if (M == null)
@@ -464,7 +468,7 @@ namespace Banner.Areas.Web.Controllers
                     DC.Account_Note.InsertOnSubmit(N);
                     DC.SubmitChanges();
                     N.Account.NightLeaderFlag = false;//拔領夜
-                    M.Account.GroupType =GetViewCheckBox(FC.Get("cbox_NoIntention")) ? "無意願" : "有意願-願分發";
+                    M.Account.GroupType = GetViewCheckBox(FC.Get("cbox_NoIntention")) ? "無意願" : "有意願-願分發";
                     M.Account.UpdDate = DT;
                     N.Account.SaveACID = ACID;
 
@@ -476,7 +480,7 @@ namespace Banner.Areas.Web.Controllers
 
                     //退會友卡
                     var MR = DC.M_Role_Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == N.ACID && q.RID == 2);
-                    if(MR !=null)
+                    if (MR != null)
                     {
                         MR.ActiveFlag = false;
                         MR.UpdDate = DT;
@@ -495,19 +499,19 @@ namespace Banner.Areas.Web.Controllers
         {
             string Error = "";
             var M = DC.M_Role_Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2);
-            if(M!=null)
+            if (M != null)
             {
                 if (DC.OrganizeInfo.Count(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag) > 1)
                     Error += "此員在其他組織仍擔任管理人,因此無法退卡<br/>";
-                if(DC.M_Staff_Account.Count(q=>q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) >0)
+                if (DC.M_Staff_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
                     Error += "此員仍為事工團團員,因此無法退卡<br/>";
                 if (DC.M_O_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
                     Error += "此員仍被按立中,因此無法退卡<br/>";
                 if (DC.M_OI2_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
                     Error += "此員仍為全職同工,因此無法退卡<br/>";
-                if(M.Account.BackUsedFlag)
+                if (M.Account.BackUsedFlag)
                     Error += "此員仍具後臺登入身分,因此無法退卡<br/>";
-                if(Error=="")
+                if (Error == "")
                 {
                     M.ActiveFlag = false;
                     M.LeaveDate = DT;
@@ -595,7 +599,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetNew_List(null));
         }
         [HttpPost]
-        public ActionResult New_List(int ID,FormCollection FC)
+        public ActionResult New_List(int ID, FormCollection FC)
         {
             GetID(ID);
             GetViewBag();
@@ -650,7 +654,7 @@ namespace Banner.Areas.Web.Controllers
 
         public ActionResult New_Remove(int ID, FormCollection FC)
         {
-            
+
             GetViewBag();
             ViewBag._CSS1 = "/Areas/Web/Content/css/form.css";
             Account_Note N = new Account_Note();
@@ -676,7 +680,7 @@ namespace Banner.Areas.Web.Controllers
                 {
                     DC.Account_Note.InsertOnSubmit(N);
                     DC.SubmitChanges();
-                    if(FC!=null)
+                    if (FC != null)
                         M.Account.GroupType = GetViewCheckBox(FC.Get("cbox_NoIntention")) ? "無意願" : "有意願-願分發";
                     M.ActiveFlag = false;
                     M.UpdDate = DT;
@@ -755,7 +759,7 @@ namespace Banner.Areas.Web.Controllers
             return View(GetBaptized_List(null));
         }
         [HttpPost]
-        public ActionResult Baptized_List(int ID,FormCollection FC)
+        public ActionResult Baptized_List(int ID, FormCollection FC)
         {
             GetID(ID);
             GetViewBag();
@@ -1038,6 +1042,131 @@ namespace Banner.Areas.Web.Controllers
             GetID(ID);
             GetViewBag();
             return View(GetGroupMeet_List(FC));
+        }
+        #endregion
+
+        #region 小組員牧養歷程
+        public cTableList GetHistory_AC(int OIID, int ACID_, FormCollection FC)
+        {
+            ACID = GetACID();
+            Error = "";
+            cTableList cTL = new cTableList();
+
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID_ && !q.DeleteFlag);
+            var MOI = DC.M_OI_Account.FirstOrDefault(q => q.ACID == ACID_ && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
+            if (AC == null)
+                Error = "此會員不存在";
+            else if (MOI == null)
+                Error = "此小組不存在,或是您並非此小組的小組長";
+
+            if (Error != "")
+                SetAlert(Error, 2, "/Web/Home/index");
+            else
+            {
+                int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+                int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+                cTL.Title = "小組員 " + AC.Name_First + AC.Name_Last + " 牧養歷程";
+                cTL.NowPage = iNowPage;
+                cTL.NumCut = iNumCut;
+                cTL.Rs = new List<cTableRow>();
+
+                var TopTitles = new List<cTableCell>();
+
+
+                TopTitles.Add(new cTableCell { Title = "日期", WidthPX = 160 });
+                TopTitles.Add(new cTableCell { Title = "類型", WidthPX = 160 });
+                TopTitles.Add(new cTableCell { Title = "歷程" });
+                cTL.Rs.Add(SetTableRowTitle(TopTitles));
+                ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+
+                List<cAChistry> Ls = GetACHistory(AC);
+                Ls = Ls.OrderByDescending(q => q.dDate).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut).ToList();
+                foreach (var L in Ls)
+                {
+                    cTableRow cTR = new cTableRow();
+                    cTR.Cs.Add(new cTableCell { Value = L.dDate.ToString(DateTimeFormat) }); //日期
+                    cTR.Cs.Add(new cTableCell { Value = L.sType }); //類型
+                    cTR.Cs.Add(new cTableCell { Value = L.sTitle }); //歷程
+                    cTL.Rs.Add(SetTableCellSortNo(cTR));
+                }
+            }
+
+            return cTL;
+        }
+        [HttpGet]
+        public ActionResult History_AC(int ID)
+        {
+            GetViewBag();
+            GetID(ID);
+            return View(GetHistory_AC(ID, GetQueryStringInInt("ACID"), null));
+        }
+        [HttpPost]
+        public ActionResult History_AC(int ID, FormCollection FC)
+        {
+            GetViewBag();
+            GetID(ID);
+            return View(GetHistory_AC(ID, GetQueryStringInInt("ACID"), FC));
+        }
+        #endregion
+        #region 小組員課程歷程
+        public cTableList GetHistory_OP(int OIID, int ACID_, FormCollection FC)
+        {
+            ACID = GetACID();
+            Error = "";
+            cTableList cTL = new cTableList();
+
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID_ && !q.DeleteFlag);
+            var MOI = DC.M_OI_Account.FirstOrDefault(q => q.ACID == ACID_ && q.OrganizeInfo.ACID == ACID && q.OIID == OIID);
+            if (AC == null)
+                Error = "此會員不存在";
+            else if (MOI == null)
+                Error = "此小組不存在,或是您並非此小組的小組長";
+
+            if (Error != "")
+                SetAlert(Error, 2, "/Web/Home/index");
+            else
+            {
+                int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+                int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+                cTL.Title = "小組員 " + AC.Name_First + AC.Name_Last + " 課程結業歷程";
+                cTL.NowPage = iNowPage;
+                cTL.NumCut = iNumCut;
+                cTL.Rs = new List<cTableRow>();
+
+                var TopTitles = new List<cTableCell>();
+
+
+                TopTitles.Add(new cTableCell { Title = "日期", WidthPX = 120 });
+                TopTitles.Add(new cTableCell { Title = "課程名稱" });
+                cTL.Rs.Add(SetTableRowTitle(TopTitles));
+                ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+
+                List<cPhistry> Ls = GetPHistory(AC);
+                Ls = Ls.OrderByDescending(q => q.dDate).Skip((iNowPage - 1) * cTL.NumCut).Take(cTL.NumCut).ToList();
+                foreach (var L in Ls)
+                {
+                    cTableRow cTR = new cTableRow();
+                    cTR.Cs.Add(new cTableCell { Value = L.dDate.ToString(DateTimeFormat) }); //日期
+                    cTR.Cs.Add(new cTableCell { Value = L.sTitle_C + " " + L.sTitle_P }); //類型
+                    cTL.Rs.Add(SetTableCellSortNo(cTR));
+                }
+            }
+
+            return cTL;
+        }
+        [HttpGet]
+        public ActionResult History_OP(int ID)
+        {
+            GetViewBag();
+            GetID(ID);
+            return View(GetHistory_OP(ID, GetQueryStringInInt("ACID"), null));
+        }
+        [HttpPost]
+        public ActionResult History_OP(int ID, FormCollection FC)
+        {
+            GetViewBag();
+            GetID(ID);
+            return View(GetHistory_OP(ID, GetQueryStringInInt("ACID"), FC));
         }
         #endregion
     }

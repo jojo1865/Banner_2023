@@ -761,6 +761,8 @@
     <Content Include="Areas\Web\Views\Include\_SearchOrganizeInfo_OI.cshtml" />
     <Content Include="Areas\Web\Views\LeaderPlace\Set_LeadTheNight_List.cshtml" />
     <Content Include="Areas\Web\Views\LeaderPlace\Set_LeadTheNight_Info.cshtml" />
+    <Content Include="Areas\Web\Views\GroupPlace\History_AC.cshtml" />
+    <Content Include="Areas\Web\Views\GroupPlace\History_OP.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

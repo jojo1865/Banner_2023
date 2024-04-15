@@ -57,9 +57,6 @@ namespace Banner
     partial void InsertContect(Contect instance);
     partial void UpdateContect(Contect instance);
     partial void DeleteContect(Contect instance);
-    partial void InsertCoupon_Account(Coupon_Account instance);
-    partial void UpdateCoupon_Account(Coupon_Account instance);
-    partial void DeleteCoupon_Account(Coupon_Account instance);
     partial void InsertCourse(Course instance);
     partial void UpdateCourse(Course instance);
     partial void DeleteCourse(Course instance);
@@ -186,9 +183,9 @@ namespace Banner
     partial void InsertM_OI_Coupon(M_OI_Coupon instance);
     partial void UpdateM_OI_Coupon(M_OI_Coupon instance);
     partial void DeleteM_OI_Coupon(M_OI_Coupon instance);
-    partial void InsertCoupon_Rool(Coupon_Rool instance);
-    partial void UpdateCoupon_Rool(Coupon_Rool instance);
-    partial void DeleteCoupon_Rool(Coupon_Rool instance);
+    partial void InsertCoupon_Rule(Coupon_Rule instance);
+    partial void UpdateCoupon_Rule(Coupon_Rule instance);
+    partial void DeleteCoupon_Rule(Coupon_Rule instance);
     partial void InsertCoupon_Header(Coupon_Header instance);
     partial void UpdateCoupon_Header(Coupon_Header instance);
     partial void DeleteCoupon_Header(Coupon_Header instance);
@@ -213,6 +210,9 @@ namespace Banner
     partial void InsertLog_OrganizeInfo_ACID(Log_OrganizeInfo_ACID instance);
     partial void UpdateLog_OrganizeInfo_ACID(Log_OrganizeInfo_ACID instance);
     partial void DeleteLog_OrganizeInfo_ACID(Log_OrganizeInfo_ACID instance);
+    partial void InsertCoupon_Account(Coupon_Account instance);
+    partial void UpdateCoupon_Account(Coupon_Account instance);
+    partial void DeleteCoupon_Account(Coupon_Account instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -308,14 +308,6 @@ namespace Banner
 			get
 			{
 				return this.GetTable<Contect>();
-			}
-		}
-		
-		public System.Data.Linq.Table<Coupon_Account> Coupon_Account
-		{
-			get
-			{
-				return this.GetTable<Coupon_Account>();
 			}
 		}
 		
@@ -655,11 +647,11 @@ namespace Banner
 			}
 		}
 		
-		public System.Data.Linq.Table<Coupon_Rool> Coupon_Rool
+		public System.Data.Linq.Table<Coupon_Rule> Coupon_Rule
 		{
 			get
 			{
-				return this.GetTable<Coupon_Rool>();
+				return this.GetTable<Coupon_Rule>();
 			}
 		}
 		
@@ -724,6 +716,14 @@ namespace Banner
 			get
 			{
 				return this.GetTable<Log_OrganizeInfo_ACID>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Coupon_Account> Coupon_Account
+		{
+			get
+			{
+				return this.GetTable<Coupon_Account>();
 			}
 		}
 		
@@ -810,8 +810,6 @@ namespace Banner
 		
 		private EntitySet<Community> _Community;
 		
-		private EntitySet<Coupon_Account> _Coupon_Account;
-		
 		private EntitySet<Family> _Family;
 		
 		private EntitySet<JoinGroupWish> _JoinGroupWish;
@@ -841,6 +839,8 @@ namespace Banner
 		private EntitySet<M_OI_Account> _M_OI_Account;
 		
 		private EntitySet<Log_OrganizeInfo_ACID> _Log_OrganizeInfo_ACID;
+		
+		private EntitySet<Coupon_Account> _Coupon_Account;
 		
     #region 擴充性方法定義
     partial void OnLoaded();
@@ -907,7 +907,6 @@ namespace Banner
 			this._Baptized = new EntitySet<Baptized>(new Action<Baptized>(this.attach_Baptized), new Action<Baptized>(this.detach_Baptized));
 			this._Change_OI_Order = default(EntityRef<Change_OI_Order>);
 			this._Community = new EntitySet<Community>(new Action<Community>(this.attach_Community), new Action<Community>(this.detach_Community));
-			this._Coupon_Account = new EntitySet<Coupon_Account>(new Action<Coupon_Account>(this.attach_Coupon_Account), new Action<Coupon_Account>(this.detach_Coupon_Account));
 			this._Family = new EntitySet<Family>(new Action<Family>(this.attach_Family), new Action<Family>(this.detach_Family));
 			this._JoinGroupWish = new EntitySet<JoinGroupWish>(new Action<JoinGroupWish>(this.attach_JoinGroupWish), new Action<JoinGroupWish>(this.detach_JoinGroupWish));
 			this._M_ML_Account = new EntitySet<M_ML_Account>(new Action<M_ML_Account>(this.attach_M_ML_Account), new Action<M_ML_Account>(this.detach_M_ML_Account));
@@ -923,6 +922,7 @@ namespace Banner
 			this._Log_BusinessType_Account = new EntitySet<Log_BusinessType_Account>(new Action<Log_BusinessType_Account>(this.attach_Log_BusinessType_Account), new Action<Log_BusinessType_Account>(this.detach_Log_BusinessType_Account));
 			this._M_OI_Account = new EntitySet<M_OI_Account>(new Action<M_OI_Account>(this.attach_M_OI_Account), new Action<M_OI_Account>(this.detach_M_OI_Account));
 			this._Log_OrganizeInfo_ACID = new EntitySet<Log_OrganizeInfo_ACID>(new Action<Log_OrganizeInfo_ACID>(this.attach_Log_OrganizeInfo_ACID), new Action<Log_OrganizeInfo_ACID>(this.detach_Log_OrganizeInfo_ACID));
+			this._Coupon_Account = new EntitySet<Coupon_Account>(new Action<Coupon_Account>(this.attach_Coupon_Account), new Action<Coupon_Account>(this.detach_Coupon_Account));
 			OnCreated();
 		}
 		
@@ -1527,19 +1527,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Coupon_Account", Storage="_Coupon_Account", ThisKey="ACID", OtherKey="ACID")]
-		public EntitySet<Coupon_Account> Coupon_Account
-		{
-			get
-			{
-				return this._Coupon_Account;
-			}
-			set
-			{
-				this._Coupon_Account.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Family", Storage="_Family", ThisKey="ACID", OtherKey="ACID")]
 		public EntitySet<Family> Family
 		{
@@ -1735,6 +1722,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Coupon_Account", Storage="_Coupon_Account", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<Coupon_Account> Coupon_Account
+		{
+			get
+			{
+				return this._Coupon_Account;
+			}
+			set
+			{
+				this._Coupon_Account.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -1798,18 +1798,6 @@ namespace Banner
 		}
 		
 		private void detach_Community(Community entity)
-		{
-			this.SendPropertyChanging();
-			entity.Account = null;
-		}
-		
-		private void attach_Coupon_Account(Coupon_Account entity)
-		{
-			this.SendPropertyChanging();
-			entity.Account = this;
-		}
-		
-		private void detach_Coupon_Account(Coupon_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -1990,6 +1978,18 @@ namespace Banner
 		}
 		
 		private void detach_Log_OrganizeInfo_ACID(Log_OrganizeInfo_ACID entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_Coupon_Account(Coupon_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_Coupon_Account(Coupon_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -4147,414 +4147,6 @@ namespace Banner
 					this._CheckDate = value;
 					this.SendPropertyChanged("CheckDate");
 					this.OnCheckDateChanged();
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Coupon_Account")]
-	public partial class Coupon_Account : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _CAID;
-		
-		private int _CHID;
-		
-		private int _ACID;
-		
-		private int _OHID;
-		
-		private int _OPID;
-		
-		private System.DateTime _UsedDate;
-		
-		private string _Note;
-		
-		private bool _ActiveFlag;
-		
-		private bool _DeleteFlag;
-		
-		private System.DateTime _CreDate;
-		
-		private System.DateTime _UpdDate;
-		
-		private int _SaveACID;
-		
-		private EntityRef<Account> _Account;
-		
-		private EntityRef<Coupon_Header> _Coupon_Header;
-		
-    #region 擴充性方法定義
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnCAIDChanging(int value);
-    partial void OnCAIDChanged();
-    partial void OnCHIDChanging(int value);
-    partial void OnCHIDChanged();
-    partial void OnACIDChanging(int value);
-    partial void OnACIDChanged();
-    partial void OnOHIDChanging(int value);
-    partial void OnOHIDChanged();
-    partial void OnOPIDChanging(int value);
-    partial void OnOPIDChanged();
-    partial void OnUsedDateChanging(System.DateTime value);
-    partial void OnUsedDateChanged();
-    partial void OnNoteChanging(string value);
-    partial void OnNoteChanged();
-    partial void OnActiveFlagChanging(bool value);
-    partial void OnActiveFlagChanged();
-    partial void OnDeleteFlagChanging(bool value);
-    partial void OnDeleteFlagChanged();
-    partial void OnCreDateChanging(System.DateTime value);
-    partial void OnCreDateChanged();
-    partial void OnUpdDateChanging(System.DateTime value);
-    partial void OnUpdDateChanged();
-    partial void OnSaveACIDChanging(int value);
-    partial void OnSaveACIDChanged();
-    #endregion
-		
-		public Coupon_Account()
-		{
-			this._Account = default(EntityRef<Account>);
-			this._Coupon_Header = default(EntityRef<Coupon_Header>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CAID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int CAID
-		{
-			get
-			{
-				return this._CAID;
-			}
-			set
-			{
-				if ((this._CAID != value))
-				{
-					this.OnCAIDChanging(value);
-					this.SendPropertyChanging();
-					this._CAID = value;
-					this.SendPropertyChanged("CAID");
-					this.OnCAIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CHID", DbType="Int NOT NULL")]
-		public int CHID
-		{
-			get
-			{
-				return this._CHID;
-			}
-			set
-			{
-				if ((this._CHID != value))
-				{
-					if (this._Coupon_Header.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnCHIDChanging(value);
-					this.SendPropertyChanging();
-					this._CHID = value;
-					this.SendPropertyChanged("CHID");
-					this.OnCHIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
-		public int ACID
-		{
-			get
-			{
-				return this._ACID;
-			}
-			set
-			{
-				if ((this._ACID != value))
-				{
-					if (this._Account.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnACIDChanging(value);
-					this.SendPropertyChanging();
-					this._ACID = value;
-					this.SendPropertyChanged("ACID");
-					this.OnACIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OHID", DbType="Int NOT NULL")]
-		public int OHID
-		{
-			get
-			{
-				return this._OHID;
-			}
-			set
-			{
-				if ((this._OHID != value))
-				{
-					this.OnOHIDChanging(value);
-					this.SendPropertyChanging();
-					this._OHID = value;
-					this.SendPropertyChanged("OHID");
-					this.OnOHIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPID", DbType="Int NOT NULL")]
-		public int OPID
-		{
-			get
-			{
-				return this._OPID;
-			}
-			set
-			{
-				if ((this._OPID != value))
-				{
-					this.OnOPIDChanging(value);
-					this.SendPropertyChanging();
-					this._OPID = value;
-					this.SendPropertyChanged("OPID");
-					this.OnOPIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UsedDate", DbType="DateTime NOT NULL")]
-		public System.DateTime UsedDate
-		{
-			get
-			{
-				return this._UsedDate;
-			}
-			set
-			{
-				if ((this._UsedDate != value))
-				{
-					this.OnUsedDateChanging(value);
-					this.SendPropertyChanging();
-					this._UsedDate = value;
-					this.SendPropertyChanged("UsedDate");
-					this.OnUsedDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Note", DbType="NVarChar(MAX)")]
-		public string Note
-		{
-			get
-			{
-				return this._Note;
-			}
-			set
-			{
-				if ((this._Note != value))
-				{
-					this.OnNoteChanging(value);
-					this.SendPropertyChanging();
-					this._Note = value;
-					this.SendPropertyChanged("Note");
-					this.OnNoteChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
-		public bool ActiveFlag
-		{
-			get
-			{
-				return this._ActiveFlag;
-			}
-			set
-			{
-				if ((this._ActiveFlag != value))
-				{
-					this.OnActiveFlagChanging(value);
-					this.SendPropertyChanging();
-					this._ActiveFlag = value;
-					this.SendPropertyChanged("ActiveFlag");
-					this.OnActiveFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
-		public bool DeleteFlag
-		{
-			get
-			{
-				return this._DeleteFlag;
-			}
-			set
-			{
-				if ((this._DeleteFlag != value))
-				{
-					this.OnDeleteFlagChanging(value);
-					this.SendPropertyChanging();
-					this._DeleteFlag = value;
-					this.SendPropertyChanged("DeleteFlag");
-					this.OnDeleteFlagChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
-		public System.DateTime CreDate
-		{
-			get
-			{
-				return this._CreDate;
-			}
-			set
-			{
-				if ((this._CreDate != value))
-				{
-					this.OnCreDateChanging(value);
-					this.SendPropertyChanging();
-					this._CreDate = value;
-					this.SendPropertyChanged("CreDate");
-					this.OnCreDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
-		public System.DateTime UpdDate
-		{
-			get
-			{
-				return this._UpdDate;
-			}
-			set
-			{
-				if ((this._UpdDate != value))
-				{
-					this.OnUpdDateChanging(value);
-					this.SendPropertyChanging();
-					this._UpdDate = value;
-					this.SendPropertyChanged("UpdDate");
-					this.OnUpdDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
-		public int SaveACID
-		{
-			get
-			{
-				return this._SaveACID;
-			}
-			set
-			{
-				if ((this._SaveACID != value))
-				{
-					this.OnSaveACIDChanging(value);
-					this.SendPropertyChanging();
-					this._SaveACID = value;
-					this.SendPropertyChanged("SaveACID");
-					this.OnSaveACIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Coupon_Account", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
-		public Account Account
-		{
-			get
-			{
-				return this._Account.Entity;
-			}
-			set
-			{
-				Account previousValue = this._Account.Entity;
-				if (((previousValue != value) 
-							|| (this._Account.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Account.Entity = null;
-						previousValue.Coupon_Account.Remove(this);
-					}
-					this._Account.Entity = value;
-					if ((value != null))
-					{
-						value.Coupon_Account.Add(this);
-						this._ACID = value.ACID;
-					}
-					else
-					{
-						this._ACID = default(int);
-					}
-					this.SendPropertyChanged("Account");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Header_Coupon_Account", Storage="_Coupon_Header", ThisKey="CHID", OtherKey="CHID", IsForeignKey=true)]
-		public Coupon_Header Coupon_Header
-		{
-			get
-			{
-				return this._Coupon_Header.Entity;
-			}
-			set
-			{
-				Coupon_Header previousValue = this._Coupon_Header.Entity;
-				if (((previousValue != value) 
-							|| (this._Coupon_Header.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Coupon_Header.Entity = null;
-						previousValue.Coupon_Account.Remove(this);
-					}
-					this._Coupon_Header.Entity = value;
-					if ((value != null))
-					{
-						value.Coupon_Account.Add(this);
-						this._CHID = value.CHID;
-					}
-					else
-					{
-						this._CHID = default(int);
-					}
-					this.SendPropertyChanged("Coupon_Header");
 				}
 			}
 		}
@@ -20005,8 +19597,8 @@ namespace Banner
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Coupon_Rool")]
-	public partial class Coupon_Rool : INotifyPropertyChanging, INotifyPropertyChanged
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Coupon_Rule")]
+	public partial class Coupon_Rule : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
 		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
@@ -20026,6 +19618,8 @@ namespace Banner
 		private int _Target_Type;
 		
 		private int _Target_ID;
+		
+		private EntitySet<Coupon_Account> _Coupon_Account;
 		
 		private EntityRef<Coupon_Header> _Coupon_Header;
 		
@@ -20051,8 +19645,9 @@ namespace Banner
     partial void OnTarget_IDChanged();
     #endregion
 		
-		public Coupon_Rool()
+		public Coupon_Rule()
 		{
+			this._Coupon_Account = new EntitySet<Coupon_Account>(new Action<Coupon_Account>(this.attach_Coupon_Account), new Action<Coupon_Account>(this.detach_Coupon_Account));
 			this._Coupon_Header = default(EntityRef<Coupon_Header>);
 			OnCreated();
 		}
@@ -20221,7 +19816,20 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Header_Coupon_Rool", Storage="_Coupon_Header", ThisKey="CHID", OtherKey="CHID", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Rule_Coupon_Account", Storage="_Coupon_Account", ThisKey="CRID", OtherKey="CRID")]
+		public EntitySet<Coupon_Account> Coupon_Account
+		{
+			get
+			{
+				return this._Coupon_Account;
+			}
+			set
+			{
+				this._Coupon_Account.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Header_Coupon_Rule", Storage="_Coupon_Header", ThisKey="CHID", OtherKey="CHID", IsForeignKey=true)]
 		public Coupon_Header Coupon_Header
 		{
 			get
@@ -20238,12 +19846,12 @@ namespace Banner
 					if ((previousValue != null))
 					{
 						this._Coupon_Header.Entity = null;
-						previousValue.Coupon_Rool.Remove(this);
+						previousValue.Coupon_Rule.Remove(this);
 					}
 					this._Coupon_Header.Entity = value;
 					if ((value != null))
 					{
-						value.Coupon_Rool.Add(this);
+						value.Coupon_Rule.Add(this);
 						this._CHID = value.CHID;
 					}
 					else
@@ -20273,6 +19881,18 @@ namespace Banner
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+		
+		private void attach_Coupon_Account(Coupon_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Coupon_Rule = this;
+		}
+		
+		private void detach_Coupon_Account(Coupon_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Coupon_Rule = null;
 		}
 	}
 	
@@ -20310,11 +19930,9 @@ namespace Banner
 		
 		private int _SaveACID;
 		
-		private EntitySet<Coupon_Account> _Coupon_Account;
-		
 		private EntitySet<M_OI_Coupon> _M_OI_Coupon;
 		
-		private EntitySet<Coupon_Rool> _Coupon_Rool;
+		private EntitySet<Coupon_Rule> _Coupon_Rool;
 		
     #region 擴充性方法定義
     partial void OnLoaded();
@@ -20352,9 +19970,8 @@ namespace Banner
 		
 		public Coupon_Header()
 		{
-			this._Coupon_Account = new EntitySet<Coupon_Account>(new Action<Coupon_Account>(this.attach_Coupon_Account), new Action<Coupon_Account>(this.detach_Coupon_Account));
 			this._M_OI_Coupon = new EntitySet<M_OI_Coupon>(new Action<M_OI_Coupon>(this.attach_M_OI_Coupon), new Action<M_OI_Coupon>(this.detach_M_OI_Coupon));
-			this._Coupon_Rool = new EntitySet<Coupon_Rool>(new Action<Coupon_Rool>(this.attach_Coupon_Rool), new Action<Coupon_Rool>(this.detach_Coupon_Rool));
+			this._Coupon_Rool = new EntitySet<Coupon_Rule>(new Action<Coupon_Rule>(this.attach_Coupon_Rool), new Action<Coupon_Rule>(this.detach_Coupon_Rool));
 			OnCreated();
 		}
 		
@@ -20638,19 +20255,6 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Header_Coupon_Account", Storage="_Coupon_Account", ThisKey="CHID", OtherKey="CHID")]
-		public EntitySet<Coupon_Account> Coupon_Account
-		{
-			get
-			{
-				return this._Coupon_Account;
-			}
-			set
-			{
-				this._Coupon_Account.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Header_M_OI_Coupon", Storage="_M_OI_Coupon", ThisKey="CHID", OtherKey="CHID")]
 		public EntitySet<M_OI_Coupon> M_OI_Coupon
 		{
@@ -20664,8 +20268,8 @@ namespace Banner
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Header_Coupon_Rool", Storage="_Coupon_Rool", ThisKey="CHID", OtherKey="CHID")]
-		public EntitySet<Coupon_Rool> Coupon_Rool
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Header_Coupon_Rule", Storage="_Coupon_Rool", ThisKey="CHID", OtherKey="CHID")]
+		public EntitySet<Coupon_Rule> Coupon_Rule
 		{
 			get
 			{
@@ -20697,18 +20301,6 @@ namespace Banner
 			}
 		}
 		
-		private void attach_Coupon_Account(Coupon_Account entity)
-		{
-			this.SendPropertyChanging();
-			entity.Coupon_Header = this;
-		}
-		
-		private void detach_Coupon_Account(Coupon_Account entity)
-		{
-			this.SendPropertyChanging();
-			entity.Coupon_Header = null;
-		}
-		
 		private void attach_M_OI_Coupon(M_OI_Coupon entity)
 		{
 			this.SendPropertyChanging();
@@ -20721,13 +20313,13 @@ namespace Banner
 			entity.Coupon_Header = null;
 		}
 		
-		private void attach_Coupon_Rool(Coupon_Rool entity)
+		private void attach_Coupon_Rool(Coupon_Rule entity)
 		{
 			this.SendPropertyChanging();
 			entity.Coupon_Header = this;
 		}
 		
-		private void detach_Coupon_Rool(Coupon_Rool entity)
+		private void detach_Coupon_Rool(Coupon_Rule entity)
 		{
 			this.SendPropertyChanging();
 			entity.Coupon_Header = null;
@@ -22695,6 +22287,414 @@ namespace Banner
 						this._OIID = default(int);
 					}
 					this.SendPropertyChanged("OrganizeInfo");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Coupon_Account")]
+	public partial class Coupon_Account : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _CAID;
+		
+		private int _CRID;
+		
+		private int _ACID;
+		
+		private int _OHID;
+		
+		private int _OPID;
+		
+		private System.DateTime _UsedDate;
+		
+		private string _Note;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _SaveACID;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<Coupon_Rule> _Coupon_Rule;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnCAIDChanging(int value);
+    partial void OnCAIDChanged();
+    partial void OnCRIDChanging(int value);
+    partial void OnCRIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnOHIDChanging(int value);
+    partial void OnOHIDChanged();
+    partial void OnOPIDChanging(int value);
+    partial void OnOPIDChanged();
+    partial void OnUsedDateChanging(System.DateTime value);
+    partial void OnUsedDateChanged();
+    partial void OnNoteChanging(string value);
+    partial void OnNoteChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnSaveACIDChanging(int value);
+    partial void OnSaveACIDChanged();
+    #endregion
+		
+		public Coupon_Account()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._Coupon_Rule = default(EntityRef<Coupon_Rule>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CAID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int CAID
+		{
+			get
+			{
+				return this._CAID;
+			}
+			set
+			{
+				if ((this._CAID != value))
+				{
+					this.OnCAIDChanging(value);
+					this.SendPropertyChanging();
+					this._CAID = value;
+					this.SendPropertyChanged("CAID");
+					this.OnCAIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CRID", DbType="Int NOT NULL")]
+		public int CRID
+		{
+			get
+			{
+				return this._CRID;
+			}
+			set
+			{
+				if ((this._CRID != value))
+				{
+					if (this._Coupon_Rule.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnCRIDChanging(value);
+					this.SendPropertyChanging();
+					this._CRID = value;
+					this.SendPropertyChanged("CRID");
+					this.OnCRIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OHID", DbType="Int NOT NULL")]
+		public int OHID
+		{
+			get
+			{
+				return this._OHID;
+			}
+			set
+			{
+				if ((this._OHID != value))
+				{
+					this.OnOHIDChanging(value);
+					this.SendPropertyChanging();
+					this._OHID = value;
+					this.SendPropertyChanged("OHID");
+					this.OnOHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OPID", DbType="Int NOT NULL")]
+		public int OPID
+		{
+			get
+			{
+				return this._OPID;
+			}
+			set
+			{
+				if ((this._OPID != value))
+				{
+					this.OnOPIDChanging(value);
+					this.SendPropertyChanging();
+					this._OPID = value;
+					this.SendPropertyChanged("OPID");
+					this.OnOPIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UsedDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UsedDate
+		{
+			get
+			{
+				return this._UsedDate;
+			}
+			set
+			{
+				if ((this._UsedDate != value))
+				{
+					this.OnUsedDateChanging(value);
+					this.SendPropertyChanging();
+					this._UsedDate = value;
+					this.SendPropertyChanged("UsedDate");
+					this.OnUsedDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Note", DbType="NVarChar(MAX)")]
+		public string Note
+		{
+			get
+			{
+				return this._Note;
+			}
+			set
+			{
+				if ((this._Note != value))
+				{
+					this.OnNoteChanging(value);
+					this.SendPropertyChanging();
+					this._Note = value;
+					this.SendPropertyChanged("Note");
+					this.OnNoteChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SaveACID", DbType="Int NOT NULL")]
+		public int SaveACID
+		{
+			get
+			{
+				return this._SaveACID;
+			}
+			set
+			{
+				if ((this._SaveACID != value))
+				{
+					this.OnSaveACIDChanging(value);
+					this.SendPropertyChanging();
+					this._SaveACID = value;
+					this.SendPropertyChanged("SaveACID");
+					this.OnSaveACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_Coupon_Account", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.Coupon_Account.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.Coupon_Account.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Coupon_Rule_Coupon_Account", Storage="_Coupon_Rule", ThisKey="CRID", OtherKey="CRID", IsForeignKey=true)]
+		public Coupon_Rule Coupon_Rule
+		{
+			get
+			{
+				return this._Coupon_Rule.Entity;
+			}
+			set
+			{
+				Coupon_Rule previousValue = this._Coupon_Rule.Entity;
+				if (((previousValue != value) 
+							|| (this._Coupon_Rule.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Coupon_Rule.Entity = null;
+						previousValue.Coupon_Account.Remove(this);
+					}
+					this._Coupon_Rule.Entity = value;
+					if ((value != null))
+					{
+						value.Coupon_Account.Add(this);
+						this._CRID = value.CRID;
+					}
+					else
+					{
+						this._CRID = default(int);
+					}
+					this.SendPropertyChanged("Coupon_Rule");
 				}
 			}
 		}

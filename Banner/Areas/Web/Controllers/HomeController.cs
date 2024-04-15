@@ -730,7 +730,7 @@ namespace Banner.Areas.Web.Controllers
                         string sNote = "";
                         if (iPrice[2] > 0)
                         {
-                            var CR = DC.Coupon_Rool.FirstOrDefault(q => q.CHID == iPrice[2]);
+                            var CR = DC.Coupon_Rule.FirstOrDefault(q => q.CHID == iPrice[2]);
                             sNote = GetCouponNote(CR);
                         }
                         Order_Product OP = new Order_Product
