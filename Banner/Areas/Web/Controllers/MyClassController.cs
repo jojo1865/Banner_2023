@@ -331,7 +331,7 @@ namespace Banner.Areas.Web.Controllers
 
         #endregion
 
-        #region 課程資訊-列表
+        #region 我的訂單-列表
         public class cGetMyOrder_List
         {
             public cTableList cTL = new cTableList();
@@ -390,12 +390,12 @@ namespace Banner.Areas.Web.Controllers
 
 
             var TopTitles = new List<cTableCell>();
-            TopTitles.Add(new cTableCell { Title = "刪除或補繳", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "刪除或補繳", WidthPX = 130 });
             TopTitles.Add(new cTableCell { Title = "訂單編號", WidthPX = 80 });
             TopTitles.Add(new cTableCell { Title = "訂單狀態", WidthPX = 80 });
             TopTitles.Add(new cTableCell { Title = "訂單日期", WidthPX = 160 });
             TopTitles.Add(new cTableCell { Title = "金額", WidthPX = 100 });
-            TopTitles.Add(new cTableCell { Title = "付款方式", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "付款方式" });
             TopTitles.Add(new cTableCell { Title = "課程名稱" });
 
 
@@ -422,7 +422,7 @@ namespace Banner.Areas.Web.Controllers
                     {
                         case 0://現金
                             {
-                                if (DT >= DT_MinClass)//已經超過課程第一天,不能刪除
+                                if (DT >= DT_MinClass && ACID != 1)//已經超過課程第一天,不能刪除
                                     cTR.Cs.Add(new cTableCell { Value = "" });
                                 else
                                     cTR.Cs.Add(new cTableCell { Value = "刪除", Type = "delete", URL = "/Web/MyClass/MyOrder_Delete/" + N.OHID });
@@ -449,7 +449,11 @@ namespace Banner.Areas.Web.Controllers
 
                         case 3://Paypal
                             {
-                                cTR.Cs.Add(new cTableCell { Value = "" });
+                                if (Paid.PaidFlag)
+                                    cTR.Cs.Add(new cTableCell { Value = "刪除", Type = "delete", URL = "/Web/MyClass/MyOrder_Delete/" + N.OHID });
+                                else
+                                    cTR.Cs.Add(new cTableCell { Value = "重新付款", Type = "paid", URL = "/Web/ClassStore/Order_Paid_PayPal/" + N.OHID });
+                                //cTR.Cs.Add(new cTableCell { Value = "" });
                             }
                             break;
 
@@ -465,11 +469,11 @@ namespace Banner.Areas.Web.Controllers
                 cTR.Cs.Add(new cTableCell { Value = N.OHID.ToString().PadLeft(5, '0') });//訂單編號
                 cTR.Cs.Add(new cTableCell { Value = sOrderType[N.Order_Type] });//訂單狀態
                 cTR.Cs.Add(new cTableCell { Value = N.CreDate.ToString(DateTimeFormat) });//訂單日期
-
+                cTR.Cs.Add(new cTableCell { Value = N.TotalPrice.ToString() });//金額
                 if (Paid != null)
                 {
                     if (Paid.PaidFlag)
-                        cTR.Cs.Add(new cTableCell { Value = "已於" + Paid.PaidDateTime.ToString(DateTimeFormat) + "使用" + sPayType[Paid.PTID] + "付款完成" });
+                        cTR.Cs.Add(new cTableCell { Value = "已於" + Paid.PaidDateTime.ToString(DateTimeFormat) + "使用" + sPayType[Paid.PayType.PayTypeID] + "付款完成" });
                     else
                         cTR.Cs.Add(new cTableCell { Value = "預計使用" + sPayType[Paid.PayType.PayTypeID] + "付款" });
                 }
@@ -477,7 +481,7 @@ namespace Banner.Areas.Web.Controllers
                     cTR.Cs.Add(new cTableCell { Value = "--" });//付款方式
 
 
-                cTR.Cs.Add(new cTableCell { Value = N.TotalPrice.ToString() });//金額
+                
                 if (N.Order_Type == 2)
                     cTR.Cs.Add(new cTableCell { Value = string.Join("<br/>", N.Order_Product.Select(q => q.Product.Title + " " + q.Product.SubTitle)), Type = "link", URL = "/Web/MyClass/MyClass_List?OHID=" + N.OHID });//課程名稱
                 else
@@ -512,7 +516,7 @@ namespace Banner.Areas.Web.Controllers
             var OH = DC.Order_Header.FirstOrDefault(q => q.OHID == ID && q.ACID == ACID);
             if (OH == null)
                 Error = "此訂單不存在或非您的訂單,不能刪除";
-            else if (OH.Order_Type == 2)
+            else if (OH.Order_Type == 2 && ACID != 1)
                 Error = "此訂單已完成付款,不能刪除";
             else if (OH.Order_Type == 1)//交易中
             {
@@ -535,11 +539,11 @@ namespace Banner.Areas.Web.Controllers
                             break;
 
                         case 3://Paypal
-                            Error = "此訂單正在等待第三方回應,不能自行刪除";
+                            //Error = "此訂單正在等待第三方回應,不能自行刪除";
                             break;
 
                         case 4://支付寶
-                            Error = "此訂單正在等待第三方回應,不能自行刪除";
+                            //Error = "此訂單正在等待第三方回應,不能自行刪除";
                             break;
                     }
                 }

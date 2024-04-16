@@ -2447,6 +2447,7 @@ namespace Banner
             TempData["OID"] = "0";//組織層級ID
             TempData["OITitle"] = "";//組織搜尋用關鍵字
             TempData["BackFlag"] = ViewBag._BackFlag;
+            TempData["PayPalID"] = "";//金流相關
             //CheckVCookie();
         }
 
@@ -2979,14 +2980,18 @@ namespace Banner
                           select p;
                 #region 過濾折價劵適用旌旗
                 //會員所屬小組對應旌旗<->折價劵可用旌旗
-                var MOIs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID)
-                           join p in DC.M_OI_Coupon.Where(q => q.OIID > 0)
-                           on q.OrganizeInfo.OI2_ID equals p.OIID
-                           select p;
-                CRs = from q in CRs
-                      join p in MOIs.GroupBy(q => q.CHID)
-                      on q.CHID equals p.Key
-                      select q;
+                if(ACID > 1)//Admin設為例外方便測試
+                {
+                    var MOIs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID)
+                               join p in DC.M_OI_Coupon.Where(q => q.OIID > 0)
+                               on q.OrganizeInfo.OI2_ID equals p.OIID
+                               select p;
+                    CRs = from q in CRs
+                          join p in MOIs.GroupBy(q => q.CHID)
+                          on q.CHID equals p.Key
+                          select q;
+                }
+                
                 #endregion
                 #region 檢查職分(就職才算,案例不算
                 var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
@@ -3050,15 +3055,15 @@ namespace Banner
         //檢查折價劵與目前金額誰低
         private void FilterCouponPrice(List<Coupon_Rule> CR_s, ref int[] iReturn, Product P)
         {
-            foreach (var CR in CR_s)
+            foreach (var CR in CR_s.OrderBy(q=>q.Coupon_Header.EDateTime))
             {
                 switch (CR.Price_Type)
                 {
                     case 0://扣錢
-                        if (P.Price_Basic + CR.Price_Cut < iReturn[1])
+                        if (P.Price_Basic - CR.Price_Cut < iReturn[1])
                         {
                             iReturn[0] = 2;
-                            iReturn[1] = P.Price_Basic + CR.Price_Cut;
+                            iReturn[1] = P.Price_Basic - CR.Price_Cut;
                             iReturn[2] = CR.CHID;
                             iReturn[3] = CR.CRID;
                         }
@@ -3411,44 +3416,6 @@ namespace Banner
         }
         #endregion
 
-        #region 金流
-        public void PaidOrder()
-        {
-            //付款方式(0:現金/1:藍新-信用卡/2:藍新-ATM/3:PayPel/4:支付寶
-            int PayType = 1;
-            switch (PayType)
-            {
-
-                case 0://現金
-                    {
-
-                    }
-                    break;
-                case 1://藍新-信用卡
-                    {
-
-                    }
-                    break;
-                case 2://藍新-ATM
-                    {
-
-                    }
-                    break;
-                case 3://PayPel
-                    {
-
-                    }
-                    break;
-                case 4://支付寶
-                    {
-
-                    }
-                    break;
-            }
-
-
-        }
-        #endregion
         #region 事工團
         public class cStaffAccount_List
         {

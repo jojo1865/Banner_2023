@@ -1030,6 +1030,12 @@ namespace Banner.Areas.Admin.Controllers
                                     PL.TargetURL = FC.Get("txb_PayType_TargetURL");
                                 }
                                 break;
+
+                            case 3://Paypal
+                                {
+                                    PL.MerchantID = FC.Get("txb_PayType_ClientID");
+                                }
+                                break;
                         }
                     }
                 }

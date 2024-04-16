@@ -9,6 +9,7 @@ using System.Security.Policy;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages.Html;
+using static Banner.Areas.Admin.Controllers.StoreSetController;
 using SelectListItem = System.Web.Mvc.SelectListItem;
 
 namespace Banner.Areas.Admin.Controllers
@@ -26,11 +27,13 @@ namespace Banner.Areas.Admin.Controllers
                 .Replace("ProductClass_BatchAdd", "Product_List")
                 .Replace("ProductClass_BatchEdit", "Product_List")
                 .Replace("ProductClass_JoinList", "Product_List")
+                .Replace("Coupon_Account_List", "Coupon_List")
                 .Replace("_Edit", "_List")
                 .Replace("Organize_Info_Account_List", "Organize_Info_List")
                 .Replace("ProductClass_", "Product_")
                 .Replace("ProductClassTeacher_", "Product_")
                 .Replace("ProductAllowAccount_", "Product_").Split('?')[0];
+            
             if (!sURL.Contains("_Info_List"))
                 sURL = sURL.Replace("_Info", "_List");
 

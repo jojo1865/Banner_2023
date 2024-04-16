@@ -1880,6 +1880,13 @@ namespace Banner.Areas.Admin.Controllers
                 Error += "請選擇限制旌旗<br/>";
             if (c.cCRCs.Any(q => (q.Price_Type == 0 || q.Price_Type == 1) && q.Price_Cut < 0))
                 Error += "折價或指定金額請輸入正整數或0<br/>";
+            
+            var OPs = from q in DC.Order_Product.Where(q=>!q.Order_Header.DeleteFlag && q.Order_Header.Order_Type==2 && q.CRID>0)
+                      join p in DC.Coupon_Rule.Where(q=>q.CHID==c.CH.CHID)
+                      on q.CRID equals p.CRID
+                      select q;
+            if(OPs.Count()>0)
+                Error += "此折價卷已被使用,不能變更<br/>";
             #endregion
 
             #endregion
@@ -1930,24 +1937,62 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 #endregion
                 #region 職分等其他限制
-                var CRs = DC.Coupon_Rule.Where(q => q.CHID == c.CH.CHID);
+                /*var CRs = DC.Coupon_Rule.Where(q => q.CHID == c.CH.CHID);
                 if (CRs.Count() > 0)
                 {
+                    var CAs = from q in CRs
+                              join p in DC.Coupon_Account
+                              on q.CRID equals p.CRID
+                              select p;
+                    if(CAs.Count()>0)
+                    {
+                        DC.Coupon_Account.DeleteAllOnSubmit(CAs);
+                        DC.SubmitChanges();
+                    }
+
                     DC.Coupon_Rule.DeleteAllOnSubmit(CRs);
                     DC.SubmitChanges();
-                }
+                }*/
                 foreach (var CRC in c.cCRCs.OrderBy(q => q.Price_Type).ThenBy(q => q.SortNo))
                 {
-                    Coupon_Rule CR = new Coupon_Rule();
-                    CR.Coupon_Header = c.CH;
-                    CR.SortNo = CRC.SortNo;
-                    CR.Code = "";
-                    CR.Price_Type = CRC.Price_Type;
-                    CR.Price_Cut = CRC.Price_Cut;
-                    CR.Target_Type = CRC.Target_Type;
-                    CR.Target_ID = CRC.Target_ID;
-                    DC.Coupon_Rule.InsertOnSubmit(CR);
-                    DC.SubmitChanges();
+                    if(CRC.CRID==0)
+                    {
+                        Coupon_Rule CR = new Coupon_Rule();
+                        CR.Coupon_Header = c.CH;
+                        CR.SortNo = CRC.SortNo;
+                        CR.Code = "";
+                        CR.Price_Type = CRC.Price_Type;
+                        CR.Price_Cut = CRC.Price_Cut;
+                        CR.Target_Type = CRC.Target_Type;
+                        CR.Target_ID = CRC.Target_ID;
+                        DC.Coupon_Rule.InsertOnSubmit(CR);
+                        DC.SubmitChanges();
+                    }
+                    else
+                    {
+                        var CR = DC.Coupon_Rule.FirstOrDefault(q => q.CRID == CRC.CRID && q.CHID == c.CH.CHID);
+                        if(CR!=null)
+                        {
+                            CR.Price_Type = CRC.Price_Type;
+                            CR.Price_Cut = CRC.Price_Cut;
+                            CR.Target_Type = CRC.Target_Type;
+                            CR.Target_ID = CRC.Target_ID;
+                            DC.SubmitChanges();
+                        }
+                        else
+                        {
+                            CR = new Coupon_Rule();
+                            CR.Coupon_Header = c.CH;
+                            CR.SortNo = CRC.SortNo;
+                            CR.Code = "";
+                            CR.Price_Type = CRC.Price_Type;
+                            CR.Price_Cut = CRC.Price_Cut;
+                            CR.Target_Type = CRC.Target_Type;
+                            CR.Target_ID = CRC.Target_ID;
+                            DC.Coupon_Rule.InsertOnSubmit(CR);
+                            DC.SubmitChanges();
+                        }
+                    }
                 }
 
                 #endregion
@@ -2172,9 +2217,7 @@ namespace Banner.Areas.Admin.Controllers
                     else
                         SetAlert("此折價劵尚無指定名單的折價規則", 2);
                 }
-
             }
-
             return View(GetCoupon_Account_List(ID, FC));
         }
 

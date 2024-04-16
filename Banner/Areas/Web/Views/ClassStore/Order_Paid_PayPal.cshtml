@@ -1,0 +1,163 @@
+﻿@model Banner.Areas.Web.Controllers.ClassStoreController.cOrder_Paid_Credit_Card
+@{
+    ViewBag.Title = "Order_Paid_Credit_Card";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container  container_phone">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/ClassStore/Index">課程選購首頁</a></li>
+                <li><img src="~/Areas/Web/Content/Img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="#">購物車</a></li>
+                <li><img src="~/Areas/Web/Content/Img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="#">PayPal付款</a></li>
+            </ol>
+        </nav>
+        <div class="container-lg">
+            <div class="card p-4" style="width: 100%;background-color: #f7f7f9;border-radius: 12px;">
+                <div class="header-container mb-2">
+                    <div class="header-left-border"></div>
+                    <h5 class="header font-bold">PayPal付款-購課明細</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model != null)
+                    {
+                        foreach (var P in Model.cPs)
+                        {
+                            <!-- 複製區域 -->
+                            <div class="row mx-0">
+                                <div class="card px-none mb-3 col-lg-12 p-md-4">
+                                    <div class="row g-0 d-flex">
+                                        <div class="col-12 col-lg-5">
+                                            <div class="d-sm-flex d-block">
+                                                <img src="@P.ImgURL" class="rounded-sm-4 me-3 mt-lg-0 mt-3" style="width:auto; height:120px;" alt="@P.Title">
+                                                <div class="w-100 px-3 px-md-0">
+                                                    <h6 class="py-1 mb-2 bg-secondary-subtle text-center mt-2 mt-sm-0" style="display: inline-block;white-space: nowrap;padding-left: 10px;padding: 10px;">
+                                                        @P.ClassType
+                                                    </h6>
+                                                    <div class="mb-2">
+                                                        <h6 class="fw-bold ">@P.Title</h6>
+                                                    </div>
+                                                    <div class="d-block">
+                                                        @if (P.Price_Type == 0)
+                                                        {
+                                                            if (P.Price_New > 0)
+                                                            {
+                                                                <span style="color: #3764AC">定價：NT$@(P.Price_Basic)</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span style="color: #3764AC">免費</span>
+                                                            }
+                                                        }
+                                                        else if (P.Price_Type == 1)
+                                                        {
+                                                            <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
+                                                            <p class="mb-0">早鳥價：NT$@P.Price_New</p>
+                                                        }
+                                                        else if (P.Price_Type == 2)
+                                                        {
+                                                            <p class="mb-0" style="text-decoration: line-through;">原價：NT$@P.Price_Basic</p>
+                                                            <p class="mb-0">優惠價：NT$@P.Price_New</p>
+                                                        }
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-2 my-lg-auto my-2 px-3 px-md-0 d-none">
+                                        </div>
+                                        <div class="col-12 col-lg-5 my-auto d-lg-block px-3 px-md-0">
+                                            @if (P.LS.ddlList.Count() == 1)
+                                            {
+                                                <div class="d-block mb-2">
+                                                    @P.LS.ddlList[0].Text
+                                                </div>
+                                            }
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!------------>
+                        }
+                    }
+                    <form method="post" id="form_Paid" action="@Model.NewebPagURL">
+                        <div class="d-none">
+                            <input name="MerchantID" id="MerchantID" value="@Model.MerchantID" />
+                            <input name="TradeInfo" id="TradeInfo" value="@Model.TradeInfo" />
+                            <input name="TradeSha" id="TradeSha" value="@Model.TradeSha" />
+                            <input name="Version" id="Version" value="2.0" />
+                            <input name="EncryptType" id="EncryptType" value="0" />
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-end">
+                                <span style="font-size:25px;color:red;">總金額：@Model.TotalPrice</span>
+                            </div>
+                            <div class="col-12 text-end">
+                                <a class="btn btn-primary btn-lg btn-round btn-submit" href="javascript:RetrunCart(@Model.OHID);">返回購物車</a>
+                                <div style="width:300px;float:right; margin-left: 10px;">
+                                    <div id="payment-button"></div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function RetrunCart(OHID) {
+        $.ajax({
+            url: '/Web/ClassStore/Order_RetrunCart?OHID=' + OHID,
+            method: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                console.log(res);
+            },
+            error: function (err) { console.log(err) },
+        })
+        location.href = '/Web/ClassStore/Order_Step1';
+    }
+</script>
+
+<script>
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+            style: {
+            layout: 'horizontal',
+            color: 'gold',
+            shape: 'pill',
+                label: 'paypal'
+            },
+            // Set up the transaction
+            createOrder: function(data, actions) {
+            return actions.order.create({
+            purchase_units: [{
+            amount: {
+                    value: @Model.TotalPrice,
+                    }
+                }]
+            });
+        },
+
+        //付款成功後重導向
+        onApprove: function (data, actions) {
+            return actions.order.capture().then(function (details) {
+                console.log(details),
+                window.location.
+                    replace("/Web/ClassStore/Order_Back_PayPal?OHID=@Model.OHID&Type=1");
+            })
+        },
+        //付款取消後重導向
+        onCancel: function (data) {
+            window.location.
+                replace("/Web/ClassStore/Order_Back_PayPal?OHID=@Model.OHID&Type=0");
+        }
+    }).render('#payment-button');
+
+</script>
