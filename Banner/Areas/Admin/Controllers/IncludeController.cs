@@ -589,6 +589,12 @@ namespace Banner.Areas.Admin.Controllers
             return PartialView();
         }
         #endregion
+        #region 組織(踢人)搜尋彈出視窗
+        public PartialViewResult _RemoveOIAccount()
+        {
+            return PartialView();
+        }
+        #endregion
         public PartialViewResult _HeadInclude()
         {
             return PartialView();

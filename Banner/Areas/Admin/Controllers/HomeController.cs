@@ -48,11 +48,13 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (GetACID() <= 0)
                 {
-                    LogInAC(1);
-                    SetBrowserData("UserName", "系統管理者");
+                    //LogInAC(1);
+                    //SetBrowserData("UserName", "系統管理者");
+
                     //LogInAC(8197);
                     //SetBrowserData("UserName", "JOJO");
-                    SetAlert("", 1, "/Admin/Home/Index");
+
+                    //SetAlert("", 1, "/Admin/Home/Index");
                 }
             }
             else if (Request.Url.Host == "web-banner.viuto-aiot.com")
@@ -483,6 +485,75 @@ namespace Banner.Areas.Admin.Controllers
 
 
             return sReturn;
+        }
+        #endregion
+        #region 小組員被移除
+        [HttpGet]
+        public string RemoveACFromOI(int ACID, int OIID, string Note, int NoIntention)
+        {
+            Error = "";
+            int UID = GetACID();
+            var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
+            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == OIID);
+            if (AC == null)
+                Error += "此會員不存在<br/>";
+            if (OI == null)
+                Error += "此小組不存在<br/>";
+            if (string.IsNullOrEmpty(Note))
+                Error += "請輸入移除原因<br/>";
+            if (Error == "")
+            {
+
+                //移除原因
+                Account_Note N = new Account_Note();
+                var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.OIID == OIID && q.ACID == ACID);
+                if (M != null)
+                {
+                    N = new Account_Note();
+                    N.Account = M.Account;
+                    N.NoteType = 3;
+                    N.OIID = M.OIID;
+                    N.DeleteFlag = false;
+                    N.CreDate = N.UpdDate = DT;
+                    N.SaveACID = UID;
+                    N.Note = Note;
+                    DC.Account_Note.InsertOnSubmit(N);
+                    DC.SubmitChanges();
+
+                    //拔小組長
+                    if (M.OrganizeInfo.ACID == ACID)
+                    {
+                        M.OrganizeInfo.ACID = 1;
+                        M.OrganizeInfo.UpdDate = DT;
+                        M.OrganizeInfo.SaveACID = UID;
+                        DC.SubmitChanges();
+                    }
+
+                    //拔領夜
+                    M.Account.NightLeaderFlag = false;
+                    M.Account.SaveACID = ACID;
+                    M.Account.GroupType = NoIntention == 1 ? "無意願" : "有意願-願分發";
+                    M.Account.UpdDate = DT;
+                    M.ActiveFlag = false;
+                    M.DeleteFlag = true;
+                    M.LeaveDate = DT;
+                    M.LeaveUID = ACID;
+                    M.SaveACID = UID;
+                    DC.SubmitChanges();
+
+                    //退會友卡
+                    var MR = DC.M_Role_Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == N.ACID && q.RID == 2);
+                    if (MR != null)
+                    {
+                        MR.ActiveFlag = false;
+                        MR.UpdDate = DT;
+                        MR.SaveACID = UID;
+                        DC.SubmitChanges();
+                    }
+                }
+                Error = "OK";
+            }
+            return Error;
         }
         #endregion
         #region 小組員換組

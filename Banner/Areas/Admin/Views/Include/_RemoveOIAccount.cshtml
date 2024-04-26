@@ -1,0 +1,82 @@
+﻿<button type="button" id="but_ShowPopup" class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#popup_RemoveAC">
+    移除小組員
+</button>
+<!-- Modal -->
+<div class="modal fade" id="popup_RemoveAC" tabindex="-1" aria-labelledby="popup_RemoveAC_Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="popup_RemoveAC_Label">移除小組員</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="txb_ACID" type="hidden" />
+                <input id="txb_OIID" type="hidden" />
+                <div class="row">
+                    <div class="col-12">
+                        <label>移除原因</label>
+                        @Html.TextArea("txb_Note", "", new { @class = "form-control form-control-lg input-underlin", maxlength = "200", @style = "height:250px" })
+
+                    </div>
+                    <div class="col-12">
+                        <label>其他設定</label><br />
+                        @Html.CheckBox("cbox_NoIntention", false, new { @class = "form-check-input" })
+                        @Html.Label("此人無意願繼續加入小組", new { @for = "cbox_NoIntention",@class= "form-check-label" })
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="but_ClosePopup">關閉視窗</button>
+                <button type="button" class="btn btn-primary" onclick="RemoveACFromGroup();">確定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //顯示彈跳視窗
+    function RemoveGroup(OIID, ACID) {
+        document.getElementById("txb_ACID").value = ACID;
+        document.getElementById("txb_OIID").value = OIID;
+        document.getElementById("but_ShowPopup").click();
+    }
+    //送出
+    function RemoveACFromGroup() {
+        var ACID = document.getElementById("txb_ACID").value;
+        var OIID = document.getElementById("txb_OIID").value;
+        var Note = document.getElementById("txb_Note").value;
+        var NoIntention = document.getElementById("cbox_NoIntention").checked ? 1 : 0;
+
+        $.ajax({
+            url: '/Admin/Home/RemoveACFromOI?ACID=' + ACID + '&OIID=' + OIID + '&Note=' + Note + '&NoIntention=' + NoIntention,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                if (res == 'OK') {
+                    Swal.fire({
+                        icon: 'success',
+                        html: '存檔完成'
+                    }).then((result) => {
+                        var Form = document.getElementById('form1');
+                        if (Form != null) {
+                            form1.submit();
+                        } else {
+                            location.reload();
+                        }
+                    });
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        html: res
+                    })
+                }
+            },
+            error: function (err) { console.log(err) },
+        })
+
+
+        document.getElementById("but_ClosePopup").click();
+    }
+
+</script>

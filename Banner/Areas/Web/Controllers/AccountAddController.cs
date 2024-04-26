@@ -840,7 +840,7 @@ namespace Banner.Areas.Web.Controllers
 
                 #region 檢查
                 Error = "";
-                if (N.AC.GroupType != "有意願-願分發" && N.AC.GroupType.Contains("有意願"))
+                if (N.AC.GroupType != "有意願-願分發" && (N.AC.GroupType.Contains("有意願") || N.AC.GroupType.Contains("已入組")))
                 {
                     string[] s = N.AC.GroupType.Split('-');
                     if (s.Length == 2)
@@ -932,7 +932,34 @@ namespace Banner.Areas.Web.Controllers
                         }
                     }
                 }
+                else if(N.AC.GroupType.Contains("已入組"))
+                {
+                    string[] GT = N.AC.GroupType.Split('-');
+                    if(GT.Length == 2)
+                    {
+                        var M = DC.M_OI_Account.FirstOrDefault(q => q.OIID.ToString() == GT[1] && q.ACID == N.AC.ACID);
+                        if (M == null)
+                        {
+                            M = new M_OI_Account
+                            {
+                                OIID = Convert.ToInt32(GT[1]),
+                                Account = N.AC,
+                                JoinDate = DT,
+                                JoinUID = N.AC.ACID,
+                                LeaveDate = DT,
+                                LeaveUID = N.AC.ACID,
+                                ActiveFlag = true,
+                                DeleteFlag = false,
+                                CreDate = DT,
+                                UpdDate = DT,
+                                SaveACID = N.AC.ACID
 
+                            };
+                            DC.M_OI_Account.InsertOnSubmit(M);
+                            DC.SubmitChanges();
+                        }
+                    }
+                }
 
                 SetAlert("", 1, "/Web/AccountAdd/Step5?ACID=" + N.sACID);
             }

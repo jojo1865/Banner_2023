@@ -12,7 +12,7 @@
     </div>
     <div class="right-area">
         <form method="post">
-            
+
             <div class="login-container">
                 <div class="backend-login-title">
                     <p>旌旗教會後台</p>
@@ -48,7 +48,7 @@
 
                 <div class="input verify-with-code">
                     @Html.TextBox("txb_ValidateCode", "", new { @class = "form-control input-underline verify-form", @placeholder = "請輸入右方驗證碼" })
-                    <img class="imgCaptcha" id="img_ValidateCode" src="/Admin/Home/ValidateCode" />
+                    <img class="imgCaptcha" id="img_ValidateCode" src="/Admin/Home/ValidateCode" onclick="ChangeValidateCode();" />
                 </div>
             </div>
 
@@ -81,6 +81,9 @@
             passwordInput.type = "password";
             visibility.textContent = "visibility_off";
         }
+    }
+    function ChangeValidateCode() {
+        document.getElementById('img_ValidateCode').src = '/Web/Home/ValidateCode?Code=' + parseInt(Math.random() * 1000000);
     }
 </script>
 

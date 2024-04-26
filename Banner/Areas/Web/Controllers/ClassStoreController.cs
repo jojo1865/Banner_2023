@@ -108,11 +108,13 @@ namespace Banner.Areas.Web.Controllers
         public class cProduct_Search
         {
             public List<Product> Ps = new List<Product>();
+            public string sKey = "";
         }
         public cProduct_Search GetProduct_Search(FormCollection FC)
         {
             cProduct_Search c = new cProduct_Search();
             string sKey = GetQueryStringInString("Key");
+            c.sKey = sKey;
             int iType = GetQueryStringInInt("Type");
             var Ns = DC.Product.Where(q => !q.DeleteFlag);
             if (sKey != "")
@@ -584,6 +586,7 @@ namespace Banner.Areas.Web.Controllers
                                     break;
 
                                 case 4://支付寶
+                                    SetAlert("", 1, "/Web/ClassStore/Order_Paid_EZPALIPAY/" + OH.OHID);
                                     break;
                             }
                         }
@@ -718,6 +721,7 @@ namespace Banner.Areas.Web.Controllers
                                 break;
 
                             case 4://支付寶
+                                c.Status = "支付寶交易中";
                                 break;
                         }
                         #endregion
@@ -1729,6 +1733,283 @@ namespace Banner.Areas.Web.Controllers
                     }
                 }
 
+                if (ACID <= 0)
+                {
+                    LogInAC(OH.ACID);
+                    SetBrowserData("UserName", OH.Account.Name_First + OH.Account.Name_Last);
+                }
+
+                SetAlert("", 2, "/Web/ClassStore/Order_Step2/" + OHID + "?OPID=" + OPID);
+            }
+            return View();
+        }
+        #endregion
+        #region 支付寶付款
+        public cOrder_Paid_Credit_Card GetOrder_Paid_EZPALIPAY(int OHID)
+        {
+            string OrderInfo = "";
+
+            ACID = GetACID();
+            Error = "";
+            cOrder_Paid_Credit_Card c = new cOrder_Paid_Credit_Card();
+            var OH = DC.Order_Header.FirstOrDefault(q => q.OHID == OHID);
+            if (OH == null)
+                Error = "訂單不存在,無法付款";
+            else if (OH.DeleteFlag)
+                Error = "訂單已刪除";
+            else if (OH.ACID != ACID)
+                Error = "您並非此訂單擁有者,不能代為交易";
+            else if (OH.Order_Type != 1)
+                Error = "此訂單並非交易中訂單,請勿重複付款";
+
+            if (Error != "")
+                SetAlert(Error, 2, "/Web/ClassStore/Index");
+            else
+            {
+                c.OHID = OH.OHID;
+                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == OH.OIID);
+                if (OI != null)
+                    OrderInfo = OI.Title + OI.Organize.Title;
+                var OP = DC.Order_Paid.FirstOrDefault(q => q.OHID == OHID);
+                if (OP == null)
+                    Error = "此訂單缺少交易資訊,請回購物車重新選擇付款方式";
+                else
+                {
+                    OP = DC.Order_Paid.FirstOrDefault(q => q.OHID == OHID && q.PayType.PayTypeID == 4);
+                    if (OP == null)
+                        Error = "此訂單並非選擇以支付寶付款";
+                    else if (OP.PaidFlag)
+                        Error = "此訂單已完成付款,請至您的訂單檢視";
+                }
+
+                if (Error != "")
+                    SetAlert(Error, 2, "/Web/ClassStore/Order_Step1");
+                else
+                {
+                    #region 組合前台確認項目
+                    c.TotalPrice = OH.TotalPrice;
+                    var OPs_ = OH.Order_Product.OrderBy(q => q.OPID);
+                    int k = 0;
+                    foreach (var OP_ in OPs_)
+                    {
+                        cProduct cP = new cProduct();
+                        cP.OPID = OP.OPID;
+                        cP.PID = OP_.Product.PID;
+                        cP.ImgURL = string.IsNullOrEmpty(OP_.Product.ImgURL) ? "/Content/Image/CourseCategory_" + OP_.Product.Course.CCID + ".jpg" : OP_.Product.ImgURL;
+                        cP.ClassType = OP_.Product.ProductType == 0 ? "實體+線上" : (OP_.Product.ProductType == 1 ? "實體課程" : "線上課程");
+                        cP.Title = "【" + OP_.Product.Course.Title + "】" + OP_.Product.SubTitle;
+                        cP.Price_Basic = OP_.Product.Price_Basic;
+                        cP.Price_Type = OP_.Price_Type;
+                        cP.Price_New = OP_.Price_Finally;
+                        cP.CRID = OP_.CRID;
+                        cP.LS = new ListSelect();
+                        cP.LS.Title = "開課班別";
+                        cP.LS.ControlName = "rbl_Class_" + OP_.Product.PID;
+                        cP.LS.SortNo = k++;
+                        cP.LS.ddlList = new List<SelectListItem>();
+                        var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == OP_.PCID);
+                        if (PC != null)
+                        {
+                            SelectListItem SL = new SelectListItem();
+                            SL.Value = PC.PCID.ToString();
+
+                            #region 課程文字
+                            //A班：2023/9/14 09:00-12:00 | 台北台中高雄宜蘭
+                            SL.Text = PC.Title + "：";
+
+                            if (PC.Product_ClassTime.Any())
+                            {
+                                var PCT = PC.Product_ClassTime.OrderBy(q => q.ClassDate).First();
+                                SL.Text += PCT.ClassDate.ToString(DateFormat) + " " + GetTimeSpanToString(PCT.STime);
+                            }
+                            else
+                                SL.Text += "班級時間未定";
+                            if (string.IsNullOrEmpty(PC.LocationName) && string.IsNullOrEmpty(PC.Address)) { }
+                            else if (string.IsNullOrEmpty(PC.LocationName) && !string.IsNullOrEmpty(PC.Address))
+                                SL.Text += " | " + PC.Address;
+                            else if (!string.IsNullOrEmpty(PC.LocationName) && string.IsNullOrEmpty(PC.Address))
+                                SL.Text += " | " + PC.LocationName;
+                            else if (!string.IsNullOrEmpty(PC.LocationName) && !string.IsNullOrEmpty(PC.Address))
+                                SL.Text += " | " + PC.LocationName + "(" + PC.Address + ")";
+                            #endregion
+                            SL.Selected = true;
+                            cP.LS.ddlList.Add(SL);
+                        }
+                        c.cPs.Add(cP);
+                    }
+                    #endregion
+
+                    //正式
+                    if (sDomanName != "https://web-banner.viuto-aiot.com" && OP != null)
+                    {
+                        sMerchantID = OP.PayType.MerchantID;
+                        sHashKey = OP.PayType.HashKey;
+                        sHashIV = OP.PayType.HashIV;
+                        sNewebPagURL = OP.PayType.TargetURL;
+                        sStoreTitle = OP.PayType.Title;
+                    }
+                    var Con = DC.Contect.FirstOrDefault(q => q.TargetID == OH.ACID && q.TargetType == 2 && q.ContectType == 2);
+                    if (Con != null)
+                        Email = Con.ContectValue;
+                    string str = "";
+                    str += "MerchantID=" + sMerchantID;//MerchantID 商店代號 String(15)
+                    str += "&RespondType=JSON";//RespondType 回傳格式 String(6)
+                    str += "&TimeStamp=" + DT.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString().Split('.')[0];//TimeStamp 時間戳記 String(50)
+                    str += "&Version=2.0";//Version 串接程式版本 String(5)
+                    str += "&LangType=zh-tw";//LangType 語系 String(5)
+                    str += "&MerchantOrderNo=" + "banner_" + OHID.ToString().PadLeft(10, '0') + "_" + DT.ToString("mmssfff");//MerchantOrderNo 商店訂單編號 String(30)
+                    str += "&Amt=" + OH.TotalPrice;//Amt 訂單金額 int(10)
+                    str += "&ItemDesc=" + OrderInfo + "課程共" + OH.Order_Product.Count() + "堂";//temDesc 商品資訊
+                    str += "&TradeLimit=600";//TradeLimit 交易有效時間  Int(3)
+                    str += "&ExpireDate=" + OH.CreDate.AddDays(CreditCardAddDays).ToString("yyyyMMdd");//ExpireDate 繳費有效期限 String(10)
+                    str += "&ReturnURL=" + sDomanName + "/Web/ClassStore/Order_Back_Credit_Card?OHID=" + OHID;//ReturnURL 支付完成返回商店網址 String(200)
+                    //str += "&NotifyURL=" + sDomanName + "/Web/ClassStore/Order_Back_Paid?OHID=" + OHID;//NotifyURL 支付通知網址 String(200)
+                    str += "&NotifyURL=";//信用卡就不用回傳了
+                    //str += "&CustomerURL=" + sDomanName + "/Web/ClassStore/Order_GetNo/" + OHID;//CustomerURL 商店取號網址 String(200)
+                    //4.2.3 回應參數-取號完成
+                    //適用交易類別：超商代碼、超商條碼、超商取貨付款、ATM
+                    str += "&CustomerURL=";
+
+                    str += "&ClientBackURL=" + sDomanName + "/Web/ClassStore/Order_Back_Credit_Card?OHID=" + OHID;//ClientBackURL 返回商店網址 String(200)
+                    str += "&Email=" + Email;//Email 付款人電子信箱 String(50)
+                    str += "&EmailModify=1";//EmailModify 付款人電子信箱是否開放修改 Int(1) 1=可修改 0=不可修改
+                    str += "&LoginType=0";//LoginType 藍新金流會員 0 = 不須登入藍新金流會員
+                    str += "&OrderComment=";//OrderComment 商店備註 String(300)
+                    str += "&CREDIT=0";//CREDIT 信用卡一次付清啟用 Int(1)
+                    str += "&ANDROIDPAY=0";//ANDROIDPAY Google Pay 啟用 Int(1)
+                    str += "&SAMSUNGPAY=0";//SAMSUNGPAY Samsung Pay 啟用 Int(1)
+                    str += "&LINEPAY=0";//LINEPAY LINE Pay 啟用 Int(1)
+                    str += "&ImageUrl=" + sDomanName + "/Content/Image/CourseCategory_1.jpg";//ImageUrl 產品圖檔連結網址 String(200)
+                    str += "&InstFlag=0";//InstFlag 信用卡分期付款啟用 String(18)
+                    str += "&CreditRed=0";//CreditRed 信用卡紅利啟用 Int(1)
+                    str += "&UNIONPAY=1";//UNIONPAY 信用卡銀聯卡啟用 Int(1)
+                    str += "&CREDITAE=1";//CREDITAE 信用卡美國運通卡啟用 Int(1)
+                    str += "&WEBATM=0";//WEBATM WEBATM啟用 Int(1)
+                    str += "&VACC=0";//VACC ATM轉帳啟用 Int(1)
+                    str += "&BankType=";//BankType 金融機構 String(26)//先選台銀
+                    str += "&CVS=0";//CVS 超商代碼繳費啟用 Int(1)
+                    str += "&BARCODE=0";//BARCODE 超商條碼繳費啟用 Int(1)
+                    str += "&ESUNWALLET=0";//ESUNWALLET 玉山Wallet Int(1)
+                    str += "&TAIWANPAY=0";//TAIWANPAY 台灣Pay Int(1)
+                    str += "&FULA=0";//FULA Fula付啦 String(20)
+                    str += "&CVSCOM=0";//CVSCOM 物流啟用 Int(1)
+                    str += "&EZPAY=0";//EZPAY 簡單付電子錢包 Int(1)
+                    str += "&EZPWECHAT=0";//EZPWECHAT 簡單付微信支付 Int(1)
+                    str += "&EZPALIPAY=1";//EZPALIPAY 簡單付支付寶 Int(1)
+                    str += "&LgsType=B2C";//LgsType 物流型態 String(3)
+                    c.NewebPagURL = sNewebPagURL;
+                    c.MerchantID = sMerchantID;
+                    c.TradeInfo = HSM.EncryptAESHex(str, sHashKey, sHashIV);
+                    string str1 = "HashKey=" + sHashKey + "&" + c.TradeInfo + "&HashIV=" + sHashIV;
+                    c.TradeSha = HSM.EncryptSHA256(str1).ToUpper();
+
+
+                    var OPD = new Order_PaidDetail();
+                    OPD.Order_Paid = OP;
+                    OPD.OPDType = 0;
+                    OPD.Title = "Data";
+                    OPD.Description = str;
+                    DC.Order_PaidDetail.InsertOnSubmit(OPD);
+                    DC.SubmitChanges();
+
+                    OPD = new Order_PaidDetail();
+                    OPD.Order_Paid = OP;
+                    OPD.OPDType = 0;
+                    OPD.Title = "TradeInfo";
+                    OPD.Description = c.TradeInfo;
+                    DC.Order_PaidDetail.InsertOnSubmit(OPD);
+                    DC.SubmitChanges();
+
+                    OPD = new Order_PaidDetail();
+                    OPD.Order_Paid = OP;
+                    OPD.OPDType = 0;
+                    OPD.Title = "TradeSha";
+                    OPD.Description = c.TradeSha;
+                    DC.Order_PaidDetail.InsertOnSubmit(OPD);
+                    DC.SubmitChanges();
+                }
+            }
+            return c;
+        }
+        [HttpGet]
+        public ActionResult Order_Paid_EZPALIPAY(int ID)
+        {
+            GetViewBag();
+            return View(GetOrder_Paid_EZPALIPAY(ID));
+        }
+        #endregion
+        #region 支付寶返回
+        [HttpPost]
+        public ActionResult Order_Back_EZPALIPAY(FormCollection FC)
+        {
+            GetViewBag();
+            Order_Header OH = null;
+            int OHID = GetQueryStringInInt("OHID");
+            int OPID = 0;
+            ACID = GetACID();
+            OH = DC.Order_Header.FirstOrDefault(q => q.OHID == OHID);
+            if (OH != null)
+            {
+                if (FC != null)
+                {
+                    var OP = DC.Order_Paid.FirstOrDefault(q => q.OHID == OHID && q.PayType.PayTypeID == 4 && !q.PaidFlag);
+                    if (OP != null)
+                    {
+                        OPID = OP.OPID;
+                        var OPD = new Order_PaidDetail();
+                        OPD.Order_Paid = OP;
+                        OPD.OPDType = 1;
+                        OPD.Title = "Status";
+                        OPD.Description = FC.Get("Status");
+                        DC.Order_PaidDetail.InsertOnSubmit(OPD);
+                        DC.SubmitChanges();
+
+                        if (OPD.Description == "SUCCESS")//付款完成
+                        {
+                            OH.Order_Type = 2;
+                            OH.UpdDate = DT;
+
+                            OP.PaidFlag = true;
+                            OP.PaidDateTime = DT;
+                            OP.PayAmt = OP.TradeAmt;
+                            OP.UpdDate = DT;
+                            DC.SubmitChanges();
+                        }
+
+                        OPD = new Order_PaidDetail();
+                        OPD.Order_Paid = OP;
+                        OPD.OPDType = 1;
+                        OPD.Title = "MerchantID";
+                        OPD.Description = FC.Get("MerchantID");
+                        DC.Order_PaidDetail.InsertOnSubmit(OPD);
+                        DC.SubmitChanges();
+
+                        OPD = new Order_PaidDetail();
+                        OPD.Order_Paid = OP;
+                        OPD.OPDType = 1;
+                        OPD.Title = "TradeInfo";
+                        OPD.Description = FC.Get("TradeInfo");
+                        DC.Order_PaidDetail.InsertOnSubmit(OPD);
+                        DC.SubmitChanges();
+
+                        OPD = new Order_PaidDetail();
+                        OPD.Order_Paid = OP;
+                        OPD.OPDType = 1;
+                        OPD.Title = "TradeSha";
+                        OPD.Description = FC.Get("TradeSha");
+                        DC.Order_PaidDetail.InsertOnSubmit(OPD);
+                        DC.SubmitChanges();
+
+                        /*OPD = new Order_PaidDetail();
+                        OPD.Order_Paid = OP;
+                        OPD.OPDType = 1;
+                        OPD.Title = "EncryptType";
+                        OPD.Description = FC.Get("EncryptType");
+                        DC.Order_PaidDetail.InsertOnSubmit(OPD);
+                        DC.SubmitChanges();*/
+                    }
+
+                }
                 if (ACID <= 0)
                 {
                     LogInAC(OH.ACID);

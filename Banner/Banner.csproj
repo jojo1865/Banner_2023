@@ -206,6 +206,7 @@
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\IncludeController.cs" />
     <Compile Include="Areas\Admin\Controllers\MeetingLocationController.cs" />
+    <Compile Include="Areas\Admin\Controllers\MessageSendController.cs" />
     <Compile Include="Areas\Admin\Controllers\OrganizeSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\StaffSetController.cs" />
     <Compile Include="Areas\Admin\Controllers\StoreSetController.cs" />
@@ -765,6 +766,11 @@
     <Content Include="Areas\Web\Views\GroupPlace\History_OP.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Order_Paid_PayPal.cshtml" />
     <Content Include="Areas\Web\Views\ClassStore\Order_Back_PayPal.cshtml" />
+    <Content Include="Areas\Admin\Views\Include\_RemoveOIAccount.cshtml" />
+    <Content Include="Areas\Web\Views\ClassStore\Order_Paid_EZPALIPAY.cshtml" />
+    <Content Include="Areas\Web\Views\ClassStore\Order_Back_EZPALIPAY.cshtml" />
+    <Content Include="Areas\Admin\Views\MessageSend\Message_List.cshtml" />
+    <Content Include="Areas\Admin\Views\MessageSend\Message_Edit.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

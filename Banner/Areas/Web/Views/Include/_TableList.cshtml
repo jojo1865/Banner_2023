@@ -65,7 +65,7 @@
 
                                                     case "button"://button
                                                         {
-                                                            <button type="button" onclick="@C_.URL" class="@C_.CSS">@C_.Value</button>
+                                                            <button type="button" onclick="@C_.URL" class="@(string.IsNullOrEmpty(C_.CSS) ? "btn btn-primary btn-round btn-sm" : C_.CSS)">@C_.Value</button>
                                                         }
                                                         break;
 

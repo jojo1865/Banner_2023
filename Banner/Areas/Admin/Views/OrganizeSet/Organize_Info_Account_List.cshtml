@@ -34,8 +34,53 @@
                 <div class="table-container">
                     @Html.Action("_TableList", "Include", new { cTL = Model })
                 </div>
+
             </form>
         }
     </div>
 </div>
-
+@Html.Action("_RemoveOIAccount", "Include")
+<script>
+    function AllowJoinGroup(OIID, ACID) {
+        $.ajax({
+            url: '/Admin/OrganizeSet/AllowJoinGroup?OIID=' + OIID + '&ACID=' + ACID,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                console.log(res);
+                Swal.fire({
+                    icon: 'success',
+                    html: '已執行落戶'
+                }).then(function () {
+                    document.getElementById('form1').submit();
+                });
+            },
+            error: function (err) { console.log(err) },
+        });
+    }
+    function EditEmtitle(ACID) {
+        $.ajax({
+            url: '/Web/GroupPlace/EditEmtitle?ACID=' + ACID,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                console.log(res);
+                if (res == '') {
+                    Swal.fire({
+                        icon: 'success',
+                        html: '已完成會友卡處理'
+                    }).then(function () {
+                        document.getElementById('form1').submit();
+                    });
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        html: res
+                    });
+                }
+            },
+            error: function (err) { console.log(err) },
+        });
+    }
+</script>

@@ -19,6 +19,9 @@ namespace Banner.Areas.Web.Controllers
         public ActionResult Index()
         {
             GetViewBag();
+            if (GetACID() <= 0)
+                Response.Redirect("/Web/Home/Login");
+            else
             Response.Redirect("/Web/AccountPlace/Index");
 
             //Response.Write("2023/10/22" + " = "+ (int)((Convert.ToDateTime("2023/10/22")).DayOfWeek));
@@ -46,8 +49,8 @@ namespace Banner.Areas.Web.Controllers
             {
                 if (GetACID() <= 0)
                 {
-                    LogInAC(1);
-                    SetBrowserData("UserName", "系統管理員");
+                    //LogInAC(1);
+                    //SetBrowserData("UserName", "系統管理員");
 
                     //LogInAC(443);
                     //SetBrowserData("UserName", "江晨旭");
@@ -69,7 +72,7 @@ namespace Banner.Areas.Web.Controllers
                     //LogInAC(1511);
                     //SetBrowserData("UserName", "莊懷德");
 
-                    Response.Redirect("/Web/Home/Index");
+                    //Response.Redirect("/Web/Home/Index");
                 }
             }
             TempData["login"] = "";
@@ -86,6 +89,7 @@ namespace Banner.Areas.Web.Controllers
             string Login = FC.Get("txb_Login");
             string PW = FC.Get("txb_Password");
             string ValidateCode = FC.Get("txb_ValidateCode");
+            //string ss = GetSession("VNum");
             TempData["login"] = Login;
             TempData["pw"] = PW;
 

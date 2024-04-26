@@ -521,7 +521,7 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 else
                 {
-                    int Ct = GetMOIAC(0, N.OIID, 0).Count();
+                    int Ct = GetMOIAC(0, N.OIID, 0, -1).Count();
                     if (Ct == 0)//沒有新成員
                         cTR.Cs.Add(new cTableCell { Value = "0" });//等待分發名單中
                     else
@@ -1075,6 +1075,12 @@ namespace Banner.Areas.Admin.Controllers
 
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "會員資料", WidthPX = 100 });
+            if (ACID == 1)
+            {
+                TopTitles.Add(new cTableCell { Title = "落戶", WidthPX = 100 });
+                TopTitles.Add(new cTableCell { Title = "會友卡", WidthPX = 100 });
+                TopTitles.Add(new cTableCell { Title = "移出小組", WidthPX = 100 });
+            }
             TopTitles.Add(new cTableCell { Title = "成員ID", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "會員ID", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "姓名" });
@@ -1091,7 +1097,30 @@ namespace Banner.Areas.Admin.Controllers
             foreach (var N in Ns)
             {
                 cTableRow cTR = new cTableRow();
-                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_black", Value = "編輯" });//
+                cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/AccountSet/Account_Aldult_Info/" + N.ACID, Target = "_black", Value = "編輯" });//會員資料
+                if (ACID == 1)
+                {
+                    var M_OI = DC.M_OI_Account.FirstOrDefault(q => q.OIID == OI.OIID && q.ACID == N.ACID && !q.ActiveFlag && !q.DeleteFlag);
+                    if (M_OI != null)
+                        cTR.Cs.Add(new cTableCell { Type = "button", URL = "AllowJoinGroup(" + OIID + "," + N.ACID + ")", Value = "落戶" });//落戶
+                    else
+                        cTR.Cs.Add(new cTableCell { Value = "" });
+
+                    var M_Rule2 = DC.M_Role_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.RID == 2);
+                    if (M_Rule2 == null)
+                        cTR.Cs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ")", Value = "發會友卡" });//會友卡
+                    else
+                    {
+                        if (M_Rule2.ActiveFlag)
+                            cTR.Cs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ")", Value = "取消會友卡" });
+                        else
+                            cTR.Cs.Add(new cTableCell { Type = "button", URL = "EditEmtitle(" + N.ACID + ")", Value = "重發會友卡" });//會友卡
+                    }
+
+                    //移除
+                    cTR.Cs.Add(new cTableCell { Type = "button", URL = "RemoveGroup(" + OIID + "," + N.ACID + ")", Value = "移出小組" });
+                }
+
                 cTR.Cs.Add(new cTableCell { Value = N.MID.ToString() });//成員ID
                 cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() });//會員ID
                 cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });//姓名
@@ -1247,6 +1276,26 @@ namespace Banner.Areas.Admin.Controllers
             public bool ActiceFlag = false;
         }
 
+
+        #endregion
+        #region 直接落戶
+        public void AllowJoinGroup(int OIID, int ACID)
+        {
+            var M = DC.M_OI_Account.FirstOrDefault(q => !q.DeleteFlag && q.OIID == OIID && q.ACID == ACID);
+            if (M == null)
+                SetAlert("查無此新人資料", 2, "/Web/GroupPlace/New_List/" + OIID);
+            else
+            {
+                M.JoinDate = DT;
+                M.UpdDate = DT;
+                M.ActiveFlag = true;
+                M.SaveACID = 1;
+                DC.SubmitChanges();
+                SetAlert("已完成落戶", 1, "/Web/GroupPlace/New_List/" + OIID);
+            }
+        }
+        #endregion
+        #region 直接給會友卡
 
         #endregion
 

@@ -213,6 +213,15 @@ namespace Banner
     partial void InsertCoupon_Account(Coupon_Account instance);
     partial void UpdateCoupon_Account(Coupon_Account instance);
     partial void DeleteCoupon_Account(Coupon_Account instance);
+    partial void InsertMessage_Target(Message_Target instance);
+    partial void UpdateMessage_Target(Message_Target instance);
+    partial void DeleteMessage_Target(Message_Target instance);
+    partial void InsertM_MH_Account(M_MH_Account instance);
+    partial void UpdateM_MH_Account(M_MH_Account instance);
+    partial void DeleteM_MH_Account(M_MH_Account instance);
+    partial void InsertMessage_Header(Message_Header instance);
+    partial void UpdateMessage_Header(Message_Header instance);
+    partial void DeleteMessage_Header(Message_Header instance);
     #endregion
 		
 		public DataClassesDataContext(string connection) : 
@@ -727,6 +736,30 @@ namespace Banner
 			}
 		}
 		
+		public System.Data.Linq.Table<Message_Target> Message_Target
+		{
+			get
+			{
+				return this.GetTable<Message_Target>();
+			}
+		}
+		
+		public System.Data.Linq.Table<M_MH_Account> M_MH_Account
+		{
+			get
+			{
+				return this.GetTable<M_MH_Account>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Message_Header> Message_Header
+		{
+			get
+			{
+				return this.GetTable<Message_Header>();
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.sp_GetOI2List")]
 		public ISingleResult<sp_GetOI2ListResult> sp_GetOI2List([global::System.Data.Linq.Mapping.ParameterAttribute(Name="ACID", DbType="Int")] System.Nullable<int> aCID)
 		{
@@ -842,6 +875,8 @@ namespace Banner
 		
 		private EntitySet<Coupon_Account> _Coupon_Account;
 		
+		private EntitySet<M_MH_Account> _M_MH_Account;
+		
     #region 擴充性方法定義
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -923,6 +958,7 @@ namespace Banner
 			this._M_OI_Account = new EntitySet<M_OI_Account>(new Action<M_OI_Account>(this.attach_M_OI_Account), new Action<M_OI_Account>(this.detach_M_OI_Account));
 			this._Log_OrganizeInfo_ACID = new EntitySet<Log_OrganizeInfo_ACID>(new Action<Log_OrganizeInfo_ACID>(this.attach_Log_OrganizeInfo_ACID), new Action<Log_OrganizeInfo_ACID>(this.detach_Log_OrganizeInfo_ACID));
 			this._Coupon_Account = new EntitySet<Coupon_Account>(new Action<Coupon_Account>(this.attach_Coupon_Account), new Action<Coupon_Account>(this.detach_Coupon_Account));
+			this._M_MH_Account = new EntitySet<M_MH_Account>(new Action<M_MH_Account>(this.attach_M_MH_Account), new Action<M_MH_Account>(this.detach_M_MH_Account));
 			OnCreated();
 		}
 		
@@ -1735,6 +1771,19 @@ namespace Banner
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_MH_Account", Storage="_M_MH_Account", ThisKey="ACID", OtherKey="ACID")]
+		public EntitySet<M_MH_Account> M_MH_Account
+		{
+			get
+			{
+				return this._M_MH_Account;
+			}
+			set
+			{
+				this._M_MH_Account.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -1990,6 +2039,18 @@ namespace Banner
 		}
 		
 		private void detach_Coupon_Account(Coupon_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = null;
+		}
+		
+		private void attach_M_MH_Account(M_MH_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Account = this;
+		}
+		
+		private void detach_M_MH_Account(M_MH_Account entity)
 		{
 			this.SendPropertyChanging();
 			entity.Account = null;
@@ -22717,6 +22778,947 @@ namespace Banner
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Message_Target")]
+	public partial class Message_Target : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _MTID;
+		
+		private int _MHID;
+		
+		private int _TargetType;
+		
+		private int _TargetID1;
+		
+		private int _TargetID2;
+		
+		private int _TargetID3;
+		
+		private EntityRef<Message_Header> _Message_Header;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnMTIDChanging(int value);
+    partial void OnMTIDChanged();
+    partial void OnMHIDChanging(int value);
+    partial void OnMHIDChanged();
+    partial void OnTargetTypeChanging(int value);
+    partial void OnTargetTypeChanged();
+    partial void OnTargetID1Changing(int value);
+    partial void OnTargetID1Changed();
+    partial void OnTargetID2Changing(int value);
+    partial void OnTargetID2Changed();
+    partial void OnTargetID3Changing(int value);
+    partial void OnTargetID3Changed();
+    #endregion
+		
+		public Message_Target()
+		{
+			this._Message_Header = default(EntityRef<Message_Header>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MTID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int MTID
+		{
+			get
+			{
+				return this._MTID;
+			}
+			set
+			{
+				if ((this._MTID != value))
+				{
+					this.OnMTIDChanging(value);
+					this.SendPropertyChanging();
+					this._MTID = value;
+					this.SendPropertyChanged("MTID");
+					this.OnMTIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MHID", DbType="Int NOT NULL")]
+		public int MHID
+		{
+			get
+			{
+				return this._MHID;
+			}
+			set
+			{
+				if ((this._MHID != value))
+				{
+					if (this._Message_Header.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnMHIDChanging(value);
+					this.SendPropertyChanging();
+					this._MHID = value;
+					this.SendPropertyChanged("MHID");
+					this.OnMHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetType", DbType="Int NOT NULL")]
+		public int TargetType
+		{
+			get
+			{
+				return this._TargetType;
+			}
+			set
+			{
+				if ((this._TargetType != value))
+				{
+					this.OnTargetTypeChanging(value);
+					this.SendPropertyChanging();
+					this._TargetType = value;
+					this.SendPropertyChanged("TargetType");
+					this.OnTargetTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetID1", DbType="Int NOT NULL")]
+		public int TargetID1
+		{
+			get
+			{
+				return this._TargetID1;
+			}
+			set
+			{
+				if ((this._TargetID1 != value))
+				{
+					this.OnTargetID1Changing(value);
+					this.SendPropertyChanging();
+					this._TargetID1 = value;
+					this.SendPropertyChanged("TargetID1");
+					this.OnTargetID1Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetID2", DbType="Int NOT NULL")]
+		public int TargetID2
+		{
+			get
+			{
+				return this._TargetID2;
+			}
+			set
+			{
+				if ((this._TargetID2 != value))
+				{
+					this.OnTargetID2Changing(value);
+					this.SendPropertyChanging();
+					this._TargetID2 = value;
+					this.SendPropertyChanged("TargetID2");
+					this.OnTargetID2Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetID3", DbType="Int NOT NULL")]
+		public int TargetID3
+		{
+			get
+			{
+				return this._TargetID3;
+			}
+			set
+			{
+				if ((this._TargetID3 != value))
+				{
+					this.OnTargetID3Changing(value);
+					this.SendPropertyChanging();
+					this._TargetID3 = value;
+					this.SendPropertyChanged("TargetID3");
+					this.OnTargetID3Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Message_Header_Message_Target", Storage="_Message_Header", ThisKey="MHID", OtherKey="MHID", IsForeignKey=true)]
+		public Message_Header Message_Header
+		{
+			get
+			{
+				return this._Message_Header.Entity;
+			}
+			set
+			{
+				Message_Header previousValue = this._Message_Header.Entity;
+				if (((previousValue != value) 
+							|| (this._Message_Header.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Message_Header.Entity = null;
+						previousValue.Message_Target.Remove(this);
+					}
+					this._Message_Header.Entity = value;
+					if ((value != null))
+					{
+						value.Message_Target.Add(this);
+						this._MHID = value.MHID;
+					}
+					else
+					{
+						this._MHID = default(int);
+					}
+					this.SendPropertyChanged("Message_Header");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.M_MH_Account")]
+	public partial class M_MH_Account : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _MID;
+		
+		private int _MHID;
+		
+		private int _MTID;
+		
+		private int _ACID;
+		
+		private System.DateTime _SendDateTime;
+		
+		private System.DateTime _ReadDateTime;
+		
+		private bool _ReadFlag;
+		
+		private bool _DeleteFlag;
+		
+		private EntityRef<Account> _Account;
+		
+		private EntityRef<Message_Header> _Message_Header;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnMIDChanging(int value);
+    partial void OnMIDChanged();
+    partial void OnMHIDChanging(int value);
+    partial void OnMHIDChanged();
+    partial void OnMTIDChanging(int value);
+    partial void OnMTIDChanged();
+    partial void OnACIDChanging(int value);
+    partial void OnACIDChanged();
+    partial void OnSendDateTimeChanging(System.DateTime value);
+    partial void OnSendDateTimeChanged();
+    partial void OnReadDateTimeChanging(System.DateTime value);
+    partial void OnReadDateTimeChanged();
+    partial void OnReadFlagChanging(bool value);
+    partial void OnReadFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    #endregion
+		
+		public M_MH_Account()
+		{
+			this._Account = default(EntityRef<Account>);
+			this._Message_Header = default(EntityRef<Message_Header>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int MID
+		{
+			get
+			{
+				return this._MID;
+			}
+			set
+			{
+				if ((this._MID != value))
+				{
+					this.OnMIDChanging(value);
+					this.SendPropertyChanging();
+					this._MID = value;
+					this.SendPropertyChanged("MID");
+					this.OnMIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MHID", DbType="Int NOT NULL")]
+		public int MHID
+		{
+			get
+			{
+				return this._MHID;
+			}
+			set
+			{
+				if ((this._MHID != value))
+				{
+					if (this._Message_Header.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnMHIDChanging(value);
+					this.SendPropertyChanging();
+					this._MHID = value;
+					this.SendPropertyChanged("MHID");
+					this.OnMHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MTID", DbType="Int NOT NULL")]
+		public int MTID
+		{
+			get
+			{
+				return this._MTID;
+			}
+			set
+			{
+				if ((this._MTID != value))
+				{
+					this.OnMTIDChanging(value);
+					this.SendPropertyChanging();
+					this._MTID = value;
+					this.SendPropertyChanged("MTID");
+					this.OnMTIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ACID", DbType="Int NOT NULL")]
+		public int ACID
+		{
+			get
+			{
+				return this._ACID;
+			}
+			set
+			{
+				if ((this._ACID != value))
+				{
+					if (this._Account.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnACIDChanging(value);
+					this.SendPropertyChanging();
+					this._ACID = value;
+					this.SendPropertyChanged("ACID");
+					this.OnACIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SendDateTime", DbType="DateTime NOT NULL")]
+		public System.DateTime SendDateTime
+		{
+			get
+			{
+				return this._SendDateTime;
+			}
+			set
+			{
+				if ((this._SendDateTime != value))
+				{
+					this.OnSendDateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._SendDateTime = value;
+					this.SendPropertyChanged("SendDateTime");
+					this.OnSendDateTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ReadDateTime", DbType="DateTime NOT NULL")]
+		public System.DateTime ReadDateTime
+		{
+			get
+			{
+				return this._ReadDateTime;
+			}
+			set
+			{
+				if ((this._ReadDateTime != value))
+				{
+					this.OnReadDateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._ReadDateTime = value;
+					this.SendPropertyChanged("ReadDateTime");
+					this.OnReadDateTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ReadFlag", DbType="Bit NOT NULL")]
+		public bool ReadFlag
+		{
+			get
+			{
+				return this._ReadFlag;
+			}
+			set
+			{
+				if ((this._ReadFlag != value))
+				{
+					this.OnReadFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ReadFlag = value;
+					this.SendPropertyChanged("ReadFlag");
+					this.OnReadFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Account_M_MH_Account", Storage="_Account", ThisKey="ACID", OtherKey="ACID", IsForeignKey=true)]
+		public Account Account
+		{
+			get
+			{
+				return this._Account.Entity;
+			}
+			set
+			{
+				Account previousValue = this._Account.Entity;
+				if (((previousValue != value) 
+							|| (this._Account.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Account.Entity = null;
+						previousValue.M_MH_Account.Remove(this);
+					}
+					this._Account.Entity = value;
+					if ((value != null))
+					{
+						value.M_MH_Account.Add(this);
+						this._ACID = value.ACID;
+					}
+					else
+					{
+						this._ACID = default(int);
+					}
+					this.SendPropertyChanged("Account");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Message_Header_M_MH_Account", Storage="_Message_Header", ThisKey="MHID", OtherKey="MHID", IsForeignKey=true)]
+		public Message_Header Message_Header
+		{
+			get
+			{
+				return this._Message_Header.Entity;
+			}
+			set
+			{
+				Message_Header previousValue = this._Message_Header.Entity;
+				if (((previousValue != value) 
+							|| (this._Message_Header.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Message_Header.Entity = null;
+						previousValue.M_MH_Account.Remove(this);
+					}
+					this._Message_Header.Entity = value;
+					if ((value != null))
+					{
+						value.M_MH_Account.Add(this);
+						this._MHID = value.MHID;
+					}
+					else
+					{
+						this._MHID = default(int);
+					}
+					this.SendPropertyChanged("Message_Header");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Message_Header")]
+	public partial class Message_Header : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _MHID;
+		
+		private int _MHType;
+		
+		private string _Title;
+		
+		private string _Description;
+		
+		private string _URL;
+		
+		private System.DateTime _PlanSendDateTime;
+		
+		private bool _SendFlag;
+		
+		private bool _ActiveFlag;
+		
+		private bool _DeleteFlag;
+		
+		private System.DateTime _CreDate;
+		
+		private int _CreUID;
+		
+		private System.DateTime _UpdDate;
+		
+		private int _UpdUID;
+		
+		private EntitySet<Message_Target> _Message_Target;
+		
+		private EntitySet<M_MH_Account> _M_MH_Account;
+		
+    #region 擴充性方法定義
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnMHIDChanging(int value);
+    partial void OnMHIDChanged();
+    partial void OnMHTypeChanging(int value);
+    partial void OnMHTypeChanged();
+    partial void OnTitleChanging(string value);
+    partial void OnTitleChanged();
+    partial void OnDescriptionChanging(string value);
+    partial void OnDescriptionChanged();
+    partial void OnURLChanging(string value);
+    partial void OnURLChanged();
+    partial void OnPlanSendDateTimeChanging(System.DateTime value);
+    partial void OnPlanSendDateTimeChanged();
+    partial void OnSendFlagChanging(bool value);
+    partial void OnSendFlagChanged();
+    partial void OnActiveFlagChanging(bool value);
+    partial void OnActiveFlagChanged();
+    partial void OnDeleteFlagChanging(bool value);
+    partial void OnDeleteFlagChanged();
+    partial void OnCreDateChanging(System.DateTime value);
+    partial void OnCreDateChanged();
+    partial void OnCreUIDChanging(int value);
+    partial void OnCreUIDChanged();
+    partial void OnUpdDateChanging(System.DateTime value);
+    partial void OnUpdDateChanged();
+    partial void OnUpdUIDChanging(int value);
+    partial void OnUpdUIDChanged();
+    #endregion
+		
+		public Message_Header()
+		{
+			this._Message_Target = new EntitySet<Message_Target>(new Action<Message_Target>(this.attach_Message_Target), new Action<Message_Target>(this.detach_Message_Target));
+			this._M_MH_Account = new EntitySet<M_MH_Account>(new Action<M_MH_Account>(this.attach_M_MH_Account), new Action<M_MH_Account>(this.detach_M_MH_Account));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MHID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int MHID
+		{
+			get
+			{
+				return this._MHID;
+			}
+			set
+			{
+				if ((this._MHID != value))
+				{
+					this.OnMHIDChanging(value);
+					this.SendPropertyChanging();
+					this._MHID = value;
+					this.SendPropertyChanged("MHID");
+					this.OnMHIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MHType", DbType="Int NOT NULL")]
+		public int MHType
+		{
+			get
+			{
+				return this._MHType;
+			}
+			set
+			{
+				if ((this._MHType != value))
+				{
+					this.OnMHTypeChanging(value);
+					this.SendPropertyChanging();
+					this._MHType = value;
+					this.SendPropertyChanged("MHType");
+					this.OnMHTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(50)")]
+		public string Title
+		{
+			get
+			{
+				return this._Title;
+			}
+			set
+			{
+				if ((this._Title != value))
+				{
+					this.OnTitleChanging(value);
+					this.SendPropertyChanging();
+					this._Title = value;
+					this.SendPropertyChanged("Title");
+					this.OnTitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Description", DbType="NVarChar(MAX)")]
+		public string Description
+		{
+			get
+			{
+				return this._Description;
+			}
+			set
+			{
+				if ((this._Description != value))
+				{
+					this.OnDescriptionChanging(value);
+					this.SendPropertyChanging();
+					this._Description = value;
+					this.SendPropertyChanged("Description");
+					this.OnDescriptionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_URL", DbType="NVarChar(200)")]
+		public string URL
+		{
+			get
+			{
+				return this._URL;
+			}
+			set
+			{
+				if ((this._URL != value))
+				{
+					this.OnURLChanging(value);
+					this.SendPropertyChanging();
+					this._URL = value;
+					this.SendPropertyChanged("URL");
+					this.OnURLChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PlanSendDateTime", DbType="DateTime NOT NULL")]
+		public System.DateTime PlanSendDateTime
+		{
+			get
+			{
+				return this._PlanSendDateTime;
+			}
+			set
+			{
+				if ((this._PlanSendDateTime != value))
+				{
+					this.OnPlanSendDateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._PlanSendDateTime = value;
+					this.SendPropertyChanged("PlanSendDateTime");
+					this.OnPlanSendDateTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SendFlag", DbType="Bit NOT NULL")]
+		public bool SendFlag
+		{
+			get
+			{
+				return this._SendFlag;
+			}
+			set
+			{
+				if ((this._SendFlag != value))
+				{
+					this.OnSendFlagChanging(value);
+					this.SendPropertyChanging();
+					this._SendFlag = value;
+					this.SendPropertyChanged("SendFlag");
+					this.OnSendFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ActiveFlag", DbType="Bit NOT NULL")]
+		public bool ActiveFlag
+		{
+			get
+			{
+				return this._ActiveFlag;
+			}
+			set
+			{
+				if ((this._ActiveFlag != value))
+				{
+					this.OnActiveFlagChanging(value);
+					this.SendPropertyChanging();
+					this._ActiveFlag = value;
+					this.SendPropertyChanged("ActiveFlag");
+					this.OnActiveFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DeleteFlag", DbType="Bit NOT NULL")]
+		public bool DeleteFlag
+		{
+			get
+			{
+				return this._DeleteFlag;
+			}
+			set
+			{
+				if ((this._DeleteFlag != value))
+				{
+					this.OnDeleteFlagChanging(value);
+					this.SendPropertyChanging();
+					this._DeleteFlag = value;
+					this.SendPropertyChanged("DeleteFlag");
+					this.OnDeleteFlagChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreDate", DbType="DateTime NOT NULL")]
+		public System.DateTime CreDate
+		{
+			get
+			{
+				return this._CreDate;
+			}
+			set
+			{
+				if ((this._CreDate != value))
+				{
+					this.OnCreDateChanging(value);
+					this.SendPropertyChanging();
+					this._CreDate = value;
+					this.SendPropertyChanged("CreDate");
+					this.OnCreDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreUID", DbType="Int NOT NULL")]
+		public int CreUID
+		{
+			get
+			{
+				return this._CreUID;
+			}
+			set
+			{
+				if ((this._CreUID != value))
+				{
+					this.OnCreUIDChanging(value);
+					this.SendPropertyChanging();
+					this._CreUID = value;
+					this.SendPropertyChanged("CreUID");
+					this.OnCreUIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdDate", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdDate
+		{
+			get
+			{
+				return this._UpdDate;
+			}
+			set
+			{
+				if ((this._UpdDate != value))
+				{
+					this.OnUpdDateChanging(value);
+					this.SendPropertyChanging();
+					this._UpdDate = value;
+					this.SendPropertyChanged("UpdDate");
+					this.OnUpdDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdUID", DbType="Int NOT NULL")]
+		public int UpdUID
+		{
+			get
+			{
+				return this._UpdUID;
+			}
+			set
+			{
+				if ((this._UpdUID != value))
+				{
+					this.OnUpdUIDChanging(value);
+					this.SendPropertyChanging();
+					this._UpdUID = value;
+					this.SendPropertyChanged("UpdUID");
+					this.OnUpdUIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Message_Header_Message_Target", Storage="_Message_Target", ThisKey="MHID", OtherKey="MHID")]
+		public EntitySet<Message_Target> Message_Target
+		{
+			get
+			{
+				return this._Message_Target;
+			}
+			set
+			{
+				this._Message_Target.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Message_Header_M_MH_Account", Storage="_M_MH_Account", ThisKey="MHID", OtherKey="MHID")]
+		public EntitySet<M_MH_Account> M_MH_Account
+		{
+			get
+			{
+				return this._M_MH_Account;
+			}
+			set
+			{
+				this._M_MH_Account.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Message_Target(Message_Target entity)
+		{
+			this.SendPropertyChanging();
+			entity.Message_Header = this;
+		}
+		
+		private void detach_Message_Target(Message_Target entity)
+		{
+			this.SendPropertyChanging();
+			entity.Message_Header = null;
+		}
+		
+		private void attach_M_MH_Account(M_MH_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Message_Header = this;
+		}
+		
+		private void detach_M_MH_Account(M_MH_Account entity)
+		{
+			this.SendPropertyChanging();
+			entity.Message_Header = null;
 		}
 	}
 	

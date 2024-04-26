@@ -62,6 +62,12 @@
                                                         }
                                                         break;
 
+                                                    case "button"://button
+                                                        {
+                                                            <button type="button" onclick="@C_.URL" class="@C_.CSS">@C_.Value</button>
+                                                        }
+                                                        break;
+
                                                     default:
                                                         {
                                                             <p>@C_.Value</p>
@@ -99,6 +105,15 @@
                                                     <td>
                                                         <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
                                                         <a href="@C.URL" target="@C.Target" class="btn btn-primary btn_Table_Gray btn-round btn_Basic">@C.Value</a>
+                                                    </td>
+                                                }
+                                                break;
+
+                                            case "button"://button
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <button type="button" onclick="@C.URL"  class="@(string.IsNullOrEmpty(C.CSS) ? "btn btn-primary btn_Table_Gray btn-round btn_Basic" : C.CSS)">@C.Value</button>
                                                     </td>
                                                 }
                                                 break;

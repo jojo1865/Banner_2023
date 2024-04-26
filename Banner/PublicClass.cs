@@ -2406,7 +2406,8 @@ namespace Banner
                                 bGroup[5] = MAC.UploadFlag;
                         }
                     }
-
+                    if (!bGroup[0])
+                        SetAlert("您不被允許瀏覽此頁面", 2, "/Admin/Home/Index");
                     ViewBag._Power = bGroup;
                 }
                 else if (CheckAdmin(ACID))//此使用者擁有系統管理者權限
@@ -2858,10 +2859,10 @@ namespace Banner
 
         }
         //取得會員或組織的對應名單
-        public IQueryable<M_OI_Account> GetMOIAC(int OID = 0, int OIID = 0, int ACID = 0)
+        public IQueryable<M_OI_Account> GetMOIAC(int OID = 0, int OIID = 0, int ACID = 0, int ActiveFlag = 1)
         {
             var MAs = DC.M_OI_Account.Where(q => !q.DeleteFlag &&
-            q.ActiveFlag &&
+            (ActiveFlag == -1 ? true : q.ActiveFlag == (ActiveFlag == 1)) &&
             !q.OrganizeInfo.DeleteFlag &&
             !q.OrganizeInfo.Organize.DeleteFlag &&
             !q.Account.DeleteFlag &&
@@ -2980,7 +2981,7 @@ namespace Banner
                           select p;
                 #region 過濾折價劵適用旌旗
                 //會員所屬小組對應旌旗<->折價劵可用旌旗
-                if(ACID > 1)//Admin設為例外方便測試
+                if (ACID > 1)//Admin設為例外方便測試
                 {
                     var MOIs = from q in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID)
                                join p in DC.M_OI_Coupon.Where(q => q.OIID > 0)
@@ -2991,7 +2992,7 @@ namespace Banner
                           on q.CHID equals p.Key
                           select q;
                 }
-                
+
                 #endregion
                 #region 檢查職分(就職才算,案例不算
                 var OIs = DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID);
@@ -3055,7 +3056,7 @@ namespace Banner
         //檢查折價劵與目前金額誰低
         private void FilterCouponPrice(List<Coupon_Rule> CR_s, ref int[] iReturn, Product P)
         {
-            foreach (var CR in CR_s.OrderBy(q=>q.Coupon_Header.EDateTime))
+            foreach (var CR in CR_s.OrderBy(q => q.Coupon_Header.EDateTime))
             {
                 switch (CR.Price_Type)
                 {
@@ -3377,11 +3378,11 @@ namespace Banner
                 if (R.LeaveDate != R.CreDate)
                     Ls.Add(new cAChistry { sType = R.Role.Title, sTitle = "移除" + R.Role.Title, dDate = R.LeaveDate });
             }
-            //案立
+            //按立
             var Os = DC.M_O_Account.Where(q => q.ACID == AC.ACID);
             foreach (var O in Os)
             {
-                Ls.Add(new cAChistry { sType = "案立", sTitle = "案立為" + O.Organize.JobTitle, dDate = O.CreDate });
+                Ls.Add(new cAChistry { sType = "按立", sTitle = "按立為" + O.Organize.JobTitle, dDate = O.CreDate });
             }
             //就職組織職分
             var Logs = DC.Log_OrganizeInfo_ACID.Where(q => q.ACID == AC.ACID);

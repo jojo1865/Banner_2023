@@ -18,7 +18,7 @@
                 <img src="/Areas/Web/Content/Img/top_logo.svg" alt="" class="img_Login_logo" /><p>全球旌旗資訊網</p>
             </div>
             <form method="post">
-                
+
                 <div class="account-with-icon">
                     <img src="/Areas/Web/Content/Img/user.png" alt="" />
                     <p>帳號</p>
@@ -49,7 +49,7 @@
 
                 <div class="input verify-with-code">
                     @Html.TextBox("txb_ValidateCode", "", new { @class = "form-control input-underline verify-form", @placeholder = "請輸入右方驗證碼" })
-                    <img src="/Web/Home/ValidateCode" alt="" id="img_ValidateCode" />
+                    <img src="/Web/Home/ValidateCode" alt="" id="img_ValidateCode" onclick="ChangeValidateCode();" />
                 </div>
                 <div class="login-button-container">
                     <button class="btn btn-primary btn-lg btn-round btn-login"
@@ -82,7 +82,7 @@
                 <p>＊未滿12歲兒童須由家長使用會員帳號登入後另行註冊</p>
             </div>
         </div>
-        
+
     </div>
 </main>
 
@@ -99,5 +99,8 @@
             passwordInput.type = "password";
             visibility.textContent = "visibility_off";
         }
+    }
+    function ChangeValidateCode() {
+        document.getElementById('img_ValidateCode').src = '/Web/Home/ValidateCode?Rage=' + Math.random();
     }
 </script>

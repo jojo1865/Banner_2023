@@ -624,6 +624,8 @@ namespace Banner.Areas.Admin.Controllers
                                         iJoinType = 1;//已入組未落戶
                                         Note = "已於" + M.CreDate.ToString(DateFormat) + "分派至 (" + M.OIID + ")" + M.OrganizeInfo.Title;
                                     }
+                                    else if (N.GroupType == "有意願-願分發")
+                                        iJoinType = 4;
                                 }
                                 else
                                 {
@@ -705,13 +707,13 @@ namespace Banner.Areas.Admin.Controllers
 
                             var COI = DC.Change_OI_Order.Where(q => q.ACID == N.ACID && !q.DeleteFlag).OrderByDescending(q => q.COIOID).FirstOrDefault();
                             if (COI.Order_Type == 0)
-                                TopTitles.Add(new cTableCell { Type = "checkbox", ControlName = "cbox_" });//選擇
+                                cTR.Cs.Add(new cTableCell { Type = "checkbox", ControlName = "cbox_" });//選擇
                             else
-                                TopTitles.Add(new cTableCell { Value = "" });//選擇
-                            TopTitles.Add(new cTableCell { Value = N.Name_First + N.Name_Last });//姓名
-                            TopTitles.Add(new cTableCell { Value = string.Join("/", GetOITitles(COI.From_OIID, 3)) });//原始小組
-                            TopTitles.Add(new cTableCell { Value = string.Join("/", GetOITitles(COI.To_OIID, 3)) });//新申請小組
-                            TopTitles.Add(new cTableCell { Value = COI.CreDate.ToString(DateTimeFormat) });//申請日期
+                                cTR.Cs.Add(new cTableCell { Value = "" });//選擇
+                            cTR.Cs.Add(new cTableCell { Value = N.Name_First + N.Name_Last });//姓名
+                            cTR.Cs.Add(new cTableCell { Value = string.Join("/", GetOITitles(COI.From_OIID, 3)) });//原始小組
+                            cTR.Cs.Add(new cTableCell { Value = string.Join("/", GetOITitles(COI.To_OIID, 3)) });//新申請小組
+                            cTR.Cs.Add(new cTableCell { Value = COI.CreDate.ToString(DateTimeFormat) });//申請日期
                             string sType = "";
                             switch (COI.Order_Type)
                             {
@@ -731,7 +733,7 @@ namespace Banner.Areas.Admin.Controllers
                                     break;
                                 case 3: { sType = "已駁回"; } break;
                             }
-                            TopTitles.Add(new cTableCell { Value = sType });
+                            cTR.Cs.Add(new cTableCell { Value = sType });
                         }
                         break;
                 }
@@ -845,7 +847,7 @@ namespace Banner.Areas.Admin.Controllers
             public int SortNo = 0;
             public string JobTitle = "";
             public string Note = "";
-            public int iType = 0;//0:未被按立,不能案立/1:未被按立,可以按立/2:已被按立,不能卸任/3:已被按立,可以卸任
+            public int iType = 0;//0:未被按立,不能按立/1:未被按立,可以按立/2:已被按立,不能卸任/3:已被按立,可以卸任
         }
         //按立
         public class cOAH
@@ -1027,7 +1029,7 @@ namespace Banner.Areas.Admin.Controllers
                         SortNo = iSortNo++,
                         JobTitle = O.JobTitle,
                         Note = "",
-                        iType = 0//0:未被按立,不能案立/1:未被按立,可以按立/2:已被按立,不能卸任/3:已被按立,可以卸任
+                        iType = 0//0:未被按立,不能按立/1:未被按立,可以按立/2:已被按立,不能卸任/3:已被按立,可以卸任
                     };
                     //判斷按立狀態
 
@@ -1080,7 +1082,7 @@ namespace Banner.Areas.Admin.Controllers
 
             #endregion
             #region 檢查能不能按立
-            //0:未被按立,不能案立/1:未被按立,可以按立/2:已被按立,不能卸任/3:已被按立,可以卸任
+            //0:未被按立,不能按立/1:未被按立,可以按立/2:已被按立,不能卸任/3:已被按立,可以卸任
             N.OAs = N.OAs.OrderByDescending(q => q.SortNo).ToList();
             if (N.OAs.Count > 0)
             {
@@ -3006,7 +3008,8 @@ namespace Banner.Areas.Admin.Controllers
             var TopTitles = new List<cTableCell>();
             TopTitles.Add(new cTableCell { Title = "會員資料", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "換組", WidthPX = 100 });
-            TopTitles.Add(new cTableCell { Title = "組員ID", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "移出小組", WidthPX = 100 });
+            //TopTitles.Add(new cTableCell { Title = "組員ID", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "會員ID", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "姓名" });
             TopTitles.Add(new cTableCell { Title = "加入日期" });
@@ -3028,9 +3031,10 @@ namespace Banner.Areas.Admin.Controllers
                 else
                     cTR.Cs.Add(new cTableCell { Type = "activebutton", URL = "ShowPopupOI(" + N.ACID + ",8, '搜尋小組', '', '');", CSS = "btn btn-primary btn_Table_Gray btn-round btn_Basic", Value = "換組" });//換組
 
+                //移除
+                cTR.Cs.Add(new cTableCell { Type = "button", URL = "RemoveGroup(" + OIID + "," + N.ACID + ")", Value = "移出小組" });
 
-
-                cTR.Cs.Add(new cTableCell { Value = N.MID.ToString() });//組員ID
+                //cTR.Cs.Add(new cTableCell { Value = N.MID.ToString() });//組員ID
                 cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() });//會員ID
                 cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });//姓名
                 if (N.JoinDate == N.CreDate)

@@ -278,7 +278,7 @@ namespace Banner.Areas.Web.Controllers
                     cTableCell cTC = new cTableCell();
                     if (N.ACID != ACID)//小組長不能移除自己
                         cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Aldult_Remove/" + N.MID, Target = "_self", CSS = "btn btn-danger btn-round-nocolor btn-sm mb-1", Value = "移除" });
-                    else if (!DC.M_Role_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//補案立
+                    else if (!DC.M_Role_Account.Any(q => q.ACID == N.ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2))//補按立
                         EditEmtitle(ACID);
 
                     cTC.cTCs.Add(new cTableCell { Type = "linkbutton", URL = "/Web/GroupPlace/Aldult_Edit/" + N.MID, Target = "_self", CSS = "btn btn-primary btn-round btn-sm mb-1", Value = "編輯" });
@@ -489,7 +489,6 @@ namespace Banner.Areas.Web.Controllers
                     }
                     SetAlert("已將組員移出此小組", 1, "/Web/GroupPlace/Aldult_List/" + M.OIID);
                 }
-
             }
             return View(N);
         }
@@ -498,22 +497,51 @@ namespace Banner.Areas.Web.Controllers
         public string EditEmtitle(int ACID)
         {
             string Error = "";
-            var M = DC.M_Role_Account.FirstOrDefault(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.RID == 2);
+            //順便檢查會員卡
+            var M = DC.M_Role_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.RID == 1);
+            if(M == null)
+            {
+                M = new M_Role_Account();
+                M.ACID = ACID;
+                M.RID = 1;
+                M.JoinDate = DT;
+                M.LeaveDate = DT;
+                M.Note = "";
+                M.ActiveFlag = true;
+                M.DeleteFlag = false;
+                M.CreDate = DT;
+                M.UpdDate = DT;
+                M.SaveACID = GetACID();
+                DC.M_Role_Account.InsertOnSubmit(M);
+                DC.SubmitChanges();
+            }
+            M = DC.M_Role_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.RID == 2);
             if (M != null)
             {
-                if (DC.OrganizeInfo.Count(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag) > 1)
-                    Error += "此員在其他組織仍擔任管理人,因此無法退卡<br/>";
-                if (DC.M_Staff_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
-                    Error += "此員仍為事工團團員,因此無法退卡<br/>";
-                if (DC.M_O_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
-                    Error += "此員仍被按立中,因此無法退卡<br/>";
-                if (DC.M_OI2_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
-                    Error += "此員仍為全職同工,因此無法退卡<br/>";
-                if (M.Account.BackUsedFlag)
-                    Error += "此員仍具後臺登入身分,因此無法退卡<br/>";
-                if (Error == "")
+                if(M.ActiveFlag)
                 {
-                    M.ActiveFlag = false;
+                    if (DC.OrganizeInfo.Count(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag) > 1)
+                        Error += "此員在其他組織仍擔任管理人,因此無法退卡<br/>";
+                    if (DC.M_Staff_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
+                        Error += "此員仍為事工團團員,因此無法退卡<br/>";
+                    if (DC.M_O_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
+                        Error += "此員仍被按立中,因此無法退卡<br/>";
+                    if (DC.M_OI2_Account.Count(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID) > 0)
+                        Error += "此員仍為全職同工,因此無法退卡<br/>";
+                    if (M.Account.BackUsedFlag)
+                        Error += "此員仍具後臺登入身分,因此無法退卡<br/>";
+                    if (Error == "")
+                    {
+                        M.ActiveFlag = false;
+                        M.LeaveDate = DT;
+                        M.UpdDate = DT;
+                        M.SaveACID = GetACID();
+                        DC.SubmitChanges();
+                    }
+                }
+                else
+                {
+                    M.ActiveFlag = true;
                     M.LeaveDate = DT;
                     M.UpdDate = DT;
                     M.SaveACID = GetACID();
@@ -536,6 +564,8 @@ namespace Banner.Areas.Web.Controllers
                 DC.M_Role_Account.InsertOnSubmit(M);
                 DC.SubmitChanges();
             }
+           
+
             return Error;
         }
         #endregion

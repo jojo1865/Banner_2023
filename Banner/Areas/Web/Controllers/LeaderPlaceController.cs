@@ -390,7 +390,7 @@ namespace Banner.Areas.Web.Controllers
                                 join p in OI_ACs
                                 on q.ACID equals p.ACID
                                 select new { q.ACID };
-                    //會友或領夜 排除被案立(小組長椅上)的人
+                    //會友或領夜 排除被按立(小組長椅上)的人
                     var ACs_3 = ACs_1.Except(ACs_2);
 
                     //篩選會友名單
