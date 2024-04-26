@@ -48,13 +48,13 @@ namespace Banner.Areas.Admin.Controllers
             {
                 if (GetACID() <= 0)
                 {
-                    //LogInAC(1);
-                    //SetBrowserData("UserName", "系統管理者");
+                    LogInAC(1);
+                    SetBrowserData("UserName", "系統管理者");
 
                     //LogInAC(8197);
                     //SetBrowserData("UserName", "JOJO");
 
-                    //SetAlert("", 1, "/Admin/Home/Index");
+                    SetAlert("", 1, "/Admin/Home/Index");
                 }
             }
             else if (Request.Url.Host == "web-banner.viuto-aiot.com")

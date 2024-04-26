@@ -1,4 +1,4 @@
-﻿
+﻿@model Banner.Areas.Admin.Controllers.MessageSendController.cGetMessage_Edit
 @{
     ViewBag.Title = "Message_Edit";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
@@ -17,17 +17,106 @@
                             <div class="form-card">
 
                                 <div class="form-group">
-                                    <label>課程分類代碼</label>
-                                    @Html.TextBox("txb_Code", Model.Code, new { @class = "form-control form-control-lg input-underline" })
+                                    <label>預計發送時間</label>
+                                    @Html.TextBox("txb_PlanSendDateTime", Model.sSendDateTime, new { @class = "form-control", @type = "datetime-local" })
                                 </div>
                                 <div class="form-group">
-                                    <label>課程分類名稱<span>*</span></label>
-                                    @Html.TextBox("txb_Title", Model.Title, new { @class = "form-control form-control-lg input-underline" })
+                                    <label>推播類別</label>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("rbl_Type", 0, Model.MHType == 0, new { @id = "rbl_Type1", @class = "form-check-input" })
+                                                @Html.Label("個人", new { @class = "form-check-label", @for = "rbl_Type1" })
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="form-check form-check-inline">
+                                                @Html.RadioButton("rbl_Type", 1, Model.MHType == 0, new { @id = "rbl_Type2", @class = "form-check-input" })
+                                                @Html.Label("廣告", new { @class = "form-check-label", @for = "rbl_Type2" })
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>備註</label>
-                                    @Html.TextArea("txb_Note", Model.Note, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
+                                    <label>推播主題<span>*</span></label>
+                                    @Html.TextBox("txb_Title", Model.Title, new { @class = "form-control" })
                                 </div>
+                                <div class="form-group">
+                                    <label>推播內容</label>
+                                    @Html.TextArea("txb_Description", Model.Description, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
+                                </div>
+                                <div class="form-group">
+                                    <label>發送對象設定</label>
+                                    <div class="row mb-2">
+                                        <div class="col-2">
+                                            @Html.RadioButton("rbl_TargetType", 0, Model.TargetType == 0, new { @class = "form-check-input", @id = "rbl_TargetType_0" })
+                                            @Html.Label("全部會員", new { @class = "form-check-label", @for = "rbl_TargetType_0" })
+                                        </div>
+                                        <div class="col-10"></div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-2">
+                                            @Html.RadioButton("rbl_TargetType", 1, Model.TargetType == 1, new { @class = "form-check-input", @id = "rbl_TargetType_1" })
+                                            @Html.Label("牧養組織與職分", new { @class = "form-check-label", @for = "rbl_TargetType_1" })
+                                        </div>
+                                        <div class="col-10">
+                                            <div class="row">
+                                                <div class="col-auto">
+                                                    @Html.TextBox("txb_OI_Title", Model.sOITitle, new {@class= "form-control",@placeholder="組織名稱" })
+                                                </div>
+                                                <div class="col-auto">
+                                                    @Html.DropDownList(Model.SL_O.ControlName, Model.SL_O.ddlList, new {@class= "form-select" })
+                                                </div>
+                                                <div class="col-auto">
+                                                    @Html.DropDownList(Model.SL_O_Target.ControlName, Model.SL_O_Target.ddlList, new { @class = "form-select" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-2">
+                                            @Html.RadioButton("rbl_TargetType", 2, Model.TargetType == 2, new { @class = "form-check-input", @id = "rbl_TargetType_2" })
+                                            @Html.Label("事工團", new { @class = "form-check-label", @for = "rbl_TargetType_2" })
+                                        </div>
+                                        <div class="col-10">
+
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-2">
+                                            @Html.RadioButton("rbl_TargetType", 3, Model.TargetType == 3, new { @class = "form-check-input", @id = "rbl_TargetType_3" })
+                                            @Html.Label("活動", new { @class = "form-check-label", @for = "rbl_TargetType_3" })
+                                        </div>
+                                        <div class="col-10"></div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-2">
+                                            @Html.RadioButton("rbl_TargetType", 4, Model.TargetType == 4, new { @class = "form-check-input", @id = "rbl_TargetType_4" })
+                                            @Html.Label("聚會點", new { @class = "form-check-label", @for = "rbl_TargetType_4" })
+                                        </div>
+                                        <div class="col-10"></div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-2">
+                                            @Html.RadioButton("rbl_TargetType", 5, Model.TargetType == 5, new { @class = "form-check-input", @id = "rbl_TargetType_5" })
+                                            @Html.Label("課程", new { @class = "form-check-label", @for = "rbl_TargetType_5" })
+                                        </div>
+                                        <div class="col-10"></div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-2">
+                                            @Html.RadioButton("rbl_TargetType", 6, Model.TargetType == 6, new { @class = "form-check-input", @id = "rbl_TargetType_6" })
+                                            @Html.Label("指定名單", new { @class = "form-check-label", @for = "rbl_TargetType_6" })
+                                        </div>
+                                        <div class="col-10"></div>
+                                    </div>
+                                </div>
+
+
+
+
+
+
                                 <div class="form-group">
                                     <label>啟用狀態</label>
                                     <div class="row">
@@ -45,7 +134,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                @if (Model.CCID > 0 && ((bool[])ViewBag._Power)[3])
+                                @if (Model.MHID > 0 && ((bool[])ViewBag._Power)[3])
                                 {
                                     <div class="form-group">
                                         <label>刪除</label>
@@ -71,7 +160,7 @@
 <div class="action-bar">
     @if (Model != null)
     {
-        if ((((bool[])ViewBag._Power)[1] && Model.CCID == 0) || (((bool[])ViewBag._Power)[2] && Model.CCID > 0))
+        if ((((bool[])ViewBag._Power)[1] && Model.MHID == 0) || (((bool[])ViewBag._Power)[2] && Model.MHID > 0))
         {
             <a href="javascript:;" onclick="SubmitConfirm();" style="color:white;" class="btn btn-primary btn-submit btn-lg btn-round btn-submit">
                 <i class="fa-solid fa-floppy-disk"></i>儲存

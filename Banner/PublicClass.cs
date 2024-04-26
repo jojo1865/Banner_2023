@@ -42,20 +42,20 @@ namespace Banner
     public class PublicClass : Controller
     {
         public DataClassesDataContext DC { get; set; }
-        public DateTime DT = DateTime.Now;
-        public string[] sWeeks = new string[] { "請選擇", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" };
-        public string[] sTimeSpans = new string[] { "上午", "下午", "晚上" };
-        public string sPhotoFileName = "Photo";//圖片存檔資料夾名稱
-        public string sNoPhoto = "/Photo/NoPhoto.jpg";
-        public string sFileName = "Files";//下載檔案資料夾名稱
-        public string sAdminPhotoFilePath = "../../../";//從後台最底層到圖片存檔資料夾的回推路徑
-        public string DateFormat = "yyyy-MM-dd";
-        public string DateTimeFormat = "yyyy-MM-dd HH:mm";
-        public string CompanyTitle = "【全球旌旗資訊網】";
-        public int EventQrCodeSTimeAdd = -30;//活動可打卡的起始時間提前校正(-30=開始前30分鐘可以開始打卡)
-        public int EventQrCodeETimeAdd = 30;//活動可打卡的結束時間校正(30=活動結束後30分鐘內可以打卡)
-        public int CreditCardAddDays = 1;//信用卡可付款天數加入數字
-        public int ATMAddDays = 2;//ATM可付款天數加入數字
+        public static DateTime DT = DateTime.Now;
+        public static string[] sWeeks = new string[] { "請選擇", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" };
+        public static string[] sTimeSpans = new string[] { "上午", "下午", "晚上" };
+        public static string sPhotoFileName = "Photo";//圖片存檔資料夾名稱
+        public static string sNoPhoto = "/Photo/NoPhoto.jpg";
+        public static string sFileName = "Files";//下載檔案資料夾名稱
+        public static string sAdminPhotoFilePath = "../../../";//從後台最底層到圖片存檔資料夾的回推路徑
+        public static string DateFormat = "yyyy-MM-dd";
+        public static string DateTimeFormat = "yyyy-MM-dd HH:mm";
+        public static string CompanyTitle = "【全球旌旗資訊網】";
+        public static int EventQrCodeSTimeAdd = -30;//活動可打卡的起始時間提前校正(-30=開始前30分鐘可以開始打卡)
+        public static int EventQrCodeETimeAdd = 30;//活動可打卡的結束時間校正(30=活動結束後30分鐘內可以打卡)
+        public static int CreditCardAddDays = 1;//信用卡可付款天數加入數字
+        public static int ATMAddDays = 2;//ATM可付款天數加入數字
         public string sDomanName
         {
             get
