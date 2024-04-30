@@ -817,6 +817,7 @@
     <Folder Include="Files\Log\外展小組\" />
     <Folder Include="Files\Log\組員轉換\" />
     <Folder Include="Files\Log\組織轉換\" />
+    <Folder Include="Files\Message\" />
     <Folder Include="Files\Product\" />
     <Folder Include="Photo\Product\" />
     <Folder Include="Views\API_Get\" />

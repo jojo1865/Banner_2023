@@ -1958,6 +1958,8 @@ namespace Banner.Areas.Admin.Controllers
                             DC.M_OI_Account.InsertOnSubmit(M);
                             DC.SubmitChanges();
 
+                            SendJoinGroup(M.MID);//推撥給小組長
+
                             SetAlert("分發完成", 1, "/Admin/AccountSet/Account_New_List/0");
                         }
                         else
@@ -1987,6 +1989,8 @@ namespace Banner.Areas.Admin.Controllers
                                 };
                                 DC.M_OI_Account.InsertOnSubmit(M);
                                 DC.SubmitChanges();
+
+                                SendJoinGroup(M.MID);//推撥給小組長
 
                                 SetAlert("分發完成", 1, "/Admin/AccountSet/Account_New_List/0");
                             }

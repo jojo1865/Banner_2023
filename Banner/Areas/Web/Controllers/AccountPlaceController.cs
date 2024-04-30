@@ -824,6 +824,8 @@ namespace Banner.Areas.Web.Controllers
                         };
                         DC.M_OI_Account.InsertOnSubmit(MOI);
                         DC.SubmitChanges();
+
+                        SendJoinGroup(MOI.MID);//推撥給小組長
                     }
                 }
             }

@@ -599,6 +599,8 @@ namespace Banner.Areas.Admin.Controllers
                 DC.M_OI_Account.InsertOnSubmit(M);
                 DC.SubmitChanges();
 
+                SendJoinGroup(M.MID);//推撥給小組長
+
                 Error = "OK";
             }
             return Error;

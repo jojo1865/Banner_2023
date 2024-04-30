@@ -129,6 +129,8 @@ namespace Banner.Controllers
                             };
                             DC.M_OI_Account.InsertOnSubmit(MOI);
                             DC.SubmitChanges();
+
+                            SendJoinGroup(MOI.MID);//推撥給小組長
                         }
 
                         O = DC.Organize.FirstOrDefault(q => q.ParentID == O.OID);
@@ -261,6 +263,8 @@ namespace Banner.Controllers
                             };
                             DC.M_OI_Account.InsertOnSubmit(MOI);
                             DC.SubmitChanges();
+
+                            SendJoinGroup(MOI.MID);//推撥給小組長
                         }
 
                     }

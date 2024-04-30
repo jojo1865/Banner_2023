@@ -1,5 +1,6 @@
 ﻿using Banner.Models;
 using Microsoft.Ajax.Utilities;
+using Newtonsoft.Json;
 using OfficeOpenXml.ConditionalFormatting;
 using System;
 using System.Collections;
@@ -273,31 +274,42 @@ namespace Banner.Areas.Admin.Controllers
 
             //後臺使用者限制使用那些旌旗資訊
             int Min_OIID = 0;
-            var OI2s = DC.M_OI2_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.OIID == 1);
-            if (OI2s.Any())
+            if (ACID != 1)
             {
-                var OIs = DC.OrganizeInfo.Where(q => q.OID == 2 && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OIID);
-                foreach (var OI in OIs) N.OI2SL.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = OI.OIID == OIs.Min(q => q.OIID) });
 
-                Min_OIID = OIs.Min(q => q.OIID);
-            }
-            else
-            {
-                OI2s = DC.M_OI2_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.OIID > 2);
+                var OI2s = DC.M_OI2_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.OIID == 1);
                 if (OI2s.Any())
                 {
-                    var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == 2 && q.ActiveFlag && !q.DeleteFlag)
-                               join p in OI2s
-                               on q.OIID equals p.OIID
-                               select q)
-                              .OrderBy(q => q.OIID);
+                    var OIs = DC.OrganizeInfo.Where(q => q.OID == 2 && q.ActiveFlag && !q.DeleteFlag).OrderBy(q => q.OIID);
                     foreach (var OI in OIs) N.OI2SL.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = OI.OIID == OIs.Min(q => q.OIID) });
 
                     Min_OIID = OIs.Min(q => q.OIID);
                 }
                 else
-                    SetAlert("此使用者未設定所屬旌旗,請設定完成後再新增/編輯上架課程", 2, "/Admin/StoreSet/Product_List");
+                {
+                    OI2s = DC.M_OI2_Account.Where(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag && q.OIID > 2);
+                    if (OI2s.Any())
+                    {
+                        var OIs = (from q in DC.OrganizeInfo.Where(q => q.OID == 2 && q.ActiveFlag && !q.DeleteFlag)
+                                   join p in OI2s
+                                   on q.OIID equals p.OIID
+                                   select q)
+                                  .OrderBy(q => q.OIID);
+                        foreach (var OI in OIs) N.OI2SL.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = OI.OIID == OIs.Min(q => q.OIID) });
+
+                        Min_OIID = OIs.Min(q => q.OIID);
+                    }
+                    else
+                        SetAlert("此使用者未設定所屬旌旗,請設定完成後再新增/編輯上架課程", 2, "/Admin/StoreSet/Product_List");
+                }
             }
+            else
+            {
+                var OIs = DC.OrganizeInfo.Where(q => q.OID == 2 && q.ActiveFlag && !q.DeleteFlag);
+                Min_OIID = OIs.Min(q => q.OIID);
+                foreach (var OI in OIs) N.OI2SL.Add(new SelectListItem { Text = OI.Title + OI.Organize.Title, Value = OI.OIID.ToString(), Selected = OI.OIID == OIs.Min(q => q.OIID) });
+            }
+
 
             //擋修用選單
             N.PBs = new List<cProduct_Before>();
@@ -409,13 +421,20 @@ namespace Banner.Areas.Admin.Controllers
 
 
                 //依據所屬旌旗的協會初始化付款方式可選擇的部分
-                var OI1 = DC.OrganizeInfo.FirstOrDefault(q => q.OID == 1 && q.OIID == N.P.OrganizeInfo.ParentID);
-                if (OI1 != null)
+                if (N.P != null)
                 {
-                    var PTs = DC.PayType.Where(q => q.OIID == OI1.OIID);
-                    foreach (var PT in PTs)
-                        N.PTSL.ddlList.First(q => q.Value == PT.PayTypeID.ToString()).Disabled = !PT.ActiveFlag;
+                    if (N.P.OrganizeInfo != null)
+                    {
+                        var OI1 = DC.OrganizeInfo.FirstOrDefault(q => q.OID == 1 && q.OIID == N.P.OrganizeInfo.ParentID);
+                        if (OI1 != null)
+                        {
+                            var PTs = DC.PayType.Where(q => q.OIID == OI1.OIID);
+                            foreach (var PT in PTs)
+                                N.PTSL.ddlList.First(q => q.Value == PT.PayTypeID.ToString()).Disabled = !PT.ActiveFlag;
+                        }
+                    }
                 }
+
             }
             else
             {
@@ -825,6 +844,24 @@ namespace Banner.Areas.Admin.Controllers
             return View(N);
         }
         #endregion
+        //下拉旌旗篩選課程
+        [HttpGet]
+        public string GetProductList(int OIID)
+        {
+            var Ns = from q in DC.Product.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == OIID).OrderBy(q => q.Course.CCID).ThenBy(q => q.CID).ThenBy(q => q.SubTitle)
+                     select new { Title = q.Course.Course_Category.Title + " " + q.Course.Title + " " + q.SubTitle, q.PID };
+
+            return JsonConvert.SerializeObject(Ns);
+        }
+        //下拉課程篩選班級
+        [HttpGet]
+        public string GetProductClassList(int PID)
+        {
+            var Ns = from q in DC.Product_Class.Where(q => q.ActiveFlag && !q.DeleteFlag && q.PID == PID).OrderBy(q => q.Product_ClassTime.Min(p=>p.ClassDate)).ThenBy(q => q.Product_ClassTime.Min(p => p.STime))
+                     select new { Title = q.Title, q.PCID };
+
+            return JsonConvert.SerializeObject(Ns);
+        }
 
         #region 上架課程-班別列表
         public class cProductClass_List
@@ -1437,10 +1474,10 @@ namespace Banner.Areas.Admin.Controllers
                     cTR.Cs.Add(new cTableCell { Value = "" });
                 cTR.Cs.Add(new cTableCell { Value = (N_.SDateTime.ToString(DateTimeFormat) + "<br/>↕<br/>" + N_.EDateTime.ToString(DateTimeFormat)) });//可用期間
                 var CR5 = N_.Coupon_Rule.FirstOrDefault(q => q.Target_Type == 5);
-                if(CR5!=null)
+                if (CR5 != null)
                     cTR.Cs.Add(new cTableCell { Type = "linkbutton", URL = "/Admin/StoreSet/Coupon_Account_List/" + CR5.CRID, Target = "_self", Value = "檢視名單(" + CR5.Coupon_Account.Count(q => !q.DeleteFlag) + ")" });//分配名單
                 else
-                    cTR.Cs.Add(new cTableCell { Value ="--" });//指定名單
+                    cTR.Cs.Add(new cTableCell { Value = "--" });//指定名單
                 cTR.Cs.Add(new cTableCell { Value = N_.ActiveFlag ? "已啟用" : "已關閉" });//啟用狀態
                 c.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
@@ -1880,12 +1917,12 @@ namespace Banner.Areas.Admin.Controllers
                 Error += "請選擇限制旌旗<br/>";
             if (c.cCRCs.Any(q => (q.Price_Type == 0 || q.Price_Type == 1) && q.Price_Cut < 0))
                 Error += "折價或指定金額請輸入正整數或0<br/>";
-            
-            var OPs = from q in DC.Order_Product.Where(q=>!q.Order_Header.DeleteFlag && q.Order_Header.Order_Type==2 && q.CRID>0)
-                      join p in DC.Coupon_Rule.Where(q=>q.CHID==c.CH.CHID)
+
+            var OPs = from q in DC.Order_Product.Where(q => !q.Order_Header.DeleteFlag && q.Order_Header.Order_Type == 2 && q.CRID > 0)
+                      join p in DC.Coupon_Rule.Where(q => q.CHID == c.CH.CHID)
                       on q.CRID equals p.CRID
                       select q;
-            if(OPs.Count()>0)
+            if (OPs.Count() > 0)
                 Error += "此折價卷已被使用,不能變更<br/>";
             #endregion
 
@@ -1955,7 +1992,7 @@ namespace Banner.Areas.Admin.Controllers
                 }*/
                 foreach (var CRC in c.cCRCs.OrderBy(q => q.Price_Type).ThenBy(q => q.SortNo))
                 {
-                    if(CRC.CRID==0)
+                    if (CRC.CRID == 0)
                     {
                         Coupon_Rule CR = new Coupon_Rule();
                         CR.Coupon_Header = c.CH;
@@ -1971,7 +2008,7 @@ namespace Banner.Areas.Admin.Controllers
                     else
                     {
                         var CR = DC.Coupon_Rule.FirstOrDefault(q => q.CRID == CRC.CRID && q.CHID == c.CH.CHID);
-                        if(CR!=null)
+                        if (CR != null)
                         {
                             CR.Price_Type = CRC.Price_Type;
                             CR.Price_Cut = CRC.Price_Cut;
@@ -2026,10 +2063,10 @@ namespace Banner.Areas.Admin.Controllers
                         }
                     }
 
-                    if(cIDs.Count>0)
+                    if (cIDs.Count > 0)
                     {
                         var CR5 = DC.Coupon_Rule.FirstOrDefault(q => q.CHID == c.CH.CHID && q.Target_Type == 5);
-                        if(CR5!=null)
+                        if (CR5 != null)
                         {
                             var CAs = (from q in DC.Coupon_Account.Where(q => q.CRID == CR5.CRID && q.ActiveFlag && !q.DeleteFlag)
                                        select new cID { ID = q.ACID }).ToList();
@@ -2057,7 +2094,7 @@ namespace Banner.Areas.Admin.Controllers
                             }
                         }
                     }
-                    
+
                 }
                 #endregion
 
@@ -2075,7 +2112,7 @@ namespace Banner.Areas.Admin.Controllers
         public cCoupon_Account_List GetCoupon_Account_List(int ID, FormCollection FC)
         {
             cCoupon_Account_List c = new cCoupon_Account_List();
-            
+
             #region 物件初始化
 
             #region 前端資料帶入

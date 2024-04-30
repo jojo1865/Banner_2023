@@ -802,8 +802,27 @@ namespace Banner.Areas.Web.Controllers
         #region 每日批次
         public string Batch_EveryDay()
         {
+            
+            
             Error = "OK";
+            //7天未落戶改回新人(有意願),並可重新申請加入小組
+            ChangeOIAccount();//退回未落戶者
+
+            //信用卡3天未付款移除訂單
+            //ATM7天未付款移除訂單
             ChangeOrder();//未完成交易的商品塞回購物車
+            return Error;
+        }
+        #endregion
+        #region 每分鐘批次
+        public string Batch_EveryMin()
+        {
+            
+            Error = "OK";
+            //一般推撥
+
+
+            //加入小組後推撥
             return Error;
         }
         #endregion

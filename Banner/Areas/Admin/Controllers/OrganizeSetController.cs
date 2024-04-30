@@ -1789,5 +1789,17 @@ namespace Banner.Areas.Admin.Controllers
             return View();
         }
         #endregion
+        #region 取主日聚會點
+        //下拉旌旗篩選主日聚會點
+        [HttpGet]
+        public string GetMeetList(int OIID)
+        {
+            var Ns = from q in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == OIID && q.SetType == 0).OrderBy(q => q.MLID)
+                     select new { Title = q.Meeting_Location.Title, q.MLID };
+
+            return JsonConvert.SerializeObject(Ns);
+        }
+        
+        #endregion
     }
 }

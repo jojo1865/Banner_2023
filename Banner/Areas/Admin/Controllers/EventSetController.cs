@@ -235,7 +235,11 @@ namespace Banner.Areas.Admin.Controllers
             foreach (var ML in MLs.OrderBy(q => q.OID).ThenBy(q => q.OIID))
                 c.ML0List.Add(new SelectListItem { Text = ML.OITitle + ML.OTitle + ":" + ML.MLTitle, Value = ML.MLSID.ToString() });
             if (MLs.Count() == 0)
-                c.ML0List.Add(new SelectListItem { Text = "無主日聚會點可供選擇", Value = "0", Selected = true });
+            {
+                if(ECID == 1)
+                    c.ML0List.Add(new SelectListItem { Text = "無主日聚會點可供選擇", Value = "0", Selected = true });
+            }
+                
             else
                 c.ML0List[0].Selected = true;
             #endregion

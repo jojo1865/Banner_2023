@@ -35,6 +35,8 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using static Banner.Areas.Admin.Controllers.StaffSetController;
 using System.Text.Json.Nodes;
+using System.Security.Policy;
+using static Banner.Areas.Admin.Controllers.HomeController;
 
 
 namespace Banner
@@ -3156,7 +3158,7 @@ namespace Banner
                 }
             }
         }
-        //未完成交易的商品塞回購物車
+        //未完成交易的商品塞回購物車(每日批次用)
         public void ChangeOrder(int ACID = 0)
         {
             #region 信用卡逾期
@@ -3291,6 +3293,67 @@ namespace Banner
             }
             #endregion
 
+        }
+        //退回未落戶者(每日批次用)
+        public void ChangeOIAccount()
+        {
+            var Ms = DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.JoinDate == q.CreDate && q.CreDate.AddDays(7).Date < DT.Date);
+            foreach (var M in Ms)
+            {
+                M.ActiveFlag = false;
+                M.DeleteFlag = true;
+                M.LeaveDate = DT;
+                M.LeaveUID = 1;
+                M.UpdDate = DT;
+                M.SaveACID = 1;
+
+                M.Account.GroupType = "有意願-願分發";
+                DC.SubmitChanges();
+            }
+        }
+        //加入小組推播
+        public void SendJoinGroup(int MID)
+        {
+            var MOI = DC.M_OI_Account.FirstOrDefault(q => q.MID == MID && q.OrganizeInfo.OID == 8);
+            if (MOI != null)
+            {
+                if (MOI.OrganizeInfo.ACID > 1)//若該小組是系統管理員就不發了
+                {
+                    Message_Header MH = new Message_Header
+                    {
+                        MHType = 0,
+                        Title = "新人入組",
+                        Description = "有一位新人:" + MOI.Account.Name_First + MOI.Account.Name_Last + "已申請加入您的小組",
+                        URL = "",
+                        PlanSendDateTime = DT,
+                        SendFlag = false,
+                        ActiveFlag = true,
+                        DeleteFlag = false,
+                        CreDate = DT,
+                        CreUID = 1,
+                        UpdDate = DT,
+                        UpdUID = 1,
+                    };
+
+                    DC.Message_Header.InsertOnSubmit(MH);
+                    DC.SubmitChanges();
+
+                    //目標是小組長
+                    M_MH_Account MAC = new M_MH_Account
+                    {
+                        Message_Header = MH,
+                        MTID = 0,
+                        Account = MOI.OrganizeInfo.Account,
+                        SendDateTime = MH.PlanSendDateTime,
+                        ReadDateTime = DT,
+                        ReadFlag = false,
+                        DeleteFlag = false
+                    };
+                    DC.M_MH_Account.InsertOnSubmit(MAC);
+                    DC.SubmitChanges();
+                }
+
+            }
         }
         //寫入Log
         public void SaveLog(string LogNote, string ForderName, string FileName)
