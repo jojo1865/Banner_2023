@@ -820,9 +820,10 @@ namespace Banner.Areas.Web.Controllers
             
             Error = "OK";
             //一般推撥
-
+            SendMessage();
 
             //加入小組後推撥
+            //直接推
             return Error;
         }
         #endregion

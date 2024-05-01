@@ -771,6 +771,7 @@
     <Content Include="Areas\Web\Views\ClassStore\Order_Back_EZPALIPAY.cshtml" />
     <Content Include="Areas\Admin\Views\MessageSend\Message_List.cshtml" />
     <Content Include="Areas\Admin\Views\MessageSend\Message_Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\MessageSend\Message_Target_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>
@@ -784,6 +785,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Files\Down\旌旗系統外部串接API操作手冊.pdf" />
+    <Content Include="Files\Down\Temp_匯入會員.xlsx" />
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />
     <Content Include="Scripts\jquery-3.7.1.min.js" />

@@ -1,0 +1,51 @@
+﻿@model Banner.Areas.Admin.Controllers.MessageSendController.cGetMessage_Target_List
+@{
+    ViewBag.Title = "Message_List";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        <form method="post" id="form1">
+            @if (Model != null)
+            {
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="row">
+                            <div class="col-lg-auto col-12">
+                                <label>姓名</label>
+                                @Html.TextBox("txb_Key", @Model.sKey, new { @class = "form-control form-control-lg input-underline", @placeholder = "推撥目標姓名" })
+                            </div>
+
+                            <div class="col-lg-auto col-12">
+                                <div class="form-control-lg">
+                                    <label>讀取狀態：</label>
+                                    @Html.RadioButton("rbl_ReadType", -1, (Model.ReadType == -1), new { @class = "form-check-input" })
+                                    @Html.Label("全部")
+                                    @Html.RadioButton("rbl_ReadType", 1, (Model.ReadType == 1), new { @class = "form-check-input" })
+                                    @Html.Label("已發送")
+                                    @Html.RadioButton("rbl_ReadType", 0, (Model.ReadType == 0), new { @class = "form-check-input" })
+                                    @Html.Label("等待發送")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-lg-end text-center">
+                                <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                </div>
+            }
+
+        </form>
+    </div>
+</div>
+

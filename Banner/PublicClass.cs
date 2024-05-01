@@ -3355,6 +3355,154 @@ namespace Banner
 
             }
         }
+        public void SendMessage()
+        {
+            var MHs = DC.Message_Header.Where(q => q.ActiveFlag && !q.DeleteFlag && !q.SendFlag && q.PlanSendDateTime < DT);
+            foreach (var MH in MHs)
+            {
+                List<cID> Send_IDs = new List<cID>();
+                //var MHTs = DC.Message_Target.ToList() ;
+                //MHTs = MHTs.Where(q => q.MHID == MH.MHID).ToList();
+                int MTID = 0;
+                foreach (var MHT in MH.Message_Target)
+                {
+                    MTID = MHT.MTID;
+                    List<cID> Plan_IDs = new List<cID>();
+                    switch (MHT.TargetType)
+                    {
+                        case 0://全對象
+                            {
+                                Plan_IDs.AddRange(DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag).Select(q => new cID { ID = q.ACID }));
+                            }
+                            break;
+
+                        case 1://牧養組織與職分
+                            {
+                                var Os = GetO();
+
+                                List<OrganizeInfo> OIs = new List<OrganizeInfo>();
+                                OIs = GetThisOIsFromTree(ref OIs, MHT.TargetID1);//取得此組織下所有組織
+                                if (MHT.TargetID2 == 8)//小組層級
+                                {
+                                    switch (MHT.TargetID3)
+                                    {
+                                        case 0://小組長
+                                            {
+                                                Plan_IDs.AddRange(OIs.Where(q => q.ACID != 1 && q.OID == MHT.TargetID2).GroupBy(q => q.ACID).Select(q => new cID { ID = q.Key }));
+                                            }
+                                            break;
+
+                                        case 1://小組員
+                                        case 2://會友
+                                        case 24://領夜
+                                            {
+                                                var Ms = from q in OIs.Where(q => q.OID == MHT.TargetID2)
+                                                         join p in DC.M_OI_Account.Where(q => q.ActiveFlag && !q.DeleteFlag)
+                                                         on q.OIID equals p.OIID
+                                                         select p;
+                                                if (MHT.TargetID3 == 2)//會友
+                                                    Ms = from q in Ms
+                                                         join p in DC.M_Role_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 2)
+                                                         on q.ACID equals p.ACID
+                                                         select q;
+                                                else if (MHT.TargetID3 == 24)//領夜
+                                                    Ms = from q in Ms
+                                                         join p in DC.M_Role_Account.Where(q => q.ActiveFlag && !q.DeleteFlag && q.RID == 24)
+                                                         on q.ACID equals p.ACID
+                                                         select q;
+
+                                                Plan_IDs.AddRange(Ms.GroupBy(q => q.ACID).Select(q => new cID { ID = q.Key }));
+                                            }
+                                            break;
+                                    }
+                                }
+                                else//其他職分
+                                {
+                                    Plan_IDs.AddRange(OIs.Where(q => q.ACID != 1 && q.OID == MHT.TargetID2).GroupBy(q => q.ACID).Select(q => new cID { ID = q.Key }));
+                                }
+                            }
+                            break;
+
+                        case 2://事工團
+                            {
+                                var Ms = DC.M_Staff_Account.Where(q => q.SID == MHT.TargetID1 && q.ActiveFlag && !q.DeleteFlag);
+                                if (MHT.TargetID2 == 1)//主責
+                                    Ms = Ms.Where(q => q.LeaderFlag);
+                                else if (MHT.TargetID2 == 2)//帶職 主責
+                                    Ms = Ms.Where(q => q.SubLeaderFlag);
+                                else if (MHT.TargetID2 == 1)//主責 + 帶職 主責
+                                    Ms = Ms.Where(q => q.LeaderFlag || q.SubLeaderFlag);
+                                Plan_IDs.AddRange(Ms.GroupBy(q => q.ACID).Select(q => new cID { ID = q.Key }));
+                            }
+                            break;
+
+                        case 3://活動
+                            {
+                                var Es = from q in DC.Event.Where(q => !q.DeleteFlag && q.ECID == MHT.TargetID1)
+                                         join p in DC.Event_Join_Detail.Where(q => !q.DeleteFlag)
+                                         on q.EID equals p.Event_Join_Header.EID
+                                         select p;
+
+                                Plan_IDs.AddRange(Es.GroupBy(q => q.ACID).Select(q => new cID { ID = q.Key }));
+                            }
+                            break;
+
+                        case 4://聚會點
+                            {
+
+                                var Ms = from q in DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag)
+                                         join p in DC.M_ML_Account.Where(q => q.MLID == MHT.TargetID2)
+                                         on q.ACID equals p.ACID
+                                         select p;
+
+                                Plan_IDs.AddRange(Ms.GroupBy(q => q.ACID).Select(q => new cID { ID = q.Key }));
+                            }
+                            break;
+
+                        case 5://課程
+                            {
+                                var ODs = DC.Order_Product.Where(q => q.Order_Header.Order_Type == 2 && !q.Order_Header.DeleteFlag && q.PID == MHT.TargetID1 && q.PCID == MHT.TargetID2);
+                                if (MHT.TargetID3 >= 0)
+                                    ODs = ODs.Where(q => q.Graduation_Flag == (MHT.TargetID3 == 1));
+                                Plan_IDs.AddRange(ODs.GroupBy(q => q.Order_Header.ACID).Select(q => new cID { ID = q.Key }));
+                            }
+                            break;
+
+                        case 6://指定名單 
+                            {
+                                //因為一開始就匯入了~所以不用名單
+                            }
+                            break;
+                    }
+                    Send_IDs = (Send_IDs.Union(Plan_IDs)).ToList<cID>();//ID聯集
+                }
+
+                var ACs = from q in Send_IDs.GroupBy(q => q.ID)
+                          join p in DC.Account.Where(q => !q.DeleteFlag)
+                          on q.Key equals p.ACID
+                          select p;
+                foreach (var AC in ACs)
+                {
+                    if(!MH.M_MH_Account.Any(q=>q.ACID == AC.ACID))
+                    {
+                        M_MH_Account M = new M_MH_Account
+                        {
+                            Message_Header = MH,
+                            Account = AC,
+                            MTID = MTID,
+                            SendDateTime = MH.PlanSendDateTime,
+                            ReadDateTime = MH.PlanSendDateTime,
+                            ReadFlag = false,
+                            DeleteFlag = false
+                        };
+                        DC.M_MH_Account.InsertOnSubmit(M);
+                        DC.SubmitChanges();
+                    }
+                }
+                MH.SendFlag = true;
+                DC.SubmitChanges();
+            }
+        }
         //寫入Log
         public void SaveLog(string LogNote, string ForderName, string FileName)
         {

@@ -14,7 +14,7 @@
             <div class="form-header visually-hidden"><h5>@ViewBag._Title</h5></div>
             @if (Model != null)
             {
-                <form method="post" id="form1">
+                <form method="post" id="form1" enctype="multipart/form-data">
 
                     <div class="form-body">
                         <div class="form-card-group">
@@ -47,7 +47,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>推播內容</label>
-                                    @Html.TextArea("txb_Description", Model.Description, new { @class = "form-control form-control-lg", @style = "hight:100px;" })
+                                    @Html.TextArea("txb_Description", Model.Description, new { @class = "form-control ", @style = "height:200px;" })
                                 </div>
                                 <div class="form-group">
                                     <label>轉換網址</label>
@@ -204,7 +204,7 @@
                                         </div>
                                         <div class="col-10">
                                             <label>檔案上傳</label>
-                                            @Html.TextBox("fu", null, new { @class = "form-control", type = "file" })
+                                            @Html.TextBox("fu", null, new { @class = "form-control", type = "file", accept = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
                                         </div>
                                     </div>
                                 </div>
@@ -260,7 +260,7 @@
                 <i class="fa-solid fa-floppy-disk"></i>儲存
             </a>
         }
-        <a href="/Admin/Course/Category_List/0" class="btn btn-outline-primary btn-lg btn-round">
+        <a href="/Admin/MessageSend/Message_List" class="btn btn-outline-primary btn-lg btn-round">
             <i class="fa-solid fa-xmark"></i>取消
         </a>
     }

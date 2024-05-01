@@ -95,8 +95,12 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Value = N.PlanSendDateTime.ToString(DateTimeFormat) });//發送日期
                 var U = DC.Account.FirstOrDefault(q => q.ACID == N.CreUID);
                 cTR.Cs.Add(new cTableCell { Value = U != null ? U.Name_First + U.Name_Last : "--" });//建立人
-                cTR.Cs.Add(new cTableCell { Value = "檢視", Type = "linkbutton", URL = "/Admin/MessageSend/Message_Target_List/" + N.MHID });//對象名單
-                //cTR.Cs.Add(new cTableCell { Value = "" });
+                if (N.M_MH_Account.Count(q => !q.DeleteFlag) > 0)
+                    cTR.Cs.Add(new cTableCell { Value = "檢視(" + N.M_MH_Account.Count(q => !q.DeleteFlag) + ")", Type = "link", URL = "/Admin/MessageSend/Message_Target_List/" + N.MHID, Target = "_black" });//對象名單
+                else
+                    cTR.Cs.Add(new cTableCell { Value = "" });
+
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
             return c;
         }
@@ -117,7 +121,7 @@ namespace Banner.Areas.Admin.Controllers
         public class cGetMessage_Edit
         {
             public int MHID = 0;
-            public string sSendDateTime = DT.ToString(DateTimeFormat);
+            public string sSendDateTime = DT.AddMinutes(10).ToString(DateTimeFormat);
             public string Title = "";
             public string Description = "";
             public string URL = "";
@@ -196,7 +200,7 @@ namespace Banner.Areas.Admin.Controllers
             }
             c.SL_O_Target.ddlList.Add(new SelectListItem { Text = "領夜同工", Value = "R_24" });
             c.SL_O_Target.ddlList.Add(new SelectListItem { Text = "會友", Value = "R_2" });
-            c.SL_O_Target.ddlList.Add(new SelectListItem { Text = "會員", Value = "R_1" });
+            c.SL_O_Target.ddlList.Add(new SelectListItem { Text = "小組員", Value = "R_1" });
 
             if (c.SL_O.ddlList.Count > 0)
                 c.SL_O.ddlList[0].Selected = true;
@@ -262,7 +266,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 string sP_ID = c.SL_Class_P.ddlList[0].Value;
                 c.SL_Class_Class.ddlList.AddRange(from q in DC.Product_Class.Where(q => q.ActiveFlag && !q.DeleteFlag && q.PID.ToString() == sP_ID).OrderBy(q => q.Title)
-                                                  select new SelectListItem { Text = q.Title, Value = q.PID.ToString() });
+                                                  select new SelectListItem { Text = q.Title, Value = q.PCID.ToString() });
                 if (c.SL_Class_Class.ddlList.Count > 0)
                     c.SL_Class_Class.ddlList[0].Selected = true;
                 else
@@ -353,8 +357,9 @@ namespace Banner.Areas.Admin.Controllers
 
                 string sClass_PID = FC.Get(c.SL_Class_P.ControlName);
                 c.SL_Class_P.ddlList.Clear();
-                c.SL_Class_P.ddlList.AddRange(from q in DC.Product.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID.ToString() == c.SL_Class_OI.ddlList[0].Value).OrderBy(q => q.Course.CCID).ThenBy(q => q.CID).ThenBy(q => q.SubTitle)
-                                              select new SelectListItem { Text = q.Course.Course_Category + " " + q.Course.Title + " " + q.SubTitle, Value = q.PID.ToString() });
+                var Ps__ = DC.Product.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID.ToString() == c.SL_Class_OI.ddlList[0].Value).OrderBy(q => q.Course.CCID).ThenBy(q => q.CID).ThenBy(q => q.SubTitle).ToList();
+                c.SL_Class_P.ddlList.AddRange(from q in Ps__
+                                              select new SelectListItem { Text = q.Course.Course_Category + " " + q.Course.Title + " " + q.SubTitle, Value = q.PID.ToString() }); ;
                 if (c.SL_Class_P.ddlList.Count > 0)
                     c.SL_Class_P.ddlList.First(q => q.Value == sClass_PID).Selected = true;
                 else
@@ -362,10 +367,14 @@ namespace Banner.Areas.Admin.Controllers
 
                 string sClass_ClassD = FC.Get(c.SL_Class_Class.ControlName);
                 c.SL_Class_Class.ddlList.Clear();
-                c.SL_Class_Class.ddlList.AddRange(from q in DC.Product_Class.Where(q => q.ActiveFlag && !q.DeleteFlag && q.PID.ToString() == sClass_PID).OrderBy(q => q.Title)
+                var PCs__ = DC.Product_Class.Where(q => q.ActiveFlag && !q.DeleteFlag && q.PID.ToString() == sClass_PID).OrderBy(q => q.Title).ToList();
+                c.SL_Class_Class.ddlList.AddRange(from q in PCs__
                                                   select new SelectListItem { Text = q.Title, Value = q.PCID.ToString() });
                 if (c.SL_Class_Class.ddlList.Count > 0)
-                    c.SL_Class_Class.ddlList.First(q => q.Value == sClass_ClassD).Selected = true;
+                {
+                    if (c.SL_Class_Class.ddlList.Any(q => q.Value == sClass_ClassD))
+                        c.SL_Class_Class.ddlList.First(q => q.Value == sClass_ClassD).Selected = true;
+                }
                 else
                     c.SL_Class_Class.ddlList.Add(new SelectListItem { Text = "查無班級", Value = "-1", Selected = true });
                 c.sClassID_1 = FC.Get("txb_Class_1");
@@ -548,7 +557,22 @@ namespace Banner.Areas.Admin.Controllers
                             }
 
                             if (c.SL_O_Target.ddlList.Any(q => q.Selected))
-                                c.TID2 = Convert.ToInt32(c.SL_O_Target.ddlList.Find(q => q.Selected).Value);
+                            {
+                                string Target = c.SL_O_Target.ddlList.Find(q => q.Selected).Value;
+                                if(Target.StartsWith("O_"))
+                                {
+                                    c.TID2 = Convert.ToInt32(Target.Replace("O_",""));
+                                }
+                                else if(Target.StartsWith("R_"))
+                                {
+                                    c.TID2 = 8;
+                                    // c.SL_O_Target.ddlList.Add(new SelectListItem { Text = "領夜同工", Value = "R_24" });
+                                    //c.SL_O_Target.ddlList.Add(new SelectListItem { Text = "會友", Value = "R_2" });
+                                    //c.SL_O_Target.ddlList.Add(new SelectListItem { Text = "會員", Value = "R_1" });
+                                    c.TID3 = Convert.ToInt32(Target.Replace("R_", ""));
+                                }
+                            }
+                                
                             else
                                 Error += "請選擇組織職分<br/>";
                         }
@@ -759,7 +783,7 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 DC.SubmitChanges();
                 //匯入指定名單
-                if (MT.TargetType == 6)
+                if (MT.TargetType == 6 && fu!=null)
                 {
                     string extension = Path.GetExtension(fu.FileName);
                     string fileName = $"{DT.ToString("yyyyMMddHHmm") + "_" + Guid.NewGuid()}{extension}";
@@ -791,16 +815,88 @@ namespace Banner.Areas.Admin.Controllers
                         }
                     }
                 }
+
+                SetAlert((ID == 0 ? "新增" : "更新") + "完成", 1, "/Admin/MessageSend/Message_List");
             }
             return View(c);
         }
         #endregion
         #region 訊息管理-名單
+        public class cGetMessage_Target_List
+        {
+            public string sKey = "";
+            public int ReadType = -1;
+            public cTableList cTL = new cTableList();
+        }
+        public cGetMessage_Target_List GetMessage_Target_List(int ID, FormCollection FC)
+        {
+            cGetMessage_Target_List c = new cGetMessage_Target_List();
+
+            #region 前端資料帶入
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            c.ReadType = Convert.ToInt32(FC != null ? FC.Get("rbl_ReadType") : "-1");
+            c.sKey = FC != null ? FC.Get("txb_Key") : "";
+
+            #endregion
+            c.cTL = new cTableList();
+            c.cTL.Title = "";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
+
+            #region 篩選
+            var Ns = DC.M_MH_Account.Where(q => q.MHID == ID && !q.DeleteFlag);
+            if (!string.IsNullOrEmpty(c.sKey))
+                Ns = Ns.Where(q => (q.Account.Name_First + q.Account.Name_Last).Contains(c.sKey));
+            if (c.ReadType >= 0)
+                Ns = Ns.Where(q => q.ReadFlag == (c.ReadType == 1));
+            #endregion
+
+            #region 標題
+            var TopTitles = new List<cTableCell>();
+            //TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "ID" });
+            TopTitles.Add(new cTableCell { Title = "姓名" });
+            TopTitles.Add(new cTableCell { Title = "讀取狀態" });
+            TopTitles.Add(new cTableCell { Title = "讀取時間" });
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            #endregion
+
+            c.cTL.TotalCt = Ns.Count();
+            c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.ACID).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
+            foreach (var N in Ns)
+            {
+                cTableRow cTR = new cTableRow();
+                cTR.Cs.Add(new cTableCell { Value = N.ACID.ToString() });//ID
+                cTR.Cs.Add(new cTableCell { Value = N.Account.Name_First + N.Account.Name_Last });//狀態
+                if (N.ReadFlag)
+                {
+                    cTR.Cs.Add(new cTableCell { Value = "已讀", CSS = "text-success" });//讀取狀態
+                    cTR.Cs.Add(new cTableCell { Value = N.ReadDateTime.ToString(DateTimeFormat) });//讀取時間
+                }
+
+                else
+                {
+                    cTR.Cs.Add(new cTableCell { Value = "未讀", CSS = "text-danger" });//讀取狀態
+                    cTR.Cs.Add(new cTableCell { Value = "--" });//讀取時間
+                }
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+            return c;
+        }
         [HttpGet]
         public ActionResult Message_Target_List(int ID)
         {
             GetViewBag();
-            return View();
+            return View(GetMessage_Target_List(ID, null));
+        }
+        [HttpPost]
+        public ActionResult Message_Target_List(int ID, FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetMessage_Target_List(ID, FC));
         }
         #endregion
         public ActionResult Index()

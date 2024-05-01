@@ -23,7 +23,11 @@ namespace BatchEveryMinute
                     #region 瀏覽紀錄整理
 
                     bool SuccessFlag = false;
-                    string _NewsURL = "https://web-banner.viuto-aiot.com/Web/Home/Batch_EveryMin";
+
+                    //string _NewsURL = "https://web-banner.viuto-aiot.com/Web/Home/Batch_EveryMin";
+                    string _NewsURL = "http://localhost:8001/Web/Home/Batch_EveryMin";
+
+
                     HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(_NewsURL);
                     request.Timeout = 60000;
                     using (var response = request.GetResponse())

@@ -1000,17 +1000,6 @@
       <Association Name="Coupon_Rule_Coupon_Account" Member="Coupon_Rule" ThisKey="CRID" OtherKey="CRID" Type="Coupon_Rule" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.Message_Target" Member="Message_Target">
-    <Type Name="Message_Target">
-      <Column Name="MTID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="MHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetID1" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetID2" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetID3" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Message_Header_Message_Target" Member="Message_Header" ThisKey="MHID" OtherKey="MHID" Type="Message_Header" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.M_MH_Account" Member="M_MH_Account">
     <Type Name="M_MH_Account">
       <Column Name="MID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -1040,8 +1029,19 @@
       <Column Name="CreUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdUID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Message_Header_Message_Target" Member="Message_Target" ThisKey="MHID" OtherKey="MHID" Type="Message_Target" />
       <Association Name="Message_Header_M_MH_Account" Member="M_MH_Account" ThisKey="MHID" OtherKey="MHID" Type="M_MH_Account" />
+      <Association Name="Message_Header_Message_Target" Member="Message_Target" ThisKey="MHID" OtherKey="MHID" Type="Message_Target" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Message_Target" Member="Message_Target">
+    <Type Name="Message_Target">
+      <Column Name="MTID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="MHID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TargetType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TargetID1" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TargetID2" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TargetID3" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Message_Header_Message_Target" Member="Message_Header" ThisKey="MHID" OtherKey="MHID" Type="Message_Header" IsForeignKey="true" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

@@ -28,6 +28,7 @@ namespace Banner.Areas.Admin.Controllers
                 .Replace("ProductClass_BatchEdit", "Product_List")
                 .Replace("ProductClass_JoinList", "Product_List")
                 .Replace("Coupon_Account_List", "Coupon_List")
+                .Replace("Message_Target_List", "Message_List")
                 .Replace("_Edit", "_List")
                 .Replace("Organize_Info_Account_List", "Organize_Info_List")
                 .Replace("ProductClass_", "Product_")
