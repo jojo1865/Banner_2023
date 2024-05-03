@@ -303,7 +303,7 @@ namespace Banner.Areas.Admin.Controllers
             if (FC != null)
             {
                 c.sSendDateTime = FC.Get("txb_PlanSendDateTime");
-                c.MHType = Convert.ToInt32(FC.Get("rbl_Type"));
+                c.MHType = Convert.ToInt32(FC.Get("rbl_TargetType"));
                 c.Title = FC.Get("txb_Title");
                 c.Description = FC.Get("txb_Description");
                 c.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
@@ -422,9 +422,27 @@ namespace Banner.Areas.Admin.Controllers
                                     c.sOITitle = OI.Title;
                                     c.SL_O.ddlList.ForEach(q => q.Selected = false);
                                     c.SL_O.ddlList.First(q => q.Value == OI.OID.ToString()).Selected = true;
+
+                                    if (MH_T.TargetID2 < 8)
+                                    {
+                                        c.SL_O_Target.ddlList.ForEach(q => q.Selected = false);
+                                        c.SL_O_Target.ddlList.First(q => q.Value == "O_" + MH_T.TargetID2.ToString()).Selected = true;
+                                    }
+                                    else if (MH_T.TargetID2 == 8)
+                                    {
+                                        if (MH_T.TargetID3 > 0)
+                                        {
+                                            c.SL_O_Target.ddlList.ForEach(q => q.Selected = false);
+                                            c.SL_O_Target.ddlList.First(q => q.Value == "R_" + MH_T.TargetID3.ToString()).Selected = true;
+                                        }
+                                        else
+                                        {
+                                            c.SL_O_Target.ddlList.ForEach(q => q.Selected = false);
+                                            c.SL_O_Target.ddlList.First(q => q.Value == "O_" + MH_T.TargetID2.ToString()).Selected = true;
+                                        }
+                                    }
                                 }
-                                c.SL_O_Target.ddlList.ForEach(q => q.Selected = false);
-                                c.SL_O_Target.ddlList.First(q => q.Value == MH_T.TargetID2.ToString()).Selected = true;
+                                
                             }
                             break;
 
@@ -534,7 +552,7 @@ namespace Banner.Areas.Admin.Controllers
 
                     case 1://牧養組織與職分
                         {
-                            if (string.IsNullOrEmpty(c.sOIID_1))//檢查指定組織ID
+                            if (!string.IsNullOrEmpty(c.sOIID_1))//檢查指定組織ID
                             {
                                 var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID.ToString() == c.sOIID_1 && !q.DeleteFlag);
                                 if (OI == null)
@@ -542,7 +560,7 @@ namespace Banner.Areas.Admin.Controllers
                                 else
                                     c.TID1 = OI.OIID;
                             }
-                            else//有輸入
+                            else//沒輸入
                             {
                                 string sOID = "0";
                                 if (c.SL_O.ddlList.Any(q => q.Selected))
