@@ -772,6 +772,7 @@
     <Content Include="Areas\Admin\Views\MessageSend\Message_List.cshtml" />
     <Content Include="Areas\Admin\Views\MessageSend\Message_Edit.cshtml" />
     <Content Include="Areas\Admin\Views\MessageSend\Message_Target_List.cshtml" />
+    <Content Include="Areas\Web\Views\GroupPlace\GroupMeetAccount_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

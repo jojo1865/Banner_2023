@@ -164,22 +164,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-card-group">
-                        <div class="header-container no-border">
-                            <div class="header-left-border"></div>
-                            <h5 class="header font-bold">社群資料</h5>
-                        </div>
-                        <div class="section-card">
-                            <label>社群帳號<span>*</span></label>
-                            @foreach (var CM in Model.Coms.OrderByDescending(q => q.SortNo))
-                            {
-                                <div class="form-group">
-                                    <label>@CM.Title</label>
-                                    @Html.TextBox(CM.ControlName, CM.InputData, new { @class = "form-control form-control-lg input-underline", @placeholder = (CM.SortNo == 0 ? "若沒有社群帳號請填寫：無" : "請輸入" + CM.Title) })
-                                </div>
-                            }
-                        </div>
-                    </div>
+                    
                 </div>
                 <div class="col-6">
                     <div class="form-card-group">
@@ -214,7 +199,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-card-group">
+                    @{
+                        string AddCSS = string.IsNullOrEmpty(Model.GroupNo) ? "" : "d-none";
+                    }
+                    <div class="form-card-group @AddCSS">
                         <div class="header-container no-border">
                             <div class="header-left-border"></div>
                             <h5 class="header font-bold">入組意願調查</h5>
@@ -300,14 +288,31 @@
                                     htmlAT_cbox.Remove("disabled");
                                 }
                                 @Html.RadioButton("rbut_GroupFlag", 2, Model.JoinGroupType == 2, htmlAT_cbox)
-                                @Html.Label("已參加小組", new { @class = "form-check-label", @for = "rbut_GroupFlag3" })
+                                @Html.Label("我想參加小組", new { @class = "form-check-label", @for = "rbut_GroupFlag3" })
                                 <br />
-                                @Html.Label("txb_GroupNo", Model.GroupNo, new { @class = "form-control form-control-lg input-underline lab_gray" })
+                                @Html.TextBox("txb_GroupNo", Model.GroupNo, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入小組編號" })
                                 <br />
                                 <div class="text-end">
                                     <span class="lab_info">若未知小組編號，請洽詢小組長</span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card-group">
+                        <div class="header-container no-border">
+                            <div class="header-left-border"></div>
+                            <h5 class="header font-bold">社群資料</h5>
+                        </div>
+                        <div class="section-card">
+                            <label>社群帳號<span>*</span></label>
+                            @foreach (var CM in Model.Coms.OrderByDescending(q => q.SortNo))
+                            {
+                                <div class="form-group">
+                                    <label>@CM.Title</label>
+                                    @Html.TextBox(CM.ControlName, CM.InputData, new { @class = "form-control form-control-lg input-underline", @placeholder = (CM.SortNo == 0 ? "若沒有社群帳號請填寫：無" : "請輸入" + CM.Title) })
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

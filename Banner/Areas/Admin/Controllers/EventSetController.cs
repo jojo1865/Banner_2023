@@ -292,6 +292,8 @@ namespace Banner.Areas.Admin.Controllers
                         c.E.Location_URL = "";
                     c.E.CircleFlag = true;
                     c.E.WeeklyNo = Convert.ToInt32(FC.Get("ddl_Weekly"));
+                    if (c.E.WeeklyNo >= sWeeks.Length)
+                        c.E.WeeklyNo = 7;
                     c.E.STime = TimeSpan.Parse(FC.Get("txb_STime"));
                     c.E.ETime = TimeSpan.Parse(FC.Get("txb_ETime"));
                 }

@@ -135,7 +135,7 @@
                             <label>帳號</label>
                             @if (Model.Login != "")
                             {
-                                @Html.TextBox("txb_Login_Old", Model.Login, new { @class = "form-control form-control-lg input-underline lab_gray", @placeholder = "請輸入帳號", required = string.Empty, @readonly = string.Empty, onchange = "checkLogin(this);" })
+                                @Html.TextBox("txb_Login_Old", Model.Login, new { @class = "form-control form-control-lg input-underline lab_gray", @placeholder = "請輸入帳號", required = string.Empty, maxlength = 50, @readonly = string.Empty, onchange = "checkLogin(this);" })
                                 <div class="d-none">
                                     @Html.TextBox("txb_Login", Model.Login)
                                     @Html.CheckBox("cbox_Login_Success", true)
@@ -143,7 +143,7 @@
                             }
                             else
                             {
-                                @Html.TextBox("txb_Login", Model.Login, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入帳號", required = string.Empty, onchange = "checkLogin(this);" })
+                                @Html.TextBox("txb_Login", Model.Login, new { @class = "form-control form-control-lg input-underline", @placeholder = "請輸入帳號", required = string.Empty, maxlength = 50, onchange = "checkLogin(this);" })
                                 <div class="d-none">
                                     @Html.CheckBox("cbox_Login_Success")
                                 </div>
@@ -194,7 +194,7 @@
                     <div class="row mt-2">
                         <div class="col mt-3">
                             <label>手機號碼</label>
-                            @Html.Action("_ContectEdit", "Include", new { C = new Contect { ContectType = 1, ContectValue = Model.CellPhone, ZID = Model.ZID_Phone }, required = true })
+                            @Html.Action("_ContectEdit", "Include", new { C = new Contect { ContectType = 1, ContectValue = Model.CellPhone, ZID = Model.ZID_Phone } })
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -231,12 +231,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-2">
-                        <div class="col mt-3">
-                            <label>居住國家</label>
-                            @Html.DropDownList("ddl_CountryZip", Model.Zs, new { @class = "form-select form-select-lg ms-0 me-0" })
-                        </div>
-                    </div>
+                    
                     <div class="row mt-2">
                         <div class="col mt-3">
                             <label>出生年月日(西元)</label>

@@ -204,33 +204,316 @@ namespace Banner.Controllers
         }
         #endregion
         #region API_4 事工團身份
-        public string API_4()//事工團身份
+        public class Return4
         {
-            return "";
+            public string Status = "Error";
+            public string ErrorMsg = "";
+            public List<cItem4> Items = new List<cItem4>();
+        }
+        public class cItem4
+        {
+            public string OrganizeTitle = "";
+            public string CategoryTitle = "";
+            public string Title = "";
+            public string JobTitle = "";
+        }
+        public string API_4(int ACID)//事工團身份
+        {
+            Return4 R = new Return4();
+            if (CheckJWT(4))
+            {
+                string sACID = HSM.Des_1(GetQueryStringInString("ID"));
+                int iACID = 0;
+                if (int.TryParse(sACID, out iACID))
+                {
+                    var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
+                    if (AC != null)
+                    {
+                        R.Items = new List<cItem4>();
+
+                        var Ms = DC.M_Staff_Account.Where(q => q.ACID == AC.ACID && q.Staff.ActiveFlag && !q.DeleteFlag && q.ActiveFlag && q.LeaveDate == q.CreDate);
+                        if (Ms.Count() > 0)
+                        {
+                            R.Status = "OK";
+                            foreach (var M in Ms.OrderBy(q => q.JoinDate))
+                            {
+                                R.Items.Add(new cItem4
+                                {
+                                    OrganizeTitle = M.OrganizeInfo.Title + M.OrganizeInfo.Organize.Title,
+                                    CategoryTitle = M.Staff.Staff_Category.Title,
+                                    Title = M.Staff.Title,
+                                    JobTitle = M.LeaderFlag ? "主責" : (M.SubLeaderFlag ? "帶職主責" : "團員")
+                                });
+                            }
+                        }
+                        else
+                            R.ErrorMsg = "此會員並未加入事工團員";
+                    }
+                    else
+                        R.ErrorMsg = "此團員不存在";
+                }
+                else
+                    R.ErrorMsg = "參數傳遞錯誤";
+            }
+            else
+                R.ErrorMsg = "您不具備查詢此項目的許可";
+            sReturn = JsonConvert.SerializeObject(R);
+
+            return sReturn;
         }
         #endregion
         #region API_5 小組出缺席紀錄
+        public class Return5
+        {
+            public string Status = "Error";
+            public string ErrorMsg = "";
+            public List<cItem5> Items = new List<cItem5>();
+        }
+        public class cItem5
+        {
+            public string OrganizeTitle = "";
+            public string Date = "";
+            public string JoinType = "";
+        }
         public string API_5()//小組出缺席紀錄
         {
-            return "";
+            Return5 R = new Return5();
+            if (CheckJWT(5))
+            {
+                string sACID = HSM.Des_1(GetQueryStringInString("ID"));
+                int iACID = 0;
+                if (int.TryParse(sACID, out iACID))
+                {
+                    var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
+                    if (AC != null)
+                    {
+                        R.Items = new List<cItem5>();
+
+                        var MOIs = DC.M_OI_Account.Where(q => q.ACID == AC.ACID).OrderBy(q => q.JoinDate);
+                        foreach (var MOI in MOIs)
+                        {
+                            var EJHs = DC.Event_Join_Header.Where(q => q.TargetType == 2 && q.OIID == MOI.OIID).OrderBy(q => q.EventDate);
+                            foreach (var EJH in EJHs)
+                            {
+                                R.Items.Add(new cItem5
+                                {
+                                    OrganizeTitle = MOI.OrganizeInfo.Title + MOI.OrganizeInfo.Organize.Title,
+                                    Date = EJH.EventDate.ToString(DateFormat),
+                                    JoinType = EJH.Event_Join_Detail.Any(q => q.ACID == AC.ACID && !q.DeleteFlag) ? "有參加" : "缺席"
+                                });
+                            }
+                        }
+                        if (MOIs.Count() == 0)
+                            R.ErrorMsg = "此會員並未加入過任何小組";
+                        else if (R.Items.Count == 0)
+                            R.ErrorMsg = "此小組組員所加入的小組沒有任何小組聚會紀錄";
+                        else
+                            R.Items = R.Items.OrderByDescending(q => q.Date).ToList();
+                    }
+                    else
+                        R.ErrorMsg = "此小組組員不存在";
+                }
+                else
+                    R.ErrorMsg = "參數傳遞錯誤";
+            }
+            else
+                R.ErrorMsg = "您不具備查詢此項目的許可";
+            sReturn = JsonConvert.SerializeObject(R);
+
+            return sReturn;
         }
         #endregion
         #region API_6 事工團出席紀錄
+        public class Return6
+        {
+            public string Status = "Error";
+            public string ErrorMsg = "";
+            public List<cItem6> Items = new List<cItem6>();
+        }
+        public class cItem6
+        {
+            public string OrganizeTitle = "";
+            public string Title = "";
+            public string Date = "";
+            public string JoinType = "";
+        }
         public string API_6()//事工團出席紀錄
         {
-            return "";
+            Return6 R = new Return6();
+            if (CheckJWT(6))
+            {
+                string sACID = HSM.Des_1(GetQueryStringInString("ID"));
+                int iACID = 0;
+                if (int.TryParse(sACID, out iACID))
+                {
+                    var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
+                    if (AC != null)
+                    {
+                        R.Items = new List<cItem6>();
+
+                        var Ms = DC.M_Staff_Account.Where(q => q.ACID == AC.ACID);
+
+                        var EJHs = from q in Ms.GroupBy(q => q.SID)
+                                   join p in DC.Event_Join_Header.Where(q => q.TargetType == 1)
+                                   on q.Key equals p.TargetID
+                                   select p;
+
+                        foreach (var EJH in EJHs.OrderBy(q => q.EventDate))
+                        {
+                            var M = Ms.FirstOrDefault(q => q.JoinDate < EJH.EventDate && (q.LeaveDate.Date >= EJH.EventDate.Date || q.LeaveDate == q.CreDate) && !q.DeleteFlag);
+                            if (M != null)//該員於該聚會日時正擔任團員
+                            {
+                                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == EJH.OIID);
+                                R.Items.Add(new cItem6
+                                {
+                                    OrganizeTitle = OI != null ? (OI.Title + OI.Organize.Title) : "",
+                                    Title = M.Staff.Staff_Category.Title + " " + M.Staff.Title,
+                                    Date = EJH.EventDate.ToString(DateFormat),
+                                    JoinType = EJH.Event_Join_Detail.Any(q => q.ACID == AC.ACID && !q.DeleteFlag) ? "有參加" : "缺席"
+                                });
+
+                            }
+                        }
+
+                        R.Items = R.Items.OrderByDescending(q => q.Date).ToList();
+                    }
+                    else
+                        R.ErrorMsg = "此團員不存在";
+                }
+                else
+                    R.ErrorMsg = "參數傳遞錯誤";
+            }
+            else
+                R.ErrorMsg = "您不具備查詢此項目的許可";
+            sReturn = JsonConvert.SerializeObject(R);
+
+            return sReturn;
         }
         #endregion
         #region API_7 課程歷程
+        public class Return7
+        {
+            public string Status = "Error";
+            public string ErrorMsg = "";
+            public List<cItem7> Items = new List<cItem7>();
+        }
+        public class cItem7
+        {
+            public int OrderNo = 0;//訂單ID
+            public string CourseTitle = "";//永久課程標題
+            public string ProductTitle = "";//上架課程副標題
+            public string Date = "";//第一次上課日期
+            public string Graduation = "";//結業狀態
+        }
         public string API_7()//課程歷程
         {
-            return "";
+            Return7 R = new Return7();
+            if (CheckJWT(7))
+            {
+                string sACID = HSM.Des_1(GetQueryStringInString("ID"));
+                int iACID = 0;
+                if (int.TryParse(sACID, out iACID))
+                {
+                    var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
+                    if (AC != null)
+                    {
+                        R.Items = new List<cItem7>();
+                        var OPs = DC.Order_Product.Where(q =>
+                                    q.Order_Header.ACID == AC.ACID &&
+                                    !q.Order_Header.DeleteFlag &&
+                                    q.Order_Header.Order_Type == 2
+                            );
+                      foreach(var OP in OPs)
+                        {
+                            cItem7 I7 = new cItem7();
+                            I7.OrderNo = OP.OHID;
+                            I7.CourseTitle = OP.Product.Course.Course_Category.Title + " " + OP.Product.Course.Title;
+                            I7.ProductTitle = OP.Product.SubTitle;
+                            I7.Graduation = OP.Graduation_Flag ? "已於" + OP.Graduation_Date.ToString(DateFormat) + "結業" : "尚未結業";
+                            if (OP.Product_Class.Product_ClassTime.Count > 0)
+                                I7.Date = OP.Product_Class.Product_ClassTime.Min(q => q.ClassDate).ToString(DateFormat);
+                            else
+                                I7.Date = "遺失上課日期";
+                        }
+
+                        R.Items = R.Items.OrderByDescending(q => q.OrderNo).ToList();
+                    }
+                    else
+                        R.ErrorMsg = "此團員不存在";
+                }
+                else
+                    R.ErrorMsg = "參數傳遞錯誤";
+            }
+            else
+                R.ErrorMsg = "您不具備查詢此項目的許可";
+            sReturn = JsonConvert.SerializeObject(R);
+
+            return sReturn;
         }
         #endregion
         #region API_8 屬靈健檢表
+        public class Return8
+        {
+            public string Status = "Error";
+            public string ErrorMsg = "";
+            public List<cItem8> Items = new List<cItem8>();
+        }
+        public class cItem8
+        {
+            public string Date = "";//第一次上課日期
+            public string Type = "";//是否主日
+            public int QTCt = 0;//當周靈修(QT)次數
+        }
         public string API_8()//屬靈健檢表
         {
-            return "";
+            Return8 R = new Return8();
+            if (CheckJWT(8))
+            {
+                string sACID = HSM.Des_1(GetQueryStringInString("ID"));
+                int iACID = 0;
+                if (int.TryParse(sACID, out iACID))
+                {
+                    var AC = DC.Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag);
+                    if (AC != null)
+                    {
+                        R.Items = new List<cItem8>();
+
+                        DateTime MaxDate = DT.AddDays(-1 * ((int)DT.DayOfWeek));//最近一個星期天
+                        var ASs = DC.Account_Spiritual.Where(q => q.ACID == AC.ACID).ToList();
+                        for (int i = 0; i < 30; i++)
+                        {
+                            DateTime DT_ = MaxDate.AddDays(i * -7).Date;
+                            var AS = ASs.FirstOrDefault(q => q.QTDate == DT_);
+
+                            cItem8 I8 = new cItem8();
+                            I8.Date = DT_.ToString(DateFormat);
+                            if (AS != null)
+                            {
+                                I8.QTCt = AS.QTCt;
+                                I8.Type = AS.QTFlag ? "true" : "false";
+                            }
+                            else
+                            {
+                                I8.QTCt = 0;
+                                I8.Type = "null";
+                            }
+
+                            R.Items.Add(I8);
+                        }
+
+                        R.Items = R.Items.OrderByDescending(q => q.Date).ToList();
+                    }
+                    else
+                        R.ErrorMsg = "此團員不存在";
+                }
+                else
+                    R.ErrorMsg = "參數傳遞錯誤";
+            }
+            else
+                R.ErrorMsg = "您不具備查詢此項目的許可";
+            sReturn = JsonConvert.SerializeObject(R);
+
+            return sReturn;
         }
         #endregion
     }

@@ -37,6 +37,8 @@ using static Banner.Areas.Admin.Controllers.StaffSetController;
 using System.Text.Json.Nodes;
 using System.Security.Policy;
 using static Banner.Areas.Admin.Controllers.HomeController;
+using OfficeOpenXml.Drawing;
+using ZXing.Common;
 
 
 namespace Banner
@@ -3311,6 +3313,81 @@ namespace Banner
                 DC.SubmitChanges();
             }
         }
+        //建立聚會活動
+        public void CreageEvent()
+        {
+            //小組聚會日
+            int iWeekDay = (int)DT.DayOfWeek;
+            if (iWeekDay == 0)
+                iWeekDay = 7;
+            var cMLSs = from q in DC.Meeting_Location_Set.Where(q => !q.DeleteFlag && q.ActiveFlag && q.SetType == 1 && q.OIID > 0 && q.WeeklyNo == iWeekDay)
+                       join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8)
+                       on q.OIID equals p.OIID
+                       select new { MLS = q, OI = p };
+            foreach (var cMLS in cMLSs)
+            {
+                var EJ = DC.Event_Join_Header.FirstOrDefault(q => q.TargetType == 2 && q.TargetID ==0 && q.OIID == cMLS.OI.OIID );
+                if (EJ == null)
+                {
+                    #region 建立活動
+                    var E2 = DC.Event.FirstOrDefault(q => q.ECID == 2);
+                    if (E2 == null)
+                    {
+                        TimeSpan S_TS = new TimeSpan(cMLS.MLS.S_hour, cMLS.MLS.S_minute, 0);
+                        TimeSpan E_TS = new TimeSpan(cMLS.MLS.E_hour, cMLS.MLS.E_minute, 0);
+
+                        TimeSpan S_Add = new TimeSpan(0, EventQrCodeSTimeAdd, 0);
+                        TimeSpan E_Add = new TimeSpan(0, EventQrCodeETimeAdd, 0);
+
+                        E2 = new Event
+                        {
+                            ECID = 2,
+                            Title = cMLS.OI.Title + "小組聚會",
+                            EventType = 0,
+                            EventInfo = "",
+                            CircleFlag = true,
+                            EventDate = DT.Date,
+                            WeeklyNo = cMLS.MLS.WeeklyNo,
+                            STime = S_TS,
+                            ETime = E_TS,
+                            SDate_AllowJoin = DT.Date,
+                            EDate_AllowJoin = DT.Date,
+                            STime_AllowJoin = S_TS.Add(S_Add),
+                            ETime_AllowJoin = E_TS.Add(E_Add),
+                            PhoneNo = "",
+                            Location_MID = cMLS.MLS.MLSID,
+                            Location_URL = "",
+                            Location_Note = "",
+                            Note = "",
+                            ActiveFlag = true,
+                            DeleteFlag = false,
+                            CreDate = DT,
+                            UpdDate = DT,
+                            SaveACID = 1
+                        };
+                        DC.Event.InsertOnSubmit(E2);
+                        DC.SubmitChanges();
+                    }
+                    #endregion
+                    #region 建立活動頭
+                    EJ = new Event_Join_Header
+                    {
+                        Event = E2,
+                        TargetType = 2,
+                        TargetID = 0,
+                        OIID = cMLS.OI.OIID,
+                        EventDate = DT.Date,
+                        Note = "",
+                        CreDate = DT,
+                        UpdDate = DT,
+                        SaveACID = 1
+                    };
+                    DC.Event_Join_Header.InsertOnSubmit(EJ);
+                    DC.SubmitChanges();
+                    #endregion
+                }
+            }
+        }
         //加入小組推播
         public void SendJoinGroup(int MID)
         {
@@ -3483,7 +3560,7 @@ namespace Banner
                           select p;
                 foreach (var AC in ACs)
                 {
-                    if(!MH.M_MH_Account.Any(q=>q.ACID == AC.ACID))
+                    if (!MH.M_MH_Account.Any(q => q.ACID == AC.ACID))
                     {
                         M_MH_Account M = new M_MH_Account
                         {

@@ -94,6 +94,8 @@ namespace Banner.Areas.Admin.Controllers
                     AC = DC.Account.Where(q => q.Login == Login && q.ActiveFlag && !q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
                     if (AC == null)
                         SetAlert("此帳號不存在", 2);
+                    else if(!AC.BackUsedFlag)
+                        SetAlert("此帳號並未獲得與此登入的授權", 2);
                     /*else if (AC.DeleteFlag)
                         SetAlert("此帳號已被移除", 2);
                     else if (!AC.ActiveFlag)

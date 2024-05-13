@@ -26,7 +26,7 @@ namespace Banner.Areas.Web.Controllers
             public string Login = "";
             public string PW = "";
             public int ZID_Phone = 10;
-            public int ZID_Location = 10;
+            //public int ZID_Location = 10;
             public string CellPhone = "";
             public string Email = "";
             public string Name_F = "";
@@ -35,7 +35,7 @@ namespace Banner.Areas.Web.Controllers
             public string sBD = "";
             public DateTime dBD = DateTime.Now;
 
-            public List<SelectListItem> Zs = new List<SelectListItem>();
+            //public List<SelectListItem> Zs = new List<SelectListItem>();
         }
         public cStep1 GetStep1(string ACID = "", FormCollection FC = null)
         {
@@ -68,14 +68,14 @@ namespace Banner.Areas.Web.Controllers
                 else
                     N.Email = "";
 
-                var Loc = DC.Location.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == AC.ACID);
+                /*var Loc = DC.Location.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == AC.ACID);
                 if (Loc != null)
-                    N.ZID_Location = Loc.ZID;
+                    N.ZID_Location = Loc.ZID;*/
             }
-            var Zs = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國").OrderBy(q => q.ZID);
+            /*var Zs = DC.ZipCode.Where(q => q.ActiveFlag && q.GroupName == "國").OrderBy(q => q.ZID);
             foreach (var Z in Zs)
                 N.Zs.Add(new SelectListItem { Text = Z.Title, Value = Z.ZID.ToString(), Selected = N.ZID_Location == Z.ZID });
-
+            */
             if (FC != null)
             {
                 N.Login = FC.Get("txb_Login");
@@ -89,9 +89,9 @@ namespace Banner.Areas.Web.Controllers
                 N.Sex = Convert.ToBoolean(FC.Get("cbox_Sex"));
                 N.sBD = FC.Get("txb_Birthday");
                 N.dBD = Convert.ToDateTime(N.sBD);
-                N.ZID_Location = Convert.ToInt32(FC.Get("ddl_CountryZip"));
-                N.Zs.ForEach(q => q.Selected = false);
-                N.Zs.First(q => q.Value == N.ZID_Location.ToString()).Selected = true;
+                ///N.ZID_Location = Convert.ToInt32(FC.Get("ddl_CountryZip"));
+                //N.Zs.ForEach(q => q.Selected = false);
+                //N.Zs.First(q => q.Value == N.ZID_Location.ToString()).Selected = true;
             }
 
             return N;
@@ -121,6 +121,10 @@ namespace Banner.Areas.Web.Controllers
                 SetAlert(sPhone, 2);
             else if (sEmail != "OK")
                 SetAlert(sEmail, 2);
+            else if(!CheckEmail(N.Email))
+                SetAlert("Email格式錯誤", 2);
+            else if(N.Email.Split('@').Length!=2)
+                SetAlert("目前僅能接受輸入一組Email", 2);
             else if (bLogin && bPW)
             {
                 if (N.ACID == 0)
@@ -185,7 +189,7 @@ namespace Banner.Areas.Web.Controllers
                     DC.Contect.InsertOnSubmit(Con);
                     DC.SubmitChanges();
 
-                    Location L = new Location
+                    /*Location L = new Location
                     {
                         TargetType = 2,
                         TargetID = AC.ACID,
@@ -193,7 +197,7 @@ namespace Banner.Areas.Web.Controllers
                         Address = ""
                     };
                     DC.Location.InsertOnSubmit(L);
-                    DC.SubmitChanges();
+                    DC.SubmitChanges();*/
 
                 }
                 else
@@ -254,7 +258,7 @@ namespace Banner.Areas.Web.Controllers
                     }
 
 
-                    Location L = DC.Location.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == N.ACID);
+                    /*Location L = DC.Location.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == N.ACID);
                     if (L != null)
                     {
                         L.ZID = N.ZID_Location;
@@ -271,7 +275,7 @@ namespace Banner.Areas.Web.Controllers
                         };
                         DC.Location.InsertOnSubmit(L);
                         DC.SubmitChanges();
-                    }
+                    }*/
                 }
 
                 Response.Redirect("/Web/AccountAdd/Step2?ACID=" + HSM.Enc_1(N.ACID.ToString().PadLeft(5, '0')));
@@ -885,6 +889,8 @@ namespace Banner.Areas.Web.Controllers
                     if (JGW != null)
                     {
                         JGW.WeeklyNo = Convert.ToInt32(WNo.Value);
+                        if (JGW.WeeklyNo >= sWeeks.Length)
+                            JGW.WeeklyNo = 7;
                         JGW.TimeNo = Convert.ToInt32(TNo.Value);
                     }
                     else
@@ -897,6 +903,9 @@ namespace Banner.Areas.Web.Controllers
                             WeeklyNo = Convert.ToInt32(WNo.Value),
                             TimeNo = Convert.ToInt32(TNo.Value)
                         };
+                        if (JGW.WeeklyNo >= sWeeks.Length)
+                            JGW.WeeklyNo = 7;
+
                         DC.JoinGroupWish.InsertOnSubmit(JGW);
                     }
                     DC.SubmitChanges();

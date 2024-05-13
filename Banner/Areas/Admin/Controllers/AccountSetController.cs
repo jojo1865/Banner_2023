@@ -1939,6 +1939,8 @@ namespace Banner.Areas.Admin.Controllers
                     else if (sddlID != "0")
                     {
                         var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8 && q.OIID.ToString() == sddlID);
+                        if (OI == null)
+                            OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8 && (q.OIID.ToString() == N.InputOIData || q.Title == N.InputOIData));
                         if (OI != null)
                         {
                             M_OI_Account M = new M_OI_Account
@@ -1965,43 +1967,38 @@ namespace Banner.Areas.Admin.Controllers
                         else
                             SetAlert("小組不存在，請重新選擇或輸入指定小組", 2);
                     }
-                    else if (N.InputOIData.Contains(')'))
+                    else
                     {
                         string[] str = N.InputOIData.Split(')');
-                        if (str.Length == 2)
+                        var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8 && q.OIID.ToString() == str[0].Replace("(", ""));
+                        if (OI != null)
                         {
-                            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8 && q.OIID.ToString() == str[0].Replace("(", ""));
-                            if (OI != null)
+                            M_OI_Account M = new M_OI_Account
                             {
-                                M_OI_Account M = new M_OI_Account
-                                {
-                                    OIID = OI.OIID,
-                                    ACID = AC.ACID,
-                                    JoinDate = DT,
-                                    JoinUID = ACID,
-                                    LeaveDate = DT,
-                                    LeaveUID = 0,
-                                    ActiveFlag = true,
-                                    DeleteFlag = false,
-                                    CreDate = DT,
-                                    UpdDate = DT,
-                                    SaveACID = ACID
-                                };
-                                DC.M_OI_Account.InsertOnSubmit(M);
-                                DC.SubmitChanges();
+                                OIID = OI.OIID,
+                                ACID = AC.ACID,
+                                JoinDate = DT,
+                                JoinUID = ACID,
+                                LeaveDate = DT,
+                                LeaveUID = 0,
+                                ActiveFlag = true,
+                                DeleteFlag = false,
+                                CreDate = DT,
+                                UpdDate = DT,
+                                SaveACID = ACID
+                            };
+                            DC.M_OI_Account.InsertOnSubmit(M);
+                            DC.SubmitChanges();
 
-                                SendJoinGroup(M.MID);//推撥給小組長
+                            SendJoinGroup(M.MID);//推撥給小組長
 
-                                SetAlert("分發完成", 1, "/Admin/AccountSet/Account_New_List/0");
-                            }
-                            else
-                                SetAlert("小組不存在，請重新選擇或輸入指定小組...", 2);
+                            SetAlert("分發完成", 1, "/Admin/AccountSet/Account_New_List/0");
                         }
                         else
-                            SetAlert("小組不存在，請重新選擇或輸入指定小組..", 2);
+                            SetAlert("小組不存在，請重新選擇或輸入指定小組.", 2);
                     }
-                    else
-                        SetAlert("小組不存在，請重新選擇或輸入指定小組.", 2);
+                    //else
+                    //    SetAlert("小組不存在，請重新選擇或輸入指定小組.", 2);
                 }
             }
 

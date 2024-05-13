@@ -141,11 +141,11 @@
                             <div class="form-group" style="flex: 1">
                                 <label>驗證方式</label><br />
                                 <div class="form-check form-check-inline">
-                                    @Html.RadioButton("rbut_Con", true, true, new { @id = "rbut_Con1", @class = "form-check-input", required = string.Empty })
+                                    @Html.RadioButton("rbut_Con", true, false, new { @id = "rbut_Con1", @class = "form-check-input", required = string.Empty })
                                     @Html.Label("手機", new { @class = "form-check-label", @for = "rbut_Con1" })
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    @Html.RadioButton("rbut_Con", false, false, new { @id = "rbut_Con2", @class = "form-check-input", required = string.Empty })
+                                    @Html.RadioButton("rbut_Con", false, true, new { @id = "rbut_Con2", @class = "form-check-input", required = string.Empty })
                                     @Html.Label("Email", new { @class = "form-check-label", @for = "rbut_Con2" })
                                 </div>
                             </div>

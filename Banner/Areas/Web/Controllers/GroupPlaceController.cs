@@ -54,8 +54,48 @@ namespace Banner.Areas.Web.Controllers
             public Location L = new Location();
             public Account AC = new Account();
             public Contect C = new Contect();
-        }
+            public cTableList cTL = new cTableList();
 
+        }
+        private cTableList GetMLSList(int OIID)
+        {
+            cTableList cTL = new cTableList();
+
+            #region 物件初始化
+            cTL.Title = "小組聚會紀錄";
+            cTL.NowPage = 1;
+            cTL.NumCut = 0;
+            cTL.Rs = new List<cTableRow>();
+
+            #endregion
+            #region 標題
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "日期", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "小組員人數" });
+            TopTitles.Add(new cTableCell { Title = "打卡人數" });
+            TopTitles.Add(new cTableCell { Title = "檢視" });
+            cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+
+            #endregion
+            var Ns = DC.Event_Join_Header.Where(q => q.OIID == OIID && q.TargetType == 2);
+            cTL.TotalCt = Ns.Count();
+            cTL.MaxNum = GetMaxNum(cTL.TotalCt, cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.EventDate).Take(20);
+            foreach (var N in Ns)
+            {
+                var MOIs = DC.M_OI_Account.Where(q => q.JoinDate.Date < N.EventDate.Date && (q.LeaveDate.Date >= N.EventDate.Date || q.LeaveDate == q.CreDate) && q.OIID == OIID);
+
+                cTableRow cTR = new cTableRow();
+                cTR.Cs.Add(new cTableCell { Value = N.EventDate.ToString(DateFormat) });//日期
+                cTR.Cs.Add(new cTableCell { Value = MOIs.Count().ToString() });//團員人數
+                cTR.Cs.Add(new cTableCell { Value = N.Event_Join_Detail.Count().ToString() });//打卡人數
+
+                cTR.Cs.Add(new cTableCell { Value = "檢視名單", Type = "link", Target = "_blank", URL = "/Web/GroupPlace/GroupMeetAccount_List/" + OIID + "?HID=" + N.EJHID, CSS = "btn btn-primary btn-round btn-sm" });//檢視
+                cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+            return cTL;
+        }
         [HttpGet]
         public ActionResult Index(int ID)
         {
@@ -114,8 +154,11 @@ namespace Banner.Areas.Web.Controllers
 
                     N.SLIs.ForEach(q => q.Selected = false);
                     N.SLIs.First(q => q.Value == N.MLS.WeeklyNo.ToString()).Selected = true;
+
+                    N.cTL = GetMLSList(OI.OIID);
                 }
             }
+
             return View(N);
         }
         [HttpPost]
@@ -177,6 +220,8 @@ namespace Banner.Areas.Web.Controllers
                 if (FC != null)
                 {
                     N.MLS.WeeklyNo = Convert.ToInt32(FC.Get("ddl_WeeklyNo"));
+                    if (N.MLS.WeeklyNo >= sWeeks.Length)
+                        N.MLS.WeeklyNo = 7;
                     string[] STime = FC.Get("txb_STime").Split(':');
                     string[] ETime = FC.Get("txb_ETime").Split(':');
                     N.MLS.S_hour = Convert.ToInt32(STime[0]);
@@ -213,6 +258,8 @@ namespace Banner.Areas.Web.Controllers
 
                 N.SLIs.ForEach(q => q.Selected = false);
                 N.SLIs.First(q => q.Value == N.MLS.WeeklyNo.ToString()).Selected = true;
+
+                N.cTL = GetMLSList(OI.OIID);
             }
             if (Error != "")
                 SetAlert(Error, 2);
@@ -499,7 +546,7 @@ namespace Banner.Areas.Web.Controllers
             string Error = "";
             //順便檢查會員卡
             var M = DC.M_Role_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.RID == 1);
-            if(M == null)
+            if (M == null)
             {
                 M = new M_Role_Account();
                 M.ACID = ACID;
@@ -518,7 +565,7 @@ namespace Banner.Areas.Web.Controllers
             M = DC.M_Role_Account.FirstOrDefault(q => q.ACID == ACID && !q.DeleteFlag && q.RID == 2);
             if (M != null)
             {
-                if(M.ActiveFlag)
+                if (M.ActiveFlag)
                 {
                     if (DC.OrganizeInfo.Count(q => q.ACID == ACID && q.ActiveFlag && !q.DeleteFlag) > 1)
                         Error += "此員在其他組織仍擔任管理人,因此無法退卡<br/>";
@@ -564,7 +611,7 @@ namespace Banner.Areas.Web.Controllers
                 DC.M_Role_Account.InsertOnSubmit(M);
                 DC.SubmitChanges();
             }
-           
+
 
             return Error;
         }
@@ -1197,6 +1244,76 @@ namespace Banner.Areas.Web.Controllers
             GetViewBag();
             GetID(ID);
             return View(GetHistory_OP(ID, GetQueryStringInInt("ACID"), FC));
+        }
+        #endregion
+
+
+        #region 小組打卡紀錄
+        public class cGetGroupMeetAccount_List
+        {
+            public cTableList cTL = new cTableList();
+            public string EventDate = "";
+            public int JoinCt = 0;
+            public int TotalCt = 0;
+        }
+        public cGetGroupMeetAccount_List GetGroupMeetAccount_List(int ID, int HID, FormCollection FC)
+        {
+            cGetGroupMeetAccount_List c = new cGetGroupMeetAccount_List();
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            c.cTL.Title = "清單";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
+
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "ID", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "姓名", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "打卡時間" });
+
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+            var EJH = DC.Event_Join_Header.FirstOrDefault(q => q.OIID == ID && q.EJHID == HID);
+            if (EJH != null)
+            {
+                c.EventDate = EJH.EventDate.ToString(DateFormat);
+                var MOIs = DC.M_OI_Account.Where(q => q.JoinDate.Date < EJH.EventDate.Date && (q.LeaveDate.Date >= EJH.EventDate.Date || q.LeaveDate == q.CreDate) && q.OIID == OIID);
+
+                c.TotalCt = MOIs.Count();
+                c.JoinCt = EJH.Event_Join_Detail.Count(q => !q.DeleteFlag);
+
+                c.cTL.TotalCt = MOIs.Count();
+                c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+                MOIs = MOIs.OrderByDescending(q => q.Account.Name_First).ThenByDescending(q => q.Account.Name_Last).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
+
+                foreach (var M in MOIs)
+                {
+                    cTableRow cTR = new cTableRow();
+                    cTR.Cs.Add(new cTableCell { Value = M.Account.ACID.ToString() });//ID
+                    cTR.Cs.Add(new cTableCell { Value = M.Account.Name_First + M.Account.Name_Last });//姓名
+                    var EJD = EJH.Event_Join_Detail.FirstOrDefault(q => q.ACID == M.ACID && !q.DeleteFlag);
+                    if (EJD == null)
+                        cTR.Cs.Add(new cTableCell { Value = "--" });//打卡時間
+                    else
+                        cTR.Cs.Add(new cTableCell { Value = EJD.JoinDate.ToString(DateTimeFormat) });//打卡時間
+                    c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+                }
+            }
+            return c;
+        }
+        [HttpGet]
+        public ActionResult GroupMeetAccount_List(int ID)
+        {
+            GetViewBag();
+            GetID(ID);
+            return View(GetGroupMeetAccount_List(ID, GetQueryStringInInt("HID"), null));
+        }
+        [HttpPost]
+        public ActionResult GroupMeetAccount_List(int ID, FormCollection FC)
+        {
+            GetViewBag();
+            GetID(ID);
+            return View(GetGroupMeetAccount_List(ID, GetQueryStringInInt("ACID"), FC));
         }
         #endregion
     }

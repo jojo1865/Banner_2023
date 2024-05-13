@@ -728,7 +728,7 @@ namespace Banner.Areas.Web.Controllers
                     }
 
 
-                    if (sDomanName.Contains("viuto-aiot.com"))//測試環境
+                    //if (sDomanName.Contains("viuto-aiot.com"))//測試環境
                     {
                         var PD = P.Order_PaidDetail.FirstOrDefault(q => q.Title == "PaymentType");
                         if (PD != null)

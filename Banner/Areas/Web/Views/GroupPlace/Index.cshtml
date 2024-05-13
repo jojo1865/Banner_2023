@@ -21,7 +21,7 @@
                 <div class="container-lg">
                     <div class="section-card">
                         <form method="post" id="form1">
-                            
+
 
                             <div class="form-group">
                                 <label>每周小組聚會</label>
@@ -52,7 +52,15 @@
                         </form>
                     </div>
                 </div>
-
+                <div class="container-lg">
+                    <div class="card mt-4">
+                        <div class="card-header"><h2 class="lab_DarkBlue">小組聚會紀錄</h2></div>
+                        <div class="card-body">
+                            @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                        </div>
+                    </div>
+                    <div style="height:80px;"></div>
+                </div>
             </div>
         </div>
         <div class="action-bar">

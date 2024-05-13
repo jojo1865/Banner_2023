@@ -55,11 +55,12 @@ namespace Banner.Areas.Web.Controllers
                     //LogInAC(443);
                     //SetBrowserData("UserName", "江晨旭");
 
-                    //LogInAC(8197);
-                    //SetBrowserData("UserName", "JOJO");
-
                     //LogInAC(2213);
                     //SetBrowserData("UserName", "劉冠廷");
+
+                    //測試事工團主責
+                    LogInAC(8197);
+                    SetBrowserData("UserName", "JOJO");
 
                     //測試帶職主責
                     //LogInAC(6741);
@@ -72,7 +73,7 @@ namespace Banner.Areas.Web.Controllers
                     //LogInAC(1511);
                     //SetBrowserData("UserName", "莊懷德");
 
-                    //Response.Redirect("/Web/Home/Index");
+                    Response.Redirect("/Web/Home/Index");
                 }
             }
             TempData["login"] = "";
@@ -811,6 +812,10 @@ namespace Banner.Areas.Web.Controllers
             //信用卡3天未付款移除訂單
             //ATM7天未付款移除訂單
             ChangeOrder();//未完成交易的商品塞回購物車
+
+            //建立當日活動
+            CreageEvent();
+
             return Error;
         }
         #endregion

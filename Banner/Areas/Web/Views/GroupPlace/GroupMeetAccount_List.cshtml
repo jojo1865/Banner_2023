@@ -1,0 +1,49 @@
+﻿@model Banner.Areas.Web.Controllers.GroupPlaceController.cGetGroupMeetAccount_List
+@{
+    ViewBag.Title = "GroupMeetAccount_List";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+@{
+    if (Model != null)
+    {
+        <div class="body-container container_phone">
+            <div class="section-container">
+                <nav class="breadcrumb-nav">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/Web/GroupPlace/Index">小組資訊</a></li>
+                        <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                        <li class="breadcrumb-item"><a href="/Web/GroupPlace/Index/@ViewBag._OIID ">小組聚會資訊更新</a></li>
+                        <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                        <li class="breadcrumb-item"><a href="">小組聚會簽到紀錄</a></li>
+                    </ol>
+                </nav>
+                <div class="header-container">
+                    <div class="header-left-border"></div>
+                    <h5 class="header">@Html.Raw(TempData["GroupTitle"]) - 小組聚會簽到紀錄</h5>
+                </div>
+                @Html.Action("_GroupTopMenu", "Include")
+                <div class="container-lg">
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h4 class="lab_DarkBlue">聚會日期：@Model.EventDate</h4>
+                            <h4 class="lab_DarkBlue">打卡狀況：@Model.JoinCt/@Model.TotalCt</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" id="form1">
+                                @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                            </form>
+                        </div>
+                    </div>
+                    <div style="height:80px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="action-bar">
+
+            <div class="btn btn-outline-primary btn-lg btn-round">
+                <a href="/Web/GroupPlace/Index/@ViewBag._OIID"><img src="/Areas/Admin/Content/Img/cancel.svg" alt="" />返回</a>
+            </div>
+        </div>
+    }
+
+}

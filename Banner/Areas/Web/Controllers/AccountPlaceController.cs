@@ -107,6 +107,11 @@ namespace Banner.Areas.Web.Controllers
                     var Meet = DC.Meeting_Location_Set.FirstOrDefault(q => q.OIID == MOI8.OIID && q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag);
                     if (Meet != null)
                     {
+                        if(Meet.WeeklyNo>= sWeeks.Length)
+                        {
+                            Meet.WeeklyNo = 7;
+                            DC.SubmitChanges();
+                        }
                         N.MyGroup.Date = sWeeks[Meet.WeeklyNo];
                         N.MyGroup.Time = sTimeSpans[Meet.TimeNo] + " " + Meet.S_hour.ToString().PadLeft(2, '0') + ":" + Meet.S_minute.ToString().PadLeft(2, '0') + "~" + Meet.E_hour.ToString().PadLeft(2, '0') + ":" + Meet.E_minute.ToString().PadLeft(2, '0');
                         N.MyGroup.Address = Meet.Meeting_Location.Title;
@@ -515,43 +520,49 @@ namespace Banner.Areas.Web.Controllers
                 }
                 #endregion
                 #region 入組意願調查
-                N.JoinGroupType = N.AC.GroupType == "有意願" ? 1 : (N.AC.GroupType == "無意願" ? 0 : 2);
-                switch (N.AC.GroupType)
+                var MOI = DC.M_OI_Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.LeaveDate == q.CreDate);
+                if(MOI!=null)
                 {
-                    case "有意願":
-                        {
-                            N.JoinGroupType = 1;
-                            var Js = DC.JoinGroupWish.Where(q => q.ACID == ID).ToList();
-                            foreach (var cJGW in N.cJGWs)
+                    N.GroupNo = MOI.OIID.ToString();
+                    N.JoinGroupType = 2;
+                }
+                else
+                {
+                    N.JoinGroupType = N.AC.GroupType == "有意願" ? 1 : (N.AC.GroupType == "無意願" ? 0 : 2);
+                    switch (N.JoinGroupType)
+                    {
+                        case 1:
                             {
-                                var JGW = Js.FirstOrDefault(q => q.JoinType == cJGW.JoinType && q.SortNo == cJGW.SortNo);
-                                cJGW.JGW = JGW;
-                                if (JGW != null)
+
+                                var Js = DC.JoinGroupWish.Where(q => q.ACID == ID).ToList();
+                                foreach (var cJGW in N.cJGWs)
                                 {
-                                    if (!cJGW.SelectFalg)
-                                        cJGW.SelectFalg = cJGW.JGW.WeeklyNo > 0 && cJGW.JGW.TimeNo > 0;
-                                    cJGW.ddl_Weekly.ddlList.ForEach(q => q.Selected = false);
-                                    cJGW.ddl_Weekly.ddlList.First(q => q.Value == cJGW.JGW.WeeklyNo.ToString()).Selected = true;
-                                    cJGW.ddl_Time.ddlList.ForEach(q => q.Selected = false);
-                                    cJGW.ddl_Time.ddlList.First(q => q.Value == cJGW.JGW.TimeNo.ToString()).Selected = true;
+                                    var JGW = Js.FirstOrDefault(q => q.JoinType == cJGW.JoinType && q.SortNo == cJGW.SortNo);
+                                    cJGW.JGW = JGW;
+                                    if (JGW != null)
+                                    {
+                                        if (!cJGW.SelectFalg)
+                                            cJGW.SelectFalg = cJGW.JGW.WeeklyNo > 0 && cJGW.JGW.TimeNo > 0;
+                                        cJGW.ddl_Weekly.ddlList.ForEach(q => q.Selected = false);
+                                        cJGW.ddl_Weekly.ddlList.First(q => q.Value == cJGW.JGW.WeeklyNo.ToString()).Selected = true;
+                                        cJGW.ddl_Time.ddlList.ForEach(q => q.Selected = false);
+                                        cJGW.ddl_Time.ddlList.First(q => q.Value == cJGW.JGW.TimeNo.ToString()).Selected = true;
+                                    }
                                 }
                             }
-                        }
-                        break;
+                            break;
 
-                    case "無意願":
-                        {
-                            N.JoinGroupType = 0;
-                        }
-                        break;
+                        case 0:
+                            break;
 
-                    default:
-                        {
-                            N.GroupNo = N.AC.GroupType;
-                            N.JoinGroupType = 2;
-                        }
-                        break;
+                        case 2:
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
+                
 
 
 
@@ -675,14 +686,35 @@ namespace Banner.Areas.Web.Controllers
                         string sGT = FC.Get("txb_GroupNo");
                         if (sGT != null)
                         {
-                            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID.ToString() == sGT && !q.DeleteFlag);
+                            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID.ToString() == sGT && !q.DeleteFlag && q.OID==8);
                             if (OI != null)
                             {
-                                var MOI = DC.M_OI_Account.FirstOrDefault(q => q.OIID == OI.OIID && q.ACID == ACID);
+                                MOI = DC.M_OI_Account.FirstOrDefault(q => q.OIID == OI.OIID && q.ACID == ACID);
                                 if (MOI != null)
                                     Error += "此小組您曾經加入過或仍在小組內,不能重複申請</br>";
                                 else
+                                {
                                     N.AC.GroupType = N.GroupNo = sGT;
+
+                                    MOI = new M_OI_Account
+                                    {
+                                        OrganizeInfo = OI,
+                                        Account = N.AC,
+                                        JoinDate = DT,
+                                        JoinUID = N.AC.ACID,
+                                        LeaveDate = DT,
+                                        LeaveUID = N.AC.ACID,
+                                        ActiveFlag = true,
+                                        DeleteFlag = false,
+                                        CreDate = DT,
+                                        UpdDate = DT,
+                                        SaveACID = N.AC.ACID
+                                    };
+                                    DC.M_OI_Account.InsertOnSubmit(MOI);
+                                    DC.SubmitChanges();
+
+                                }
+                                    
                             }
                             else
                                 Error += "您期望加入的小組編號輸入錯誤</br>";
@@ -781,6 +813,8 @@ namespace Banner.Areas.Web.Controllers
                     if (JGW != null)
                     {
                         JGW.WeeklyNo = Convert.ToInt32(WNo.Value);
+                        if (JGW.WeeklyNo >= sWeeks.Length)
+                            JGW.WeeklyNo = 7;
                         JGW.TimeNo = Convert.ToInt32(TNo.Value);
                     }
                     else
@@ -793,6 +827,8 @@ namespace Banner.Areas.Web.Controllers
                             WeeklyNo = Convert.ToInt32(WNo.Value),
                             TimeNo = Convert.ToInt32(TNo.Value)
                         };
+                        if (JGW.WeeklyNo >= sWeeks.Length)
+                            JGW.WeeklyNo = 7;
                         DC.JoinGroupWish.InsertOnSubmit(JGW);
                     }
                     DC.SubmitChanges();
@@ -1348,12 +1384,12 @@ namespace Banner.Areas.Web.Controllers
                             SetAlert("小組聚會時間為" + SDT.ToString("HH:mm") + "~" + EDT.ToString("HH:mm") + ",請在這段時間內報到", 3, "/Web/Home/Index");
                         else
                         {
-                            var EJH = DC.Event_Join_Header.FirstOrDefault(q => q.EID == 1 && q.TargetType == 0 && q.TargetID == OI.OIID && q.EventDate == DT.Date);
+                            var EJH = DC.Event_Join_Header.FirstOrDefault(q => q.EID == 2 && q.TargetType == 0 && q.TargetID == OI.OIID && q.EventDate == DT.Date);
                             if (EJH == null)
                             {
                                 EJH = new Event_Join_Header
                                 {
-                                    EID = 1,
+                                    EID = 2,
                                     TargetType = 0,
                                     TargetID = OI.OIID,
                                     EventDate = DT.Date,
