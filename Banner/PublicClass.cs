@@ -2357,6 +2357,7 @@ namespace Banner
             ViewBag._CSS1 = "";
             ViewBag._URL = NowURL;
             string ShortURL = Request.RawUrl.Split('?')[0];
+            //後臺調整
             if (ShortURL.ToLower().Contains("/admin/"))
             {
                 ViewBag._CSS1 = "/Areas/Admin/Content/CSS/" + (ShortURL.Contains("_List") ? "list.css" : "form.css");
@@ -2444,6 +2445,12 @@ namespace Banner
             TempData["CartNo"] = OPs.Count();
             //SetResponseVerify();
 
+            //推播
+            int NewMessageCt = 0;
+            if (AC != null)
+                NewMessageCt = DC.M_MH_Account.Count(q => q.ACID == AC.ACID && !q.DeleteFlag && !q.ReadFlag);
+
+
             TempData["UID"] = ACID;
             TempData["msg"] = "";
             TempData["msgtype"] = "";
@@ -2453,6 +2460,7 @@ namespace Banner
             TempData["OITitle"] = "";//組織搜尋用關鍵字
             TempData["BackFlag"] = ViewBag._BackFlag;
             TempData["PayPalID"] = "";//金流相關
+            TempData["NewMessageCt"] = NewMessageCt.ToString();//推播訊息未讀數量
             //CheckVCookie();
         }
 
@@ -3321,12 +3329,12 @@ namespace Banner
             if (iWeekDay == 0)
                 iWeekDay = 7;
             var cMLSs = from q in DC.Meeting_Location_Set.Where(q => !q.DeleteFlag && q.ActiveFlag && q.SetType == 1 && q.OIID > 0 && q.WeeklyNo == iWeekDay)
-                       join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8)
-                       on q.OIID equals p.OIID
-                       select new { MLS = q, OI = p };
+                        join p in DC.OrganizeInfo.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OID == 8)
+                        on q.OIID equals p.OIID
+                        select new { MLS = q, OI = p };
             foreach (var cMLS in cMLSs)
             {
-                var EJ = DC.Event_Join_Header.FirstOrDefault(q => q.TargetType == 2 && q.TargetID ==0 && q.OIID == cMLS.OI.OIID );
+                var EJ = DC.Event_Join_Header.FirstOrDefault(q => q.TargetType == 2 && q.TargetID == 0 && q.OIID == cMLS.OI.OIID);
                 if (EJ == null)
                 {
                     #region 建立活動
@@ -3415,11 +3423,23 @@ namespace Banner
                     DC.Message_Header.InsertOnSubmit(MH);
                     DC.SubmitChanges();
 
+                    Message_Target MT = new Message_Target
+                    {
+                        Message_Header = MH,
+                        TargetType = 0,
+                        TargetID1 = 0,
+                        TargetID2 = 0,
+                        TargetID3 = 0
+
+                    };
+                    DC.Message_Target.InsertOnSubmit(MT);
+                    DC.SubmitChanges();
+
                     //目標是小組長
                     M_MH_Account MAC = new M_MH_Account
                     {
                         Message_Header = MH,
-                        MTID = 0,
+                        MTID = MT.MTID,
                         Account = MOI.OrganizeInfo.Account,
                         SendDateTime = MH.PlanSendDateTime,
                         ReadDateTime = DT,
@@ -3447,7 +3467,7 @@ namespace Banner
                     List<cID> Plan_IDs = new List<cID>();
                     switch (MHT.TargetType)
                     {
-                        case 0://全對象
+                        case 0://系統訊息
                             {
                                 Plan_IDs.AddRange(DC.Account.Where(q => !q.DeleteFlag && q.ActiveFlag).Select(q => new cID { ID = q.ACID }));
                             }

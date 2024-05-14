@@ -3,6 +3,7 @@ using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
@@ -107,7 +108,7 @@ namespace Banner.Areas.Web.Controllers
                     var Meet = DC.Meeting_Location_Set.FirstOrDefault(q => q.OIID == MOI8.OIID && q.SetType == 1 && q.ActiveFlag && !q.DeleteFlag);
                     if (Meet != null)
                     {
-                        if(Meet.WeeklyNo>= sWeeks.Length)
+                        if (Meet.WeeklyNo >= sWeeks.Length)
                         {
                             Meet.WeeklyNo = 7;
                             DC.SubmitChanges();
@@ -521,7 +522,7 @@ namespace Banner.Areas.Web.Controllers
                 #endregion
                 #region 入組意願調查
                 var MOI = DC.M_OI_Account.FirstOrDefault(q => q.ActiveFlag && !q.DeleteFlag && q.ACID == ACID && q.LeaveDate == q.CreDate);
-                if(MOI!=null)
+                if (MOI != null)
                 {
                     N.GroupNo = MOI.OIID.ToString();
                     N.JoinGroupType = 2;
@@ -562,7 +563,7 @@ namespace Banner.Areas.Web.Controllers
                             break;
                     }
                 }
-                
+
 
 
 
@@ -686,7 +687,7 @@ namespace Banner.Areas.Web.Controllers
                         string sGT = FC.Get("txb_GroupNo");
                         if (sGT != null)
                         {
-                            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID.ToString() == sGT && !q.DeleteFlag && q.OID==8);
+                            var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID.ToString() == sGT && !q.DeleteFlag && q.OID == 8);
                             if (OI != null)
                             {
                                 MOI = DC.M_OI_Account.FirstOrDefault(q => q.OIID == OI.OIID && q.ACID == ACID);
@@ -714,7 +715,7 @@ namespace Banner.Areas.Web.Controllers
                                     DC.SubmitChanges();
 
                                 }
-                                    
+
                             }
                             else
                                 Error += "您期望加入的小組編號輸入錯誤</br>";
@@ -1675,6 +1676,195 @@ namespace Banner.Areas.Web.Controllers
             return Error;
         }
         #endregion
+        #region 我的推播訊息-列表
+
+        public class cGetMessage_List
+        {
+            public cTableList cTL = new cTableList();
+            public int iTargetType = -1;
+            public ListSelect LS_TargetType = new ListSelect();
+            public int iReadFlag = -1;
+            public ListSelect LS_ReadFlag = new ListSelect();
+            public string sKey = "";
+        }
+        public cGetMessage_List GetMessage_List(FormCollection FC)
+        {
+            cGetMessage_List c = new cGetMessage_List();
+            string[] sLS_TargetType = new string[] { "系統訊息", "牧養", "事工團", "活動", "聚會點", "課程", "私密" };
+            #region 物件初始化
+            ACID = GetACID();
+            int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
+            int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
+            c.cTL.Title = "我的訊息";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
+
+            c.LS_TargetType = new ListSelect();
+            c.LS_TargetType.ControlName = "ddl_TargetType";
+
+            c.LS_TargetType.ddlList = new List<SelectListItem>();
+            c.LS_TargetType.ddlList.Add(new SelectListItem { Text = "全部", Value = "-1", Selected = true });
+            for (int i = 0; i < sLS_TargetType.Length; i++)
+                c.LS_TargetType.ddlList.Add(new SelectListItem { Text = sLS_TargetType[i], Value = i.ToString() });
+
+            c.LS_ReadFlag = new ListSelect();
+            c.LS_ReadFlag.ControlName = "ddl_ReadFlag";
+            c.LS_ReadFlag.ddlList = new List<SelectListItem> {
+                new SelectListItem { Text = "全部", Value = "-1",Selected=true },
+                new SelectListItem { Text = "已讀", Value = "1" },
+                new SelectListItem { Text = "未讀", Value = "0" }
+            };
+            #endregion
+            #region 前端資料取得
+            string sType = "";
+            if (FC != null)
+            {
+                string s = FC.Get(c.LS_TargetType.ControlName);
+                c.iTargetType = Convert.ToInt32(s);
+                c.LS_TargetType.ddlList.ForEach(q => q.Selected = false);
+                c.LS_TargetType.ddlList.First(q => q.Value == c.iTargetType.ToString()).Selected = true;
+
+                c.iReadFlag = Convert.ToInt32(FC.Get(c.LS_ReadFlag.ControlName));
+                c.LS_ReadFlag.ddlList.ForEach(q => q.Selected = false);
+                c.LS_ReadFlag.ddlList.First(q => q.Value == c.iReadFlag.ToString()).Selected = true;
+
+                c.sKey = FC.Get("txb_Key");
+
+                sType = FC.Get("hid_Type");
+            }
+            #endregion
+
+            #region 標題
+            var TopTitles = new List<cTableCell>();
+            TopTitles.Add(new cTableCell { Title = "選擇", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "發送時間", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "類型", WidthPX = 100 });
+            TopTitles.Add(new cTableCell { Title = "主題" });
+            TopTitles.Add(new cTableCell { Title = "檢視", WidthPX = 100 });
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            ViewBag._CSS1 = "/Areas/Web/Content/css/list.css";
+
+            #endregion
+
+            #region 篩選
+            var Ns = DC.M_MH_Account.Where(q => q.ACID == ACID);
+            if (c.iTargetType >= 0)
+                Ns = from q in DC.Message_Target.Where(q => q.TargetType == c.iTargetType).GroupBy(q => q.MTID)
+                     join p in Ns
+                     on q.Key equals p.MTID
+                     select p;
+            if (c.iReadFlag >= 0)
+                Ns = Ns.Where(q => q.ReadFlag == (c.iReadFlag == 1));
+            if (!string.IsNullOrEmpty(c.sKey))
+                Ns = Ns.Where(q => q.Message_Header.Title.Contains(c.sKey));
+            if(sType!="")
+            {
+                foreach(var N in Ns)
+                {
+                    if(GetViewCheckBox(FC.Get("cbox_S_" + N.MID)))
+                    {
+                        if (sType == "D")
+                            N.DeleteFlag = true;
+                        else if(sType == "R")
+                        {
+                            N.ReadFlag = true;
+                            N.ReadDateTime = DT;
+                        }
+                        DC.SubmitChanges();
+                    }
+                }
+                SetAlert("已完成", 1);
+            }
+            Ns = Ns.Where(q => !q.DeleteFlag);
+            c.cTL.TotalCt = Ns.Count();
+            c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+            Ns = Ns.OrderByDescending(q => q.SendDateTime).ThenByDescending(q => q.MID).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
+            #endregion
+            #region 組成表單
+            foreach (var N in Ns)
+            {
+                cTableRow cTR = new cTableRow();
+                string sCss = N.ReadFlag ? "lab_gray" : "";
+                cTR.ID = N.MID;
+                cTR.Cs.Add(new cTableCell { Type = "checkbox", ControlName = "cbox_S_" }); ;//選擇
+                cTR.Cs.Add(new cTableCell { Value = N.SendDateTime.ToString(DateTimeFormat), CSS = sCss });//時間
+
+                var MT = DC.Message_Target.FirstOrDefault(q => q.MTID == N.MTID && q.MHID == N.MHID);
+                if (MT == null)
+                {
+                    MT = new Message_Target
+                    {
+                        Message_Header = N.Message_Header,
+                        TargetType = 0,
+                        TargetID1 = 0,
+                        TargetID2 = 0,
+                        TargetID3 = 0
+                    };
+                    DC.Message_Target.InsertOnSubmit(MT);
+                    DC.SubmitChanges();
+
+                    N.MTID = MT.MTID;
+                    DC.SubmitChanges();
+                }
+                cTR.Cs.Add(new cTableCell { Value = sLS_TargetType[MT.TargetType], CSS = sCss });//類型
+
+
+                cTR.Cs.Add(new cTableCell { Value = N.Message_Header.Title, CSS = sCss });//主題
+                cTR.Cs.Add(new cTableCell { Value = "檢視", Type = "button", URL = "ShowMessage(" + N.MID + ")" });//檢視
+
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
+            }
+            #endregion
+            return c;
+        }
+        [HttpGet]
+        public ActionResult Message_List()
+        {
+            GetViewBag();
+            return View(GetMessage_List(null));
+        }
+        [HttpPost]
+        public ActionResult Message_List(FormCollection FC)
+        {
+            GetViewBag();
+            return View(GetMessage_List(FC));
+        }
+
+        #endregion
+        public class cMessage
+        {
+            public string Error { get; set; }
+            public string Title { get; set; }
+            public string Info { get; set; }
+            public string ReadDate { get; set; }
+        }
+        [HttpGet]
+        public string GetMessageInfo(int MID)
+        {
+            string sReturn = "";
+            cMessage c = new cMessage();
+            ACID = GetACID();
+            var M = DC.M_MH_Account.FirstOrDefault(q => !q.DeleteFlag && q.ACID == ACID && q.MID == MID);
+            if (M == null)
+                c.Error = "此訊息不存在";
+            else
+            {
+                if (!M.ReadFlag)
+                {
+                    M.ReadFlag = true;
+                    M.ReadDateTime = DT;
+                    DC.SubmitChanges();
+                }
+
+                c.Title = M.Message_Header.Title;
+                c.Info = M.Message_Header.Description.Replace("\n", "<br/>");
+                c.ReadDate = M.ReadDateTime.ToString(DateTimeFormat);
+            }
+
+            sReturn = JsonConvert.SerializeObject(c);
+            return sReturn;
+        }
     }
 }
 

@@ -55,12 +55,13 @@ namespace Banner.Areas.Web.Controllers
                     //LogInAC(443);
                     //SetBrowserData("UserName", "江晨旭");
 
-                    //LogInAC(2213);
-                    //SetBrowserData("UserName", "劉冠廷");
+                    //測推播
+                    LogInAC(2213);
+                    SetBrowserData("UserName", "劉冠廷");
 
                     //測試事工團主責
-                    LogInAC(8197);
-                    SetBrowserData("UserName", "JOJO");
+                    //LogInAC(8197);
+                    //SetBrowserData("UserName", "JOJO");
 
                     //測試帶職主責
                     //LogInAC(6741);

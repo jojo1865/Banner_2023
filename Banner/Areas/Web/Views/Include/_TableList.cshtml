@@ -109,6 +109,17 @@
                                                     </td>
                                                 }
                                                 break;
+
+                                            case "button"://button
+                                                {
+                                                    <td>
+                                                        <span class="lab_MobelTitle">@(Model.Rs[0].Cs[C.SortNo].Title)</span>
+                                                        <button type="button" onclick="@C.URL" class="@(string.IsNullOrEmpty(C.CSS) ? "btn btn-primary btn-round btn-sm" : C.CSS)">@C.Value</button>
+                                                    </td>
+                                                }
+                                                break;
+
+
                                             case "Media"://Media
                                                 {
                                                     <td>

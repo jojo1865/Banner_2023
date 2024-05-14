@@ -1,0 +1,93 @@
+﻿@model Banner.Areas.Web.Controllers.AccountPlaceController.cGetMessage_List
+@{
+    ViewBag.Title = "Message_List";
+    Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
+}
+
+<div class="body-container container_phone">
+    <div class="section-container">
+        <nav class="breadcrumb-nav">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Web/Home/Index">首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="/Web/AccountPlace/Index">會員中心首頁</a></li>
+                <li><img src="/Areas/Web/Content/img/right.svg" alt="" /></li>
+                <li class="breadcrumb-item"><a href="">推播訊息</a></li>
+            </ol>
+        </nav>
+        <div class="header-container">
+            <div class="header-left-border"></div>
+            <h5 class="header">推播訊息</h5>
+        </div>
+
+        <div class="container-lg">
+            <form id="form1" method="post">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-auto">
+                                <label class="lab_DarkBlue">訊息類別：</label>
+                                @Html.DropDownList(Model.LS_TargetType.ControlName, Model.LS_TargetType.ddlList, new { @class = "form-select form-control" })
+                            </div>
+                            <div class="col-auto">
+                                <label class="lab_DarkBlue">是否已讀：</label>
+                                @Html.DropDownList(Model.LS_ReadFlag.ControlName, Model.LS_ReadFlag.ddlList, new { @class = "form-select form-control" })
+                            </div>
+                            <div class="col-auto">
+                                <label class="lab_DarkBlue">主題：</label>
+                                @Html.TextBox("txb_Key", Model.sKey, new { @class = "form-control" })
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-lg-end text-center pt-4">
+
+                                <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-submit btn-round btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>搜尋</a>
+
+                                <a href="javascript:;" onclick="RemoveSelect()" class="btn btn-danger btn-lg btn-submit btn-round-danger btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>移除所選</a>
+                                <a href="javascript:;" onclick="ReadSelect()" class="btn btn-success btn-lg btn-submit btn-round-success btn-submit me-2"><i class="fa-solid fa-magnifying-glass"></i>設為已讀</a>
+
+                                <input type="hidden" id="hid_Type" name="hid_Type" value="" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function ShowMessage(MID) {
+        $.ajax({
+            url: '/Web/AccountPlace/GetMessageInfo?MID=' + MID,
+            method: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                Swal.fire({
+                    title: res.Title,
+                    html: res.Info + '<br/><hr>讀取時間：' + res.ReadDate
+                });
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
+
+    function RemoveSelect() {
+        document.getElementById("hid_Type").value = "D";
+        document.getElementById('form1').submit();
+    }
+
+    function ReadSelect() {
+        document.getElementById("hid_Type").value = "R";
+        document.getElementById('form1').submit();
+    }
+</script>

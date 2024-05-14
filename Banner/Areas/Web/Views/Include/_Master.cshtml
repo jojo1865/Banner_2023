@@ -27,6 +27,19 @@
                     <a href="https://admin-banner.viuto-aiot.com/Admin/Home/Login" class="btn btn-outline-primary d-block" style="background-color: white; color: #3764ac" target="_blank">進入後台</a>
                 </div>
             }
+            @if (TempData["NewMessageCt"].ToString() == "0")
+            {
+                <div class="me-2">
+                    <a href="/Web/AccountPlace/Message_List" class="btn btn-outline-primary d-block" style="background-color: white; color: #3764ac" target="_blank"><i class="fa-solid fa-bell"></i></a>
+                </div>
+            }
+            else
+            {
+                <div class="me-2">
+                    <a href="/Web/AccountPlace/Message_List" class="btn btn-outline-primary d-block" style="background-color: white; color: #ff0000" target="_blank"><i class="fa-solid fa-bell"></i> @(TempData["NewMessageCt"].ToString())</a>
+                </div>
+            }
+
             <div class="me-2">
                 <a href="/Web/ClassStore/Order_Step1" style="color:white;">
                     購物車<i class="fa-solid fa-cart-shopping ms-1"></i>
