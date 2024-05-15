@@ -60,6 +60,7 @@ namespace Banner
         public static int EventQrCodeETimeAdd = 30;//活動可打卡的結束時間校正(30=活動結束後30分鐘內可以打卡)
         public static int CreditCardAddDays = 1;//信用卡可付款天數加入數字
         public static int ATMAddDays = 2;//ATM可付款天數加入數字
+        public string[] sMHType = new string[] { "個人", "廣告" };
         public string sDomanName
         {
             get
@@ -3522,12 +3523,12 @@ namespace Banner
 
                         case 2://事工團
                             {
-                                var Ms = DC.M_Staff_Account.Where(q => q.SID == MHT.TargetID1 && q.ActiveFlag && !q.DeleteFlag);
-                                if (MHT.TargetID2 == 1)//主責
+                                var Ms = DC.M_Staff_Account.Where(q => q.SID == MHT.TargetID2 && q.OIID == MHT.TargetID1 && q.ActiveFlag && !q.DeleteFlag);
+                                if (MHT.TargetID3 == 1)//主責
                                     Ms = Ms.Where(q => q.LeaderFlag);
-                                else if (MHT.TargetID2 == 2)//帶職 主責
+                                else if (MHT.TargetID3 == 2)//帶職 主責
                                     Ms = Ms.Where(q => q.SubLeaderFlag);
-                                else if (MHT.TargetID2 == 1)//主責 + 帶職 主責
+                                else if (MHT.TargetID3 == 1)//主責 + 帶職 主責
                                     Ms = Ms.Where(q => q.LeaderFlag || q.SubLeaderFlag);
                                 Plan_IDs.AddRange(Ms.GroupBy(q => q.ACID).Select(q => new cID { ID = q.Key }));
                             }

@@ -40,7 +40,7 @@
                     {
                         foreach (var R in Model.Rs.Where(q => q.CSS != "Bgn"))
                         {
-                            <tr class="@R.CSS">
+                            <tr name="tr_@R.ID" class="@R.CSS">
                                 @foreach (var C in R.Cs)
                                 {
                                     if (C.cTCs.Count > 0)//若一欄內有多個按鈕功能

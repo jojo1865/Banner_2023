@@ -17,8 +17,6 @@ namespace Banner.Areas.Admin.Controllers
 {
     public class MessageSendController : PublicClass
     {
-        public string[] sMHType = new string[] { "個人", "廣告" };
-
         #region 訊息管理-列表
         public class cGetMessage_List
         {
@@ -49,14 +47,17 @@ namespace Banner.Areas.Admin.Controllers
             }
 
             var TopTitles = new List<cTableCell>();
-            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 200 });
+            TopTitles.Add(new cTableCell { Title = "操作", WidthPX = 80 });
             TopTitles.Add(new cTableCell { Title = "訊息主題" });
             TopTitles.Add(new cTableCell { Title = "發送狀態", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "類型", WidthPX = 100 });
-            TopTitles.Add(new cTableCell { Title = "建立日期", WidthPX = 120 });
-            TopTitles.Add(new cTableCell { Title = "發送日期", WidthPX = 120 });
+            TopTitles.Add(new cTableCell { Title = "建立日期", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "發送日期", WidthPX = 160 });
+            TopTitles.Add(new cTableCell { Title = "啟用狀態", WidthPX = 80 });
+            TopTitles.Add(new cTableCell { Title = "發送狀態", WidthPX = 80 });
             TopTitles.Add(new cTableCell { Title = "建立人", WidthPX = 100 });
             TopTitles.Add(new cTableCell { Title = "對象名單", WidthPX = 100 });
+
             c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
             #endregion
             #region 資料過濾
@@ -93,6 +94,8 @@ namespace Banner.Areas.Admin.Controllers
                 cTR.Cs.Add(new cTableCell { Value = sMHType[N.MHType] });//類型
                 cTR.Cs.Add(new cTableCell { Value = N.CreDate.ToString(DateTimeFormat) });//建立日期
                 cTR.Cs.Add(new cTableCell { Value = N.PlanSendDateTime.ToString(DateTimeFormat) });//發送日期
+                cTR.Cs.Add(new cTableCell { Value = N.ActiveFlag ? "已啟用": "停用" });//啟用狀態
+                cTR.Cs.Add(new cTableCell { Value = N.SendFlag ? "已發送" : "" });//發送狀態
                 var U = DC.Account.FirstOrDefault(q => q.ACID == N.CreUID);
                 cTR.Cs.Add(new cTableCell { Value = U != null ? U.Name_First + U.Name_Last : "--" });//建立人
                 if (N.M_MH_Account.Count(q => !q.DeleteFlag) > 0)
@@ -132,7 +135,7 @@ namespace Banner.Areas.Admin.Controllers
             public int TID1 = 0;
             public int TID2 = 0;
             public int TID3 = 0;
-
+            public bool bSendFlag = false;
             //public bool bSendFlag = false;
 
 
@@ -183,6 +186,7 @@ namespace Banner.Areas.Admin.Controllers
             OI2s = OI2s.OrderBy(q => q.OIID).ThenBy(q => q.Title).ToList();
             #endregion
             #region 物件初始化
+            
             //組織與職分
             #region 組織與職分
 
@@ -300,10 +304,153 @@ namespace Banner.Areas.Admin.Controllers
             #region 前端載入
             var MH = DC.Message_Header.FirstOrDefault(q => q.MHID == ID && !q.DeleteFlag);
             var MH_T = DC.Message_Target.FirstOrDefault(q => q.MHID == ID);
+            if (MH != null)
+            {
+                c.MHID = MH.MHID;
+                c.bSendFlag = MH.SendFlag;
+                if(c.bSendFlag)
+                {
+                    ((bool[])ViewBag._Power)[2] = false;
+                }
+
+                c.sSendDateTime = MH.PlanSendDateTime.ToString(DateTimeFormat);
+                c.MHType = MH.MHType;
+                c.Title = MH.Title;
+                c.URL = MH.URL;
+                c.Description = MH.Description;
+                c.ActiveFlag = MH.ActiveFlag;
+                c.DeleteFlag = MH.DeleteFlag;
+
+                //若已送出就不能修改
+                if (MH.SendFlag)
+                    c.AllowEddit = false;
+
+                if (MH_T != null)
+                {
+                    c.TargetType = MH_T.TargetType;
+                    switch (MH_T.TargetType)
+                    {
+                        default:
+                        case 0://全體會員
+                            {
+
+                            }
+                            break;
+
+                        case 1://牧養組織與職分
+                            {
+                                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == MH_T.TargetID1);
+                                if (OI != null)
+                                {
+                                    c.sOITitle = OI.Title;
+                                    c.SL_O.ddlList.ForEach(q => q.Selected = false);
+                                    c.SL_O.ddlList.First(q => q.Value == OI.OID.ToString()).Selected = true;
+
+                                    if (MH_T.TargetID2 < 8)
+                                    {
+                                        c.SL_O_Target.ddlList.ForEach(q => q.Selected = false);
+                                        c.SL_O_Target.ddlList.First(q => q.Value == "O_" + MH_T.TargetID2.ToString()).Selected = true;
+                                    }
+                                    else if (MH_T.TargetID2 == 8)
+                                    {
+                                        if (MH_T.TargetID3 > 0)
+                                        {
+                                            c.SL_O_Target.ddlList.ForEach(q => q.Selected = false);
+                                            c.SL_O_Target.ddlList.First(q => q.Value == "R_" + MH_T.TargetID3.ToString()).Selected = true;
+                                        }
+                                        else
+                                        {
+                                            c.SL_O_Target.ddlList.ForEach(q => q.Selected = false);
+                                            c.SL_O_Target.ddlList.First(q => q.Value == "O_" + MH_T.TargetID2.ToString()).Selected = true;
+                                        }
+                                    }
+                                }
+
+                            }
+                            break;
+
+                        case 2://事工團
+                            {
+                                c.ddl_OI_Staff.ForEach(q => q.Selected = false);
+                                c.ddl_OI_Staff.First(q => q.Value == MH_T.TargetID1.ToString()).Selected = true;
+
+                                var Staff = DC.Staff.FirstOrDefault(q => q.SID == MH_T.TargetID2);
+                                if (Staff != null)
+                                {
+                                    c.ddl_Category_Staff.ForEach(q => q.Selected = false);
+                                    c.ddl_Category_Staff.First(q => q.Value == Staff.SCID.ToString()).Selected = true;
+
+                                    c.ddl_Staff.Clear();
+                                    c.ddl_Staff.AddRange(from q in DC.Staff.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SCID == Staff.SCID).OrderBy(q => q.ChildrenFlag).ThenBy(q => q.Title)
+                                                         select new SelectListItem { Text = (q.ChildrenFlag ? "[兒童]" : "") + q.Title, Value = q.SID.ToString(), Selected = q.SID == MH_T.TargetID2 });
+
+                                    c.ddl_Staff_Target.ForEach(q => q.Selected = false);
+                                    c.ddl_Staff_Target.First(q => q.Value == MH_T.TargetID3.ToString()).Selected = true;
+                                }
+                            }
+                            break;
+
+                        case 3://活動
+                            {
+                                c.SL_Event_Type.ddlList.ForEach(q => q.Selected = false);
+                                c.SL_Event_Type.ddlList.First(q => q.Value == MH_T.TargetID1.ToString()).Selected = true;
+                                var E = DC.Event.FirstOrDefault(q => q.EID == MH_T.TargetID2);
+                                if (E != null)
+                                {
+                                    c.sEventID_1 = MH_T.TargetID2.ToString();
+                                    c.EventTitle = E.Title;
+                                    c.EventDate = E.EventDate.ToString(DateFormat);
+                                }
+                            }
+                            break;
+
+                        case 4://聚會點
+                            {
+                                c.SL_Meet_OI.ddlList.ForEach(q => q.Selected = false);
+                                c.SL_Meet_OI.ddlList.First(q => q.Value == MH_T.TargetID1.ToString()).Selected = true;
+
+                                c.SL_Meet_0.ddlList.ForEach(q => q.Selected = false);
+                                c.SL_Meet_0.ddlList.AddRange(from q in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == MH_T.TargetID1 && q.SetType == 0)
+                                                             select new SelectListItem { Text = q.Meeting_Location.Title, Value = q.MLID.ToString(), Selected = MH_T.TargetID2 == q.MLID });
+                            }
+                            break;
+
+                        case 5://課程
+                            {
+                                var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == MH_T.TargetID2);
+                                if (PC != null)
+                                {
+                                    c.SL_Class_OI.ddlList.ForEach(q => q.Selected = false);
+                                    c.SL_Class_OI.ddlList.First(q => q.Value == PC.Product.OIID.ToString()).Selected = true;
+
+                                    c.SL_Class_P.ddlList.Clear();
+                                    c.SL_Class_P.ddlList.AddRange(from q in DC.Product.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == PC.Product.OIID).OrderBy(q => q.Course.CCID).ThenBy(q => q.CID).ThenBy(q => q.SubTitle)
+                                                                  select new SelectListItem { Text = q.Course.Course_Category + " " + q.Course.Title + " " + q.SubTitle, Value = q.PID.ToString(), Selected = PC.PID == q.PID });
+
+                                    c.SL_Class_Class.ddlList.Clear();
+                                    c.SL_Class_Class.ddlList.AddRange(from q in DC.Product_Class.Where(q => q.ActiveFlag && !q.DeleteFlag && q.PID == PC.PID).OrderBy(q => q.Title)
+                                                                      select new SelectListItem { Text = q.Title, Value = q.PCID.ToString(), Selected = PC.PCID == q.PCID });
+                                }
+
+                                c.SL_Class_Graduatio_Type.ddlList.ForEach(q => q.Selected = false);
+                                c.SL_Class_Graduatio_Type.ddlList.First(q => q.Value == MH_T.TargetID3.ToString()).Selected = true;
+                            }
+                            break;
+
+                        case 6://指定名單
+                            {
+
+                            }
+                            break;
+                    }
+                }
+            }
+
+            
             if (FC != null)
             {
                 c.sSendDateTime = FC.Get("txb_PlanSendDateTime");
-                c.MHType = Convert.ToInt32(FC.Get("rbl_TargetType"));
+                c.MHType = Convert.ToInt32(FC.Get("rbl_Type"));
                 c.Title = FC.Get("txb_Title");
                 c.Description = FC.Get("txb_Description");
                 c.ActiveFlag = GetViewCheckBox(FC.Get("cbox_ActiveFlag"));
@@ -388,137 +535,7 @@ namespace Banner.Areas.Admin.Controllers
                 c.EventDate = FC.Get("txb_EventDate");
                 c.sEventID_1 = FC.Get("txb_EventID_1");
             }
-            else if (MH != null)
-            {
-                c.sSendDateTime = MH.PlanSendDateTime.ToString(DateTimeFormat);
-                c.MHType = MH.MHType;
-                c.Title = MH.Title;
-                c.URL = MH.URL;
-                c.Description = MH.Description;
-                c.ActiveFlag = MH.ActiveFlag;
-                c.DeleteFlag = MH.DeleteFlag;
 
-                //若已送出就不能修改
-                if (MH.SendFlag)
-                    c.AllowEddit = false;
-
-                if (MH_T != null)
-                {
-                    c.TargetType = MH_T.TargetType;
-                    switch (MH_T.TargetType)
-                    {
-                        default:
-                        case 0://全體會員
-                            {
-
-                            }
-                            break;
-
-                        case 1://牧養組織與職分
-                            {
-                                var OI = DC.OrganizeInfo.FirstOrDefault(q => q.OIID == MH_T.TargetID1);
-                                if (OI != null)
-                                {
-                                    c.sOITitle = OI.Title;
-                                    c.SL_O.ddlList.ForEach(q => q.Selected = false);
-                                    c.SL_O.ddlList.First(q => q.Value == OI.OID.ToString()).Selected = true;
-
-                                    if (MH_T.TargetID2 < 8)
-                                    {
-                                        c.SL_O_Target.ddlList.ForEach(q => q.Selected = false);
-                                        c.SL_O_Target.ddlList.First(q => q.Value == "O_" + MH_T.TargetID2.ToString()).Selected = true;
-                                    }
-                                    else if (MH_T.TargetID2 == 8)
-                                    {
-                                        if (MH_T.TargetID3 > 0)
-                                        {
-                                            c.SL_O_Target.ddlList.ForEach(q => q.Selected = false);
-                                            c.SL_O_Target.ddlList.First(q => q.Value == "R_" + MH_T.TargetID3.ToString()).Selected = true;
-                                        }
-                                        else
-                                        {
-                                            c.SL_O_Target.ddlList.ForEach(q => q.Selected = false);
-                                            c.SL_O_Target.ddlList.First(q => q.Value == "O_" + MH_T.TargetID2.ToString()).Selected = true;
-                                        }
-                                    }
-                                }
-                                
-                            }
-                            break;
-
-                        case 2://事工團
-                            {
-                                var Staff = DC.Staff.FirstOrDefault(q => q.SID == MH_T.TargetID1);
-                                if (Staff != null)
-                                {
-                                    c.ddl_Category_Staff.ForEach(q => q.Selected = false);
-                                    c.ddl_Category_Staff.First(q => q.Value == Staff.SCID.ToString()).Selected = true;
-
-                                    c.ddl_Staff.Clear();
-                                    c.ddl_Staff.AddRange(from q in DC.Staff.Where(q => q.ActiveFlag && !q.DeleteFlag && q.SCID == Staff.SCID).OrderBy(q => q.ChildrenFlag).ThenBy(q => q.Title)
-                                                         select new SelectListItem { Text = (q.ChildrenFlag ? "[兒童]" : "") + q.Title, Value = q.SID.ToString(), Selected = q.SID == MH_T.TargetID1 });
-
-                                    c.ddl_Staff_Target.ForEach(q => q.Selected = false);
-                                    c.ddl_Staff_Target.First(q => q.Value == MH_T.TargetID2.ToString()).Selected = true;
-                                }
-                            }
-                            break;
-
-                        case 3://活動
-                            {
-                                c.SL_Event_Type.ddlList.ForEach(q => q.Selected = false);
-                                c.SL_Event_Type.ddlList.First(q => q.Value == MH_T.TargetID1.ToString()).Selected = true;
-                                var E = DC.Event.FirstOrDefault(q => q.EID == MH_T.TargetID2);
-                                if (E != null)
-                                {
-                                    c.sEventID_1 = MH_T.TargetID2.ToString();
-                                    c.EventTitle = E.Title;
-                                    c.EventDate = E.EventDate.ToString(DateFormat);
-                                }
-                            }
-                            break;
-
-                        case 4://聚會點
-                            {
-                                c.SL_Meet_OI.ddlList.ForEach(q => q.Selected = false);
-                                c.SL_Meet_OI.ddlList.First(q => q.Value == MH_T.TargetID1.ToString()).Selected = true;
-
-                                c.SL_Meet_0.ddlList.ForEach(q => q.Selected = false);
-                                c.SL_Meet_0.ddlList.AddRange(from q in DC.Meeting_Location_Set.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == MH_T.TargetID1 && q.SetType == 0)
-                                                             select new SelectListItem { Text = q.Meeting_Location.Title, Value = q.MLID.ToString(), Selected = MH_T.TargetID2 == q.MLID });
-                            }
-                            break;
-
-                        case 5://課程
-                            {
-                                var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == MH_T.TargetID2);
-                                if (PC != null)
-                                {
-                                    c.SL_Class_OI.ddlList.ForEach(q => q.Selected = false);
-                                    c.SL_Class_OI.ddlList.First(q => q.Value == PC.Product.OIID.ToString()).Selected = true;
-
-                                    c.SL_Class_P.ddlList.Clear();
-                                    c.SL_Class_P.ddlList.AddRange(from q in DC.Product.Where(q => q.ActiveFlag && !q.DeleteFlag && q.OIID == PC.Product.OIID).OrderBy(q => q.Course.CCID).ThenBy(q => q.CID).ThenBy(q => q.SubTitle)
-                                                                  select new SelectListItem { Text = q.Course.Course_Category + " " + q.Course.Title + " " + q.SubTitle, Value = q.PID.ToString(), Selected = PC.PID == q.PID });
-
-                                    c.SL_Class_Class.ddlList.Clear();
-                                    c.SL_Class_Class.ddlList.AddRange(from q in DC.Product_Class.Where(q => q.ActiveFlag && !q.DeleteFlag && q.PID == PC.PID).OrderBy(q => q.Title)
-                                                                      select new SelectListItem { Text = q.Title, Value = q.PCID.ToString(), Selected = PC.PCID == q.PCID });
-                                }
-
-                                c.SL_Class_Graduatio_Type.ddlList.ForEach(q => q.Selected = false);
-                                c.SL_Class_Graduatio_Type.ddlList.First(q => q.Value == MH_T.TargetID3.ToString()).Selected = true;
-                            }
-                            break;
-
-                        case 6://指定名單
-                            {
-
-                            }
-                            break;
-                    }
-                }
-            }
             #endregion
 
             #region 檢查輸入
@@ -544,7 +561,7 @@ namespace Banner.Areas.Admin.Controllers
                         Error += "網址輸入錯誤<br/>";
                 }
 
-                switch (c.MHType)
+                switch (c.TargetType)
                 {
                     default:
                     case 0://全部會員
@@ -751,9 +768,12 @@ namespace Banner.Areas.Admin.Controllers
                 Message_Header MH = DC.Message_Header.FirstOrDefault(q => q.MHID == ID);
                 if (MH != null)
                 {
+                    MH.PlanSendDateTime = Convert.ToDateTime(c.sSendDateTime);
                     MH.MHType = c.MHType;
                     MH.Title = c.Title;
                     MH.Description = c.Description;
+                    MH.ActiveFlag = c.ActiveFlag;
+                    MH.DeleteFlag = c.DeleteFlag;
                     MH.URL = c.URL;
                     MH.UpdDate = DT;
                     MH.UpdUID = ACID;

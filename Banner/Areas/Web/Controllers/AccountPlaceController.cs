@@ -1758,15 +1758,15 @@ namespace Banner.Areas.Web.Controllers
                 Ns = Ns.Where(q => q.ReadFlag == (c.iReadFlag == 1));
             if (!string.IsNullOrEmpty(c.sKey))
                 Ns = Ns.Where(q => q.Message_Header.Title.Contains(c.sKey));
-            if(sType!="")
+            if (sType != "")
             {
-                foreach(var N in Ns)
+                foreach (var N in Ns)
                 {
-                    if(GetViewCheckBox(FC.Get("cbox_S_" + N.MID)))
+                    if (GetViewCheckBox(FC.Get("cbox_S_" + N.MID)))
                     {
                         if (sType == "D")
                             N.DeleteFlag = true;
-                        else if(sType == "R")
+                        else if (sType == "R")
                         {
                             N.ReadFlag = true;
                             N.ReadDateTime = DT;
@@ -1782,13 +1782,14 @@ namespace Banner.Areas.Web.Controllers
             Ns = Ns.OrderByDescending(q => q.SendDateTime).ThenByDescending(q => q.MID).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
             #endregion
             #region 組成表單
+
             foreach (var N in Ns)
             {
                 cTableRow cTR = new cTableRow();
-                string sCss = N.ReadFlag ? "lab_gray" : "";
                 cTR.ID = N.MID;
+                cTR.CSS = N.ReadFlag ? "tr_Gray" : "";
                 cTR.Cs.Add(new cTableCell { Type = "checkbox", ControlName = "cbox_S_" }); ;//選擇
-                cTR.Cs.Add(new cTableCell { Value = N.SendDateTime.ToString(DateTimeFormat), CSS = sCss });//時間
+                cTR.Cs.Add(new cTableCell { Value = N.SendDateTime.ToString(DateTimeFormat) });//時間
 
                 var MT = DC.Message_Target.FirstOrDefault(q => q.MTID == N.MTID && q.MHID == N.MHID);
                 if (MT == null)
@@ -1807,10 +1808,8 @@ namespace Banner.Areas.Web.Controllers
                     N.MTID = MT.MTID;
                     DC.SubmitChanges();
                 }
-                cTR.Cs.Add(new cTableCell { Value = sLS_TargetType[MT.TargetType], CSS = sCss });//類型
-
-
-                cTR.Cs.Add(new cTableCell { Value = N.Message_Header.Title, CSS = sCss });//主題
+                cTR.Cs.Add(new cTableCell { Value = sLS_TargetType[MT.TargetType] });//類型
+                cTR.Cs.Add(new cTableCell { Value = "[" + sMHType[N.Message_Header.MHType] + "]" + N.Message_Header.Title });//主題
                 cTR.Cs.Add(new cTableCell { Value = "檢視", Type = "button", URL = "ShowMessage(" + N.MID + ")" });//檢視
 
                 c.cTL.Rs.Add(SetTableCellSortNo(cTR));

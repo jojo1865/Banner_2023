@@ -3,7 +3,11 @@
     ViewBag.Title = "Message_List";
     Layout = "~/Areas/Web/Views/Include/_Master.cshtml";
 }
-
+<style>
+    .tr_Gray td span:last-child {
+        color: var(--bs-gray-500);
+    }
+</style>
 <div class="body-container container_phone">
     <div class="section-container">
         <nav class="breadcrumb-nav">
@@ -67,6 +71,7 @@
 
 <script>
     function ShowMessage(MID) {
+        document.getElementsByName("tr_" + MID)[0].className = "tr_Gray";
         $.ajax({
             url: '/Web/AccountPlace/GetMessageInfo?MID=' + MID,
             method: 'GET',
