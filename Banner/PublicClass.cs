@@ -3536,7 +3536,7 @@ namespace Banner
 
                         case 3://活動
                             {
-                                var Es = from q in DC.Event.Where(q => !q.DeleteFlag && q.ECID == MHT.TargetID1)
+                                var Es = from q in DC.Event.Where(q => !q.DeleteFlag && q.ECID == MHT.TargetID1 && q.EID == MHT.TargetID2)
                                          join p in DC.Event_Join_Detail.Where(q => !q.DeleteFlag)
                                          on q.EID equals p.Event_Join_Header.EID
                                          select p;

@@ -57,17 +57,12 @@
                                     <label>發送對象設定</label>
                                     <div class="row mb-2 div_Row_Bottom_Line">
                                         <div class="col-2">
-                                            @Html.RadioButton("rbl_TargetType", 0, Model.TargetType == 0, new { @class = "form-check-input", @id = "rbl_TargetType_0" })
-                                            @Html.Label("全部會員", new { @class = "form-check-label", @for = "rbl_TargetType_0" })
+                                            @Html.DropDownList(Model.LS_TargetType.ControlName, Model.LS_TargetType.ddlList, new { @class = "form-select", onchange = "ShowDiv(this.value);" })
+                                            
+
                                         </div>
-                                        <div class="col-10"></div>
-                                    </div>
-                                    <div class="row mb-2 div_Row_Bottom_Line">
-                                        <div class="col-2">
-                                            @Html.RadioButton("rbl_TargetType", 1, Model.TargetType == 1, new { @class = "form-check-input", @id = "rbl_TargetType_1" })
-                                            @Html.Label("牧養組織與職分", new { @class = "form-check-label", @for = "rbl_TargetType_1" })
-                                        </div>
-                                        <div class="col-10">
+                                        <div class="col-10 @(Model.iTargetType!=0 ? "d-none":"")" id="div_0"></div>
+                                        <div class="col-10 @(Model.iTargetType!=1 ? "d-none":"")" id="div_1">
                                             <div class="row">
                                                 <div class="col-auto">
                                                     <label>組織名稱</label>
@@ -89,13 +84,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row mb-2 div_Row_Bottom_Line">
-                                        <div class="col-2">
-                                            @Html.RadioButton("rbl_TargetType", 2, Model.TargetType == 2, new { @class = "form-check-input", @id = "rbl_TargetType_2" })
-                                            @Html.Label("事工團", new { @class = "form-check-label", @for = "rbl_TargetType_2" })
-                                        </div>
-                                        <div class="col-10">
+
+                                        <div class="col-10 @(Model.iTargetType!=2 ? "d-none":"")" id="div_2">
                                             <div class="row">
                                                 <div class="col-auto">
                                                     <label>所屬旌旗</label>
@@ -115,13 +105,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row mb-2 div_Row_Bottom_Line">
-                                        <div class="col-2">
-                                            @Html.RadioButton("rbl_TargetType", 3, Model.TargetType == 3, new { @class = "form-check-input", @id = "rbl_TargetType_3" })
-                                            @Html.Label("活動", new { @class = "form-check-label", @for = "rbl_TargetType_3" })
-                                        </div>
-                                        <div class="col-10">
+             
+                                        <div class="col-10 @(Model.iTargetType!=3 ? "d-none":"")" id="div_3">
                                             <div class="row">
                                                 <div class="col-auto">
                                                     <label>活動類型</label>
@@ -143,13 +128,8 @@
                                                 <div class="col-auto pt-4">)</div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row mb-2 div_Row_Bottom_Line">
-                                        <div class="col-2">
-                                            @Html.RadioButton("rbl_TargetType", 4, Model.TargetType == 4, new { @class = "form-check-input", @id = "rbl_TargetType_4" })
-                                            @Html.Label("聚會點", new { @class = "form-check-label", @for = "rbl_TargetType_4" })
-                                        </div>
-                                        <div class="col-10">
+     
+                                        <div class="col-10 @(Model.iTargetType!=4 ? "d-none":"")" id="div_4">
 
                                             <div class="row">
                                                 <div class="col-auto">
@@ -163,13 +143,8 @@
 
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row mb-2 div_Row_Bottom_Line">
-                                        <div class="col-2">
-                                            @Html.RadioButton("rbl_TargetType", 5, Model.TargetType == 5, new { @class = "form-check-input", @id = "rbl_TargetType_5" })
-                                            @Html.Label("課程", new { @class = "form-check-label", @for = "rbl_TargetType_5" })
-                                        </div>
-                                        <div class="col-10">
+         
+                                        <div class="col-10 @(Model.iTargetType!=5 ? "d-none":"")" id="div_5">
                                             <div class="row">
                                                 <div class="col-auto">
                                                     <label>開課旌旗</label>
@@ -196,21 +171,13 @@
                                             </div>
 
                                         </div>
-                                    </div>
-                                    <div class="row mb-2 div_Row_Bottom_Line">
-                                        <div class="col-2">
-                                            @Html.RadioButton("rbl_TargetType", 6, Model.TargetType == 6, new { @class = "form-check-input", @id = "rbl_TargetType_6" })
-                                            @Html.Label("指定名單", new { @class = "form-check-label", @for = "rbl_TargetType_6" })
-                                        </div>
-                                        <div class="col-10">
+    
+                                        <div class="col-10 @(Model.iTargetType!=6 ? "d-none":"")" id="div_6">
                                             <label>檔案上傳</label>
                                             @Html.TextBox("fu", null, new { @class = "form-control", type = "file", accept = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
                                         </div>
                                     </div>
                                 </div>
-
-
-
                                 <div class="form-group">
                                     <label>啟用狀態</label>
                                     <div class="row">
@@ -361,5 +328,15 @@
             },
             error: function (err) { console.log(err) },
         })
+    }
+
+    function ShowDiv(TargetID) {
+        document.getElementById("div_0").className = (TargetID == "0" ? "col-10" : "col-10 d-none");
+        document.getElementById("div_1").className = (TargetID == "1" ? "col-10" : "col-10 d-none");
+        document.getElementById("div_2").className = (TargetID == "2" ? "col-10" : "col-10 d-none");
+        document.getElementById("div_3").className = (TargetID == "3" ? "col-10" : "col-10 d-none");
+        document.getElementById("div_4").className = (TargetID == "4" ? "col-10" : "col-10 d-none");
+        document.getElementById("div_5").className = (TargetID == "5" ? "col-10" : "col-10 d-none");
+        document.getElementById("div_6").className = (TargetID == "6" ? "col-10" : "col-10 d-none");
     }
 </script>

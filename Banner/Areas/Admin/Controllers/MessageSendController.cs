@@ -61,7 +61,7 @@ namespace Banner.Areas.Admin.Controllers
             c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
             #endregion
             #region 資料過濾
-            var Ns = DC.Message_Header.Where(q => !q.DeleteFlag);
+            var Ns = DC.Message_Header.Where(q => !q.DeleteFlag && q.CreUID == ACID);
             if (!string.IsNullOrEmpty(c.sKey))
                 Ns = Ns.Where(q => q.Title.Contains(c.sKey));
             if (!string.IsNullOrEmpty(c.sSDate))
@@ -88,13 +88,13 @@ namespace Banner.Areas.Admin.Controllers
             {
                 cTableRow cTR = new cTableRow();
                 cTR.SortNo = N.MHID;
-                cTR.Cs.Add(new cTableCell { Value = "編輯", Type = "linkbutton", URL = "/Admin/MessageSend/Message_Edit/" + N.MHID });//操作
+                cTR.Cs.Add(new cTableCell { Value = (N.SendFlag ? "檢視" : "編輯"), Type = "linkbutton", URL = "/Admin/MessageSend/Message_Edit/" + N.MHID });//操作
                 cTR.Cs.Add(new cTableCell { Value = N.Title });//訊息主題
                 cTR.Cs.Add(new cTableCell { Value = N.SendFlag ? "已發送" : "等待發送" });//發送狀態
                 cTR.Cs.Add(new cTableCell { Value = sMHType[N.MHType] });//類型
                 cTR.Cs.Add(new cTableCell { Value = N.CreDate.ToString(DateTimeFormat) });//建立日期
                 cTR.Cs.Add(new cTableCell { Value = N.PlanSendDateTime.ToString(DateTimeFormat) });//發送日期
-                cTR.Cs.Add(new cTableCell { Value = N.ActiveFlag ? "已啟用": "停用" });//啟用狀態
+                cTR.Cs.Add(new cTableCell { Value = N.ActiveFlag ? "已啟用" : "停用" });//啟用狀態
                 cTR.Cs.Add(new cTableCell { Value = N.SendFlag ? "已發送" : "" });//發送狀態
                 var U = DC.Account.FirstOrDefault(q => q.ACID == N.CreUID);
                 cTR.Cs.Add(new cTableCell { Value = U != null ? U.Name_First + U.Name_Last : "--" });//建立人
@@ -131,7 +131,8 @@ namespace Banner.Areas.Admin.Controllers
             public int MHType = 0;
             public bool ActiveFlag = true;
             public bool DeleteFlag = false;
-            public int TargetType = 0;
+            public int iTargetType = 0;
+            public ListSelect LS_TargetType = new ListSelect();
             public int TID1 = 0;
             public int TID2 = 0;
             public int TID3 = 0;
@@ -186,7 +187,19 @@ namespace Banner.Areas.Admin.Controllers
             OI2s = OI2s.OrderBy(q => q.OIID).ThenBy(q => q.Title).ToList();
             #endregion
             #region 物件初始化
-            
+            c.LS_TargetType = new ListSelect();
+            c.LS_TargetType.ControlName = "ddl_TargetType";
+            c.LS_TargetType.ddlList = new List<SelectListItem>();
+            if (ACID == 1)
+                c.LS_TargetType.ddlList.Add(new SelectListItem { Text = "全部會員", Value = "0" });
+            c.LS_TargetType.ddlList.Add(new SelectListItem { Text = "牧養組織與職分", Value = "1" });
+            c.LS_TargetType.ddlList.Add(new SelectListItem { Text = "事工團", Value = "2" });
+            c.LS_TargetType.ddlList.Add(new SelectListItem { Text = "活動", Value = "3" });
+            c.LS_TargetType.ddlList.Add(new SelectListItem { Text = "聚會點", Value = "4" });
+            c.LS_TargetType.ddlList.Add(new SelectListItem { Text = "課程", Value = "5" });
+            c.LS_TargetType.ddlList.Add(new SelectListItem { Text = "指定名單", Value = "6" });
+            c.iTargetType = ACID == 1 ? 0 : 1;
+            c.LS_TargetType.ddlList[c.iTargetType].Selected = true;
             //組織與職分
             #region 組織與職分
 
@@ -308,7 +321,7 @@ namespace Banner.Areas.Admin.Controllers
             {
                 c.MHID = MH.MHID;
                 c.bSendFlag = MH.SendFlag;
-                if(c.bSendFlag)
+                if (c.bSendFlag)
                 {
                     ((bool[])ViewBag._Power)[2] = false;
                 }
@@ -327,7 +340,9 @@ namespace Banner.Areas.Admin.Controllers
 
                 if (MH_T != null)
                 {
-                    c.TargetType = MH_T.TargetType;
+                    c.iTargetType = MH_T.TargetType;
+                    c.LS_TargetType.ddlList.ForEach(q => q.Selected = false);
+                    c.LS_TargetType.ddlList.First(q => q.Value == c.iTargetType.ToString()).Selected = true;
                     switch (MH_T.TargetType)
                     {
                         default:
@@ -446,7 +461,7 @@ namespace Banner.Areas.Admin.Controllers
                 }
             }
 
-            
+
             if (FC != null)
             {
                 c.sSendDateTime = FC.Get("txb_PlanSendDateTime");
@@ -457,7 +472,9 @@ namespace Banner.Areas.Admin.Controllers
                 c.DeleteFlag = GetViewCheckBox(FC.Get("cbox_DeleteFlag"));
                 c.URL = FC.Get("txb_URL");
                 //發送對象選擇
-                c.TargetType = Convert.ToInt32(FC.Get("rbl_TargetType"));
+                c.iTargetType = Convert.ToInt32(FC.Get("rbl_TargetType"));
+                c.LS_TargetType.ddlList.ForEach(q => q.Selected = false);
+                c.LS_TargetType.ddlList.First(q => q.Value == c.iTargetType.ToString()).Selected = true;
                 //牧養組織與職分
                 c.sOITitle = FC.Get("txb_OI_Title");
                 if (c.SL_O.ddlList.Count > 0)
@@ -561,7 +578,7 @@ namespace Banner.Areas.Admin.Controllers
                         Error += "網址輸入錯誤<br/>";
                 }
 
-                switch (c.TargetType)
+                switch (c.iTargetType)
                 {
                     default:
                     case 0://全部會員
@@ -594,11 +611,11 @@ namespace Banner.Areas.Admin.Controllers
                             if (c.SL_O_Target.ddlList.Any(q => q.Selected))
                             {
                                 string Target = c.SL_O_Target.ddlList.Find(q => q.Selected).Value;
-                                if(Target.StartsWith("O_"))
+                                if (Target.StartsWith("O_"))
                                 {
-                                    c.TID2 = Convert.ToInt32(Target.Replace("O_",""));
+                                    c.TID2 = Convert.ToInt32(Target.Replace("O_", ""));
                                 }
-                                else if(Target.StartsWith("R_"))
+                                else if (Target.StartsWith("R_"))
                                 {
                                     c.TID2 = 8;
                                     // c.SL_O_Target.ddlList.Add(new SelectListItem { Text = "領夜同工", Value = "R_24" });
@@ -607,7 +624,7 @@ namespace Banner.Areas.Admin.Controllers
                                     c.TID3 = Convert.ToInt32(Target.Replace("R_", ""));
                                 }
                             }
-                                
+
                             else
                                 Error += "請選擇組織職分<br/>";
                         }
@@ -802,7 +819,7 @@ namespace Banner.Areas.Admin.Controllers
                 var MT = DC.Message_Target.FirstOrDefault(q => q.MHID == ID);
                 if (MT != null)
                 {
-                    MT.TargetType = c.TargetType;
+                    MT.TargetType = c.iTargetType;
                     MT.TargetID1 = c.TID1;
                     MT.TargetID2 = c.TID2;
                     MT.TargetID3 = c.TID3;
@@ -812,7 +829,7 @@ namespace Banner.Areas.Admin.Controllers
                     MT = new Message_Target
                     {
                         Message_Header = MH,
-                        TargetType = c.TargetType,
+                        TargetType = c.iTargetType,
                         TargetID1 = c.TID1,
                         TargetID2 = c.TID2,
                         TargetID3 = c.TID3
@@ -821,7 +838,7 @@ namespace Banner.Areas.Admin.Controllers
                 }
                 DC.SubmitChanges();
                 //匯入指定名單
-                if (MT.TargetType == 6 && fu!=null)
+                if (MT.TargetType == 6 && fu != null)
                 {
                     string extension = Path.GetExtension(fu.FileName);
                     string fileName = $"{DT.ToString("yyyyMMddHHmm") + "_" + Guid.NewGuid()}{extension}";
