@@ -1,0 +1,115 @@
+﻿@model Banner.Areas.Admin.Controllers.QuestionSetController.cGetQuestion_List
+@{
+    ViewBag.Title = "Question_List";
+    Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
+}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-left-border"></div>
+        <h5 class="header font-bold">@ViewBag._Title</h5>
+    </div>
+    <div class="body-container">
+        <form method="post" id="form1">
+            @if (Model != null)
+            {
+                <div class="search-form">
+                    <div class="search-form-section">
+                        <div class="d-flex justify-content-end">
+                            <a href="javascript:;" onclick="ShowQuestion(0);" class="btn btn-success btn-lg btn-round btn-submit me-2"><i class="fa-solid fa-plus"></i>新增問題</a>
+                            <a href="javascript:;" onclick="document.getElementById('form1').submit();" class="btn btn-primary btn-lg btn-round btn-submit me-2"><i class="fa-solid fa-sort"></i>更新排序</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div class="table-container">
+                        @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
+                    </div>
+                </div>
+            }
+        </form>
+    </div>
+</div>
+
+<button type="button" id="but_Edit" class="d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    新增
+</button>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">問與答</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="but_Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hid_Type" value="@Model.Type" />
+                <input type="hidden" id="hid_QID" value="" />
+                <div class="row mb-2">
+                    <div class="col-2">問題</div>
+                    <div class="col-10">
+                        <input id="txb_Question" class="form-control" value=""/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-2">答案</div>
+                    <div class="col-10">
+                        <textarea id="txb_Answer" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="SaveNewQuestion()">送出</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function ShowQuestion(QID) {
+        document.getElementById("hid_QID").value = QID;
+
+        if (QID != '0' && QID != 0) {
+            $.ajax({
+                url: '/Admin/QuestionSet/GetQuestion?QID=' + QID,
+                method: 'GET',
+                dataType: 'json',
+                success: function (res) {
+                    document.getElementById("txb_Question").value = res.Question;
+                    document.getElementById("txb_Answer").value = res.Answer;
+                },
+                error: function (err) { console.log(err) },
+            })
+        }
+
+        document.getElementById("but_Edit").click();
+    }
+
+    function SaveNewQuestion() {
+        var QType = document.getElementById("hid_Type").value;
+        var QID = document.getElementById("hid_QID").value;
+        var Q = document.getElementById("txb_Question").value;
+        var A = document.getElementById("txb_Answer").value;
+        var sData = {
+            QID: QID,
+            QType: QType,
+            Question: Q,
+            Answer:A
+        }
+        $.ajax({
+            url: '/Admin/QuestionSet/SaveQuestion',
+            method: 'GET',
+            dataType: 'json',
+            data: sData,
+            success: function () {},
+            error: function (err) { console.log(err) },
+        })
+        document.getElementById("but_Close").click();
+        Swal.fire({
+            icon: 'success',
+            html: '存檔完成'
+        }).then((result) => {
+            setTimeout(() => { location.reload(); }, 1000);
+        });
+    }
+</script>

@@ -17,13 +17,7 @@ namespace Banner.Areas.Web.Controllers
 {
     public class ClassStoreController : PublicClass
     {
-        //測試預定值
-        public string sStoreTitle = "JOJO測試店家";
-        public string sNewebPagURL = "https://ccore.newebpay.com/MPG/mpg_gateway";//藍新金流網址
-        public string sMerchantID = "MS151311400";//商店代號
-        public string sHashKey = "xiI3upb6WXwkvJS7PrYPfGrb6gX2aAAh";
-        public string sHashIV = "CHioAFLrrYhkcpYP";
-        public string Email = "minto.momoko.jojo1865@gmail.com";
+        
         // GET: Web/ClassStore
         #region 首頁
         public class cIndex
@@ -674,7 +668,7 @@ namespace Banner.Areas.Web.Controllers
             {
                 #region 組合前台確認項目
                 c.TotalPrice = OH.TotalPrice;
-
+                c.OHID = OH.OHID;
                 var P = DC.Order_Paid.FirstOrDefault(q => q.OHID == OH.OHID);
                 if (P != null)
                 {
@@ -962,14 +956,14 @@ namespace Banner.Areas.Web.Controllers
                     #endregion
 
                     //正式
-                    if (sDomanName != "https://web-banner.viuto-aiot.com" && OP != null)
+                    /*if (sDomanName != "https://web-banner.viuto-aiot.com" && OP != null)
                     {
                         sMerchantID = OP.PayType.MerchantID;
                         sHashKey = OP.PayType.HashKey;
                         sHashIV = OP.PayType.HashIV;
                         sNewebPagURL = OP.PayType.TargetURL;
                         sStoreTitle = OP.PayType.Title;
-                    }
+                    }*/
                     var Con = DC.Contect.FirstOrDefault(q => q.TargetID == OH.ACID && q.TargetType == 2 && q.ContectType == 2);
                     if (Con != null)
                         Email = Con.ContectValue;
@@ -979,7 +973,9 @@ namespace Banner.Areas.Web.Controllers
                     str += "&TimeStamp=" + DT.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString().Split('.')[0];//TimeStamp 時間戳記 String(50)
                     str += "&Version=2.0";//Version 串接程式版本 String(5)
                     str += "&LangType=zh-tw";//LangType 語系 String(5)
-                    str += "&MerchantOrderNo=" + "banner_" + OHID.ToString().PadLeft(10, '0') + "_" + DT.ToString("mmssfff");//MerchantOrderNo 商店訂單編號 String(30)
+
+                    string sMerchantOrderNo = "banner_" + OHID.ToString().PadLeft(10, '0') + "_" + DT.ToString("mmssfff");
+                    str += "&MerchantOrderNo=" + sMerchantOrderNo;//MerchantOrderNo 商店訂單編號 String(30)
                     str += "&Amt=" + OH.TotalPrice;//Amt 訂單金額 int(10)
                     str += "&ItemDesc=" + OrderInfo + "課程共" + OH.Order_Product.Count() + "堂";//temDesc 商品資訊
                     str += "&TradeLimit=600";//TradeLimit 交易有效時間  Int(3)
@@ -1004,8 +1000,17 @@ namespace Banner.Areas.Web.Controllers
                     str += "&ImageUrl=" + sDomanName + "/Content/Image/CourseCategory_1.jpg";//ImageUrl 產品圖檔連結網址 String(200)
                     str += "&InstFlag=0";//InstFlag 信用卡分期付款啟用 String(18)
                     str += "&CreditRed=0";//CreditRed 信用卡紅利啟用 Int(1)
-                    str += "&UNIONPAY=1";//UNIONPAY 信用卡銀聯卡啟用 Int(1)
-                    str += "&CREDITAE=1";//CREDITAE 信用卡美國運通卡啟用 Int(1)
+                    if(sMerchantID == "MS151311400")//JOJO測試不開
+                    {
+                        str += "&UNIONPAY=0";//UNIONPAY 信用卡銀聯卡啟用 Int(1)
+                        str += "&CREDITAE=0";//CREDITAE 信用卡美國運通卡啟用 Int(1)
+                    }
+                    else
+                    {
+                        str += "&UNIONPAY=1";//UNIONPAY 信用卡銀聯卡啟用 Int(1)
+                        str += "&CREDITAE=1";//CREDITAE 信用卡美國運通卡啟用 Int(1)
+                    }
+                   
                     str += "&WEBATM=0";//WEBATM WEBATM啟用 Int(1)
                     str += "&VACC=0";//VACC ATM轉帳啟用 Int(1)
                     str += "&BankType=";//BankType 金融機構 String(26)//先選台銀
@@ -1049,6 +1054,15 @@ namespace Banner.Areas.Web.Controllers
                     OPD.Description = c.TradeSha;
                     DC.Order_PaidDetail.InsertOnSubmit(OPD);
                     DC.SubmitChanges();
+
+                    OPD = new Order_PaidDetail();
+                    OPD.Order_Paid = OP;
+                    OPD.OPDType = 0;
+                    OPD.Title = "MerchantOrderNo";
+                    OPD.Description = sMerchantOrderNo;
+                    DC.Order_PaidDetail.InsertOnSubmit(OPD);
+                    DC.SubmitChanges();
+                    
                 }
             }
             return c;

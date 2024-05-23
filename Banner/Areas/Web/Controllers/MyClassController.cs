@@ -7,7 +7,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
 using ZXing.OneD;
-using static Banner.Areas.Web.Controllers.MyClassController;
+using Banner.Areas.Admin.Controllers;
+using Antlr.Runtime.Tree;
 
 namespace Banner.Areas.Web.Controllers
 {
@@ -433,8 +434,10 @@ namespace Banner.Areas.Web.Controllers
                             {
                                 if (DT > N.CreDate.AddDays(CreditCardAddDays))//已過期,可以刪除
                                     cTR.Cs.Add(new cTableCell { Value = "刪除", Type = "delete", URL = "/Web/MyClass/MyOrder_Delete/" + N.OHID });
+                                else if (DT.Date < DT_MinClass.Date && N.Order_Type == 2)//尚未超過課程第一天且已完成付款,可以退刷
+                                    cTR.Cs.Add(new cTableCell { Value = "取消訂單", Type = "cancel", URL = "/Web/MyClass/MyOrder_Cancel/" + N.OHID });
                                 else //可重新付款
-                                    cTR.Cs.Add(new cTableCell { Value = "補刷卡", Type = "paid", URL = "/Web/ClassStore/Order_Paid_Credit_Card?OHID=" + N.OHID });
+                                    cTR.Cs.Add(new cTableCell { Value = "補刷卡", Type = "paid", URL = "/Web/ClassStore/Order_Paid_Credit_Card/" + N.OHID });
                             }
                             break;
 
@@ -481,7 +484,7 @@ namespace Banner.Areas.Web.Controllers
                     cTR.Cs.Add(new cTableCell { Value = "--" });//付款方式
 
 
-                
+
                 if (N.Order_Type == 2)
                     cTR.Cs.Add(new cTableCell { Value = string.Join("<br/>", N.Order_Product.Select(q => q.Product.Title + " " + q.Product.SubTitle)), Type = "link", URL = "/Web/MyClass/MyClass_List?OHID=" + N.OHID });//課程名稱
                 else
@@ -563,7 +566,59 @@ namespace Banner.Areas.Web.Controllers
             return View();
         }
         #endregion
+        #region 取消訂單
+        [HttpGet]
+        public ActionResult MyOrder_Cancel(int ID)
+        {
+            GetViewBag();
+            ACID = GetACID();
+            Error = "";
+            var OH = DC.Order_Header.FirstOrDefault(q => q.OHID == ID && q.ACID == ACID);
+            if (OH == null)
+                Error = "此訂單不存在或非您的訂單,不能取消訂單";
+            else if (OH.Order_Type != 2 && ACID != 1)
+                Error = "此訂單非付款完成訂單,不能取消訂單";
+            else if (OH.Order_Type == 2)//交易完成
+            {
+                var OP = DC.Order_Paid.OrderByDescending(q => q.OHID == OH.OHID).FirstOrDefault();
+                if (OP != null)
+                {
+                    switch (OP.PayType.PayTypeID)
+                    {
+                        case 0://現金
+                            break;
+                        case 2://ATM
+                        case 3://Paypal
+                        case 4://支付寶
 
+                            break;
+
+                        case 1://信用卡
+                            {
+                                Error = CancelOrder_CradCard(ID);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            if (Error != "")
+                SetAlert(Error, 2);
+            else
+            {
+                if (OH.Order_Type == 2)//已付款
+                    OH.Order_Type = 5;
+                else if (OH.Order_Type == 1)
+                    OH.Order_Type = 3;
+                OH.UpdDate = DT;
+                OH.SaveACID = ACID;
+                DC.SubmitChanges();
+
+                SetAlert("訂單已取消", 1, "/Web/MyClass/MyOrder_List");
+            }
+            return View();
+        }
+        #endregion
         #region 我的打卡紀錄
         public class cGetMyJoinClassHistory_List
         {

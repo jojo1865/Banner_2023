@@ -18,11 +18,23 @@
                         <p class="mb-2"><b>訂單編號：</b>@Model.OHID</p>
                         <p class="mb-2"><b>訂購日期：</b>@Model.CreDate</p>
                         <p class="mb-2"><b>付款方式：</b>@Model.PayType</p>
-                        <p class="mb-2"><b>訂單狀況：</b>@Model.OrderType
-                        @if (Model.PayType == "現金" && Model.OrderType == "交易中")
-                        {
-                            <button onclick="ChengeOrderType(@Model.OHID, 2);" class="btn btn-success">改為已繳費</button>
-                        }
+                        <p class="mb-2">
+                            <b>訂單狀況：</b>@Model.OrderType
+                            @if (Model.PayType == "現金" && Model.OrderType == "交易中")
+                            {
+                                <button onclick="ChengeOrderType(@Model.OHID, 2);" class="btn btn-success">改為已繳費</button>
+                            }
+                            else if (Model.PayType == "信用卡" && Model.OrderType == "交易完成")
+                            {
+                                if (!Model.OPs.Any(q=>q.GraduatioFlag))
+                                {
+                                    <a href="/Admin/StoreSet/Order_Cancel_Credit_Card/@Model.OHID" class="btn btn-danger">取消訂單(退刷)</a>
+                                }
+                            }
+                            else if (Model.OrderType == "交易中")
+                            {
+                                <button onclick="ChengeOrderType(@Model.OHID, 3);" class="btn btn-success">取消訂單</button>
+                            }
                         </p>
                     </div>
                 </div>
@@ -58,9 +70,7 @@
     </div>
 </div>
 <div class="action-bar">
-
-        <a href="/Admin/StoreSet/Order_List/" class="btn btn-outline-primary btn-lg btn-round">
-            <i class="fa-solid fa-xmark"></i>返回訂單列表
-        </a>
-
+    <a href="/Admin/StoreSet/Order_List/" class="btn btn-outline-primary btn-lg btn-round">
+        <i class="fa-solid fa-xmark"></i>返回訂單列表
+    </a>
 </div>

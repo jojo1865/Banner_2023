@@ -39,6 +39,7 @@ using System.Security.Policy;
 using static Banner.Areas.Admin.Controllers.HomeController;
 using OfficeOpenXml.Drawing;
 using ZXing.Common;
+using System.Collections.Specialized;
 
 
 namespace Banner
@@ -61,6 +62,20 @@ namespace Banner
         public static int CreditCardAddDays = 1;//信用卡可付款天數加入數字
         public static int ATMAddDays = 2;//ATM可付款天數加入數字
         public string[] sMHType = new string[] { "個人", "廣告" };
+        public string[] sPayTypeID = new string[] { "現金", "信用卡", "ATM", "PayPal", "支付寶" };
+
+
+        //測試預定值
+        public string sStoreTitle = "JOJO測試店家";
+        public string sNewebPagURL = "https://ccore.newebpay.com/MPG/mpg_gateway";//藍新金流網址
+        public string sMerchantID = "MS151311400";//商店代號
+        public string sHashKey = "xiI3upb6WXwkvJS7PrYPfGrb6gX2aAAh";
+        public string sHashIV = "CHioAFLrrYhkcpYP";
+        public string Email = "minto.momoko.jojo1865@gmail.com";
+
+        public string sCloseURL_before = "/MPG/mpg_gateway";
+        public string sCloseURL_after = "/API/CreditCard/Close";
+
         public string sDomanName
         {
             get
@@ -3221,7 +3236,7 @@ namespace Banner
                         Price_Finally = iPrice[1],
                         Price_Type = iPrice[0],
                         Price_Note = sNote,
-                        Graduation_Flag = true,
+                        Graduation_Flag = false,
                         Graduation_ACID = 0,
                         Graduation_Date = DT,
                         CreDate = DT,
@@ -3286,7 +3301,7 @@ namespace Banner
                         Price_Finally = iPrice[1],
                         Price_Type = iPrice[0],
                         Price_Note = sNote,
-                        Graduation_Flag = true,
+                        Graduation_Flag = false,
                         Graduation_ACID = 0,
                         Graduation_Date = DT,
                         CreDate = DT,
@@ -3724,6 +3739,113 @@ namespace Banner
             }
             return Ls;
         }
+        //取消並退刷
+        public string CancelOrder_CradCard(int OHID)
+        {
+            Error = "";
+            var OH = DC.Order_Header.FirstOrDefault(q => q.OHID == OHID);
+            var OP = DC.Order_Paid.FirstOrDefault(q => q.OHID == OHID);
+            if (OH == null)
+                Error = "訂單不存在,無法付款";
+            else if (OH.DeleteFlag)
+                Error = "訂單已刪除";
+            else if (OP == null)
+                Error = "此訂單缺少交易資訊,請回購物車重新選擇付款方式";
+            else
+            {
+                OP = DC.Order_Paid.FirstOrDefault(q => q.OHID == OHID && q.PayType.PayTypeID == 1);
+                if (OP == null)
+                    Error = "此訂單並非選擇以信用卡付款";
+                else if (!OP.PaidFlag)
+                    Error = "此訂單尚未完成付款,不應使用退刷程序";
+            }
+
+
+            if (Error != "")
+                SetAlert(Error);
+            else
+            {
+                //正式
+                if (sDomanName != "https://web-banner.viuto-aiot.com" && OP != null)
+                {
+                    sMerchantID = OP.PayType.MerchantID;
+                    sHashKey = OP.PayType.HashKey;
+                    sHashIV = OP.PayType.HashIV;
+                    sNewebPagURL = OP.PayType.TargetURL.Replace(sCloseURL_before, sCloseURL_after);
+                    sStoreTitle = OP.PayType.Title;
+                }
+                else
+                    sNewebPagURL = sNewebPagURL.Replace(sCloseURL_before, sCloseURL_after);
+
+                string str = "";
+                str += "RespondType=JSON";//RespondType 回傳格式 String(6)
+                str += "&Version=1.1";//Version 串接程式版本 String(5)
+                str += "&Amt=" + OH.TotalPrice;//Amt 訂單金額 int(10)
+
+                var OPD = OP.Order_PaidDetail.Where(q => q.Title == "MerchantOrderNo").OrderByDescending(q => q.OPDID).FirstOrDefault();
+
+                str += "&MerchantOrderNo=" + (OPD != null ? OPD.Description : "");//MerchantOrderNo 商店訂單編號 String(30)
+                str += "&TimeStamp=" + DT.Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString().Split('.')[0];//TimeStamp 時間戳記 String(50)
+                str += "&IndexType=1";//IndexType 選用單號類別 1代表選用商店訂單編號/2代表選用藍新金流交易序號
+
+                OPD = OP.Order_PaidDetail.Where(q => q.Title == "TradeInfo").OrderByDescending(q => q.OPDID).FirstOrDefault();
+                str += "&TradeNo=" + (OPD != null ? OPD.Description : "");//TradeNo 藍新金流交易序號 String(20)
+
+                str += "&CloseType=1";//CloseType 請款或退款 Int(1) 退款 B032 / 取消退款 B034時請填 2
+                str += "&Cancel=0";//Cancel 取消請款或退款 Int(1) 取消 退款 (B034)時 此欄 請填 1
+
+                
+
+                string PostData = HSM.EncryptAESHex(str, sHashKey, sHashIV);
+
+                using (WebClient client = new WebClient())
+                {
+                    #region POST給藍星並取得回傳值
+
+                    byte[] response =
+                    client.UploadValues(sNewebPagURL, new NameValueCollection()
+                    {
+                           { "MerchantID_",  sMerchantID },
+                           { "PostData_", PostData }
+                    });
+                    string result = System.Text.Encoding.UTF8.GetString(response);
+
+                    #endregion
+                    OPD = new Order_PaidDetail
+                    {
+                        Order_Paid = OP,
+                        OPDType = 2,
+                        Title = "Cancel_Order",
+                        Description = result
+
+                    };
+                    DC.Order_PaidDetail.InsertOnSubmit(OPD);
+                    DC.SubmitChanges();
+                    try
+                    {
+                        var JData = ChangeJsonStringToClass(result);
+                        if (JData["Status"].ToString() != "SUCCESS")
+                            SetAlert(JData["Status"].ToString() + ":" + JData["Message"].ToString(), 2);
+                        else
+                        {
+                            OH.Order_Type = 5;
+                            OH.UpdDate = DT;
+                            OH.SaveACID = GetACID();
+                            DC.SubmitChanges();
+
+                            SetAlert("已完成退款", 1, "/Admin/StoreSet/Order_Info/" + OHID);
+                        }
+                    }
+                    catch
+                    {
+                        SetAlert("退款訊息轉換失敗,請直接進入第三方金流平台檢視結果", 2);
+                    }
+                }
+            }
+
+            return Error;
+        }
+
         #endregion
 
         #region 事工團

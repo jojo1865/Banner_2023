@@ -49,6 +49,7 @@
       <Association Name="Account_Log_OrganizeInfo_ACID" Member="Log_OrganizeInfo_ACID" ThisKey="ACID" OtherKey="ACID" Type="Log_OrganizeInfo_ACID" />
       <Association Name="Account_Coupon_Account" Member="Coupon_Account" ThisKey="ACID" OtherKey="ACID" Type="Coupon_Account" />
       <Association Name="Account_M_MH_Account" Member="M_MH_Account" ThisKey="ACID" OtherKey="ACID" Type="M_MH_Account" />
+      <Association Name="Account_Log_ChangeClass" Member="Log_ChangeClass" ThisKey="ACID" OtherKey="ACID" Type="Log_ChangeClass" />
     </Type>
   </Table>
   <Table Name="dbo.ZipCode" Member="ZipCode">
@@ -1042,6 +1043,32 @@
       <Column Name="TargetID2" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="TargetID3" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Message_Header_Message_Target" Member="Message_Header" ThisKey="MHID" OtherKey="MHID" Type="Message_Header" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Log_ChangeClass" Member="Log_ChangeClass">
+    <Type Name="Log_ChangeClass">
+      <Column Name="LCID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OPID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PCID_Old" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PCID_New" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="CreACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Account_Log_ChangeClass" Member="Account" ThisKey="ACID" OtherKey="ACID" Type="Account" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Question_Answer" Member="Question_Answer">
+    <Type Name="Question_Answer">
+      <Column Name="QID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="QType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SortNo" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Question" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="Answer" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="ActiveFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="DeleteFlag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SaveACID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
     </Type>
   </Table>
   <Function Name="dbo.sp_GetOI2List" Method="sp_GetOI2List">

@@ -94,7 +94,7 @@ namespace Banner.Areas.Admin.Controllers
                     AC = DC.Account.Where(q => q.Login == Login && q.ActiveFlag && !q.DeleteFlag).OrderByDescending(q => q.CreDate).FirstOrDefault();
                     if (AC == null)
                         SetAlert("此帳號不存在", 2);
-                    else if(!AC.BackUsedFlag)
+                    else if (!AC.BackUsedFlag)
                         SetAlert("此帳號並未獲得與此登入的授權", 2);
                     /*else if (AC.DeleteFlag)
                         SetAlert("此帳號已被移除", 2);
@@ -746,6 +746,19 @@ namespace Banner.Areas.Admin.Controllers
                     }
                     break;
 
+                case "Question":
+                    {
+                        var Q = DC.Question_Answer.FirstOrDefault(q => q.QID == ID);
+                        if (Q != null)
+                        {
+                            Q.ActiveFlag = !Q.ActiveFlag;
+                            Q.UpdDate = DT;
+                            Q.SaveACID = ACID;
+                            DC.SubmitChanges();
+                            Msg = "OK";
+                        }
+                    }
+                    break;
             }
             return Msg;
         }

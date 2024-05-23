@@ -1,4 +1,4 @@
-﻿
+﻿@model Banner.Areas.Admin.Controllers.StoreSetController.cGetProductClass_JoinList
 @{
     ViewBag.Title = "ProductClass_JoinList";
     Layout = "~/Areas/Admin/Views/Include/_Master.cshtml";
@@ -16,9 +16,62 @@
             <div class="table-container">
                 @if (Model != null)
                 {
-                    @Html.Action("_TableList", "Include", new { cTL = Model })
+                    @Html.Action("_TableList", "Include", new { cTL = Model.cTL })
                 }
             </div>
         </form>
     </div>
 </div>
+
+<button type="button" id="but_ChangeClass" class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    轉班
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">變更班級</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hid_PCID" value="@Model.PCID" />
+                <input type="hidden" id="hid_ACID" value="" />
+                @Html.DropDownList(Model.LS.ControlName, Model.LS.ddlList, new { @class = "form-select" })
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="SaveNewClass()">送出</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function ShowChangeClass(ACID) {
+        document.getElementById("hid_ACID").value = ACID;
+        document.getElementById("but_ChangeClass").click();
+    }
+
+    function SaveNewClass() {
+        var ACID = document.getElementById("hid_ACID").value;
+        var PCID_Old = document.getElementById("hid_PCID").value;
+        var PCID_New = document.getElementById("@(Model.LS.ControlName)").value;
+        $.ajax({
+            url: '/Admin/StoreSet/ChangeClass?ACID=' + ACID + "&PCIDO=" + PCID_Old + "&PCIDN=" + PCID_New,
+            method: 'GET',
+            dataType: 'text',
+            success: function (res) {
+                console.log(res);
+                Swal.fire({
+                    icon: 'success',
+                    html: '存檔完成'
+                }).then((result) => {
+                    setTimeout(() => { location.reload(); }, 1000);
+                });
+            },
+            error: function (err) { console.log(err) },
+        })
+    }
+</script>

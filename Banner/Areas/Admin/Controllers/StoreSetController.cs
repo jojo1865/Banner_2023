@@ -1,14 +1,17 @@
-﻿using Banner.Models;
+﻿using Antlr.Runtime;
+using Banner.Models;
 using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
 using OfficeOpenXml.ConditionalFormatting;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Policy;
@@ -22,7 +25,7 @@ namespace Banner.Areas.Admin.Controllers
 {
     public class StoreSetController : PublicClass
     {
-        // GET: Admin/StoreSet
+
 
         #region 上架課程-列表
         public class cProduct_List
@@ -857,7 +860,7 @@ namespace Banner.Areas.Admin.Controllers
         [HttpGet]
         public string GetProductClassList(int PID)
         {
-            var Ns = from q in DC.Product_Class.Where(q => q.ActiveFlag && !q.DeleteFlag && q.PID == PID).OrderBy(q => q.Product_ClassTime.Min(p=>p.ClassDate)).ThenBy(q => q.Product_ClassTime.Min(p => p.STime))
+            var Ns = from q in DC.Product_Class.Where(q => q.ActiveFlag && !q.DeleteFlag && q.PID == PID).OrderBy(q => q.Product_ClassTime.Min(p => p.ClassDate)).ThenBy(q => q.Product_ClassTime.Min(p => p.STime))
                      select new { Title = q.Title, q.PCID };
 
             return JsonConvert.SerializeObject(Ns);
@@ -2761,27 +2764,54 @@ namespace Banner.Areas.Admin.Controllers
         }
         #endregion
         #region 課程報名名單/打卡一覽
-        public cTableList GetProductClass_JoinList(int PCID, int PCTID, FormCollection FC)
+        public class cGetProductClass_JoinList
         {
+            public cTableList cTL = new cTableList();
+            public ListSelect LS = new ListSelect();
+            public int PCID = 0;
+        }
+        public cGetProductClass_JoinList GetProductClass_JoinList(int PCID, int PCTID, FormCollection FC)
+        {
+            cGetProductClass_JoinList c = new cGetProductClass_JoinList();
+            c.PCID = PCID;
             #region 物件初始化
+            bool OtherClassFlag = false;
+            List<Product_Class> PCs = new List<Product_Class>();
+            var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == PCID);
+            if (PC != null)
+            {
+                PCs = DC.Product_Class.Where(q => q.PID == PC.PID && !q.DeleteFlag).ToList();
+                OtherClassFlag = true;
+            }
             var PCT = DC.Product_ClassTime.FirstOrDefault(q => q.PCTID == PCTID);
             if (PCT != null)
                 ViewBag._Title += " - " + PCT.Product_Class.Title + "：" + PCT.ClassDate + " " + PCT.STime.ToString(@"hh\:mm") + "～" + PCT.ETime.ToString(@"hh\:mm");
-            else
+            else if (PC != null)
+                ViewBag._Title += " - " + PC.Title;
+
+            c.LS = new ListSelect();
+            c.LS.ControlName = "ddl_OtherClass";
+            c.LS.ddlList = new List<SelectListItem>();
+            foreach (var PC_ in PCs.Where(q => q.PCID != PCID).OrderBy(q => q.Title))
             {
-                var PC = DC.Product_Class.FirstOrDefault(q => q.PCID == PCID);
-                if (PC != null)
-                    ViewBag._Title += " - " + PC.Title;
+                var PCT_ = PC.Product_ClassTime.OrderBy(q => q.ClassDate).ThenBy(q => q.STime).FirstOrDefault();
+                c.LS.ddlList.Add(new SelectListItem
+                {
+                    Text = "(" + PC_.PCID + ")" + PC_.Title + " " + (PCT_ != null ? (PCT_.ClassDate.ToString(DateFormat) + " " + GetTimeSpanToString(PCT_.STime)) : ""),
+                    Value = PC_.PCID.ToString()
+                });
             }
+            if (c.LS.ddlList.Count > 0)
+                c.LS.ddlList[0].Selected = true;
             #region 前端資料帶入
             int iNumCut = Convert.ToInt32(FC != null ? FC.Get("ddl_ChangePageCut") : "10");
             int iNowPage = Convert.ToInt32(FC != null ? FC.Get("hid_NextPage") : "1");
             #endregion
-            cTableList c = new cTableList();
-            c.Title = "";
-            c.NowPage = iNowPage;
-            c.NumCut = iNumCut;
-            c.Rs = new List<cTableRow>();
+            c.cTL = new cTableList();
+            c.cTL.Title = "";
+            c.cTL.NowPage = iNowPage;
+            c.cTL.NumCut = iNumCut;
+            c.cTL.Rs = new List<cTableRow>();
 
             #endregion
             #region 資料庫資料帶入
@@ -2805,6 +2835,8 @@ namespace Banner.Areas.Admin.Controllers
                 Ns = Ns.Where(q => q.Product.OIID == 1);
 
             var TopTitles = new List<cTableCell>();
+            if (PCTID == 0 && OtherClassFlag)
+                TopTitles.Add(new cTableCell { Title = "轉班" });
             TopTitles.Add(new cTableCell { Title = "會員ID" });
             TopTitles.Add(new cTableCell { Title = "會員名稱" });
             TopTitles.Add(new cTableCell { Title = "所屬小組" });
@@ -2820,10 +2852,10 @@ namespace Banner.Areas.Admin.Controllers
             {
                 TopTitles.Add(new cTableCell { Title = "打卡狀態" });
             }
-            c.Rs.Add(SetTableRowTitle(TopTitles));
-            c.TotalCt = Ns.Count();
-            c.MaxNum = GetMaxNum(c.TotalCt, c.NumCut);
-            Ns = Ns.OrderBy(q => q.Order_Header.CreDate).Skip((iNowPage - 1) * c.NumCut).Take(c.NumCut);
+            c.cTL.Rs.Add(SetTableRowTitle(TopTitles));
+            c.cTL.TotalCt = Ns.Count();
+            c.cTL.MaxNum = GetMaxNum(c.cTL.TotalCt, c.cTL.NumCut);
+            Ns = Ns.OrderBy(q => q.Order_Header.CreDate).Skip((iNowPage - 1) * c.cTL.NumCut).Take(c.cTL.NumCut);
 
             var Cons = (from q in DC.Contect.Where(q => q.TargetType == 2 && q.ContectType == 1)
                         join p in Ns
@@ -2836,6 +2868,13 @@ namespace Banner.Areas.Admin.Controllers
             foreach (var N in Ns)
             {
                 cTableRow cTR = new cTableRow();
+                if (PCTID == 0 && OtherClassFlag)
+                {
+                    if (N.Graduation_Flag)
+                        cTR.Cs.Add(new cTableCell { Value = "" });//已結業就不能轉班
+                    else
+                        cTR.Cs.Add(new cTableCell { Value = "轉班選擇", Type = "button", URL = "ShowChangeClass(" + N.Order_Header.ACID + ");" });
+                }
                 cTR.Cs.Add(new cTableCell { Value = N.Order_Header.ACID.ToString() });//會員ID
                 cTR.Cs.Add(new cTableCell { Value = N.Order_Header.Account.Name_First + N.Order_Header.Account.Name_Last });//會員名稱
                 cTR.Cs.Add(new cTableCell { Value = string.Join(",", GetMOIAC(8, 0, N.Order_Header.ACID).Select(q => q.OrganizeInfo.Title + q.OrganizeInfo.Organize.Title)) });//所屬小組
@@ -2856,7 +2895,7 @@ namespace Banner.Areas.Admin.Controllers
                     var OJ = OJs.FirstOrDefault(q => q.ACID == N.Order_Header.ACID);
                     cTR.Cs.Add(new cTableCell { Value = OJ == null ? "尚未打卡" : OJ.CreDate.ToString(DateTimeFormat) });//打卡狀態
                 }
-                c.Rs.Add(SetTableCellSortNo(cTR));
+                c.cTL.Rs.Add(SetTableCellSortNo(cTR));
             }
             #endregion
 
@@ -2874,6 +2913,39 @@ namespace Banner.Areas.Admin.Controllers
         {
             GetViewBag();
             return View(GetProductClass_JoinList(ID, PCTID, FC));
+        }
+
+        #endregion
+        #region 轉班
+        [HttpGet]
+        public string ChangeClass()
+        {
+            int ACID = GetQueryStringInInt("ACID");
+            int PCIDO = GetQueryStringInInt("PCIDO");
+            int PCIDN = GetQueryStringInInt("PCIDN");
+            var PCN = DC.Product_Class.FirstOrDefault(q => q.PCID == PCIDN);
+            var OP = DC.Order_Product.FirstOrDefault(q => q.Order_Header.ACID == ACID && q.PCID == PCIDO);
+            if (OP != null && PCN != null)
+            {
+                Log_ChangeClass LC = new Log_ChangeClass
+                {
+                    Account = OP.Order_Header.Account,
+                    OPID = OP.OPID,
+                    PCID_Old = OP.PCID,
+                    PCID_New = PCN.PCID,
+                    CreDate = DT,
+                    CreACID = GetACID()
+                };
+                DC.Log_ChangeClass.InsertOnSubmit(LC);
+                DC.SubmitChanges();
+
+                OP.Product_Class = PCN;
+                DC.SubmitChanges();
+
+                return "OK";
+            }
+            else
+                return "查無此班";
         }
 
         #endregion
@@ -3117,6 +3189,7 @@ namespace Banner.Areas.Admin.Controllers
             public string ClassTitle = "";
             public string TeacherTitle = "";
             public string Graduation = "";//結業時間
+            public bool GraduatioFlag = false;
             public cTableList cTL = new cTableList();
         }
         public cGetOrder_Info GetOrder_Info(int ID)
@@ -3133,7 +3206,7 @@ namespace Banner.Areas.Admin.Controllers
 
                 var OPaid = DC.Order_Paid.FirstOrDefault(q => q.OHID == c.OHID);
                 if (OPaid != null)
-                    c.PayType = OPaid.PayType.Title;
+                    c.PayType = sPayTypeID[OPaid.PayType.PayTypeID];
                 c.OrderType = sOrderType[OH.Order_Type];
 
                 c.OPs = new List<cGetOrder_Info_Product>();
@@ -3150,7 +3223,7 @@ namespace Banner.Areas.Admin.Controllers
                     cOP.ProductInfo = OP.Product.ProductInfo;
                     cOP.TargetInfo = OP.Product.TargetInfo;
                     cOP.GraduationInfo = OP.Product.GraduationInfo;
-
+                    cOP.GraduatioFlag = OP.Graduation_Flag;
                     var Class = DC.Product_Class.FirstOrDefault(q => q.PCID == OP.PCID);
                     if (Class != null)
                     {
@@ -3292,5 +3365,32 @@ namespace Banner.Areas.Admin.Controllers
             }
         }
         #endregion
+        #region 退刷
+
+        public void GetOrder_Cancel_Credit_Card(int ID)
+        {
+
+            Error = CancelOrder_CradCard(ID);
+
+            if (Error != "")
+                SetAlert(Error);
+
+        }
+        [HttpGet]
+        public ActionResult Order_Cancel_Credit_Card(int ID)
+        {
+            GetViewBag();
+            GetOrder_Cancel_Credit_Card(ID);
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Order_Cancel_Credit_Card(int ID, FormCollection FC = null)
+        {
+            GetViewBag();
+            GetOrder_Cancel_Credit_Card(ID);
+            return View();
+        }
+        #endregion
+
     }
 }

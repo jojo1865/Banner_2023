@@ -221,6 +221,7 @@
     <Compile Include="Areas\Web\Controllers\LeaderPlaceController.cs" />
     <Compile Include="Areas\Web\Controllers\MyClassController.cs" />
     <Compile Include="Areas\Web\Controllers\OutputController.cs" />
+    <Compile Include="Areas\Admin\Controllers\QuestionSetController.cs" />
     <Compile Include="Areas\Web\Controllers\StaffPlaceController.cs" />
     <Compile Include="Areas\Web\Controllers\TeacherController.cs" />
     <Compile Include="Areas\Web\WebAreaRegistration.cs" />
@@ -774,6 +775,8 @@
     <Content Include="Areas\Admin\Views\MessageSend\Message_Target_List.cshtml" />
     <Content Include="Areas\Web\Views\GroupPlace\GroupMeetAccount_List.cshtml" />
     <Content Include="Areas\Web\Views\AccountPlace\Message_List.cshtml" />
+    <Content Include="Areas\Admin\Views\StoreSet\Order_Cancel_Credit_Card.cshtml" />
+    <Content Include="Areas\Admin\Views\QuestionSet\Question_List.cshtml" />
     <None Include="DataClasses.dbml.layout">
       <DependentUpon>DataClasses.dbml</DependentUpon>
     </None>

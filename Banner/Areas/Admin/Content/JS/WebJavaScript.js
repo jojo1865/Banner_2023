@@ -31,9 +31,9 @@ function GetZipCode(ddl) {
     })
 }
 /*用關鍵字搜尋小組 */
-function GetOIList(ACID,txb) {
+function GetOIList(ACID, txb) {
     $.ajax({
-        url: '/Admin/Home/GetOIList?ACID='+ACID+'&Key=' + txb.value,
+        url: '/Admin/Home/GetOIList?ACID=' + ACID + '&Key=' + txb.value,
         method: 'GET',
         dataType: 'json',
         success: function (res) {
@@ -202,7 +202,7 @@ function CheckInput(ACID) {
     var sNew1 = document.getElementById('txb_New1').value;
     var sNew2 = document.getElementById('txb_New2').value;
     $.ajax({
-        url: '/Admin/Home/CheckPasswordInput?ACID=' +ACID+'&Old=' + sOld + '&New1=' + sNew1 + '&New2=' + sNew2,
+        url: '/Admin/Home/CheckPasswordInput?ACID=' + ACID + '&Old=' + sOld + '&New1=' + sNew1 + '&New2=' + sNew2,
         method: 'GET',
         dataType: 'text',
         success: function (res) {
@@ -229,7 +229,7 @@ function SetAlertNote(Msg) {
     ClearLoading();
 }
 //資料啟用/停用
-function ChangeActive(TargetControl,TableName, ID) {
+function ChangeActive(TargetControl, TableName, ID) {
     $.ajax({
         url: '/Admin/Home/ChangeActive?TableName=' + TableName + '&ID=' + ID,
         method: 'GET',
@@ -246,7 +246,7 @@ function ChangeActive(TargetControl,TableName, ID) {
         },
         error: function (err) { console.log(err) },
     })
-    
+
 }
 //資料刪除
 function DataDelete(TableName, ID) {
@@ -283,7 +283,7 @@ function ChangeTeacher(TargetControl, TID, PCID) {
             }).then((result) => {
                 location.reload();
             });
-            
+
         },
         error: function (err) { console.log(err) },
     })
